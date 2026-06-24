@@ -479,18 +479,21 @@ export default function HomePage() {
             </div>
           </ScrollReveal>
 
-          <ScrollRevealGroup className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" staggerChildren={0.1}>
+          <ScrollRevealGroup
+            className="grid items-stretch gap-5 sm:grid-cols-2 xl:grid-cols-4"
+            staggerChildren={0.1}
+          >
             {boxProducts.map((product) => {
               const productImage = getProductImage(product.images[0] ?? "")
 
               return (
-                <ScrollRevealItem key={product.id}>
+                <ScrollRevealItem key={product.id} className="h-full">
                   <GlowingCard
-                    className="shadow-xl shadow-black/20"
-                    innerClassName="bg-[#090807] p-5"
+                    className="h-full shadow-xl shadow-black/20"
+                    innerClassName="flex h-full flex-col overflow-hidden bg-[#090807] p-0"
                   >
                     {productImage ? (
-                      <div className="relative mb-4 aspect-square overflow-hidden border border-[#fffaf0]/14 bg-[#171211]">
+                      <div className="relative aspect-[4/3] shrink-0 overflow-hidden border-b border-[#fffaf0]/14 bg-[#171211]">
                         <Image
                           src={productImage}
                           alt={product.name}
@@ -501,36 +504,49 @@ export default function HomePage() {
                         />
                       </div>
                     ) : null}
-                    <div className="flex items-center justify-between gap-3">
-                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#ffb0a5]">
-                        {product.type === "box" ? "Box temática" : "Produto"}
+
+                    <div className="flex flex-1 flex-col p-5">
+                      <div className="flex items-center justify-between gap-3">
+                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#ffb0a5]">
+                          {product.type === "box" ? "Box temática" : "Produto"}
+                        </p>
+                        <span className="shrink-0 border border-[#fffaf0]/14 bg-[#171211] px-2 py-1 text-xs text-[#d7c9b5]">
+                          {product.availability === "limited" ? "Limitado" : "Disponível"}
+                        </span>
+                      </div>
+
+                      <h3 className="mt-4 line-clamp-2 min-h-14 font-heading text-lg font-semibold leading-snug">
+                        {product.name}
+                      </h3>
+
+                      <p className="mt-2 line-clamp-2 min-h-12 text-sm leading-6 text-[#d7c9b5]">
+                        {product.shortDescription}
                       </p>
-                      <span className="border border-[#fffaf0]/14 bg-[#171211] px-2 py-1 text-xs text-[#d7c9b5]">
-                        {product.availability === "limited" ? "Limitado" : "Disponível"}
-                      </span>
-                    </div>
-                    <h3 className="mt-4 font-heading text-xl font-semibold">{product.name}</h3>
-                    <p className="mt-2 min-h-12 text-sm leading-6 text-[#d7c9b5]">
-                      {product.shortDescription}
-                    </p>
-                    {product.includedItems?.length ? (
-                      <ul className="mt-4 space-y-2 text-sm text-[#e5d8c4]">
-                        {product.includedItems.slice(0, 3).map((item) => (
-                          <li key={item} className="flex gap-2">
-                            <IconCircleCheck className="mt-0.5 size-4 shrink-0 text-[#d84132]" />
-                            <span>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : null}
-                    <div className="mt-5 flex items-center justify-between gap-4">
-                      <p className="font-semibold">{formatCurrency(product.price)}</p>
-                      <Link
-                        href={`/loja/${product.slug}`}
-                        className="text-sm font-medium text-[#ffb0a5] hover:text-[#fffaf0] hover:underline"
-                      >
-                        Ver detalhes
-                      </Link>
+
+                      {product.includedItems?.length ? (
+                        <ul className="mt-4 min-h-21 space-y-2 text-sm text-[#e5d8c4]">
+                          {product.includedItems.slice(0, 3).map((item) => (
+                            <li key={item} className="flex gap-2">
+                              <IconCircleCheck className="mt-0.5 size-4 shrink-0 text-[#d84132]" />
+                              <span className="line-clamp-1">{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <div className="mt-4 min-h-21" aria-hidden="true" />
+                      )}
+
+                      <div className="mt-auto flex items-center justify-between gap-4 border-t border-[#fffaf0]/10 pt-4">
+                        <p className="font-heading text-lg font-semibold">
+                          {formatCurrency(product.price)}
+                        </p>
+                        <Link
+                          href={`/loja/${product.slug}`}
+                          className="shrink-0 text-sm font-medium text-[#ffb0a5] hover:text-[#fffaf0] hover:underline"
+                        >
+                          Ver detalhes
+                        </Link>
+                      </div>
                     </div>
                   </GlowingCard>
                 </ScrollRevealItem>
