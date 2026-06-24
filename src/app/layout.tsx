@@ -1,8 +1,8 @@
 import { Geist, Geist_Mono, Inter, Roboto_Slab } from "next/font/google"
 
 import "./globals.css"
-import { ThemeProvider } from "@/components/theme-provider"
-import { cn } from "@/lib/utils";
+import { ThemeProvider } from "@/src/components/theme-provider"
+import { cn } from "@/src/lib/utils";
 
 const robotoSlabHeading = Roboto_Slab({subsets:['latin'],variable:'--font-heading'});
 
