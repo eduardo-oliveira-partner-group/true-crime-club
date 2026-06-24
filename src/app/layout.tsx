@@ -1,3 +1,4 @@
+import type { Metadata } from "next"
 import { Geist_Mono, Inter, Roboto_Slab } from "next/font/google"
 
 import "./globals.css"
@@ -12,6 +13,13 @@ const fontMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
 })
+
+export const metadata: Metadata = {
+  title: {
+    default: "True Crime Club",
+    template: "%s | True Crime Club",
+  },
+}
 
 export default function RootLayout({
   children,
