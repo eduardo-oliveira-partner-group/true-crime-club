@@ -15,7 +15,8 @@ import {
 } from "@tabler/icons-react"
 
 import { Button } from "@/src/components/ui/button"
-import { GlowingCard, GlowingFeatureCard } from "@/src/components/ui/glowing-card"
+import { EncryptedText } from "@/src/components/ui/encrypted-text"
+import { GlowingCard } from "@/src/components/ui/glowing-card"
 import {
   ScrollReveal,
   ScrollRevealGroup,
@@ -89,6 +90,14 @@ const trustItems = [
 ]
 
 const heroWordAngles = ["-rotate-1", "rotate-1", "-rotate-2", "rotate-0"]
+const heroPaperCuts = [
+  "[clip-path:polygon(1%_8%,99%_0,98%_86%,3%_100%)]",
+  "[clip-path:polygon(0_7%,97%_4%,100%_92%,2%_96%)]",
+  "[clip-path:polygon(2%_3%,100%_9%,98%_96%,0_91%)]",
+  "[clip-path:polygon(0_10%,98%_2%,100%_90%,1%_100%)]",
+]
+const heroTitleRevealDelayMs = 72
+const heroTitleWordOverlap = 0.8
 
 export default function HomePage() {
   const heroTitle = getDynamicContent("home.hero.title")
@@ -116,7 +125,7 @@ export default function HomePage() {
           className="absolute inset-0 -z-20 object-cover object-[68%_center]"
         />
         <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,#090807_0%,rgba(9,8,7,0.96)_24%,rgba(9,8,7,0.62)_52%,rgba(9,8,7,0.18)_100%)]" />
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_18%_20%,rgba(216,65,50,0.22),transparent_24%),linear-gradient(90deg,rgba(255,250,240,0.035)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.035)_1px,transparent_1px)] bg-[size:auto,42px_42px,42px_42px]" />
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_18%_20%,rgba(216,65,50,0.22),transparent_24%),linear-gradient(90deg,rgba(255,250,240,0.035)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.035)_1px,transparent_1px)] bg-size-[auto,42px_42px,42px_42px]" />
 
         <div className="mx-auto flex min-h-[720px] max-w-6xl items-center px-4 py-16 sm:px-6 lg:min-h-[760px]">
           <div className="max-w-3xl space-y-7">
@@ -130,18 +139,44 @@ export default function HomePage() {
             <div className="space-y-5">
               <ScrollReveal immediate delay={0.15} y={20}>
                 <h1
-                  className="flex max-w-3xl flex-wrap items-start gap-x-3 gap-y-2 font-heading text-4xl font-black uppercase leading-[0.95] tracking-wide text-[#171211] sm:text-6xl lg:text-7xl"
+                  className="flex max-w-3xl flex-col items-start gap-y-3 font-heading text-4xl font-black uppercase leading-[0.95] tracking-wide text-[#171211] sm:text-6xl lg:text-7xl"
                   aria-label={heroTitle?.value ?? "Investigue. Colete. Desvende."}
                 >
-                  {titleWords.map((word, index) => (
-                    <span
-                      key={`${word}-${index}`}
-                      aria-hidden="true"
-                      className={`${heroWordAngles[index % heroWordAngles.length]} inline-block border border-[#fffaf0]/70 bg-[#fffaf0] px-2 pb-1 pt-0.5 shadow-[0_0_0_1px_rgba(26,18,17,0.35),0_0_22px_rgba(123,83,255,0.42)]`}
-                    >
-                      {word}
-                    </span>
-                  ))}
+                  {titleWords.map((word, index) => {
+                    const startDelayMs = titleWords
+                      .slice(0, index)
+                      .reduce(
+                        (total, prevWord) =>
+                          total +
+                          prevWord.length *
+                            heroTitleRevealDelayMs *
+                            heroTitleWordOverlap,
+                        0,
+                      )
+
+                    return (
+                      <span
+                        key={`${word}-${index}`}
+                        aria-hidden="true"
+                        className={`${heroWordAngles[index % heroWordAngles.length]} relative isolate inline-flex w-fit max-w-full items-center overflow-visible`}
+                      >
+                        <span
+                          className={`${heroPaperCuts[index % heroPaperCuts.length]} relative inline-flex items-center border border-[#d9ccb2]/85 bg-[radial-gradient(circle_at_18%_25%,rgba(107,77,42,0.16)_0_1px,transparent_1.4px),radial-gradient(circle_at_78%_68%,rgba(38,25,17,0.1)_0_1px,transparent_1.3px),linear-gradient(96deg,#fffdf2_0%,#f3ead7_46%,#fffbec_100%)] bg-size-[9px_9px,11px_11px,100%_100%] px-[0.18em] pb-[0.12em] pt-[0.03em] shadow-[0_13px_2px_-10px_rgba(0,0,0,0.78),0_2px_0_rgba(28,19,14,0.6),0_0_0_1px_rgba(255,250,229,0.42)_inset]`}
+                        >
+                          <span className="pointer-events-none absolute inset-x-3 bottom-1 h-px bg-[#171211]/80" />
+                          <EncryptedText
+                            text={word}
+                            className="relative z-10 drop-shadow-[0_1px_0_rgba(255,255,255,0.2)]"
+                            encryptedClassName="text-[#81746b]"
+                            revealedClassName="bg-[radial-gradient(circle_at_35%_40%,rgba(23,18,17,0.88)_0_0.9px,transparent_1.25px),linear-gradient(95deg,#15100f,#332a25_52%,#16110f)] bg-size-[4px_4px,100%_100%] bg-clip-text text-transparent [-webkit-text-stroke:1.2px_rgba(23,18,17,0.84)] [paint-order:stroke_fill]"
+                            revealDelayMs={heroTitleRevealDelayMs}
+                            flipDelayMs={65}
+                            startDelayMs={startDelayMs}
+                          />
+                        </span>
+                      </span>
+                    )
+                  })}
                 </h1>
               </ScrollReveal>
               <TextGenerateEffect
@@ -219,53 +254,82 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="border-b border-[#fffaf0]/10 bg-[#090807]">
-        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-14 sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
-          <div className="space-y-4">
+      <section className="relative isolate overflow-hidden border-b border-[#fffaf0]/10 bg-[#0b0908]">
+        <div className="absolute inset-0 -z-20 bg-[radial-gradient(circle_at_18%_22%,rgba(216,65,50,0.2),transparent_28%),radial-gradient(circle_at_80%_12%,rgba(215,181,109,0.12),transparent_30%),linear-gradient(135deg,#0b0908_0%,#130d0b_46%,#090807_100%)]" />
+        <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.035)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.035)_1px,transparent_1px)] bg-size-[56px_56px]" />
+        <div className="absolute left-0 top-10 -z-10 h-px w-full bg-linear-to-r from-transparent via-[#d7b56d]/35 to-transparent" />
+
+        <div className="mx-auto flex max-w-6xl flex-col gap-10 px-4 py-16 sm:px-6 lg:py-24">
+          <div className="mx-auto max-w-4xl space-y-4 text-center">
             <ScrollReveal>
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#d7b56d]">
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#d7b56d]">
                 O que é o Club?
               </p>
             </ScrollReveal>
             <ScrollReveal delay={0.08}>
-              <h2 className="font-heading text-3xl font-semibold tracking-tight sm:text-4xl">
-                Uma caixa mensal para quem gosta de investigar detalhes.
+              <h2 className="font-heading text-4xl font-black uppercase leading-[0.95] tracking-wide text-[#fffaf0] sm:text-5xl lg:text-6xl">
+                Uma caixa mensal para investigar, colecionar e pertencer.
               </h2>
             </ScrollReveal>
             <TextGenerateEffect
               words="A experiência combina produto físico, narrativa colecionável e conteúdo digital. Cada entrega funciona como uma nova página do arquivo: você recebe itens para usar, guardar e conectar com as pistas do caso em andamento."
-              textClassName="text-base leading-7 text-[#d7c9b5]"
+              textClassName="mx-auto max-w-3xl text-base leading-7 text-[#d7c9b5]"
               staggerDelay={0.05}
             />
-            <ScrollReveal delay={0.15}>
-              <Button
-                asChild
-                variant="outline"
-                className="border-[#fffaf0]/25 bg-transparent text-[#fffaf0] hover:bg-[#fffaf0]/12 hover:text-[#fffaf0]"
-              >
-                <Link href="/assinatura">
-                  Conhecer planos
-                  <IconArrowRight className="size-4" />
-                </Link>
-              </Button>
-            </ScrollReveal>
           </div>
 
-          <ScrollRevealGroup className="grid gap-3 sm:grid-cols-2" staggerChildren={0.1}>
-            {clubHighlights.map((feature) => {
-              const Icon = feature.icon
-              return (
-                <ScrollRevealItem key={feature.title}>
-                  <GlowingFeatureCard
-                    className="transition-transform hover:-translate-y-1 hover:border-[#fffaf0]/22"
-                    icon={<Icon className="size-5" />}
-                    title={feature.title}
-                    description={feature.description}
-                  />
-                </ScrollRevealItem>
-              )
-            })}
-          </ScrollRevealGroup>
+          <div className="space-y-6">
+            <ScrollRevealGroup
+              className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
+              staggerChildren={0.08}
+            >
+              {clubHighlights.map((feature, index) => {
+                const Icon = feature.icon
+                return (
+                  <ScrollRevealItem key={feature.title}>
+                    <GlowingCard
+                      className="min-h-[258px] transition-transform duration-300 hover:-translate-y-1"
+                      innerClassName="group relative h-full overflow-hidden bg-[#171211]/84 p-5 transition-colors duration-300 hover:bg-[#1e1512]"
+                    >
+                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(216,65,50,0.12),transparent_30%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                      <div className="relative flex h-full flex-col">
+                        <span className="absolute right-0 top-0 font-heading text-4xl font-black text-[#fffaf0]/5">
+                          0{index + 1}
+                        </span>
+                        <div className="flex size-10 items-center justify-center bg-[#d84132] text-white shadow-[0_0_26px_rgba(216,65,50,0.24)]">
+                          <Icon className="size-5" />
+                        </div>
+                        <h3 className="mt-5 font-heading text-lg font-semibold">
+                          {feature.title}
+                        </h3>
+                        <p className="mt-2 text-sm leading-6 text-[#d7c9b5]">
+                          {feature.description}
+                        </p>
+                        <div className="mt-auto pt-5">
+                          <div className="h-px w-full bg-linear-to-r from-[#d84132]/60 via-[#d7b56d]/35 to-transparent opacity-55 transition-opacity group-hover:opacity-100" />
+                        </div>
+                      </div>
+                    </GlowingCard>
+                  </ScrollRevealItem>
+                )
+              })}
+            </ScrollRevealGroup>
+
+            <ScrollReveal delay={0.15}>
+              <div className="mx-auto max-w-md">
+                <Button
+                  asChild
+                  variant="outline"
+                  className="h-12 w-full justify-between border-[#fffaf0]/18 bg-[#fffaf0]/6 px-5 text-[#fffaf0] hover:bg-[#fffaf0]/12 hover:text-[#fffaf0]"
+                >
+                  <Link href="/assinatura">
+                    Conhecer planos
+                    <IconArrowRight className="size-4" />
+                  </Link>
+                </Button>
+              </div>
+            </ScrollReveal>
+          </div>
         </div>
       </section>
 
@@ -451,7 +515,7 @@ export default function HomePage() {
                 className="absolute inset-0 -z-20 object-cover object-[68%_center]"
               />
               <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(9,8,7,0.96)_0%,rgba(9,8,7,0.86)_38%,rgba(9,8,7,0.38)_68%,rgba(9,8,7,0.18)_100%)]" />
-              <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.04)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.04)_1px,transparent_1px)] bg-[size:42px_42px,42px_42px]" />
+              <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.04)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.04)_1px,transparent_1px)] bg-size-[42px_42px,42px_42px]" />
 
               <div className="flex min-h-[300px] max-w-xl flex-col justify-center space-y-4 lg:min-h-[356px]">
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#d7b56d]">
@@ -493,7 +557,7 @@ export default function HomePage() {
                     innerClassName="flex h-full flex-col overflow-hidden bg-[#090807] p-0"
                   >
                     {productImage ? (
-                      <div className="relative aspect-[4/3] shrink-0 overflow-hidden border-b border-[#fffaf0]/14 bg-[#171211]">
+                      <div className="relative aspect-4/3 shrink-0 overflow-hidden border-b border-[#fffaf0]/14 bg-[#171211]">
                         <Image
                           src={productImage}
                           alt={product.name}
