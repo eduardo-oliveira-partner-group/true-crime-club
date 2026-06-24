@@ -503,16 +503,29 @@ export const mockDynamicContent: DynamicContentBlock[] = [
     route: "/",
   },
   {
+    key: "home.hero.badge",
+    type: "text",
+    value: "Primeiro Clube de True Crime do Brasil",
+    route: "/",
+  },
+  {
     key: "home.hero.subtitle",
     type: "text",
     value:
-      "O clube de assinatura que envia mensalmente uma box temática de true crime com curadoria exclusiva, surpresa e uma trama investigativa contínua.",
+      "Eleve seu nível de conteúdo com uma caixa temática mensal, recheada de surpresas exclusivas — da abertura ao design impecável de cada item colecionável.",
     route: "/",
   },
   {
     key: "home.hero.cta",
     type: "text",
-    value: "Assine agora",
+    value: "Garantir minha vaga",
+    route: "/",
+  },
+  {
+    key: "home.final_cta.subtitle",
+    type: "text",
+    value:
+      "Garanta sua vaga no clube antes que a próxima edição esgote. A próxima pista já está sendo preparada.",
     route: "/",
   },
   {

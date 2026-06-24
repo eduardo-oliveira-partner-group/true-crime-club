@@ -1,11 +1,15 @@
 import type { Metadata } from "next"
-import { Geist_Mono, Inter, Roboto_Slab } from "next/font/google"
+import { Geist_Mono, Inter, Libre_Baskerville } from "next/font/google"
 
 import "./globals.css"
 import { ThemeProvider } from "@/src/components/theme-provider"
 import { cn } from "@/src/lib/utils";
 
-const robotoSlabHeading = Roboto_Slab({subsets:['latin'],variable:'--font-heading'});
+const libreBaskervilleHeading = Libre_Baskerville({
+  subsets: ["latin"],
+  weight: ["700"],
+  variable: "--font-heading",
+})
 
 const inter = Inter({subsets:['latin'],variable:'--font-sans'})
 
@@ -30,7 +34,13 @@ export default function RootLayout({
     <html
       lang="pt-BR"
       suppressHydrationWarning
-      className={cn("antialiased", fontMono.variable, "font-sans", inter.variable, robotoSlabHeading.variable)}
+      className={cn(
+        "antialiased",
+        fontMono.variable,
+        "font-sans",
+        inter.variable,
+        libreBaskervilleHeading.variable,
+      )}
     >
       <body>
         <ThemeProvider>{children}</ThemeProvider>

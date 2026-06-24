@@ -2,6 +2,7 @@ import Image from "next/image"
 import Link from "next/link"
 import {
   IconArrowRight,
+  IconBook,
   IconBoxSeam,
   IconCalendarEvent,
   IconChecklist,
@@ -9,9 +10,13 @@ import {
   IconClipboardText,
   IconCreditCard,
   IconFingerprint,
+  IconHome,
+  IconNotebook,
   IconPackage,
   IconShieldCheck,
+  IconShirt,
   IconSparkles,
+  IconUsers,
 } from "@tabler/icons-react"
 
 import { Button } from "@/src/components/ui/button"
@@ -24,6 +29,7 @@ import {
 } from "@/src/components/ui/scroll-reveal"
 import { TextGenerateEffect } from "@/src/components/ui/text-generate-effect"
 import heroBanner from "@/src/assets/images/banner-hero-v2.png"
+import investigationContinuousBg from "@/src/assets/images/investigation-continuous-bg.png"
 import previousBoxesBanner from "@/src/assets/images/perdeu-as-caixas-anteriores-v2.png"
 import {
   getActiveCase,
@@ -32,7 +38,7 @@ import {
   listPlans,
   listProducts,
 } from "@/src/lib/domain/repositories"
-import { formatCurrency } from "@/src/lib/formatters"
+import { formatCurrency, formatDate } from "@/src/lib/formatters"
 import { getProductImage } from "@/src/lib/product-images"
 
 const clubHighlights = [
@@ -40,25 +46,58 @@ const clubHighlights = [
     icon: IconBoxSeam,
     title: "Box temática mensal",
     description:
-      "Uma curadoria surpresa com itens colecionáveis, papelaria premium, decoração e acessórios inspirados no universo true crime.",
+      "Todo mês, sua caixa chega como um presente exclusivo — surpresas pensadas por quem vive true crime e cuida de cada detalhe.",
   },
   {
     icon: IconFingerprint,
     title: "Pistas colecionáveis",
     description:
-      "Cada ciclo libera uma nova evidência da investigação fictícia do ano, criada para ser acompanhada com a comunidade.",
+      "A cada edição, uma nova pista do caso fictício do ano: dicas, evidências e documentos que se acumulam até a revelação final.",
   },
   {
     icon: IconClipboardText,
     title: "Conteúdos exclusivos",
     description:
-      "Arquivos, registros e materiais digitais para aprofundar teorias e conectar os detalhes entre uma box e outra.",
+      "Trechos de livros raros, vídeos especiais e materiais digitais reservados a quem está dentro do clube.",
   },
   {
     icon: IconSparkles,
     title: "Edições limitadas",
     description:
-      "Produtos avulsos, extras e lançamentos especiais para completar a coleção ou presentear quem também ama mistério.",
+      "Boxes avulsas, extras e lançamentos especiais para completar a coleção ou presentear quem também ama mistério.",
+  },
+]
+
+const boxCategories = [
+  {
+    icon: IconSparkles,
+    title: "Itens colecionáveis",
+    description:
+      "Peças exclusivas inspiradas nas séries, filmes e casos que você mais ama — objetos de tirar o fôlego.",
+  },
+  {
+    icon: IconNotebook,
+    title: "Papelaria premium",
+    description:
+      "Blocos estilosos, cadernos de alta qualidade e planners temáticos para suas anotações investigativas.",
+  },
+  {
+    icon: IconHome,
+    title: "Decoração e utilidades",
+    description:
+      "Pôsteres impactantes, quadros colecionáveis e itens de cozinha e organização com aquele toque misterioso.",
+  },
+  {
+    icon: IconShirt,
+    title: "Moda true crime",
+    description:
+      "Camisetas, blusas confortáveis, chinelos e acessórios para exibir sua paixão pelo gênero.",
+  },
+  {
+    icon: IconBook,
+    title: "Conteúdo exclusivo",
+    description:
+      "Trechos de livros raros, vídeos especiais e materiais digitais que só assinantes recebem.",
   },
 ]
 
@@ -83,9 +122,9 @@ const howItWorks = [
 ]
 
 const trustItems = [
-  "Curadoria temática",
+  "Primeiro clube do Brasil",
   "Pistas mensais",
-  "Conteúdo exclusivo",
+  "Evento ao vivo com a comunidade",
   "Cancelamento flexível",
 ]
 
@@ -101,8 +140,10 @@ const heroTitleWordOverlap = 0.8
 
 export default function HomePage() {
   const heroTitle = getDynamicContent("home.hero.title")
+  const heroBadge = getDynamicContent("home.hero.badge")
   const heroSubtitle = getDynamicContent("home.hero.subtitle")
   const heroCta = getDynamicContent("home.hero.cta")
+  const finalCtaSubtitle = getDynamicContent("home.final_cta.subtitle")
   const trustSupport = getDynamicContent("home.trust.support")
   const featuredProducts = listProducts({ featured: true })
   const boxProducts = listProducts().filter((product) => product.type === "box")
@@ -111,6 +152,9 @@ export default function HomePage() {
   const progress = activeCase ? getSubscriberProgress(activeCase.id) : null
   const featuredBox = featuredProducts.find((product) => product.type === "box")
   const titleWords = (heroTitle?.value ?? "Investigue. Colete. Desvende.").split(" ")
+  const liveEventDate = progress?.liveEventDate ?? activeCase?.liveEventDate
+  const liveEventTitle =
+    progress?.liveEventTitle ?? activeCase?.liveEventTitle ?? "Grande Revelação"
 
   return (
     <div className="bg-[#090807] text-[#fffaf0]">
@@ -132,7 +176,9 @@ export default function HomePage() {
             <ScrollReveal immediate delay={0.05}>
               <div className="inline-flex max-w-full items-center gap-2 border border-[#d84132]/45 bg-[#2c1713]/80 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-[#ffb0a5] shadow-[0_0_24px_rgba(216,65,50,0.18)]">
                 <IconFingerprint className="size-4 shrink-0" />
-                <span>Clube de assinatura investigativo</span>
+                <span>
+                  {heroBadge?.value ?? "Primeiro Clube de True Crime do Brasil"}
+                </span>
               </div>
             </ScrollReveal>
 
@@ -161,7 +207,7 @@ export default function HomePage() {
                         className={`${heroWordAngles[index % heroWordAngles.length]} relative isolate inline-flex w-fit max-w-full items-center overflow-visible`}
                       >
                         <span
-                          className={`${heroPaperCuts[index % heroPaperCuts.length]} relative inline-flex items-center border border-[#d9ccb2]/85 bg-[radial-gradient(circle_at_18%_25%,rgba(107,77,42,0.16)_0_1px,transparent_1.4px),radial-gradient(circle_at_78%_68%,rgba(38,25,17,0.1)_0_1px,transparent_1.3px),linear-gradient(96deg,#fffdf2_0%,#f3ead7_46%,#fffbec_100%)] bg-size-[9px_9px,11px_11px,100%_100%] px-[0.18em] pb-[0.12em] pt-[0.03em] shadow-[0_13px_2px_-10px_rgba(0,0,0,0.78),0_2px_0_rgba(28,19,14,0.6),0_0_0_1px_rgba(255,250,229,0.42)_inset]`}
+                          className={`${heroPaperCuts[index % heroPaperCuts.length]} relative inline-flex items-center border border-[#d9ccb2]/85 bg-[radial-gradient(circle_at_18%_25%,rgba(107,77,42,0.16)_0_1px,transparent_1.4px),radial-gradient(circle_at_78%_68%,rgba(38,25,17,0.1)_0_1px,transparent_1.3px),linear-gradient(96deg,#fffdf2_0%,#f3ead7_46%,#fffbec_100%)] bg-size-[9px_9px,11px_11px,100%_100%] px-[0.22em] py-[0.12em] shadow-[0_13px_2px_-10px_rgba(0,0,0,0.78),0_2px_0_rgba(28,19,14,0.6),0_0_0_1px_rgba(255,250,229,0.42)_inset]`}
                         >
                           <span className="pointer-events-none absolute inset-x-3 bottom-1 h-px bg-[#171211]/80" />
                           <EncryptedText
@@ -183,7 +229,7 @@ export default function HomePage() {
                 immediate
                 words={
                   heroSubtitle?.value ??
-                  "O clube de assinatura que envia mensalmente uma box temática de true crime com curadoria exclusiva, surpresa e uma trama investigativa contínua."
+                  "Eleve seu nível de conteúdo com uma caixa temática mensal, recheada de surpresas exclusivas — da abertura ao design impecável de cada item colecionável."
                 }
                 textClassName="max-w-2xl bg-black/28 py-1 text-lg leading-8 text-[#f0e2c5] [box-decoration-break:clone] sm:text-xl"
                 staggerDelay={0.04}
@@ -198,7 +244,7 @@ export default function HomePage() {
                   className="bg-[#d84132] text-white shadow-[0_0_26px_rgba(216,65,50,0.35)] hover:bg-[#b93227]"
                 >
                   <Link href="/assinatura">
-                    {heroCta?.value ?? "Assine agora"}
+                    {heroCta?.value ?? "Garantir minha vaga"}
                     <IconArrowRight className="size-4" />
                   </Link>
                 </Button>
@@ -257,7 +303,7 @@ export default function HomePage() {
       <section className="relative isolate overflow-hidden border-b border-[#fffaf0]/10 bg-[#0b0908]">
         <div className="absolute inset-0 -z-20 bg-[radial-gradient(circle_at_18%_22%,rgba(216,65,50,0.2),transparent_28%),radial-gradient(circle_at_80%_12%,rgba(215,181,109,0.12),transparent_30%),linear-gradient(135deg,#0b0908_0%,#130d0b_46%,#090807_100%)]" />
         <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.035)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.035)_1px,transparent_1px)] bg-size-[56px_56px]" />
-        <div className="absolute left-0 top-10 -z-10 h-px w-full bg-linear-to-r from-transparent via-[#d7b56d]/35 to-transparent" />
+        {/* <div className="absolute left-0 top-10 -z-10 h-px w-full bg-linear-to-r from-transparent via-[#d7b56d]/35 to-transparent" /> */}
 
         <div className="mx-auto flex max-w-6xl flex-col gap-10 px-4 py-16 sm:px-6 lg:py-24">
           <div className="mx-auto max-w-4xl space-y-4 text-center">
@@ -267,15 +313,38 @@ export default function HomePage() {
               </p>
             </ScrollReveal>
             <ScrollReveal delay={0.08}>
-              <h2 className="font-heading text-4xl font-black uppercase leading-[0.95] tracking-wide text-[#fffaf0] sm:text-5xl lg:text-6xl">
-                Uma caixa mensal para investigar, colecionar e pertencer.
+              <h2 className="mx-auto max-w-2xl font-heading text-3xl font-black uppercase leading-[1.15] tracking-wide text-[#fffaf0] sm:text-4xl">
+                Muito além de uma caixa.
+                <br />
+                <span className="text-[#d7b56d]">
+                  Uma imersão mensal
+                  <br />
+                  em true crime.
+                </span>
               </h2>
             </ScrollReveal>
             <TextGenerateEffect
-              words="A experiência combina produto físico, narrativa colecionável e conteúdo digital. Cada entrega funciona como uma nova página do arquivo: você recebe itens para usar, guardar e conectar com as pistas do caso em andamento."
+              words="Unimos qualidade e conteúdo para quem busca profundidade e exclusividade no universo true crime. Cada entrega é uma experiência completa — da abertura da caixa ao design impecável de cada item colecionável."
               textClassName="mx-auto max-w-3xl text-base leading-7 text-[#d7c9b5]"
               staggerDelay={0.05}
             />
+            <ScrollReveal delay={0.12}>
+              <div className="mx-auto flex max-w-2xl items-start gap-4 border border-[#fffaf0]/12 bg-[#171211]/60 p-5 text-left sm:p-6">
+                <div className="flex size-10 shrink-0 items-center justify-center bg-[#d84132]/20 text-[#ffb0a5]">
+                  <IconUsers className="size-5" />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#d7b56d]">
+                    Curadoria com paixão
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-[#d7c9b5]">
+                    Todo mês, sua caixa chega cheia de surpresas pensadas por designers
+                    que vivem true crime e colocam o coração em cada detalhe — do
+                    conceito ao acabamento final.
+                  </p>
+                </div>
+              </div>
+            </ScrollReveal>
           </div>
 
           <div className="space-y-6">
@@ -296,9 +365,7 @@ export default function HomePage() {
                         <span className="absolute right-0 top-0 font-heading text-4xl font-black text-[#fffaf0]/5">
                           0{index + 1}
                         </span>
-                        <div className="flex size-10 items-center justify-center bg-[#d84132] text-white shadow-[0_0_26px_rgba(216,65,50,0.24)]">
-                          <Icon className="size-5" />
-                        </div>
+                        <Icon className="size-10 text-[#d84132] drop-shadow-[0_0_26px_rgba(216,65,50,0.24)]" />
                         <h3 className="mt-5 font-heading text-lg font-semibold">
                           {feature.title}
                         </h3>
@@ -333,92 +400,225 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="border-b border-[#fffaf0]/10 bg-[#171211]">
-        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-14 sm:px-6 lg:grid-cols-[1.12fr_0.88fr] lg:items-center">
-          <div className="space-y-5">
+      <section className="border-b border-[#fffaf0]/10 bg-[#090807]">
+        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-20">
+          <div className="mx-auto mb-10 max-w-3xl space-y-4 text-center">
             <ScrollReveal>
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#d7b56d]">
-                Investigação contínua
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#d7b56d]">
+                O que vem na caixa
               </p>
             </ScrollReveal>
             <ScrollReveal delay={0.08}>
-              <h2 className="max-w-3xl font-heading text-3xl font-semibold tracking-tight sm:text-4xl">
-                Uma pista por mês, um caso inteiro para desvendar ao longo do ano.
+              <h2 className="font-heading text-3xl font-semibold tracking-tight sm:text-4xl">
+                O que você vai encontrar dentro da sua box?
               </h2>
             </ScrollReveal>
             <TextGenerateEffect
-              words="Além dos itens da box, assinantes acompanham uma trama fictícia com documentos, registros e evidências digitais. O caso avança em ciclos e termina em um evento ao vivo com a comunidade."
-              textClassName="max-w-3xl text-base leading-7 text-[#d7c9b5]"
-              staggerDelay={0.05}
+              words="Cada edição traz uma curadoria surpresa com itens das categorias abaixo — selecionados e combinados para manter exclusividade e fator surpresa a cada entrega."
+              textClassName="mx-auto max-w-2xl text-sm leading-6 text-[#d7c9b5]"
+              staggerDelay={0.04}
             />
           </div>
 
-          <ScrollReveal delay={0.12}>
-            <GlowingCard innerClassName="bg-[#090807] p-5 text-[#fffaf0]">
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-[#d7b56d]">
-                    Progresso atual
+          <ScrollRevealGroup
+            className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5"
+            staggerChildren={0.07}
+          >
+            {boxCategories.map((category, index) => {
+              const Icon = category.icon
+              return (
+                <ScrollRevealItem key={category.title}>
+                  <GlowingCard
+                    className="h-full"
+                    innerClassName="group relative h-full bg-[#171211] p-5"
+                  >
+                    <span className="absolute right-3 top-3 font-heading text-2xl font-black text-[#fffaf0]/5">
+                      0{index + 1}
+                    </span>
+                    <Icon className="size-9 text-[#d84132]" />
+                    <h3 className="mt-4 font-heading text-base font-semibold leading-snug">
+                      {category.title}
+                    </h3>
+                    <p className="mt-2 text-sm leading-6 text-[#d7c9b5]">
+                      {category.description}
+                    </p>
+                  </GlowingCard>
+                </ScrollRevealItem>
+              )
+            })}
+          </ScrollRevealGroup>
+
+          <ScrollReveal delay={0.15}>
+            <div className="mx-auto mt-8 max-w-3xl border border-[#d7b56d]/25 bg-[#171211]/80 p-5 sm:p-6">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#d7b56d]">
+                Nota do arquivo
+              </p>
+              <p className="mt-3 text-sm leading-6 text-[#d7c9b5]">
+                Para garantir exclusividade e fator surpresa, cada edição conta com uma{" "}
+                <strong className="font-medium text-[#e5d8c4]">
+                  seleção de alguns itens
+                </strong>{" "}
+                das categorias acima, variando a cada mês. Você não receberá todos os
+                tipos de itens em uma única entrega — e sim uma curadoria especial e
+                inédita a cada ciclo.
+              </p>
+            </div>
+          </ScrollReveal>
+        </div>
+      </section>
+
+      <section className="relative isolate overflow-hidden border-y border-[#fffaf0]/10 bg-[#050403]">
+        <Image
+          src={investigationContinuousBg}
+          alt=""
+          fill
+          placeholder="blur"
+          sizes="100vw"
+          className="absolute inset-0 -z-20 object-cover object-center"
+        />
+        <div className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(5,4,3,0.72)_0%,rgba(5,4,3,0.55)_45%,rgba(5,4,3,0.82)_100%),linear-gradient(90deg,rgba(5,4,3,0.88)_0%,rgba(5,4,3,0.35)_42%,rgba(5,4,3,0.2)_100%)]" />
+
+        <div className="relative z-10 mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-20">
+          <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14 xl:gap-16">
+            <div className="space-y-6 lg:max-w-xl">
+              <div className="flex items-center gap-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#d7b56d]">
+                  Investigação contínua
+                </p>
+                <span className="hidden h-px flex-1 bg-[#d7b56d]/55 sm:block" />
+              </div>
+
+              <h2 className="font-heading text-3xl font-black leading-tight text-[#f0e8dd] sm:text-4xl lg:text-[2.75rem] lg:leading-[1.08] xl:text-5xl">
+                Uma pista por mês. Um caso inteiro para desvendar.
+              </h2>
+
+              <p className="max-w-lg text-base leading-7 text-[#c8bdad] sm:text-lg sm:leading-8">
+                Receba dicas, evidências, documentos e revelações que se acumulam ao
+                longo do ano — até desvendar o crime juntos, em tempo real, com toda a
+                comunidade do clube.
+              </p>
+
+              {liveEventDate ? (
+                <div className="max-w-lg border border-[#b98542]/40 bg-[#070604]/75 p-4 backdrop-blur-sm sm:p-5">
+                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#d7b56d]">
+                    Evento ao vivo
                   </p>
-                  <h3 className="mt-2 font-heading text-2xl font-semibold">
+                  <p className="mt-2 font-heading text-lg font-semibold text-[#f0e8dd]">
+                    {liveEventTitle}
+                  </p>
+                  <p className="mt-1 text-sm leading-6 text-[#c8bdad]">
+                    {formatDate(liveEventDate)} — revelação final com a comunidade
+                  </p>
+                </div>
+              ) : null}
+            </div>
+
+            <div className="border border-[#b98542]/55 bg-[#070604]/82 p-6 text-[#f0e8dd] shadow-[0_24px_64px_rgba(0,0,0,0.45)] backdrop-blur-sm sm:p-8 lg:mx-auto lg:w-full lg:max-w-md xl:max-w-lg">
+              <div className="relative">
+                <IconCalendarEvent className="absolute right-0 top-0 size-10 text-[#e24132] sm:size-11" />
+                <div className="pr-14">
+                  <p className="text-xs font-semibold uppercase tracking-[0.27em] text-[#d7b56d] sm:text-sm">
+                    Progresso do caso
+                  </p>
+                  <h3 className="mt-4 font-heading text-3xl font-black leading-tight text-[#f0e8dd] sm:text-4xl">
                     {progress ? `${progress.percentComplete}% investigado` : "Caso aberto"}
                   </h3>
                 </div>
-                <IconCalendarEvent className="size-9 text-[#d84132]" />
+
+                <div className="mt-8 h-px bg-[#a78a5a]/35" />
+
+                <div className="grid grid-cols-3 border-b border-[#a78a5a]/35 py-6 text-center sm:py-8">
+                  <div className="border-r border-[#a78a5a]/35 px-2 sm:px-3">
+                    <p className="font-heading text-3xl font-black leading-none sm:text-4xl">
+                      {progress?.currentCycle ?? 1}
+                    </p>
+                    <p className="mt-2 text-sm text-[#c8bdad] sm:text-base">ciclo</p>
+                  </div>
+                  <div className="border-r border-[#a78a5a]/35 px-2 sm:px-3">
+                    <p className="font-heading text-3xl font-black leading-none sm:text-4xl">
+                      {progress?.collectedClues ?? 0}
+                    </p>
+                    <p className="mt-2 text-sm text-[#c8bdad] sm:text-base">pistas</p>
+                  </div>
+                  <div className="px-2 sm:px-3">
+                    <p className="font-heading text-3xl font-black leading-none sm:text-4xl">
+                      {activeCase?.totalClues ?? progress?.totalClues ?? 12}
+                    </p>
+                    <p className="mt-2 text-sm text-[#c8bdad] sm:text-base">no ano</p>
+                  </div>
+                </div>
+
+                <Button
+                  asChild
+                  size="lg"
+                  className="mt-6 w-full bg-[#d84132] text-white shadow-[0_0_26px_rgba(216,65,50,0.35)] hover:bg-[#b93227] sm:mt-8"
+                >
+                  <Link href="/assinatura">
+                    Garantir minha vaga no clube
+                    <IconArrowRight className="size-4" />
+                  </Link>
+                </Button>
               </div>
-              <div className="mt-6 grid grid-cols-3 border border-[#fffaf0]/12 text-center">
-                <div className="border-r border-[#fffaf0]/12 p-4">
-                  <p className="font-heading text-2xl font-semibold">
-                    {progress?.currentCycle ?? 1}
-                  </p>
-                  <p className="mt-1 text-xs text-[#d7c9b5]">ciclo</p>
-                </div>
-                <div className="border-r border-[#fffaf0]/12 p-4">
-                  <p className="font-heading text-2xl font-semibold">
-                    {progress?.collectedClues ?? 0}
-                  </p>
-                  <p className="mt-1 text-xs text-[#d7c9b5]">pistas</p>
-                </div>
-                <div className="p-4">
-                  <p className="font-heading text-2xl font-semibold">
-                    {activeCase?.totalClues ?? progress?.totalClues ?? 12}
-                  </p>
-                  <p className="mt-1 text-xs text-[#d7c9b5]">no ano</p>
-                </div>
-              </div>
-              <Button asChild className="mt-6 w-full bg-[#d84132] text-white hover:bg-[#b93227]">
-                <Link href="/cliente/conteudos">
-                  Explorar conteúdos exclusivos
-                  <IconArrowRight className="size-4" />
-                </Link>
-              </Button>
-            </GlowingCard>
-          </ScrollReveal>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-[#fffaf0]/10 bg-[#171211]">
+        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+          <div className="mb-8 max-w-2xl">
+            <ScrollReveal>
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#d7b56d]">
+                Como funciona?
+              </p>
+            </ScrollReveal>
+            <ScrollReveal delay={0.08}>
+              <h2 className="mt-2 font-heading text-3xl font-semibold tracking-tight sm:text-4xl">
+                Da assinatura ao dossiê final em três passos.
+              </h2>
+            </ScrollReveal>
+          </div>
+
+          <ScrollRevealGroup className="grid gap-4 md:grid-cols-3" staggerChildren={0.12}>
+            {howItWorks.map((step, index) => {
+              const Icon = step.icon
+              return (
+                <ScrollRevealItem key={step.title}>
+                  <GlowingCard innerClassName="bg-[#090807] p-6">
+                    <div className="flex items-center justify-between">
+                      <Icon className="size-10 text-[#d84132]" />
+                      <span className="font-heading text-4xl font-semibold text-[#fffaf0]/10">
+                        0{index + 1}
+                      </span>
+                    </div>
+                    <h3 className="mt-6 font-heading text-xl font-semibold">{step.title}</h3>
+                    <p className="mt-2 text-sm leading-6 text-[#d7c9b5]">{step.description}</p>
+                  </GlowingCard>
+                </ScrollRevealItem>
+              )
+            })}
+          </ScrollRevealGroup>
         </div>
       </section>
 
       <section className="border-b border-[#fffaf0]/10 bg-[#090807]">
         <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
-          <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
-            <div>
-              <ScrollReveal>
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#d7b56d]">
-                  Escolha seu plano
-                </p>
-              </ScrollReveal>
-              <ScrollReveal delay={0.08}>
-                <h2 className="mt-2 font-heading text-3xl font-semibold tracking-tight sm:text-4xl">
-                  Comece pelo ritmo que combina com você.
-                </h2>
-              </ScrollReveal>
-            </div>
-            <ScrollReveal delay={0.12}>
-              <TextGenerateEffect
-                words="Planos recorrentes para acompanhar todos os ciclos ou compra avulsa para experimentar uma edição específica."
-                textClassName="max-w-md text-sm leading-6 text-[#d7c9b5]"
-                staggerDelay={0.04}
-              />
+          <div className="mb-8 max-w-2xl space-y-4">
+            <ScrollReveal>
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#d7b56d]">
+                Escolha seu plano
+              </p>
             </ScrollReveal>
+            <ScrollReveal delay={0.08}>
+              <h2 className="font-heading text-3xl font-semibold tracking-tight sm:text-4xl">
+                Comece pelo ritmo que combina com você.
+              </h2>
+            </ScrollReveal>
+            <TextGenerateEffect
+              words="Planos recorrentes para acompanhar todos os ciclos ou compra avulsa para experimentar uma edição específica."
+              textClassName="max-w-2xl text-sm leading-6 text-[#d7c9b5]"
+              staggerDelay={0.04}
+            />
           </div>
 
           <ScrollRevealGroup className="grid gap-4 lg:grid-cols-3" staggerChildren={0.12}>
@@ -463,45 +663,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="border-b border-[#fffaf0]/10 bg-[#171211]">
-        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
-          <div className="mb-8 max-w-2xl">
-            <ScrollReveal>
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#d7b56d]">
-                Como funciona?
-              </p>
-            </ScrollReveal>
-            <ScrollReveal delay={0.08}>
-              <h2 className="mt-2 font-heading text-3xl font-semibold tracking-tight sm:text-4xl">
-                Da assinatura ao dossiê final em três passos.
-              </h2>
-            </ScrollReveal>
-          </div>
-
-          <ScrollRevealGroup className="grid gap-4 md:grid-cols-3" staggerChildren={0.12}>
-            {howItWorks.map((step, index) => {
-              const Icon = step.icon
-              return (
-                <ScrollRevealItem key={step.title}>
-                  <GlowingCard innerClassName="bg-[#090807] p-6">
-                    <div className="flex items-center justify-between">
-                      <div className="flex size-10 items-center justify-center bg-[#d84132] text-white">
-                        <Icon className="size-5" />
-                      </div>
-                      <span className="font-heading text-4xl font-semibold text-[#fffaf0]/10">
-                        0{index + 1}
-                      </span>
-                    </div>
-                    <h3 className="mt-6 font-heading text-xl font-semibold">{step.title}</h3>
-                    <p className="mt-2 text-sm leading-6 text-[#d7c9b5]">{step.description}</p>
-                  </GlowingCard>
-                </ScrollRevealItem>
-              )
-            })}
-          </ScrollRevealGroup>
-        </div>
-      </section>
-
       <section className="bg-[#171211] text-[#fffaf0]">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
           <ScrollReveal>
@@ -522,7 +683,7 @@ export default function HomePage() {
                   Loja e edições avulsas
                 </p>
                 <h2 className="font-heading text-3xl font-semibold tracking-tight sm:text-5xl">
-                  Perdeu uma edição? O arquivo ainda pode estar aberto.
+                  Perdeu uma edição? <br />O arquivo ainda pode estar aberto.
                 </h2>
                 <TextGenerateEffect
                   words="Boxes anteriores e produtos extras continuam disponíveis enquanto houver estoque. Assinantes veem preços especiais em itens selecionados."
@@ -579,11 +740,11 @@ export default function HomePage() {
                         </span>
                       </div>
 
-                      <h3 className="mt-4 line-clamp-2 min-h-14 font-heading text-lg font-semibold leading-snug">
+                      <h3 className="mt-4 line-clamp-2 h-[2lh] overflow-hidden font-heading text-lg font-semibold leading-snug">
                         {product.name}
                       </h3>
 
-                      <p className="mt-2 line-clamp-2 min-h-12 text-sm leading-6 text-[#d7c9b5]">
+                      <p className="mt-2 line-clamp-2 h-[2lh] overflow-hidden text-sm leading-6 text-[#d7c9b5]">
                         {product.shortDescription}
                       </p>
 
@@ -628,10 +789,13 @@ export default function HomePage() {
                 Pronto para abrir o arquivo?
               </p>
               <h2 className="mt-2 font-heading text-3xl font-semibold">
-                Sua próxima pista pode chegar no próximo ciclo.
+                Garanta sua vaga antes que a próxima edição esgote.
               </h2>
               <TextGenerateEffect
-                words={trustSupport?.value ?? "Suporte humano de segunda a sexta, das 9h às 18h."}
+                words={
+                  finalCtaSubtitle?.value ??
+                  "Garanta sua vaga no clube antes que a próxima edição esgote. A próxima pista já está sendo preparada."
+                }
                 textClassName="mt-2 text-sm text-white/80"
                 staggerDelay={0.06}
                 filter={false}
@@ -641,7 +805,7 @@ export default function HomePage() {
           <ScrollReveal delay={0.15}>
             <Button asChild size="lg" className="bg-white text-[#171211] hover:bg-[#fff1dd]">
               <Link href="/assinatura">
-                Comparar planos
+                Garantir minha vaga
                 <IconArrowRight className="size-4" />
               </Link>
             </Button>
