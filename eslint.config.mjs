@@ -2,6 +2,7 @@ import { defineConfig, globalIgnores } from 'eslint/config'
 import nextVitals from 'eslint-config-next/core-web-vitals'
 import nextTs from 'eslint-config-next/typescript'
 import prettierConfig from 'eslint-config-prettier'
+import eslintPluginBetterTailwindcss from 'eslint-plugin-better-tailwindcss'
 import prettierPlugin from 'eslint-plugin-prettier'
 import simpleImportSort from 'eslint-plugin-simple-import-sort'
 
@@ -11,8 +12,14 @@ const eslintConfig = defineConfig([
   prettierConfig,
   {
     plugins: {
+      'better-tailwindcss': eslintPluginBetterTailwindcss,
       'simple-import-sort': simpleImportSort,
       prettier: prettierPlugin,
+    },
+    settings: {
+      'better-tailwindcss': {
+        entryPoint: 'src/app/globals.css',
+      },
     },
     rules: {
       'prettier/prettier': [
@@ -41,6 +48,8 @@ const eslintConfig = defineConfig([
       'react-hooks/refs': 'warn',
       'react-hooks/globals': 'warn',
       'react-hooks/purity': 'warn',
+
+      'better-tailwindcss/enforce-canonical-classes': 'warn',
     },
   },
 
