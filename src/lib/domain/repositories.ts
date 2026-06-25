@@ -41,6 +41,7 @@ import type {
   Product,
   SeoEntry,
   ShippingEstimate,
+  SubscriberPreferences,
   SubscriberProgress,
   Subscription,
   SubscriptionPlan,
@@ -267,6 +268,17 @@ export function getCurrentCustomer(): Customer | null {
     return null
   }
   return mockCustomer
+}
+
+export function updateSubscriberPreferences(
+  preferences: SubscriberPreferences,
+): Customer {
+  throwIfError()
+  const updated: Customer = {
+    ...mockCustomer,
+    preferences: { ...mockCustomer.preferences, ...preferences },
+  }
+  return updated
 }
 
 export function listAddresses(): Address[] {
