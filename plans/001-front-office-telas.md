@@ -19,7 +19,7 @@
 - **Depende de**: nenhum
 - **Categoria**: direção
 - **Planejado em**: commit `fe41adc`, 2026-06-25 (reconcile; baseline original `d80f959`)
-- **Execução**: IN PROGRESS — Etapas 1–4 em grande parte concluídas; Etapas 5–7 pendentes (ver seção "Progresso do reconcile")
+- **Execução**: DONE — Etapas 5–7 + lacunas da Etapa 3 executadas em worktree `codex/front-office-telas` (revisão @ `bda7b33`, commits `9316088`..`1937fe6`). Gates `pnpm typecheck`/`pnpm lint`/`pnpm build` exit 0 verificados pelo revisor. Aguarda merge do usuário via `/apply-worktree`; cleanup com `/delete-worktree`.
 
 ## Por que isso importa
 

@@ -9,7 +9,7 @@ atualizar sua linha de status ao finalizar.
 
 | Plano | Título | Prioridade | Esforço | Depende de | Status |
 |------|--------|------------|---------|------------|--------|
-| 001 | Implementar as telas do Front Office com mocks, SEO e contratos futuros | P1 | L | - | IN PROGRESS — Etapas 1–4 ~done; 5–7 pendentes (reconcile 2026-06-25 @ `fe41adc`) |
+| 001 | Implementar as telas do Front Office com mocks, SEO e contratos futuros | P1 | L | - | DONE — Etapas 5–7 + lacunas 3 executadas em worktree `codex/front-office-telas` (commits 9316088..1937fe6); typecheck/lint/build exit 0. Aguarda merge pelo usuário via `/apply-worktree` |
 | 002 | Transformar a Home em uma experiência de abertura da caixa | P1 | L | - | IN PROGRESS |
 
 Valores de status: TODO | IN PROGRESS | DONE | BLOCKED (com motivo em uma linha) | REJECTED (com justificativa em uma linha)
