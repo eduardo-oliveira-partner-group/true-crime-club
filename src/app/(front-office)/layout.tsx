@@ -1,3 +1,4 @@
+import { CookieConsentBanner } from '@/src/components/layout/cookie-consent-banner'
 import { PublicFooter } from '@/src/components/layout/public-footer'
 import { PublicHeader } from '@/src/components/layout/public-header'
 
@@ -11,6 +12,7 @@ export default function FrontOfficeLayout({
       <PublicHeader />
       <main className="flex-1">{children}</main>
       <PublicFooter />
+      <CookieConsentBanner />
     </div>
   )
 }
