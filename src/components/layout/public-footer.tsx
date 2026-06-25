@@ -1,7 +1,7 @@
 import {
   IconBrandInstagram,
-  IconCircleCheck,
-  IconFingerprint,
+  // IconCircleCheck,
+  // IconFingerprint,
   IconMail,
   IconPhone,
 } from '@tabler/icons-react'
@@ -28,12 +28,12 @@ const legalLinks = [
   { href: '/politica-de-privacidade', label: 'Política de privacidade' },
 ]
 
-const trustItems = [
-  'Primeiro clube do Brasil',
-  'Pistas mensais',
-  'Evento ao vivo com a comunidade',
-  'Cancelamento flexível',
-]
+// const trustItems = [
+//   'Primeiro clube do Brasil',
+//   'Pistas mensais',
+//   'Evento ao vivo com a comunidade',
+//   'Cancelamento flexível',
+// ]
 
 function FooterSection({
   title,
@@ -53,7 +53,7 @@ function FooterSection({
 }
 
 export function PublicFooter() {
-  const heroBadge = getDynamicContent('home.hero.badge')
+  // const heroBadge = getDynamicContent('home.hero.badge')
   const trustSupport = getDynamicContent('home.trust.support')
 
   return (

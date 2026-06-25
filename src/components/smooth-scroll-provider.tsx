@@ -1,7 +1,7 @@
 'use client'
 
-import { useReducedMotion } from 'motion/react'
 import { ReactLenis } from 'lenis/react'
+import { useReducedMotion } from 'motion/react'
 
 type SmoothScrollProviderProps = {
   children: React.ReactNode

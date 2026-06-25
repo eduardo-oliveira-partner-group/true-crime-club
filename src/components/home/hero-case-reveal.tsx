@@ -224,7 +224,7 @@ export function HeroCaseReveal({ badge, title }: HeroCaseRevealProps) {
   return (
     <section
       ref={sectionRef}
-      className="relative isolate overflow-clip border-b border-[#2d201b]/15 bg-[#090807] text-[#fffaf0] max-lg:min-h-0 lg:min-h-[250vh] motion-reduce:min-h-screen"
+      className="relative isolate overflow-clip border-b border-[#2d201b]/15 bg-[#090807] text-[#fffaf0] motion-reduce:min-h-screen max-lg:min-h-0 lg:min-h-[250vh]"
     >
       <div className="max-lg:relative lg:sticky lg:top-0 lg:min-h-screen lg:overflow-hidden">
         <div
@@ -268,7 +268,7 @@ export function HeroCaseReveal({ badge, title }: HeroCaseRevealProps) {
           style={{ opacity: finalGateOpacity }}
         />
 
-        <div className="relative z-10 mx-auto flex max-w-7xl items-start px-4 py-16 sm:px-6 lg:min-h-screen lg:items-center lg:py-20 lg:px-10">
+        <div className="relative z-10 mx-auto flex max-w-7xl items-start px-4 py-16 sm:px-6 lg:min-h-screen lg:items-center lg:px-10 lg:py-20">
           <div className="relative z-10 w-full max-w-[42rem] space-y-7 lg:max-w-[40rem] xl:max-w-[43rem]">
             <ScrollReveal immediate delay={0.05}>
               <div className="inline-grid max-w-full grid-cols-[4.75rem_minmax(0,1fr)] border border-[#b8945f]/55 bg-[#080604]/72 text-[#c9a66a] shadow-[0_0_0_1px_rgba(255,250,240,0.04)_inset,0_18px_54px_rgba(0,0,0,0.4)] backdrop-blur-sm">

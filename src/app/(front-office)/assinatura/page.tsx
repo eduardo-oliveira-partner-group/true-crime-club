@@ -14,13 +14,13 @@ export default function AssinaturaPage() {
         <h1 className="font-heading text-3xl font-bold tracking-tight sm:text-4xl">
           Planos de assinatura
         </h1>
-        <p className="mx-auto md:mx-0 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
+        <p className="mx-auto max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base md:mx-0">
           Escolha entre mensal, anual ou box avulsa. Cobrança no mês da compra;
           envio no mês seguinte.
         </p>
       </div>
 
-      <div className="flex gap-5 overflow-x-auto pb-6 snap-x snap-mandatory -mx-4 px-4 sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] lg:grid lg:grid-cols-3 lg:overflow-x-visible lg:pb-0">
+      <div className="-mx-4 flex snap-x snap-mandatory [scrollbar-width:none] gap-5 overflow-x-auto px-4 pb-6 [-ms-overflow-style:none] sm:mx-0 sm:px-0 lg:grid lg:grid-cols-3 lg:overflow-x-visible lg:pb-0 [&::-webkit-scrollbar]:hidden">
         {plans.map((plan) => (
           <div
             key={plan.id}
@@ -45,4 +45,3 @@ export default function AssinaturaPage() {
     </div>
   )
 }
-
