@@ -1,3 +1,4 @@
+import { IconArrowLeft } from '@tabler/icons-react'
 import Link from 'next/link'
 
 import { Button } from '@/src/components/ui/button'
@@ -6,17 +7,29 @@ import { updateCard } from '@/src/lib/domain/repositories'
 export default function AtualizarCartaoPage() {
   return (
     <div>
-      <Button asChild variant="ghost" className="mb-4 h-auto p-0">
-        <Link href="/cliente/financeiro">← Voltar</Link>
+      <Button
+        asChild
+        variant="ghost"
+        className="mb-6 h-auto gap-1 p-0 text-[#c8bdad] hover:bg-transparent hover:text-[#d7b56d]"
+      >
+        <Link href="/cliente/financeiro">
+          <IconArrowLeft className="size-4" />
+          Voltar
+        </Link>
       </Button>
 
-      <h1 className="font-heading text-2xl font-semibold">Atualizar cartão</h1>
-      <p className="mt-2 text-sm text-muted-foreground">
+      <p className="text-xs font-semibold tracking-[0.24em] text-[#d7b56d] uppercase">
+        Arquivo do assinante
+      </p>
+      <h1 className="mt-2 font-heading text-2xl font-black tracking-tight text-[#fffaf0] uppercase">
+        Atualizar cartão
+      </h1>
+      <p className="mt-2 text-sm/6 text-[#d7c9b5]">
         Formulário mockado — dados não são enviados a nenhum gateway.
       </p>
 
       <form
-        className="mt-6 max-w-md space-y-4"
+        className="mt-6 max-w-md space-y-5"
         action={async (formData) => {
           'use server'
           updateCard({
@@ -27,28 +40,39 @@ export default function AtualizarCartaoPage() {
         }}
       >
         <div>
-          <label className="text-sm font-medium" htmlFor="holder">
+          <label
+            className="text-xs font-semibold tracking-[0.2em] text-[#c8bdad] uppercase"
+            htmlFor="holder"
+          >
             Nome no cartão
           </label>
           <input
             id="holder"
             name="holder"
-            className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
+            className="mt-2 w-full border border-[#fffaf0]/14 bg-[#0c0a09] px-4 py-3 text-sm text-[#fffaf0] placeholder:text-[#bfb4a3]/60 outline-none transition focus:border-[#d7b56d]/70 focus:bg-[#0b0908]"
           />
         </div>
         <div>
-          <label className="text-sm font-medium" htmlFor="lastFour">
+          <label
+            className="text-xs font-semibold tracking-[0.2em] text-[#c8bdad] uppercase"
+            htmlFor="lastFour"
+          >
             Final do cartão
           </label>
           <input
             id="lastFour"
             name="lastFour"
             maxLength={4}
-            className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
+            className="mt-2 w-full border border-[#fffaf0]/14 bg-[#0c0a09] px-4 py-3 text-sm text-[#fffaf0] placeholder:text-[#bfb4a3]/60 outline-none transition focus:border-[#d7b56d]/70 focus:bg-[#0b0908]"
           />
         </div>
         <input type="hidden" name="brand" value="Visa" />
-        <Button type="submit">Salvar cartão (mock)</Button>
+        <Button
+          type="submit"
+          className="bg-[#d84132] text-white shadow-[0_0_26px_rgba(216,65,50,0.35)] hover:bg-[#b93227]"
+        >
+          Salvar cartão (mock)
+        </Button>
       </form>
     </div>
   )

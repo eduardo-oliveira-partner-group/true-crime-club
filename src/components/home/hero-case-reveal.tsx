@@ -28,10 +28,7 @@ const VIDEO_FRAME_DURATION = 1 / 24
 const DESKTOP_HERO_MEDIA_QUERY = '(min-width: 1024px)'
 
 function useDesktopHero() {
-  const [isDesktopHero, setIsDesktopHero] = useState(() => {
-    if (typeof window === 'undefined') return false
-    return window.matchMedia(DESKTOP_HERO_MEDIA_QUERY).matches
-  })
+  const [isDesktopHero, setIsDesktopHero] = useState(false)
 
   useEffect(() => {
     const mediaQuery = window.matchMedia(DESKTOP_HERO_MEDIA_QUERY)
@@ -250,32 +247,32 @@ export function HeroCaseReveal({ badge, title }: HeroCaseRevealProps) {
               aria-hidden
               tabIndex={-1}
               onLoadedData={handleVideoReady}
-              className="absolute inset-0 h-full w-full [transform:translateZ(0)] object-cover object-[68%_center]"
+              className="absolute inset-0 size-full transform-[translateZ(0)] object-cover object-[68%_center]"
             />
           </motion.div>
         ) : null}
 
-        <div className="pointer-events-none absolute inset-0 z-[1] hidden bg-[linear-gradient(90deg,#090807_0%,rgba(9,8,7,0.96)_24%,rgba(9,8,7,0.62)_52%,rgba(9,8,7,0.18)_100%)] lg:block" />
-        <div className="pointer-events-none absolute inset-0 z-[1] hidden bg-[radial-gradient(circle_at_18%_20%,rgba(216,65,50,0.22),transparent_24%),linear-gradient(90deg,rgba(255,250,240,0.035)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.035)_1px,transparent_1px)] bg-size-[auto,42px_42px,42px_42px] lg:block" />
+        <div className="pointer-events-none absolute inset-0 z-1 hidden bg-[linear-gradient(90deg,#090807_0%,rgba(9,8,7,0.96)_24%,rgba(9,8,7,0.62)_52%,rgba(9,8,7,0.18)_100%)] lg:block" />
+        <div className="pointer-events-none absolute inset-0 z-1 hidden bg-[radial-gradient(circle_at_18%_20%,rgba(216,65,50,0.22),transparent_24%),linear-gradient(90deg,rgba(255,250,240,0.035)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.035)_1px,transparent_1px)] bg-size-[auto,42px_42px,42px_42px] lg:block" />
         <motion.div
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] hidden h-[30vh] bg-[linear-gradient(0deg,#090807_0%,rgba(9,8,7,0.92)_34%,rgba(9,8,7,0)_100%)] lg:block"
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-2 hidden h-[30vh] bg-[linear-gradient(0deg,#090807_0%,rgba(9,8,7,0.92)_34%,rgba(9,8,7,0)_100%)] lg:block"
           style={{ opacity: finalGateOpacity, y: finalGateY }}
         />
         <motion.div
           aria-hidden
-          className="pointer-events-none absolute right-0 bottom-0 left-0 z-[2] hidden h-px bg-linear-to-r from-transparent via-[#d7b56d]/70 to-transparent lg:block"
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-2 hidden h-px bg-linear-to-r from-transparent via-[#d7b56d]/70 to-transparent lg:block"
           style={{ opacity: finalGateOpacity }}
         />
 
         <div className="relative z-10 mx-auto flex max-w-7xl items-start px-4 py-16 sm:px-6 lg:min-h-screen lg:items-center lg:px-10 lg:py-20">
-          <div className="relative z-10 w-full max-w-[42rem] space-y-7 lg:max-w-[40rem] xl:max-w-[43rem]">
+          <div className="relative z-10 w-full max-w-2xl space-y-7 lg:max-w-160 xl:max-w-172">
             <ScrollReveal immediate delay={0.05}>
               <div className="inline-grid max-w-full grid-cols-[4.75rem_minmax(0,1fr)] border border-[#b8945f]/55 bg-[#080604]/72 text-[#c9a66a] shadow-[0_0_0_1px_rgba(255,250,240,0.04)_inset,0_18px_54px_rgba(0,0,0,0.4)] backdrop-blur-sm">
                 <span className="grid min-h-16 place-items-center border-r border-[#b8945f]/35 bg-[#d7c7a5]/14">
                   <IconFingerprint className="size-9 text-[#e8d39b] drop-shadow-[0_0_14px_rgba(215,181,109,0.48)]" />
                 </span>
-                <span className="flex items-center px-6 py-3 font-heading text-sm leading-7 font-semibold tracking-[0.24em] uppercase">
+                <span className="flex items-center px-6 py-3 font-heading text-sm/7 font-semibold tracking-[0.24em] uppercase">
                   {badge}
                 </span>
               </div>
@@ -300,7 +297,7 @@ export function HeroCaseReveal({ badge, title }: HeroCaseRevealProps) {
               </ScrollReveal>
 
               <ScrollReveal immediate delay={0.32}>
-                <p className="max-w-md border-l-2 border-[#c8382b] py-1 pl-5 text-base leading-7 text-[#d8d0c4] sm:text-lg">
+                <p className="max-w-md border-l-2 border-[#c8382b] py-1 pl-5 text-base/7 text-[#d8d0c4] sm:text-lg">
                   Uma experiência mensal que transforma você em parte da
                   investigação. Pistas, conteúdos exclusivos e itens
                   colecionáveis entregues na sua casa.
@@ -352,7 +349,7 @@ export function HeroCaseReveal({ badge, title }: HeroCaseRevealProps) {
                             <p className="font-heading text-xs font-semibold tracking-[0.18em] text-[#d7b56d] uppercase">
                               {benefit.title}
                             </p>
-                            <p className="mt-2 text-sm leading-5 text-[#bfb4a3]">
+                            <p className="mt-2 text-sm/5 text-[#bfb4a3]">
                               {benefit.description}
                             </p>
                           </div>

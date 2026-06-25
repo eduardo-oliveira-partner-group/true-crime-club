@@ -205,7 +205,7 @@ export default function HomePage() {
                   <p className="text-xs font-semibold tracking-[0.2em] text-[#d7b56d] uppercase">
                     Curadoria com paixão
                   </p>
-                  <p className="mt-2 text-sm leading-6 text-[#d7c9b5]">
+                  <p className="mt-2 text-sm/6 text-[#d7c9b5]">
                     Todo mês, sua caixa chega cheia de surpresas pensadas por
                     designers que vivem true crime e colocam o coração em cada
                     detalhe — do conceito ao acabamento final.
@@ -312,7 +312,7 @@ export default function HomePage() {
               <p className="text-xs font-semibold tracking-[0.2em] text-[#d7b56d] uppercase">
                 Nota do arquivo
               </p>
-              <p className="mt-3 text-sm leading-6 text-[#d7c9b5]">
+              <p className="mt-3 text-sm/6 text-[#d7c9b5]">
                 Para garantir exclusividade e fator surpresa, cada edição conta
                 com uma{' '}
                 <strong className="font-medium text-[#e5d8c4]">
@@ -348,11 +348,11 @@ export default function HomePage() {
                 <span className="hidden h-px flex-1 bg-[#d7b56d]/55 sm:block" />
               </div>
 
-              <h2 className="font-heading text-3xl leading-tight font-black text-[#f0e8dd] sm:text-4xl lg:text-[2.75rem] lg:leading-[1.08] xl:text-5xl">
+              <h2 className="font-heading text-3xl/tight font-black text-[#f0e8dd] sm:text-4xl lg:text-[2.75rem] lg:leading-[1.08] xl:text-5xl">
                 Uma pista por mês. Um caso inteiro para desvendar.
               </h2>
 
-              <p className="max-w-lg text-base leading-7 text-[#c8bdad] sm:text-lg sm:leading-8">
+              <p className="max-w-lg text-base/7 text-[#c8bdad] sm:text-lg/8">
                 Receba dicas, evidências, documentos e revelações que se
                 acumulam ao longo do ano — até desvendar o crime juntos, em
                 tempo real, com toda a comunidade do clube.
@@ -366,7 +366,7 @@ export default function HomePage() {
                   <p className="mt-2 font-heading text-lg font-semibold text-[#f0e8dd]">
                     {liveEventTitle}
                   </p>
-                  <p className="mt-1 text-sm leading-6 text-[#c8bdad]">
+                  <p className="mt-1 text-sm/6 text-[#c8bdad]">
                     {formatDate(liveEventDate)} — revelação final com a
                     comunidade
                   </p>
@@ -381,7 +381,7 @@ export default function HomePage() {
                   <p className="text-xs font-semibold tracking-[0.27em] text-[#d7b56d] uppercase sm:text-sm">
                     Progresso do caso
                   </p>
-                  <h3 className="mt-4 font-heading text-3xl leading-tight font-black text-[#f0e8dd] sm:text-4xl">
+                  <h3 className="mt-4 font-heading text-3xl/tight font-black text-[#f0e8dd] sm:text-4xl">
                     {progress
                       ? `${progress.percentComplete}% investigado`
                       : 'Caso aberto'}

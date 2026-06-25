@@ -49,7 +49,7 @@ export function PublicHeaderContent({ itemCount }: PublicHeaderContentProps) {
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-2 px-3 sm:gap-4 sm:px-6">
           <Link href="/" className="min-w-0 shrink">
             <BrandLogo
-              className="h-7 max-w-[9.5rem] drop-shadow-[0_8px_18px_rgba(0,0,0,0.45)] sm:h-8 sm:max-w-none"
+              className="h-7 max-w-38 drop-shadow-[0_8px_18px_rgba(0,0,0,0.45)] sm:h-8 sm:max-w-none"
               priority
             />
           </Link>

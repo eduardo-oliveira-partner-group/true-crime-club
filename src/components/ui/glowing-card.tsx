@@ -61,7 +61,7 @@ export function GlowingFeatureCard({
         {icon}
       </div>
       <h3 className="mt-5 font-heading text-lg font-semibold">{title}</h3>
-      <p className="mt-2 text-sm leading-6 text-[#d7c9b5]">{description}</p>
+      <p className="mt-2 text-sm/6 text-[#d7c9b5]">{description}</p>
     </GlowingCard>
   )
 }

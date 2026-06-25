@@ -72,7 +72,7 @@ export function PublicFooter() {
               </span>
             </div> */}
 
-            <p className="max-w-sm text-sm leading-6 text-[#d7c9b5]">
+            <p className="max-w-sm text-sm/6 text-[#d7c9b5]">
               Caixa temática mensal com itens colecionáveis, pistas de um caso
               fictício anual e conteúdos exclusivos para quem vive true crime.
             </p>
@@ -151,7 +151,7 @@ export function PublicFooter() {
                 </a>
               </li>
             </ul>
-            <p className="text-xs leading-5 text-[#a89882]">
+            <p className="text-xs/5 text-[#a89882]">
               {trustSupport?.value ??
                 'Suporte humano de segunda a sexta, das 9h às 18h.'}
             </p>
@@ -162,14 +162,14 @@ export function PublicFooter() {
           <p className="text-xs font-semibold tracking-[0.2em] text-[#d7b56d] uppercase">
             Endereço
           </p>
-          <address className="mt-2 space-y-0.5 text-sm leading-6 text-[#d7c9b5] not-italic">
+          <address className="mt-2 space-y-0.5 text-sm/6 text-[#d7c9b5] not-italic">
             <p>Av. Tamboré, 287 - Tamboré,</p>
             <p>Barueri - SP, 06460-000, Torre Norte — 10º Andar</p>
           </address>
         </div>
       </div>
 
-      <div className="border-t border-[#fffaf0]/10 px-4 py-4 sm:px-6">
+      <div className="border-t border-[#fffaf0]/10 p-4 sm:px-6">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 text-center text-xs text-[#a89882] sm:flex-row sm:text-left">
           <p>
             © {new Date().getFullYear()} True Crime Club. Todos os direitos

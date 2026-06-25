@@ -182,7 +182,7 @@ export function FeatureDossierCard({
             className={cn(
               'font-heading font-semibold tracking-tight text-[#fffaf0]',
               variant === 'box'
-                ? 'text-base leading-snug sm:text-lg'
+                ? 'text-base/snug sm:text-lg'
                 : 'text-lg sm:text-xl',
             )}
           >
@@ -190,8 +190,8 @@ export function FeatureDossierCard({
           </h3>
           <p
             className={cn(
-              'mt-3 flex-1 text-sm leading-6 text-[#d7c9b5]',
-              variant === 'club' ? 'min-h-[5.25rem]' : 'min-h-[4.5rem]',
+              'mt-3 flex-1 text-sm/6 text-[#d7c9b5]',
+              variant === 'club' ? 'min-h-21' : 'min-h-18',
             )}
           >
             {description}

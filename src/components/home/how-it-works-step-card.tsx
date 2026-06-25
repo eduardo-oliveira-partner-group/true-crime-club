@@ -130,7 +130,7 @@ export function HowItWorksStepCard({
           <h3 className="font-heading text-xl font-semibold tracking-tight text-[#fffaf0] sm:text-[1.35rem]">
             {title}
           </h3>
-          <p className="mt-3 min-h-[4.5rem] text-sm leading-6 text-[#d7c9b5]">
+          <p className="mt-3 min-h-18 text-sm/6 text-[#d7c9b5]">
             {description}
           </p>
         </div>

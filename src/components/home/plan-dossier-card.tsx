@@ -130,7 +130,7 @@ export function PlanDossierCard({ plan }: PlanDossierCardProps) {
           <h3 className="font-heading text-xl font-semibold tracking-tight text-[#fffaf0] sm:text-[1.35rem]">
             {plan.name}
           </h3>
-          <p className="mt-3 min-h-12 text-sm leading-6 text-[#d7c9b5]">
+          <p className="mt-3 min-h-12 text-sm/6 text-[#d7c9b5]">
             {plan.description}
           </p>
         </div>
@@ -151,7 +151,7 @@ export function PlanDossierCard({ plan }: PlanDossierCardProps) {
           </p>
         </div>
 
-        <ul className="relative mt-5 min-h-[8.25rem] flex-1 space-y-3 text-sm text-[#e5d8c4]">
+        <ul className="relative mt-5 min-h-33 flex-1 space-y-3 text-sm text-[#e5d8c4]">
           {plan.features.slice(0, 4).map((feature) => (
             <li key={feature} className="flex gap-3">
               <span

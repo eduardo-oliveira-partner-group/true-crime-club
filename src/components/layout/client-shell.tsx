@@ -1,16 +1,19 @@
 'use client'
 
+import { IconBoxSeam, IconCreditCard, IconFileText, IconHome } from '@tabler/icons-react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
+import logo from '@/src/assets/images/brand/logo.png'
 import { getCurrentCustomer } from '@/src/lib/domain/repositories'
 import { cn } from '@/src/lib/utils'
 
 const navItems = [
-  { href: '/cliente/pedidos', label: 'Pedidos' },
-  { href: '/cliente/assinatura', label: 'Assinatura' },
-  { href: '/cliente/financeiro', label: 'Financeiro' },
-  { href: '/cliente/conteudos', label: 'Conteúdos' },
+  { href: '/cliente/pedidos', label: 'Pedidos', icon: IconBoxSeam },
+  { href: '/cliente/assinatura', label: 'Assinatura', icon: IconHome },
+  { href: '/cliente/financeiro', label: 'Financeiro', icon: IconCreditCard },
+  { href: '/cliente/conteudos', label: 'Conteúdos', icon: IconFileText },
 ]
 
 export function ClientShell({ children }: { children: React.ReactNode }) {
@@ -18,35 +21,51 @@ export function ClientShell({ children }: { children: React.ReactNode }) {
   const customer = getCurrentCustomer()
 
   return (
-    <div className="min-h-svh bg-background">
-      <header className="border-b border-border">
-        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
-          <Link href="/" className="font-heading text-sm font-semibold">
-            True Crime Club
+    <div className="relative isolate min-h-svh bg-[#090807] text-[#fffaf0]">
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.028)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.028)_1px,transparent_1px)] bg-size-[56px_56px]" />
+
+      <header className="border-b border-[#fffaf0]/12 bg-[#0b0908]/80 backdrop-blur-sm">
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
+          <Link href="/" className="inline-flex items-center">
+            <Image src={logo} alt="True Crime Club" className="h-7 w-auto" />
           </Link>
-          <div className="text-right text-sm">
-            <p className="font-medium">{customer?.name ?? 'Visitante'}</p>
-            <p className="text-xs text-muted-foreground">{customer?.email}</p>
+          <div className="text-right">
+            <p className="font-heading text-sm font-semibold tracking-wide text-[#fffaf0]">
+              {customer?.name ?? 'Visitante'}
+            </p>
+            <p className="font-mono text-[10px] tracking-[0.12em] text-[#bfb4a3] uppercase">
+              {customer?.email}
+            </p>
           </div>
         </div>
       </header>
 
-      <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-6 sm:px-6 lg:flex-row">
-        <aside className="lg:w-56 lg:shrink-0">
-          <nav className="flex gap-2 overflow-x-auto lg:flex-col lg:overflow-visible">
+      <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-6 sm:px-6 lg:flex-row lg:py-10">
+        <aside className="lg:w-60 lg:shrink-0">
+          <p className="mb-3 hidden text-xs font-semibold tracking-[0.24em] text-[#d7b56d] uppercase lg:block">
+            Arquivo do assinante
+          </p>
+          <nav className="flex gap-2 overflow-x-auto border-b border-[#fffaf0]/10 pb-3 lg:flex-col lg:overflow-visible lg:border-b-0 lg:pb-0">
             {navItems.map((item) => {
               const active = pathname.startsWith(item.href)
+              const Icon = item.icon
               return (
                 <Link
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    'shrink-0 rounded-lg px-3 py-2 text-sm transition-colors',
+                    'group flex shrink-0 items-center gap-2.5 border px-3 py-2.5 text-sm transition-colors',
                     active
-                      ? 'bg-primary text-primary-foreground'
-                      : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                      ? 'border-[#d7b56d]/45 bg-[#171211] text-[#fffaf0]'
+                      : 'border-transparent text-[#c8bdad] hover:border-[#fffaf0]/12 hover:bg-[#171211]/60 hover:text-[#fffaf0]',
                   )}
                 >
+                  <Icon
+                    className={cn(
+                      'size-4 shrink-0',
+                      active ? 'text-[#d7b56d]' : 'text-[#bfb4a3] group-hover:text-[#d7b56d]',
+                    )}
+                  />
                   {item.label}
                 </Link>
               )
