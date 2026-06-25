@@ -26,8 +26,8 @@ import { FeatureDossierCard } from '@/src/components/home/feature-dossier-card'
 import { HeroCaseReveal } from '@/src/components/home/hero-case-reveal'
 import { HowItWorksStepCard } from '@/src/components/home/how-it-works-step-card'
 import { PlanDossierCard } from '@/src/components/home/plan-dossier-card'
+import { PreviousBoxesShowcase } from '@/src/components/home/previous-boxes-showcase'
 import { Button } from '@/src/components/ui/button'
-import { GlowingCard } from '@/src/components/ui/glowing-card'
 import {
   ScrollReveal,
   ScrollRevealGroup,
@@ -41,8 +41,7 @@ import {
   listPlans,
   listProducts,
 } from '@/src/lib/domain/repositories'
-import { formatCurrency, formatDate } from '@/src/lib/formatters'
-import { getProductImage } from '@/src/lib/product-images'
+import { formatDate } from '@/src/lib/formatters'
 import { cn } from '@/src/lib/utils'
 
 const clubHighlights = [
@@ -561,109 +560,7 @@ export default function HomePage() {
             </div>
           </ScrollReveal>
 
-          <ScrollRevealGroup
-            className="grid items-stretch gap-5 lg:grid-cols-2 lg:gap-6"
-            staggerChildren={0.1}
-          >
-            {boxProducts.map((product) => {
-              const productImage = getProductImage(product.images[0] ?? '')
-              const availabilityLabel =
-                product.availability === 'limited'
-                  ? 'Limitado'
-                  : product.availability === 'out_of_stock'
-                    ? 'Indisponível'
-                    : product.availability === 'coming_soon'
-                      ? 'Em breve'
-                      : 'Disponível'
-              const displayPrice = product.subscriberPrice ?? product.price
-              const evidenceNumber = String(product.cycleNumber ?? 0).padStart(
-                2,
-                '0',
-              )
-
-              return (
-                <ScrollRevealItem key={product.id} className="h-full">
-                  <GlowingCard
-                    className="group h-full shadow-[0_22px_48px_rgba(0,0,0,0.28)]"
-                    innerClassName="relative flex h-full min-h-[300px] flex-col overflow-hidden bg-[#0b0908] p-0 md:flex-row"
-                  >
-                    <div className="pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.035)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.035)_1px,transparent_1px)] bg-size-[34px_34px]" />
-                    <div className="pointer-events-none absolute top-0 right-6 z-20 h-12 w-10 border-x border-b border-[#d7b56d]/28 bg-[#d7b56d]/14" />
-
-                    {productImage ? (
-                      <div className="relative aspect-square shrink-0 overflow-hidden border-b border-[#fffaf0]/14 bg-[#171211] md:w-[42%] md:border-r md:border-b-0">
-                        <Image
-                          src={productImage}
-                          alt={product.name}
-                          fill
-                          placeholder="blur"
-                          sizes="(max-width: 768px) 100vw, 480px"
-                          className="object-cover object-center transition duration-500 group-hover:scale-[1.03]"
-                        />
-                        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(9,8,7,0.08)_0%,rgba(9,8,7,0.48)_100%)]" />
-                        <div className="absolute top-4 left-4 border border-[#fffaf0]/20 bg-[#090807]/82 px-3 py-2 backdrop-blur-sm">
-                          <p className="text-[0.65rem] font-semibold tracking-[0.2em] text-[#d7b56d] uppercase">
-                            Caixa
-                          </p>
-                          <p className="font-heading text-2xl leading-none font-semibold text-[#fffaf0]">
-                            {evidenceNumber}
-                          </p>
-                        </div>
-                      </div>
-                    ) : null}
-
-                    <div className="relative z-20 flex flex-1 flex-col p-5 sm:p-6">
-                      <div className="flex flex-wrap items-start justify-between gap-3">
-                        <p className="border-l-2 border-[#d84132] pl-3 text-xs font-semibold tracking-[0.2em] text-[#ffb0a5] uppercase">
-                          Arquivo avulso
-                        </p>
-                        <span className="shrink-0 border border-[#d84132]/38 bg-[#2c1713]/72 px-3 py-1 text-xs font-semibold tracking-[0.14em] text-[#ffb0a5] uppercase">
-                          {availabilityLabel}
-                        </span>
-                      </div>
-
-                      <h3 className="mt-5 line-clamp-2 min-h-[2lh] overflow-hidden font-heading text-2xl leading-tight font-semibold tracking-wide text-[#fffaf0] uppercase">
-                        {product.name}
-                      </h3>
-
-                      <p className="mt-3 line-clamp-2 min-h-[2lh] overflow-hidden text-sm leading-6 text-[#d7c9b5]">
-                        {product.shortDescription}
-                      </p>
-
-                      <div className="mt-auto flex items-end justify-between gap-4 border-t border-[#fffaf0]/10 pt-5">
-                        <div className="min-w-0">
-                          {product.subscriberPrice ? (
-                            <div className="space-y-1.5">
-                              <p className="text-xs text-[#d7c9b5]/68 line-through decoration-[#ffb0a5]/70 decoration-2">
-                                de {formatCurrency(product.price)}
-                              </p>
-                              <p className="text-xs font-semibold tracking-[0.16em] text-[#d7b56d] uppercase">
-                                Assinante
-                              </p>
-                              <p className="font-heading text-xl leading-none font-semibold text-[#fffaf0]">
-                                {formatCurrency(product.subscriberPrice)}
-                              </p>
-                            </div>
-                          ) : (
-                            <p className="font-heading text-lg font-semibold">
-                              {formatCurrency(displayPrice)}
-                            </p>
-                          )}
-                        </div>
-                        <Link
-                          href={`/loja/${product.slug}`}
-                          className="inline-flex h-10 shrink-0 items-center gap-2 border border-[#fffaf0]/16 bg-[#fffaf0]/6 px-4 text-sm font-semibold text-[#fffaf0] transition hover:border-[#d84132]/55 hover:bg-[#d84132]/18 hover:text-[#fffaf0]"
-                        >
-                          Detalhes
-                          <IconArrowRight className="size-4" />
-                        </Link>
-                      </div>
-                    </div>
-                  </GlowingCard>
-                </ScrollRevealItem>
-              )
-            })}
-          </ScrollRevealGroup>
+          <PreviousBoxesShowcase products={boxProducts} />
         </div>
       </section>
 
