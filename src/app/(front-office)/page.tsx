@@ -11,7 +11,6 @@ import {
   IconHome,
   IconNotebook,
   IconPackage,
-  IconShieldCheck,
   IconShirt,
   IconSparkles,
   IconUsers,
@@ -23,7 +22,11 @@ import boxContentsBg from '@/src/assets/images/home/box-contents-bg.png'
 import clubOverviewBg from '@/src/assets/images/home/club-overview-bg.png'
 import heroBanner from '@/src/assets/images/home/hero-banner.png'
 import investigationContinuousBg from '@/src/assets/images/home/investigation-continuous-bg.png'
+import plansDossierPlate from '@/src/assets/images/home/plans-dossier-plate.png'
 import previousBoxesBanner from '@/src/assets/images/home/previous-boxes-banner.png'
+import { FeatureDossierCard } from '@/src/components/home/feature-dossier-card'
+import { HowItWorksStepCard } from '@/src/components/home/how-it-works-step-card'
+import { PlanDossierCard } from '@/src/components/home/plan-dossier-card'
 import { Button } from '@/src/components/ui/button'
 import { EncryptedText } from '@/src/components/ui/encrypted-text'
 import { GlowingCard } from '@/src/components/ui/glowing-card'
@@ -42,6 +45,7 @@ import {
 } from '@/src/lib/domain/repositories'
 import { formatCurrency, formatDate } from '@/src/lib/formatters'
 import { getProductImage } from '@/src/lib/product-images'
+import { cn } from '@/src/lib/utils'
 
 const clubHighlights = [
   {
@@ -373,37 +377,21 @@ export default function HomePage() {
 
           <div className="space-y-6">
             <ScrollRevealGroup
-              className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
+              className="grid items-stretch gap-5 sm:grid-cols-2"
               staggerChildren={0.08}
             >
-              {clubHighlights.map((feature, index) => {
-                const Icon = feature.icon
-                return (
-                  <ScrollRevealItem key={feature.title}>
-                    <GlowingCard
-                      className="min-h-[258px] transition-transform duration-300 hover:-translate-y-1"
-                      innerClassName="group relative h-full overflow-hidden bg-[#171211]/84 p-5 transition-colors duration-300 hover:bg-[#1e1512]"
-                    >
-                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(216,65,50,0.12),transparent_30%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                      <div className="relative flex h-full flex-col">
-                        <span className="absolute top-0 right-0 font-heading text-4xl font-black text-[#fffaf0]/5">
-                          0{index + 1}
-                        </span>
-                        <Icon className="size-10 text-[#d84132] drop-shadow-[0_0_26px_rgba(216,65,50,0.24)]" />
-                        <h3 className="mt-5 font-heading text-lg font-semibold">
-                          {feature.title}
-                        </h3>
-                        <p className="mt-2 text-sm leading-6 text-[#d7c9b5]">
-                          {feature.description}
-                        </p>
-                        <div className="mt-auto pt-5">
-                          <div className="h-px w-full bg-linear-to-r from-[#d84132]/60 via-[#d7b56d]/35 to-transparent opacity-55 transition-opacity group-hover:opacity-100" />
-                        </div>
-                      </div>
-                    </GlowingCard>
-                  </ScrollRevealItem>
-                )
-              })}
+              {clubHighlights.map((feature, index) => (
+                <ScrollRevealItem key={feature.title} className="h-full">
+                  <FeatureDossierCard
+                    icon={feature.icon}
+                    title={feature.title}
+                    description={feature.description}
+                    index={index}
+                    variant="club"
+                    total={clubHighlights.length}
+                  />
+                </ScrollRevealItem>
+              ))}
             </ScrollRevealGroup>
 
             <ScrollReveal delay={0.15}>
@@ -456,31 +444,27 @@ export default function HomePage() {
           </div>
 
           <ScrollRevealGroup
-            className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5"
+            className="grid items-stretch gap-5 sm:grid-cols-6"
             staggerChildren={0.07}
           >
-            {boxCategories.map((category, index) => {
-              const Icon = category.icon
-              return (
-                <ScrollRevealItem key={category.title}>
-                  <GlowingCard
-                    className="h-full"
-                    innerClassName="group relative h-full bg-[#171211]/88 p-5 backdrop-blur-sm"
-                  >
-                    <span className="absolute top-3 right-3 font-heading text-2xl font-black text-[#fffaf0]/5">
-                      0{index + 1}
-                    </span>
-                    <Icon className="size-9 text-[#d84132]" />
-                    <h3 className="mt-4 font-heading text-base leading-snug font-semibold">
-                      {category.title}
-                    </h3>
-                    <p className="mt-2 text-sm leading-6 text-[#d7c9b5]">
-                      {category.description}
-                    </p>
-                  </GlowingCard>
-                </ScrollRevealItem>
-              )
-            })}
+            {boxCategories.map((category, index) => (
+              <ScrollRevealItem
+                key={category.title}
+                className={cn(
+                  'h-full',
+                  index < 2 ? 'sm:col-span-3' : 'sm:col-span-2',
+                )}
+              >
+                <FeatureDossierCard
+                  icon={category.icon}
+                  title={category.title}
+                  description={category.description}
+                  index={index}
+                  variant="box"
+                  total={boxCategories.length}
+                />
+              </ScrollRevealItem>
+            ))}
           </ScrollRevealGroup>
 
           <ScrollReveal delay={0.15}>
@@ -613,109 +597,81 @@ export default function HomePage() {
         <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.035)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.035)_1px,transparent_1px)] bg-size-[56px_56px]" />
 
         <div className="relative z-10 mx-auto max-w-6xl px-4 py-14 sm:px-6">
-          <div className="mb-8 max-w-2xl">
+          <div className="mb-10 max-w-2xl">
             <ScrollReveal>
-              <p className="text-xs font-semibold tracking-[0.22em] text-[#d7b56d] uppercase">
-                Como funciona?
-              </p>
+              <div className="flex items-center gap-4">
+                <p className="text-xs font-semibold tracking-[0.22em] text-[#d7b56d] uppercase">
+                  Como funciona?
+                </p>
+                <span className="hidden h-px flex-1 bg-[#d7b56d]/45 sm:block" />
+              </div>
             </ScrollReveal>
             <ScrollReveal delay={0.08}>
-              <h2 className="mt-2 font-heading text-3xl font-semibold tracking-tight sm:text-4xl">
+              <h2 className="mt-2 font-heading text-3xl font-semibold tracking-tight text-[#fffaf0] sm:text-4xl">
                 Da assinatura ao dossiê final em três passos.
               </h2>
             </ScrollReveal>
           </div>
 
           <ScrollRevealGroup
-            className="grid gap-4 md:grid-cols-3"
+            className="grid items-stretch gap-5 md:grid-cols-3 lg:gap-6"
             staggerChildren={0.12}
           >
-            {howItWorks.map((step, index) => {
-              const Icon = step.icon
-              return (
-                <ScrollRevealItem key={step.title}>
-                  <GlowingCard innerClassName="bg-[#090807] p-6">
-                    <div className="flex items-center justify-between">
-                      <Icon className="size-10 text-[#d84132]" />
-                      <span className="font-heading text-4xl font-semibold text-[#fffaf0]/10">
-                        0{index + 1}
-                      </span>
-                    </div>
-                    <h3 className="mt-6 font-heading text-xl font-semibold">
-                      {step.title}
-                    </h3>
-                    <p className="mt-2 text-sm leading-6 text-[#d7c9b5]">
-                      {step.description}
-                    </p>
-                  </GlowingCard>
-                </ScrollRevealItem>
-              )
-            })}
+            {howItWorks.map((step, index) => (
+              <ScrollRevealItem key={step.title} className="h-full">
+                <HowItWorksStepCard
+                  icon={step.icon}
+                  title={step.title}
+                  description={step.description}
+                  stepIndex={index}
+                />
+              </ScrollRevealItem>
+            ))}
           </ScrollRevealGroup>
         </div>
       </section>
 
-      <section className="border-b border-[#fffaf0]/10 bg-[#090807]">
-        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
-          <div className="mb-8 max-w-2xl space-y-4">
+      <section className="relative isolate overflow-hidden border-b border-[#fffaf0]/10 bg-[#0b0908]">
+        <Image
+          src={plansDossierPlate}
+          alt=""
+          fill
+          placeholder="blur"
+          sizes="100vw"
+          className="absolute inset-0 -z-20 object-cover object-center brightness-[0.42] saturate-[0.78]"
+        />
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_14%_18%,rgba(216,65,50,0.14),transparent_30%),radial-gradient(circle_at_86%_12%,rgba(215,181,109,0.12),transparent_28%),linear-gradient(180deg,rgba(11,9,8,0.88)_0%,rgba(11,9,8,0.62)_42%,rgba(11,9,8,0.9)_100%)]" />
+        <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.032)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.032)_1px,transparent_1px)] bg-size-[56px_56px]" />
+
+        <div className="relative z-10 mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-20">
+          <div className="mb-10 max-w-2xl space-y-4">
             <ScrollReveal>
-              <p className="text-xs font-semibold tracking-[0.22em] text-[#d7b56d] uppercase">
-                Escolha seu plano
-              </p>
+              <div className="flex items-center gap-4">
+                <p className="text-xs font-semibold tracking-[0.22em] text-[#d7b56d] uppercase">
+                  Escolha seu plano
+                </p>
+                <span className="hidden h-px flex-1 bg-[#d7b56d]/45 sm:block" />
+              </div>
             </ScrollReveal>
             <ScrollReveal delay={0.08}>
-              <h2 className="font-heading text-3xl font-semibold tracking-tight sm:text-4xl">
-                Comece pelo ritmo que combina com você.
+              <h2 className="font-heading text-3xl font-semibold tracking-tight text-[#fffaf0] sm:text-4xl">
+                Entre no caso pelo ritmo que combina com você.
               </h2>
             </ScrollReveal>
             <TextGenerateEffect
-              words="Planos recorrentes para acompanhar todos os ciclos ou compra avulsa para experimentar uma edição específica."
+              words="Cada opção abre um dossiê diferente: acompanhamento mensal, arquivo completo anual ou uma edição avulsa para experimentar sem compromisso."
               textClassName="max-w-2xl text-sm leading-6 text-[#d7c9b5]"
               staggerDelay={0.04}
             />
           </div>
 
           <ScrollRevealGroup
-            className="grid gap-4 lg:grid-cols-3"
+            className="grid items-stretch gap-5 lg:grid-cols-3 lg:gap-6"
             staggerChildren={0.12}
           >
             {plans.map((plan) => (
-              <ScrollRevealItem key={plan.id}>
-                <GlowingCard className="relative h-full" innerClassName="p-6">
-                  {plan.isRecommended ? (
-                    <span className="absolute top-4 right-4 z-10 bg-[#d84132] px-2 py-1 text-xs font-semibold tracking-[0.16em] text-white uppercase">
-                      Melhor escolha
-                    </span>
-                  ) : null}
-                  <h3 className="pr-28 font-heading text-xl font-semibold">
-                    {plan.name}
-                  </h3>
-                  <p className="mt-3 min-h-12 text-sm leading-6 text-[#d7c9b5]">
-                    {plan.description}
-                  </p>
-                  <p className="mt-5 font-heading text-3xl font-semibold">
-                    {plan.pricePerMonth
-                      ? `${formatCurrency(plan.pricePerMonth)}/mês`
-                      : formatCurrency(plan.price)}
-                  </p>
-                  <ul className="mt-5 space-y-3 text-sm text-[#e5d8c4]">
-                    {plan.features.slice(0, 4).map((feature) => (
-                      <li key={feature} className="flex gap-2">
-                        <IconShieldCheck className="mt-0.5 size-4 shrink-0 text-[#d84132]" />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <Button
-                    asChild
-                    className="mt-6 w-full bg-[#d84132] text-white hover:bg-[#b93227]"
-                  >
-                    <Link href={`/checkout?plano=${plan.slug}`}>
-                      Escolher
-                      <IconArrowRight className="size-4" />
-                    </Link>
-                  </Button>
-                </GlowingCard>
+              <ScrollRevealItem key={plan.id} className="h-full">
+                <PlanDossierCard plan={plan} />
               </ScrollRevealItem>
             ))}
           </ScrollRevealGroup>
