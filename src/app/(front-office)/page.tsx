@@ -19,6 +19,7 @@ import Link from 'next/link'
 
 import boxContentsBg from '@/src/assets/images/home/box-contents-bg.png'
 import clubOverviewBg from '@/src/assets/images/home/club-overview-bg.png'
+import finalCtaDossierPlate from '@/src/assets/images/home/final-cta-dossier-plate.png'
 import investigationContinuousBg from '@/src/assets/images/home/investigation-continuous-bg.png'
 import plansDossierPlate from '@/src/assets/images/home/plans-dossier-plate.png'
 import previousBoxesBanner from '@/src/assets/images/home/previous-boxes-banner.png'
@@ -564,14 +565,23 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="bg-[#d84132] text-white">
-        <div className="mx-auto flex max-w-6xl flex-col gap-5 px-4 py-10 sm:px-6 md:flex-row md:items-center md:justify-between">
+      <section className="relative isolate overflow-hidden bg-[#d84132] text-white">
+        <Image
+          src={finalCtaDossierPlate}
+          alt=""
+          fill
+          sizes="100vw"
+          className="absolute inset-0 -z-30 object-cover object-center brightness-[0.42] saturate-[0.9]"
+        />
+        <div className="absolute inset-0 -z-20 bg-[rgba(216,65,50,0.42)]" />
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_18%_45%,rgba(255,244,220,0.24),transparent_28%),linear-gradient(90deg,rgba(23,18,17,0.38),transparent_58%,rgba(23,18,17,0.2))]" />
+        <div className="mx-auto flex max-w-6xl flex-col gap-5 px-4 py-12 sm:px-6 md:flex-row md:items-center md:justify-between">
           <ScrollReveal>
-            <div>
-              <p className="text-sm font-semibold tracking-[0.2em] text-white/75 uppercase">
+            <div className="max-w-2xl">
+              <p className="text-sm font-semibold tracking-[0.2em] text-white/78 uppercase">
                 Pronto para abrir o arquivo?
               </p>
-              <h2 className="mt-2 font-heading text-3xl font-semibold">
+              <h2 className="mt-2 font-heading text-3xl font-semibold text-balance sm:text-4xl">
                 Garanta sua vaga antes que a próxima edição esgote.
               </h2>
               <TextGenerateEffect
@@ -579,7 +589,7 @@ export default function HomePage() {
                   finalCtaSubtitle?.value ??
                   'Garanta sua vaga no clube antes que a próxima edição esgote. A próxima pista já está sendo preparada.'
                 }
-                textClassName="mt-2 text-sm text-white/80"
+                textClassName="mt-3 max-w-xl text-sm leading-6 text-white/82"
                 staggerDelay={0.06}
                 filter={false}
               />
@@ -589,7 +599,7 @@ export default function HomePage() {
             <Button
               asChild
               size="lg"
-              className="bg-white text-[#171211] hover:bg-[#fff1dd]"
+              className="w-fit bg-white text-[#171211] shadow-[0_18px_44px_rgba(23,18,17,0.28)] hover:bg-[#fff1dd]"
             >
               <Link href="/assinatura">
                 Garantir minha vaga
