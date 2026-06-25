@@ -153,22 +153,34 @@ Telas previstas:
 
 # 4. Diretrizes de UX/UI
 
-A interface deve seguir um padrão premium, moderno e profissional, alinhado à identidade visual já validada no projeto.
+A interface deve seguir o padrão visual validado na Home pública em `src/app/(front-office)/page.tsx`. Essa página é a base de estilização para os demais componentes e telas do Front Office: atmosfera escura e premium, linguagem de dossiê investigativo, imagens reais de produto/arquivo, overlays cinematográficos, grade sutil, acentos dourados/vermelhos e navegação clara.
 
-Diretrizes:
+Diretrizes gerais:
 
-- Visual limpo e enterprise.
-- Boa hierarquia visual.
-- Componentes reutilizáveis.
-- Experiência responsiva.
-- Fluxos simples e claros.
-- Priorizar clareza na jornada do cliente.
-- Estados bem definidos: vazio, carregando, erro, sucesso, bloqueado, pendente.
-- Estrutura preparada para conteúdos dinâmicos definidos pelo Design (ex: textos editáveis, banners configuráveis, imagens substituíveis).
-- Utilizar como referência de UX, navegação e construção de fluxos as seguintes plataformas:
-    - https://www\.wine\.com\.br/ (referência para experiência de assinatura, storytelling de produto e jornada de compra)
-    - https://literaturaclassica\.com\.br (referência para apresentação de produtos, organização de catálogo e comunicação de valor)
-    - https://nerdaocubo\.com\.br (referência para experiência de box por assinatura, engajamento e construção de comunidade)
+- Manter boa hierarquia visual e leitura rápida.
+- Construir componentes reutilizáveis a partir da anatomia já usada na Home.
+- Garantir experiência responsiva, com versões desktop e mobile planejadas.
+- Priorizar clareza na jornada do cliente, especialmente em compra, assinatura, login, checkout e área logada.
+- Definir estados bem legíveis: vazio, carregando, erro, sucesso, bloqueado, pendente, indisponível e recomendado.
+- Preparar a estrutura para conteúdos dinâmicos definidos pelo Design (ex: textos editáveis, banners configuráveis, imagens substituíveis).
+- Usar movimento e revelação progressiva para storytelling, sem atrapalhar fluxos transacionais.
+
+Diretrizes visuais obrigatórias derivadas da Home:
+
+- Paleta: fundo principal `#090807`, superfícies `#0b0908`, `#171211` e `#050403`, texto claro `#fffaf0`/`#f0e8dd`, texto secundário `#d7c9b5`, dourado `#d7b56d` e vermelho de ação `#d84132`.
+- Seções: usar blocos full-width com bordas finas de baixa opacidade, containers `max-w-6xl`/`max-w-7xl`, overlays escuros e grades sutis de arquivo.
+- Cards: tratar features, planos, produtos, passos e conteúdos como dossiês, com borda fina, cabeçalho técnico, ícone, label, código de referência, corpo com índice/preço/progresso e textura sutil.
+- CTAs: usar vermelho para ação comercial principal, dourado para recomendação/premium e outline escuro/dourado para ações secundárias.
+- Tipografia: títulos com `font-heading`, peso alto e hierarquia forte; metadados em uppercase com tracking amplo; códigos e referências podem usar `font-mono`.
+- Iconografia: preferir Tabler Icons para ações, status e cabeçalhos de card.
+- Imagens: priorizar fotos ou vídeos que mostrem box, produto, evidência, arquivo, mesa de investigação ou itens colecionáveis. Evitar imagens genéricas ou apenas atmosféricas quando o usuário precisar entender o produto.
+- Movimento: reaproveitar padrões como `ScrollReveal`, `ScrollRevealGroup` e `TextGenerateEffect` em páginas editoriais; reduzir movimento em checkout, carrinho, login e área do cliente.
+
+Referências externas continuam úteis para validar fluxo e conversão, mas não devem substituir a identidade visual da Home:
+
+- https://www\.wine\.com\.br/ (referência para experiência de assinatura, storytelling de produto e jornada de compra)
+- https://literaturaclassica\.com\.br (referência para apresentação de produtos, organização de catálogo e comunicação de valor)
+- https://nerdaocubo\.com\.br (referência para experiência de box por assinatura, engajamento e construção de comunidade)
 
 ---
 
