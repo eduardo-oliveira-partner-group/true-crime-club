@@ -4,7 +4,6 @@ import {
   IconBoxSeam,
   IconCalendarEvent,
   IconChecklist,
-  IconCircleCheck,
   IconClipboardText,
   IconCreditCard,
   IconFingerprint,
@@ -20,15 +19,14 @@ import Link from 'next/link'
 
 import boxContentsBg from '@/src/assets/images/home/box-contents-bg.png'
 import clubOverviewBg from '@/src/assets/images/home/club-overview-bg.png'
-import heroBanner from '@/src/assets/images/home/hero-banner.png'
 import investigationContinuousBg from '@/src/assets/images/home/investigation-continuous-bg.png'
 import plansDossierPlate from '@/src/assets/images/home/plans-dossier-plate.png'
 import previousBoxesBanner from '@/src/assets/images/home/previous-boxes-banner.png'
 import { FeatureDossierCard } from '@/src/components/home/feature-dossier-card'
+import { HeroCaseReveal } from '@/src/components/home/hero-case-reveal'
 import { HowItWorksStepCard } from '@/src/components/home/how-it-works-step-card'
 import { PlanDossierCard } from '@/src/components/home/plan-dossier-card'
 import { Button } from '@/src/components/ui/button'
-import { EncryptedText } from '@/src/components/ui/encrypted-text'
 import { GlowingCard } from '@/src/components/ui/glowing-card'
 import {
   ScrollReveal,
@@ -128,23 +126,6 @@ const howItWorks = [
   },
 ]
 
-const trustItems = [
-  'Primeiro clube do Brasil',
-  'Pistas mensais',
-  'Evento ao vivo com a comunidade',
-  'Cancelamento flexível',
-]
-
-const heroWordAngles = ['-rotate-1', 'rotate-1', '-rotate-2', 'rotate-0']
-const heroPaperCuts = [
-  '[clip-path:polygon(1%_8%,99%_0,98%_86%,3%_100%)]',
-  '[clip-path:polygon(0_7%,97%_4%,100%_92%,2%_96%)]',
-  '[clip-path:polygon(2%_3%,100%_9%,98%_96%,0_91%)]',
-  '[clip-path:polygon(0_10%,98%_2%,100%_90%,1%_100%)]',
-]
-const heroTitleRevealDelayMs = 72
-const heroTitleWordOverlap = 0.8
-
 export default function HomePage() {
   const heroTitle = getDynamicContent('home.hero.title')
   const heroBadge = getDynamicContent('home.hero.badge')
@@ -158,168 +139,27 @@ export default function HomePage() {
   const activeCase = getActiveCase()
   const progress = activeCase ? getSubscriberProgress(activeCase.id) : null
   const featuredBox = featuredProducts.find((product) => product.type === 'box')
-  const titleWords = (
-    heroTitle?.value ?? 'Investigue. Colete. Desvende.'
-  ).split(' ')
   const liveEventDate = progress?.liveEventDate ?? activeCase?.liveEventDate
   const liveEventTitle =
     progress?.liveEventTitle ?? activeCase?.liveEventTitle ?? 'Grande Revelação'
 
   return (
     <div className="bg-[#090807] text-[#fffaf0]">
-      <section className="relative isolate overflow-hidden border-b border-[#2d201b]/15 bg-[#090807] text-[#fffaf0]">
-        <Image
-          src={heroBanner}
-          alt=""
-          fill
-          priority
-          placeholder="blur"
-          sizes="100vw"
-          className="absolute inset-0 -z-20 object-cover object-[68%_center]"
-        />
-        <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,#090807_0%,rgba(9,8,7,0.96)_24%,rgba(9,8,7,0.62)_52%,rgba(9,8,7,0.18)_100%)]" />
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_18%_20%,rgba(216,65,50,0.22),transparent_24%),linear-gradient(90deg,rgba(255,250,240,0.035)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.035)_1px,transparent_1px)] bg-size-[auto,42px_42px,42px_42px]" />
-
-        <div className="mx-auto flex min-h-[720px] max-w-6xl items-center px-4 py-16 sm:px-6 lg:min-h-[760px]">
-          <div className="max-w-3xl space-y-7">
-            <ScrollReveal immediate delay={0.05}>
-              <div className="inline-flex max-w-full items-center gap-2 border border-[#d84132]/45 bg-[#2c1713]/80 px-3 py-1 text-xs font-semibold tracking-[0.24em] text-[#ffb0a5] uppercase shadow-[0_0_24px_rgba(216,65,50,0.18)]">
-                <IconFingerprint className="size-4 shrink-0" />
-                <span>
-                  {heroBadge?.value ?? 'Primeiro Clube de True Crime do Brasil'}
-                </span>
-              </div>
-            </ScrollReveal>
-
-            <div className="space-y-5">
-              <ScrollReveal immediate delay={0.15} y={20}>
-                <h1
-                  className="flex max-w-3xl flex-col items-start gap-y-3 font-heading text-4xl leading-[0.95] font-black tracking-wide text-[#171211] uppercase sm:text-6xl lg:text-7xl"
-                  aria-label={
-                    heroTitle?.value ?? 'Investigue. Colete. Desvende.'
-                  }
-                >
-                  {titleWords.map((word, index) => {
-                    const startDelayMs = titleWords
-                      .slice(0, index)
-                      .reduce(
-                        (total, prevWord) =>
-                          total +
-                          prevWord.length *
-                            heroTitleRevealDelayMs *
-                            heroTitleWordOverlap,
-                        0,
-                      )
-
-                    return (
-                      <span
-                        key={`${word}-${index}`}
-                        aria-hidden="true"
-                        className={`${heroWordAngles[index % heroWordAngles.length]} relative isolate inline-flex w-fit max-w-full items-center overflow-visible`}
-                      >
-                        <span
-                          className={`${heroPaperCuts[index % heroPaperCuts.length]} relative inline-flex items-center border border-[#d9ccb2]/85 bg-[radial-gradient(circle_at_18%_25%,rgba(107,77,42,0.16)_0_1px,transparent_1.4px),radial-gradient(circle_at_78%_68%,rgba(38,25,17,0.1)_0_1px,transparent_1.3px),linear-gradient(96deg,#fffdf2_0%,#f3ead7_46%,#fffbec_100%)] bg-size-[9px_9px,11px_11px,100%_100%] px-[0.22em] py-[0.12em] shadow-[0_13px_2px_-10px_rgba(0,0,0,0.78),0_2px_0_rgba(28,19,14,0.6),0_0_0_1px_rgba(255,250,229,0.42)_inset]`}
-                        >
-                          <span className="pointer-events-none absolute inset-x-3 bottom-1 h-px bg-[#171211]/80" />
-                          <EncryptedText
-                            text={word}
-                            className="relative z-10 drop-shadow-[0_1px_0_rgba(255,255,255,0.2)]"
-                            encryptedClassName="text-[#81746b]"
-                            revealedClassName="bg-[radial-gradient(circle_at_35%_40%,rgba(23,18,17,0.88)_0_0.9px,transparent_1.25px),linear-gradient(95deg,#15100f,#332a25_52%,#16110f)] bg-size-[4px_4px,100%_100%] bg-clip-text text-transparent [-webkit-text-stroke:1.2px_rgba(23,18,17,0.84)] [paint-order:stroke_fill]"
-                            revealDelayMs={heroTitleRevealDelayMs}
-                            flipDelayMs={65}
-                            startDelayMs={startDelayMs}
-                          />
-                        </span>
-                      </span>
-                    )
-                  })}
-                </h1>
-              </ScrollReveal>
-              <TextGenerateEffect
-                immediate
-                words={
-                  heroSubtitle?.value ??
-                  'Eleve seu nível de conteúdo com uma caixa temática mensal, recheada de surpresas exclusivas — da abertura ao design impecável de cada item colecionável.'
-                }
-                textClassName="max-w-2xl bg-black/28 py-1 text-lg leading-8 text-[#f0e2c5] [box-decoration-break:clone] sm:text-xl"
-                staggerDelay={0.04}
-              />
-            </div>
-
-            <ScrollReveal immediate delay={0.45}>
-              <div className="flex flex-wrap gap-3">
-                <Button
-                  asChild
-                  size="lg"
-                  className="bg-[#d84132] text-white shadow-[0_0_26px_rgba(216,65,50,0.35)] hover:bg-[#b93227]"
-                >
-                  <Link href="/assinatura">
-                    {heroCta?.value ?? 'Garantir minha vaga'}
-                    <IconArrowRight className="size-4" />
-                  </Link>
-                </Button>
-                <Button
-                  asChild
-                  variant="outline"
-                  size="lg"
-                  className="border-[#fffaf0]/25 bg-[#090807]/45 text-[#fffaf0] backdrop-blur-sm hover:bg-[#fffaf0]/12 hover:text-[#fffaf0]"
-                >
-                  <Link href="/loja">Ver boxes avulsas</Link>
-                </Button>
-              </div>
-            </ScrollReveal>
-
-            <ScrollRevealGroup
-              immediate
-              delayChildren={0.55}
-              staggerChildren={0.08}
-            >
-              <div className="grid max-w-2xl gap-2 text-sm text-[#e5d8c4] sm:grid-cols-2">
-                {trustItems.map((item) => (
-                  <ScrollRevealItem key={item}>
-                    <div className="flex items-center gap-2">
-                      <IconCircleCheck className="size-4 text-[#d84132]" />
-                      <span>{item}</span>
-                    </div>
-                  </ScrollRevealItem>
-                ))}
-              </div>
-            </ScrollRevealGroup>
-
-            <ScrollRevealGroup
-              immediate
-              delayChildren={0.7}
-              staggerChildren={0.1}
-            >
-              <div className="grid max-w-2xl gap-3 pt-2 text-sm sm:grid-cols-2">
-                <ScrollRevealItem>
-                  <div className="border border-[#fffaf0]/14 bg-[#090807]/58 p-4 backdrop-blur-sm">
-                    <p className="text-xs font-semibold tracking-[0.18em] text-[#d7b56d] uppercase">
-                      Caso em andamento
-                    </p>
-                    <p className="mt-2 font-heading text-xl font-semibold">
-                      {activeCase?.title ?? 'Operação Meia-Noite'}
-                    </p>
-                  </div>
-                </ScrollRevealItem>
-                <ScrollRevealItem>
-                  <div className="border border-[#fffaf0]/14 bg-[#090807]/58 p-4 backdrop-blur-sm">
-                    <p className="text-xs font-semibold tracking-[0.18em] text-[#d7b56d] uppercase">
-                      Ciclo atual
-                    </p>
-                    <p className="mt-2 font-heading text-xl font-semibold">
-                      {featuredBox?.cycleNumber
-                        ? `Box #${featuredBox.cycleNumber}`
-                        : 'Nova box mensal'}
-                    </p>
-                  </div>
-                </ScrollRevealItem>
-              </div>
-            </ScrollRevealGroup>
-          </div>
-        </div>
-      </section>
+      <HeroCaseReveal
+        badge={heroBadge?.value ?? 'Primeiro Clube de True Crime do Brasil'}
+        title={heroTitle?.value ?? 'Investigue. Colete. Desvende.'}
+        subtitle={
+          heroSubtitle?.value ??
+          'Eleve seu nível de conteúdo com uma caixa temática mensal, recheada de surpresas exclusivas — da abertura ao design impecável de cada item colecionável.'
+        }
+        ctaLabel={heroCta?.value ?? 'Garantir minha vaga'}
+        activeCaseTitle={activeCase?.title ?? 'Operação Meia-Noite'}
+        cycleLabel={
+          featuredBox?.cycleNumber
+            ? `Box #${featuredBox.cycleNumber}`
+            : 'Nova box mensal'
+        }
+      />
 
       <section className="relative isolate overflow-hidden border-b border-[#fffaf0]/10 bg-[#0b0908]">
         <Image
@@ -722,73 +562,100 @@ export default function HomePage() {
           </ScrollReveal>
 
           <ScrollRevealGroup
-            className="grid items-stretch gap-5 sm:grid-cols-2 xl:grid-cols-4"
+            className="grid items-stretch gap-5 lg:grid-cols-2 lg:gap-6"
             staggerChildren={0.1}
           >
             {boxProducts.map((product) => {
               const productImage = getProductImage(product.images[0] ?? '')
+              const availabilityLabel =
+                product.availability === 'limited'
+                  ? 'Limitado'
+                  : product.availability === 'out_of_stock'
+                    ? 'Indisponível'
+                    : product.availability === 'coming_soon'
+                      ? 'Em breve'
+                      : 'Disponível'
+              const displayPrice = product.subscriberPrice ?? product.price
+              const evidenceNumber = String(product.cycleNumber ?? 0).padStart(
+                2,
+                '0',
+              )
 
               return (
                 <ScrollRevealItem key={product.id} className="h-full">
                   <GlowingCard
-                    className="h-full shadow-xl shadow-black/20"
-                    innerClassName="flex h-full flex-col overflow-hidden bg-[#090807] p-0"
+                    className="group h-full shadow-[0_22px_48px_rgba(0,0,0,0.28)]"
+                    innerClassName="relative flex h-full min-h-[300px] flex-col overflow-hidden bg-[#0b0908] p-0 md:flex-row"
                   >
+                    <div className="pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.035)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.035)_1px,transparent_1px)] bg-size-[34px_34px]" />
+                    <div className="pointer-events-none absolute top-0 right-6 z-20 h-12 w-10 border-x border-b border-[#d7b56d]/28 bg-[#d7b56d]/14" />
+
                     {productImage ? (
-                      <div className="relative aspect-4/3 shrink-0 overflow-hidden border-b border-[#fffaf0]/14 bg-[#171211]">
+                      <div className="relative aspect-square shrink-0 overflow-hidden border-b border-[#fffaf0]/14 bg-[#171211] md:w-[42%] md:border-r md:border-b-0">
                         <Image
                           src={productImage}
                           alt={product.name}
                           fill
                           placeholder="blur"
-                          sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 25vw"
-                          className="object-cover"
+                          sizes="(max-width: 768px) 100vw, 480px"
+                          className="object-cover object-center transition duration-500 group-hover:scale-[1.03]"
                         />
+                        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(9,8,7,0.08)_0%,rgba(9,8,7,0.48)_100%)]" />
+                        <div className="absolute top-4 left-4 border border-[#fffaf0]/20 bg-[#090807]/82 px-3 py-2 backdrop-blur-sm">
+                          <p className="text-[0.65rem] font-semibold tracking-[0.2em] text-[#d7b56d] uppercase">
+                            Caixa
+                          </p>
+                          <p className="font-heading text-2xl leading-none font-semibold text-[#fffaf0]">
+                            {evidenceNumber}
+                          </p>
+                        </div>
                       </div>
                     ) : null}
 
-                    <div className="flex flex-1 flex-col p-5">
-                      <div className="flex items-center justify-between gap-3">
-                        <p className="text-xs font-semibold tracking-[0.18em] text-[#ffb0a5] uppercase">
-                          {product.type === 'box' ? 'Box temática' : 'Produto'}
+                    <div className="relative z-20 flex flex-1 flex-col p-5 sm:p-6">
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <p className="border-l-2 border-[#d84132] pl-3 text-xs font-semibold tracking-[0.2em] text-[#ffb0a5] uppercase">
+                          Arquivo avulso
                         </p>
-                        <span className="shrink-0 border border-[#fffaf0]/14 bg-[#171211] px-2 py-1 text-xs text-[#d7c9b5]">
-                          {product.availability === 'limited'
-                            ? 'Limitado'
-                            : 'Disponível'}
+                        <span className="shrink-0 border border-[#d84132]/38 bg-[#2c1713]/72 px-3 py-1 text-xs font-semibold tracking-[0.14em] text-[#ffb0a5] uppercase">
+                          {availabilityLabel}
                         </span>
                       </div>
 
-                      <h3 className="mt-4 line-clamp-2 h-[2lh] overflow-hidden font-heading text-lg leading-snug font-semibold">
+                      <h3 className="mt-5 line-clamp-2 min-h-[2lh] overflow-hidden font-heading text-2xl leading-tight font-semibold tracking-wide text-[#fffaf0] uppercase">
                         {product.name}
                       </h3>
 
-                      <p className="mt-2 line-clamp-2 h-[2lh] overflow-hidden text-sm leading-6 text-[#d7c9b5]">
+                      <p className="mt-3 line-clamp-2 min-h-[2lh] overflow-hidden text-sm leading-6 text-[#d7c9b5]">
                         {product.shortDescription}
                       </p>
 
-                      {product.includedItems?.length ? (
-                        <ul className="mt-4 min-h-21 space-y-2 text-sm text-[#e5d8c4]">
-                          {product.includedItems.slice(0, 3).map((item) => (
-                            <li key={item} className="flex gap-2">
-                              <IconCircleCheck className="mt-0.5 size-4 shrink-0 text-[#d84132]" />
-                              <span className="line-clamp-1">{item}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <div className="mt-4 min-h-21" aria-hidden="true" />
-                      )}
-
-                      <div className="mt-auto flex items-center justify-between gap-4 border-t border-[#fffaf0]/10 pt-4">
-                        <p className="font-heading text-lg font-semibold">
-                          {formatCurrency(product.price)}
-                        </p>
+                      <div className="mt-auto flex items-end justify-between gap-4 border-t border-[#fffaf0]/10 pt-5">
+                        <div className="min-w-0">
+                          {product.subscriberPrice ? (
+                            <div className="space-y-1.5">
+                              <p className="text-xs text-[#d7c9b5]/68 line-through decoration-[#ffb0a5]/70 decoration-2">
+                                de {formatCurrency(product.price)}
+                              </p>
+                              <p className="text-xs font-semibold tracking-[0.16em] text-[#d7b56d] uppercase">
+                                Assinante
+                              </p>
+                              <p className="font-heading text-xl leading-none font-semibold text-[#fffaf0]">
+                                {formatCurrency(product.subscriberPrice)}
+                              </p>
+                            </div>
+                          ) : (
+                            <p className="font-heading text-lg font-semibold">
+                              {formatCurrency(displayPrice)}
+                            </p>
+                          )}
+                        </div>
                         <Link
                           href={`/loja/${product.slug}`}
-                          className="shrink-0 text-sm font-medium text-[#ffb0a5] hover:text-[#fffaf0] hover:underline"
+                          className="inline-flex h-10 shrink-0 items-center gap-2 border border-[#fffaf0]/16 bg-[#fffaf0]/6 px-4 text-sm font-semibold text-[#fffaf0] transition hover:border-[#d84132]/55 hover:bg-[#d84132]/18 hover:text-[#fffaf0]"
                         >
-                          Ver detalhes
+                          Detalhes
+                          <IconArrowRight className="size-4" />
                         </Link>
                       </div>
                     </div>

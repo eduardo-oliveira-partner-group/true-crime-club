@@ -3,6 +3,7 @@ import './globals.css'
 import type { Metadata } from 'next'
 import { Geist_Mono, Inter, Libre_Baskerville } from 'next/font/google'
 
+import { SmoothScrollProvider } from '@/src/components/smooth-scroll-provider'
 import { ThemeProvider } from '@/src/components/theme-provider'
 import { cn } from '@/src/lib/utils'
 
@@ -44,7 +45,9 @@ export default function RootLayout({
       )}
     >
       <body>
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <SmoothScrollProvider>{children}</SmoothScrollProvider>
+        </ThemeProvider>
       </body>
     </html>
   )

@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+@import "lenis/dist/lenis.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -141,6 +142,12 @@
   html {
     @apply font-sans;
     }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html:not(.lenis) {
+      scroll-behavior: smooth;
+    }
+  }
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading), var(--font-sans), sans-serif;
     }

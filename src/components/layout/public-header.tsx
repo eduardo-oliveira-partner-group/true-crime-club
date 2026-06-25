@@ -17,9 +17,12 @@ export function PublicHeader() {
 
   return (
     <header className="border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
-        <Link href="/" className="shrink-0">
-          <BrandLogo priority />
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-2 px-3 sm:gap-4 sm:px-6">
+        <Link href="/" className="min-w-0 shrink">
+          <BrandLogo
+            className="h-7 max-w-[9.5rem] sm:h-8 sm:max-w-none"
+            priority
+          />
         </Link>
 
         <nav className="hidden items-center gap-6 md:flex">
@@ -34,17 +37,17 @@ export function PublicHeader() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
           <Button variant="ghost" size="sm" asChild>
-            <Link href="/login">
+            <Link href="/login" aria-label="Conta">
               <IconUser className="size-4" />
               <span className="hidden sm:inline">Conta</span>
             </Link>
           </Button>
           <Button variant="outline" size="sm" asChild>
-            <Link href="/carrinho">
+            <Link href="/carrinho" aria-label="Carrinho">
               <IconShoppingCart className="size-4" />
-              <span>Carrinho</span>
+              <span className="hidden min-[380px]:inline">Carrinho</span>
               {itemCount > 0 ? (
                 <span className="rounded-full bg-primary px-1.5 py-0.5 text-xs text-primary-foreground">
                   {itemCount}
@@ -55,7 +58,7 @@ export function PublicHeader() {
         </div>
       </div>
 
-      <nav className="flex gap-4 overflow-x-auto border-t border-border px-4 py-2 md:hidden">
+      <nav className="flex max-w-full gap-4 overflow-x-auto border-t border-border px-3 py-2 md:hidden">
         {navLinks.map((link) => (
           <Link
             key={link.href}
