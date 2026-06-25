@@ -6,7 +6,7 @@
 > pare e reporte. Ao finalizar, atualize a linha de status deste plano em
 > `plans/README.md`.
 >
-> **Verificação de drift (rode primeiro)**: `git diff --stat d80f959..HEAD -- docs/escopo-frontend.md package.json src public components.json next.config.ts tsconfig.json`
+> **Verificação de drift (rode primeiro)**: `git diff --stat fe41adc..HEAD -- docs/escopo-frontend.md package.json src public components.json next.config.ts tsconfig.json`
 > Se algum arquivo em escopo mudou desde que este plano foi escrito, compare os
 > trechos da seção "Estado atual" com o código vivo antes de prosseguir. Se
 > houver divergência material, trate como condição de parada.
@@ -18,7 +18,8 @@
 - **Risco**: MED
 - **Depende de**: nenhum
 - **Categoria**: direção
-- **Planejado em**: commit `d80f959`, 2026-06-24
+- **Planejado em**: commit `fe41adc`, 2026-06-25 (reconcile; baseline original `d80f959`)
+- **Execução**: IN PROGRESS — Etapas 1–4 em grande parte concluídas; Etapas 5–7 pendentes (ver seção "Progresso do reconcile")
 
 ## Por que isso importa
 
@@ -42,10 +43,18 @@ O resultado esperado é um frontend que Design, Produto, Backend e stakeholders 
 - O aceite exige todas as telas principais navegáveis, fluxos com mocks funcionando, rotas organizadas, componentes reutilizáveis, responsividade, documentação de APIs, SEO, preparo para conteúdo dinâmico e documentação suficiente para o Backend iniciar a implementação (`docs/escopo-frontend.md:371-384`).
 - Fora do escopo: backend real, banco de dados, gateway de pagamento, Omie, integração com transportadoras, autenticação real, pagamento real, emissão real de nota fiscal e deploy definitivo em produção (`docs/escopo-frontend.md:388-400`).
 - Requisito de benchmark: entregar maturidade no mínimo equivalente a `https://www.truecrime.club/` em navegação, jornada do assinante, área do cliente e experiência geral, sem reproduzir a UI (`docs/escopo-frontend.md:404-416`).
-- O app atual ainda é um placeholder de template: `src/app/page.tsx:1-19` renderiza "Project ready!" e um botão.
-- O layout raiz existe em `src/app/layout.tsx:1-32`, usa `ThemeProvider`, fontes Inter/Roboto Slab/Geist Mono e hoje define `lang="en"`; isso deve mudar para `pt-BR`.
+- O Front Office já existe em route groups `(front-office)`, `(auth)` e `(cliente)` com 19 rotas compilando em `pnpm build` (commit `fe41adc`). A Home vive em `src/app/(front-office)/page.tsx`; não há mais placeholder em `src/app/page.tsx`.
+- O layout raiz em `src/app/layout.tsx` usa `lang="pt-BR"`, `ThemeProvider`, `SmoothScrollProvider` e fontes Inter/Libre Baskerville/Geist Mono; metadata default em `src/app/layout.tsx:23-28`.
+- `components.json` já aponta para `src/app/globals.css` e aliases `@/src/...` (`components.json:7-20`).
+- A camada mockada está em `src/lib/domain/{types,mock-data,repositories,scenarios}.ts` e `src/lib/formatters.ts`, com funções como `listProducts`, `getCart`, `createOrder`, `getActiveCase`, `listClues`, `getSubscriberProgress` e `getSeoEntry` (`src/lib/domain/repositories.ts`).
+- Layouts públicos: `PublicHeader`, `PublicFooter` em `src/components/layout/`; shell privado em `src/components/layout/client-shell.tsx`.
+- Carrinho, checkout e confirmação existem; checkout é **página única simplificada** (`src/app/(front-office)/checkout/page.tsx`), sem stepper nem etapa de preferências de assinante.
+- Gamificação na área logada: `src/app/(cliente)/cliente/conteudos/page.tsx` renderiza timeline de pistas, progresso e evento ao vivo.
+- Confirmação comunica descompasso cobrança × envio via `order.billingCycleNote` / `order.shippingCycleNote` (`src/app/(front-office)/checkout/confirmacao/page.tsx:44-50`).
+- **Ainda ausente**: `src/app/sitemap.ts`, `src/app/robots.ts`, `generateMetadata` por rota, JSON-LD, banner de cookies, `loading/error/not-found` por rota, docs em `docs/front-office-*.md`, `noindex` em layouts auth/cliente, formulário de preferências no checkout.
 - Os scripts em `package.json:6-13` são `pnpm dev`, `pnpm build`, `pnpm start`, `pnpm lint`, `pnpm format` e `pnpm typecheck`.
 - O projeto usa Next `16.2.6`, React `19.2.4`, Tailwind 4, shadcn, radix-ui, next-themes e Tabler icons (`package.json:14-25`).
+- Gates em `fe41adc`: `pnpm typecheck` exit 0, `pnpm build` exit 0, `pnpm lint` **exit 1** (9 erros Prettier em arquivos de auth/cliente/faq).
 
 ## Notas do Benchmark (True Crime Club)
 
@@ -288,30 +297,46 @@ O repo atualmente não tem script de testes. Não adicione um framework completo
 
 Se a adição de testes for aprovada, priorize testes focados de componente/domínio para repositórios mockados, totais de carrinho, cálculos de frete/cupom, transições de status de assinatura e transições de status de pagamento.
 
+## Progresso do reconcile (2026-06-25, HEAD `fe41adc`)
+
+Verificado spot-check no commit atual. **Não marcar DONE** até todos os critérios abaixo passarem.
+
+| Etapa | Situação | Evidência |
+|-------|----------|-----------|
+| 1 — Fundação | Concluída | `lang="pt-BR"`, route groups, domínio mockado, `components.json` corrigido |
+| 2 — Comércio público | Concluída | Home, Loja, `[slug]`, Assinatura, FAQ navegáveis; breadcrumbs inline em detalhe |
+| 3 — Carrinho/checkout | Parcial | Carrinho rico (cupom, frete, vazio); checkout single-page; confirmação com notas de ciclo; **falta stepper, preferências e fluxo assinatura completo** |
+| 4 — Auth + cliente | Concluída | 19 rotas no build; gamificação com progresso/pistas bloqueadas |
+| 5 — SEO | Não iniciada | Sem `sitemap.ts`/`robots.ts`, sem `generateMetadata` por rota, sem JSON-LD; `getSeoEntry` existe mas não é consumido |
+| 6 — Docs | Não iniciada | `docs/front-office-api-contracts.md`, `docs/front-office-dynamic-content-map.md`, `docs/front-office-route-map.md` ausentes |
+| 7 — QA final | Parcial | Build/typecheck OK; lint falha; sem arquivos `loading/error/not-found`; cookie consent ausente |
+
+**Próximo executor**: retomar na **Etapa 5** (SEO), depois **Etapa 6** (docs), depois fechar lacunas das Etapas 3 e 7. Rodar `pnpm lint --fix` ou corrigir manualmente os 9 erros Prettier antes de marcar DONE.
+
 ## Critérios de Conclusão
 
 Todos devem ser verdadeiros:
 
-- [ ] Toda rota em "Mapa de Rotas a Implementar" existe e é navegável.
-- [ ] O fluxo público de compra de produto/box funciona com mocks.
+- [x] Toda rota em "Mapa de Rotas a Implementar" existe e é navegável.
+- [x] O fluxo público de compra de produto/box funciona com mocks.
 - [ ] O fluxo de assinatura funciona com mocks e captura preferências do assinante.
-- [ ] Os fluxos da área do cliente funcionam com mocks para pedidos, assinatura, financeiro e conteúdo exclusivo.
-- [ ] Os mock data cobrem toda entidade exigida em `docs/escopo-frontend.md:175-194`.
+- [x] Os fluxos da área do cliente funcionam com mocks para pedidos, assinatura, financeiro e conteúdo exclusivo.
+- [x] Os mock data cobrem toda entidade exigida em `docs/escopo-frontend.md:175-194`.
 - [ ] A documentação de APIs futuras cobre todo grupo exigido em `docs/escopo-frontend.md:257-315`.
 - [ ] O mapa de conteúdo dinâmico existe e inclui textos, banners, imagens, texto de SEO, entradas de FAQ, copy de planos e conteúdo configurável da área do cliente.
 - [ ] SEO existe para páginas públicas, incluindo metadata, Open Graph/Twitter, sitemap, robots, breadcrumbs visíveis, JSON-LD de produto e JSON-LD de breadcrumbs.
 - [ ] Páginas privadas/auth têm comportamento `noindex`.
 - [ ] O layout responsivo foi validado em mobile e desktop.
-- [ ] `pnpm typecheck` finaliza com exit 0.
+- [x] `pnpm typecheck` finaliza com exit 0.
 - [ ] `pnpm lint` finaliza com exit 0.
-- [ ] `pnpm build` finaliza com exit 0.
+- [x] `pnpm build` finaliza com exit 0.
 - [ ] A linha de status em `plans/README.md` foi atualizada.
 
 ## Condições de Parada
 
 Pare e reporte se:
 
-- O `docs/escopo-frontend.md`, `package.json`, `src/app/page.tsx` ou `src/app/layout.tsx` vivo divergir materialmente da seção "Estado atual".
+- Arquivos de escopo (`docs/escopo-frontend.md`, `package.json`, `src/app/layout.tsx`, camada `src/lib/domain/**`) divergirem materialmente da seção "Estado atual" **sem** atualizar este plano via reconcile.
 - A documentação do Next 16 contradizer qualquer abordagem de rotas, metadata, imagens ou JSON-LD deste plano.
 - Implementar uma página exigir credenciais reais de backend, chamadas reais de pagamento/gateway, autenticação real ou integração real de frete.
 - Assets/copy finais de design forem obrigatórios e estiverem indisponíveis; use placeholders mockados somente se Produto/Design aceitarem isso para esta etapa.
