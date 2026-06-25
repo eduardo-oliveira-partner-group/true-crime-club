@@ -7,7 +7,7 @@
 > `plans/README.md`.
 >
 > **Verificação de drift (rode primeiro)**:
-> `git diff --stat e8847fa..HEAD -- 'src/app/(front-office)/page.tsx' src/components/ui/scroll-reveal.tsx src/components/ui/glowing-card.tsx src/lib/domain/mock-data.ts src/lib/domain/types.ts src/assets/images/home plans/README.md`
+> `git diff --stat fc79de0..HEAD -- 'src/app/(front-office)/page.tsx' src/components/ui/scroll-reveal.tsx src/components/ui/glowing-card.tsx src/lib/domain/mock-data.ts src/lib/domain/types.ts src/assets/images/home src/components/home plans/README.md`
 > Se qualquer arquivo em escopo mudou desde que este plano foi escrito, compare
 > os trechos da seção "Estado atual" com o código vivo antes de prosseguir. Se
 > houver divergência material no hero, na seção "O que vem na caixa", nos cards
@@ -20,7 +20,8 @@
 - **Risco**: MED
 - **Depende de**: nenhum
 - **Categoria**: direção
-- **Planejado em**: commit `e8847fa`, 2026-06-25
+- **Planejado em**: commit `fc79de0`, 2026-06-25 (reconcile; baseline original `e8847fa`)
+- **Execução**: IN PROGRESS — implementação substancial no HEAD; lacuna documentada no hero mobile (ver reconcile)
 
 ## Por que isso importa
 
@@ -359,23 +360,40 @@ por causa do sticky.
   - CTA final leva para `/assinatura`;
   - mobile não tem sobreposição de texto.
 
+## Progresso do reconcile (2026-06-25, HEAD `fc79de0`)
+
+Implementação substancial já presente no código — possivelmente iniciada antes do plano (`c5306f5`) e evoluída em `fe41adc`.
+
+| Critério | Situação | Evidência |
+|----------|----------|-----------|
+| Gates typecheck/lint/build | OK | exit 0 em `fc79de0` |
+| Home Server Component | OK | `src/app/(front-office)/page.tsx` sem `"use client"` |
+| Hero scroll reveal | OK (desktop) | `HeroCaseReveal` — sticky `250vh`, vídeo scrub `public/videos/hero-opening-scrub.mp4`, `useScroll`/`useReducedMotion` |
+| Seção "O que vem na caixa" | OK | `FeatureDossierCard` em grid assimétrico (`page.tsx:293-315`), não cinco `GlowingCard` iguais |
+| Planos distintos | OK | `PlanDossierCard`; Anual `isRecommended: true` (`mock-data.ts:232`); CTA `/checkout?plano=` |
+| Como funciona | OK | `HowItWorksStepCard` |
+| CTA final investigativo | OK | `finalCtaDossierPlate` em vez de bloco vermelho sólido |
+| Hero homem+caixa no 1º viewport | **Lacuna mobile** | Vídeo só em `lg+` (`hero-case-reveal.tsx:235-253`); mobile mostra apenas gradientes + copy |
+
+**Próximo executor**: adicionar fallback estático (ex. `hero-banner.png` ou frame do vídeo) no hero mobile para cumprir o critério visual; depois QA manual da checklist da Etapa 7.
+
 ## Critérios de conclusão
 
-- [ ] `pnpm typecheck` sai com exit 0.
-- [ ] `pnpm lint` sai com exit 0.
-- [ ] `pnpm build` sai com exit 0.
-- [ ] A Home mantém `src/app/(front-office)/page.tsx` como Server Component ou
+- [x] `pnpm typecheck` sai com exit 0.
+- [x] `pnpm lint` sai com exit 0.
+- [x] `pnpm build` sai com exit 0.
+- [x] A Home mantém `src/app/(front-office)/page.tsx` como Server Component ou
       isola qualquer `"use client"` em componentes menores.
-- [ ] O hero exibe o mesmo homem segurando a caixa no primeiro viewport.
-- [ ] O scroll do hero tem reveal perceptível da caixa e prepara a seção
+- [ ] O hero exibe o mesmo homem segurando a caixa no primeiro viewport. *(desktop: vídeo scrub; mobile: sem imagem/vídeo — lacuna)*
+- [x] O scroll do hero tem reveal perceptível da caixa e prepara a seção
       seguinte.
-- [ ] A seção "O que vem na caixa" não é apenas cinco `GlowingCard` equivalentes.
-- [ ] Os planos Mensal, Anual e Box Avulsa têm hierarquia visual própria sem
+- [x] A seção "O que vem na caixa" não é apenas cinco `GlowingCard` equivalentes.
+- [x] Os planos Mensal, Anual e Box Avulsa têm hierarquia visual própria sem
       alteração de dados mockados.
-- [ ] O plano Anual continua marcado como recomendado.
-- [ ] CTAs existentes continuam apontando para `/assinatura`, `/loja` e
+- [x] O plano Anual continua marcado como recomendado.
+- [x] CTAs existentes continuam apontando para `/assinatura`, `/loja` e
       `/checkout?plano=<slug>` conforme o estado atual.
-- [ ] `plans/README.md` está atualizado com o status deste plano.
+- [x] `plans/README.md` está atualizado com o status deste plano.
 
 ## Condições de parada
 
