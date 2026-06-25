@@ -28,9 +28,11 @@ import {
   ScrollRevealItem,
 } from "@/src/components/ui/scroll-reveal"
 import { TextGenerateEffect } from "@/src/components/ui/text-generate-effect"
-import heroBanner from "@/src/assets/images/banner-hero-v2.png"
-import investigationContinuousBg from "@/src/assets/images/investigation-continuous-bg.png"
-import previousBoxesBanner from "@/src/assets/images/perdeu-as-caixas-anteriores-v2.png"
+import heroBanner from "@/src/assets/images/home/hero-banner.png"
+import clubOverviewBg from "@/src/assets/images/home/club-overview-bg.png"
+import boxContentsBg from "@/src/assets/images/home/box-contents-bg.png"
+import investigationContinuousBg from "@/src/assets/images/home/investigation-continuous-bg.png"
+import previousBoxesBanner from "@/src/assets/images/home/previous-boxes-banner.png"
 import {
   getActiveCase,
   getDynamicContent,
@@ -301,11 +303,18 @@ export default function HomePage() {
       </section>
 
       <section className="relative isolate overflow-hidden border-b border-[#fffaf0]/10 bg-[#0b0908]">
-        <div className="absolute inset-0 -z-20 bg-[radial-gradient(circle_at_18%_22%,rgba(216,65,50,0.2),transparent_28%),radial-gradient(circle_at_80%_12%,rgba(215,181,109,0.12),transparent_30%),linear-gradient(135deg,#0b0908_0%,#130d0b_46%,#090807_100%)]" />
+        <Image
+          src={clubOverviewBg}
+          alt=""
+          fill
+          placeholder="blur"
+          sizes="100vw"
+          className="absolute inset-0 -z-20 object-cover object-center brightness-[0.52] saturate-[0.85]"
+        />
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_18%_22%,rgba(216,65,50,0.16),transparent_28%),radial-gradient(circle_at_80%_12%,rgba(215,181,109,0.1),transparent_30%),linear-gradient(180deg,rgba(11,9,8,0.82)_0%,rgba(11,9,8,0.58)_42%,rgba(11,9,8,0.86)_100%),linear-gradient(135deg,rgba(11,9,8,0.72)_0%,rgba(19,13,11,0.55)_46%,rgba(9,8,7,0.78)_100%)]" />
         <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.035)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.035)_1px,transparent_1px)] bg-size-[56px_56px]" />
-        {/* <div className="absolute left-0 top-10 -z-10 h-px w-full bg-linear-to-r from-transparent via-[#d7b56d]/35 to-transparent" /> */}
 
-        <div className="mx-auto flex max-w-6xl flex-col gap-10 px-4 py-16 sm:px-6 lg:py-24">
+        <div className="relative z-10 mx-auto flex max-w-6xl flex-col gap-10 px-4 py-16 sm:px-6 lg:py-24">
           <div className="mx-auto max-w-4xl space-y-4 text-center">
             <ScrollReveal>
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#d7b56d]">
@@ -329,7 +338,7 @@ export default function HomePage() {
               staggerDelay={0.05}
             />
             <ScrollReveal delay={0.12}>
-              <div className="mx-auto flex max-w-2xl items-start gap-4 border border-[#fffaf0]/12 bg-[#171211]/60 p-5 text-left sm:p-6">
+              <div className="mx-auto flex max-w-2xl items-start gap-4 border border-[#fffaf0]/12 bg-[#171211]/72 p-5 text-left backdrop-blur-sm sm:p-6">
                 <div className="flex size-10 shrink-0 items-center justify-center bg-[#d84132]/20 text-[#ffb0a5]">
                   <IconUsers className="size-5" />
                 </div>
@@ -400,8 +409,19 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="border-b border-[#fffaf0]/10 bg-[#090807]">
-        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-20">
+      <section className="relative isolate overflow-hidden border-b border-[#fffaf0]/10 bg-[#090807]">
+        <Image
+          src={boxContentsBg}
+          alt=""
+          fill
+          placeholder="blur"
+          sizes="100vw"
+          className="absolute inset-0 -z-20 object-cover object-center brightness-[0.38] saturate-[0.75]"
+        />
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_50%_42%,rgba(9,8,7,0.55)_0%,rgba(9,8,7,0.92)_68%),linear-gradient(180deg,rgba(9,8,7,0.88)_0%,rgba(9,8,7,0.72)_38%,rgba(9,8,7,0.94)_100%)]" />
+        <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.028)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.028)_1px,transparent_1px)] bg-size-[56px_56px]" />
+
+        <div className="relative z-10 mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-20">
           <div className="mx-auto mb-10 max-w-3xl space-y-4 text-center">
             <ScrollReveal>
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#d7b56d]">
@@ -430,7 +450,7 @@ export default function HomePage() {
                 <ScrollRevealItem key={category.title}>
                   <GlowingCard
                     className="h-full"
-                    innerClassName="group relative h-full bg-[#171211] p-5"
+                    innerClassName="group relative h-full bg-[#171211]/88 p-5 backdrop-blur-sm"
                   >
                     <span className="absolute right-3 top-3 font-heading text-2xl font-black text-[#fffaf0]/5">
                       0{index + 1}
@@ -449,7 +469,7 @@ export default function HomePage() {
           </ScrollRevealGroup>
 
           <ScrollReveal delay={0.15}>
-            <div className="mx-auto mt-8 max-w-3xl border border-[#d7b56d]/25 bg-[#171211]/80 p-5 sm:p-6">
+            <div className="mx-auto mt-8 max-w-3xl border border-[#d7b56d]/25 bg-[#171211]/88 p-5 backdrop-blur-sm sm:p-6">
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#d7b56d]">
                 Nota do arquivo
               </p>
@@ -564,8 +584,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="border-b border-[#fffaf0]/10 bg-[#171211]">
-        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+      <section className="relative isolate overflow-hidden border-b border-[#fffaf0]/10 bg-[#171211]">
+        <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.035)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.035)_1px,transparent_1px)] bg-size-[56px_56px]" />
+
+        <div className="relative z-10 mx-auto max-w-6xl px-4 py-14 sm:px-6">
           <div className="mb-8 max-w-2xl">
             <ScrollReveal>
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#d7b56d]">
@@ -663,8 +685,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="bg-[#171211] text-[#fffaf0]">
-        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+      <section className="relative isolate overflow-hidden bg-[#171211] text-[#fffaf0]">
+        <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.035)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.035)_1px,transparent_1px)] bg-size-[56px_56px]" />
+
+        <div className="relative z-10 mx-auto max-w-6xl px-4 py-16 sm:px-6">
           <ScrollReveal>
             <div className="relative isolate mb-8 min-h-[360px] overflow-hidden border border-[#fffaf0]/14 bg-[#090807] p-6 shadow-[0_24px_48px_rgba(0,0,0,0.3)] sm:p-8 lg:min-h-[420px]">
               <Image

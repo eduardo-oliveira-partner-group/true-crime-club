@@ -1,6 +1,6 @@
 import Image from "next/image"
 
-import logo from "@/src/assets/images/logo.png"
+import logo from "@/src/assets/images/brand/logo.png"
 import { cn } from "@/src/lib/utils"
 
 type BrandLogoProps = {

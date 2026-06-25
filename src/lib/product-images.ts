@@ -1,15 +1,15 @@
 import type { StaticImageData } from "next/image"
 
-import caixa01 from "@/src/assets/images/boxes/caixa-01.jpeg"
-import caixa02 from "@/src/assets/images/boxes/caixa-02.jpeg"
-import caixa03 from "@/src/assets/images/boxes/caixa-03.jpg"
-import caixa04 from "@/src/assets/images/boxes/caixa-04.jpg"
+import box01 from "@/src/assets/images/products/box-01.jpg"
+import box02 from "@/src/assets/images/products/box-02.jpg"
+import box03 from "@/src/assets/images/products/box-03.jpg"
+import box04 from "@/src/assets/images/products/box-04.jpg"
 
 const productImages: Record<string, StaticImageData> = {
-  "boxes/caixa-01.jpeg": caixa01,
-  "boxes/caixa-02.jpeg": caixa02,
-  "boxes/caixa-03.jpg": caixa03,
-  "boxes/caixa-04.jpg": caixa04,
+  "products/box-01.jpg": box01,
+  "products/box-02.jpg": box02,
+  "products/box-03.jpg": box03,
+  "products/box-04.jpg": box04,
 }
 
 export function getProductImage(path: string): StaticImageData | undefined {
