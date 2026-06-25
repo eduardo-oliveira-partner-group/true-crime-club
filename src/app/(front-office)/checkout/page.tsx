@@ -6,10 +6,18 @@ import {
   getCart,
   getCartTotals,
   getCurrentCustomer,
+  getSeoEntry,
   listAddresses,
   listPaymentMethods,
 } from '@/src/lib/domain/repositories'
 import { formatCurrency } from '@/src/lib/formatters'
+import { buildMetadata } from '@/src/lib/seo'
+
+export const metadata = buildMetadata({
+  path: '/checkout',
+  entry: getSeoEntry('/checkout'),
+  noindex: true,
+})
 
 export default function CheckoutPage() {
   const cart = getCart()

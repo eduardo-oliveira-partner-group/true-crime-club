@@ -2,7 +2,17 @@ import Image from 'next/image'
 
 import plansDossierPlate from '@/src/assets/images/home/plans-dossier-plate.png'
 import { PlanDossierCard } from '@/src/components/home/plan-dossier-card'
-import { getDynamicContent, listPlans } from '@/src/lib/domain/repositories'
+import {
+  getDynamicContent,
+  getSeoEntry,
+  listPlans,
+} from '@/src/lib/domain/repositories'
+import { buildMetadata } from '@/src/lib/seo'
+
+export const metadata = buildMetadata({
+  path: '/assinatura',
+  entry: getSeoEntry('/assinatura'),
+})
 
 export default function AssinaturaPage() {
   const plans = listPlans()

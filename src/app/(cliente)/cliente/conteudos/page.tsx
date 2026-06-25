@@ -51,7 +51,7 @@ export default function ConteudosPage() {
           </div>
           <div className="mt-3 h-2 overflow-hidden bg-[#0c0a09]">
             <div
-              className="h-full bg-gradient-to-r from-[#d84132] to-[#d7b56d]"
+              className="h-full bg-linear-to-r from-[#d84132] to-[#d7b56d]"
               style={{ width: `${progress.percentComplete}%` }}
             />
           </div>

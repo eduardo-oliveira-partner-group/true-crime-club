@@ -38,12 +38,19 @@ import { TextGenerateEffect } from '@/src/components/ui/text-generate-effect'
 import {
   getActiveCase,
   getDynamicContent,
+  getSeoEntry,
   getSubscriberProgress,
   listPlans,
   listProducts,
 } from '@/src/lib/domain/repositories'
 import { formatDate } from '@/src/lib/formatters'
+import { buildMetadata } from '@/src/lib/seo'
 import { cn } from '@/src/lib/utils'
+
+export const metadata = buildMetadata({
+  path: '/',
+  entry: getSeoEntry('/'),
+})
 
 const clubHighlights = [
   {

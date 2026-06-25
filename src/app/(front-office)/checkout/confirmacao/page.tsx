@@ -1,12 +1,19 @@
 import Link from 'next/link'
 
 import { Button } from '@/src/components/ui/button'
-import { listOrders } from '@/src/lib/domain/repositories'
+import { getSeoEntry, listOrders } from '@/src/lib/domain/repositories'
 import {
   formatCurrency,
   formatOrderStatus,
   formatPaymentStatus,
 } from '@/src/lib/formatters'
+import { buildMetadata } from '@/src/lib/seo'
+
+export const metadata = buildMetadata({
+  path: '/checkout/confirmacao',
+  entry: getSeoEntry('/checkout/confirmacao'),
+  noindex: true,
+})
 
 export default function ConfirmacaoPage() {
   const orders = listOrders()

@@ -1,6 +1,11 @@
 'use client'
 
-import { IconBoxSeam, IconCreditCard, IconFileText, IconHome } from '@tabler/icons-react'
+import {
+  IconBoxSeam,
+  IconCreditCard,
+  IconFileText,
+  IconHome,
+} from '@tabler/icons-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -63,7 +68,9 @@ export function ClientShell({ children }: { children: React.ReactNode }) {
                   <Icon
                     className={cn(
                       'size-4 shrink-0',
-                      active ? 'text-[#d7b56d]' : 'text-[#bfb4a3] group-hover:text-[#d7b56d]',
+                      active
+                        ? 'text-[#d7b56d]'
+                        : 'text-[#bfb4a3] group-hover:text-[#d7b56d]',
                     )}
                   />
                   {item.label}

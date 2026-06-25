@@ -3,13 +3,20 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import previousBoxesBanner from '@/src/assets/images/home/previous-boxes-banner.png'
+import { JsonLd } from '@/src/components/seo/json-ld'
 import { Button } from '@/src/components/ui/button'
 import {
   ScrollReveal,
   ScrollRevealGroup,
   ScrollRevealItem,
 } from '@/src/components/ui/scroll-reveal'
-import { getDynamicContent } from '@/src/lib/domain/repositories'
+import { getDynamicContent, getSeoEntry } from '@/src/lib/domain/repositories'
+import { buildMetadata } from '@/src/lib/seo'
+
+export const metadata = buildMetadata({
+  path: '/faq',
+  entry: getSeoEntry('/faq'),
+})
 
 const faqItems = [
   {
@@ -46,8 +53,22 @@ const faqItems = [
 export default function FaqPage() {
   const intro = getDynamicContent('faq.intro')
 
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqItems.map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.answer,
+      },
+    })),
+  }
+
   return (
     <div className="bg-[#090807] text-[#fffaf0]">
+      <JsonLd data={faqJsonLd} />
       <section className="relative isolate overflow-hidden border-b border-[#fffaf0]/10 bg-[#090807]">
         <Image
           src={previousBoxesBanner}
@@ -129,8 +150,8 @@ export default function FaqPage() {
                 Entre no caso. O arquivo está aberto.
               </h2>
               <p className="max-w-xl text-sm/6 text-[#d7c9b5]">
-                Garanta sua vaga no clube e comece a receber pistas, evidências e
-                edições exclusivas todo mês.
+                Garanta sua vaga no clube e comece a receber pistas, evidências
+                e edições exclusivas todo mês.
               </p>
             </div>
           </ScrollReveal>

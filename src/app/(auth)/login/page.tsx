@@ -48,7 +48,7 @@ export default function LoginPage() {
             id="email"
             type="email"
             defaultValue={customer?.email}
-            className="mt-2 w-full border border-[#fffaf0]/14 bg-[#0c0a09] px-4 py-3 text-sm text-[#fffaf0] placeholder:text-[#bfb4a3]/60 outline-none transition focus:border-[#d7b56d]/70 focus:bg-[#0b0908]"
+            className="mt-2 w-full border border-[#fffaf0]/14 bg-[#0c0a09] px-4 py-3 text-sm text-[#fffaf0] transition outline-none placeholder:text-[#bfb4a3]/60 focus:border-[#d7b56d]/70 focus:bg-[#0b0908]"
           />
         </div>
         <div>
@@ -61,7 +61,7 @@ export default function LoginPage() {
           <input
             id="password"
             type="password"
-            className="mt-2 w-full border border-[#fffaf0]/14 bg-[#0c0a09] px-4 py-3 text-sm text-[#fffaf0] placeholder:text-[#bfb4a3]/60 outline-none transition focus:border-[#d7b56d]/70 focus:bg-[#0b0908]"
+            className="mt-2 w-full border border-[#fffaf0]/14 bg-[#0c0a09] px-4 py-3 text-sm text-[#fffaf0] transition outline-none placeholder:text-[#bfb4a3]/60 focus:border-[#d7b56d]/70 focus:bg-[#0b0908]"
           />
         </div>
         <Button

@@ -36,7 +36,8 @@ export default function PedidosPage() {
       <div className="mt-8 space-y-4">
         {orders.map((order) => {
           const tone =
-            statusTone[order.status] ?? 'text-[#c8bdad] border-[#fffaf0]/18 bg-[#fffaf0]/5'
+            statusTone[order.status] ??
+            'text-[#c8bdad] border-[#fffaf0]/18 bg-[#fffaf0]/5'
           return (
             <Link
               key={order.id}

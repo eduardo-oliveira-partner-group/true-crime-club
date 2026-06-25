@@ -1,10 +1,14 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
+import { Breadcrumbs } from '@/src/components/seo/breadcrumbs'
+import { ProductJsonLd } from '@/src/components/seo/product-json-ld'
 import { Button } from '@/src/components/ui/button'
 import {
   addCartItem,
   getProductBySlug,
+  getSeoEntry,
   listProducts,
 } from '@/src/lib/domain/repositories'
 import {
@@ -12,9 +16,33 @@ import {
   formatCurrency,
   formatEditionMonth,
 } from '@/src/lib/formatters'
+import { buildMetadata } from '@/src/lib/seo'
 
 interface ProductDetailPageProps {
   params: Promise<{ slug: string }>
+}
+
+export async function generateMetadata({
+  params,
+}: ProductDetailPageProps): Promise<Metadata> {
+  const { slug } = await params
+  const product = getProductBySlug(slug)
+
+  if (!product) {
+    return buildMetadata({
+      path: `/loja/${slug}`,
+      entry: getSeoEntry('/loja'),
+      noindex: true,
+    })
+  }
+
+  return buildMetadata({
+    path: `/loja/${slug}`,
+    title: `${product.name} — Loja`,
+    entry: getSeoEntry('/loja'),
+    image: product.images[0],
+    ogType: 'website',
+  })
 }
 
 export default async function ProductDetailPage({
@@ -31,15 +59,16 @@ export default async function ProductDetailPage({
     (p) => product.relatedProductIds?.includes(p.id) && p.id !== product.id,
   )
 
+  const breadcrumbItems = [
+    { name: 'Home', path: '/' },
+    { name: 'Loja', path: '/loja' },
+    { name: product.name, path: `/loja/${product.slug}` },
+  ]
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-      <nav className="mb-6 text-sm text-muted-foreground">
-        <Link href="/loja" className="hover:text-foreground">
-          Loja
-        </Link>
-        <span className="mx-2">/</span>
-        <span>{product.name}</span>
-      </nav>
+      <Breadcrumbs items={breadcrumbItems} className="mb-6" />
+      <ProductJsonLd product={product} path={`/loja/${product.slug}`} />
 
       <div className="grid gap-10 lg:grid-cols-2">
         <div className="aspect-square rounded-2xl bg-brand-muted/40" />

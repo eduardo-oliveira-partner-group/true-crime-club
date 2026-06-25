@@ -9,10 +9,16 @@ import {
   PriceBlock,
 } from '@/src/components/ui/product-quick-view'
 import { ScrollReveal } from '@/src/components/ui/scroll-reveal'
-import { listProducts } from '@/src/lib/domain/repositories'
+import { getSeoEntry, listProducts } from '@/src/lib/domain/repositories'
 import type { Product } from '@/src/lib/domain/types'
 import { getProductImage } from '@/src/lib/product-images'
+import { buildMetadata } from '@/src/lib/seo'
 import { cn } from '@/src/lib/utils'
+
+export const metadata = buildMetadata({
+  path: '/loja',
+  entry: getSeoEntry('/loja'),
+})
 
 const stats = [
   { label: 'boxes no arquivo', value: '04' },

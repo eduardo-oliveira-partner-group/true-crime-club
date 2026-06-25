@@ -18,14 +18,22 @@ import {
   calculateShipping,
   getCart,
   getCartTotals,
+  getSeoEntry,
   removeCartItem,
   updateCartItemQuantity,
 } from '@/src/lib/domain/repositories'
 import { formatCurrency } from '@/src/lib/formatters'
 import { getProductImage } from '@/src/lib/product-images'
+import { buildMetadata } from '@/src/lib/seo'
 import { cn } from '@/src/lib/utils'
 
 const sampleZipCode = '05435-020'
+
+export const metadata = buildMetadata({
+  path: '/carrinho',
+  entry: getSeoEntry('/carrinho'),
+  noindex: true,
+})
 
 export default function CarrinhoPage() {
   const cart = getCart()

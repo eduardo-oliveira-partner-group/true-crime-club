@@ -577,6 +577,21 @@ export const mockSeoEntries: Record<string, SeoEntry> = {
     description:
       'Tire dúvidas sobre planos, entrega, pagamento e cancelamento.',
   },
+  '/carrinho': {
+    title: 'Carrinho — Dossiê de compra',
+    description:
+      'Revise os itens selecionados, aplique cupons e calcule o frete antes de finalizar o pedido.',
+  },
+  '/checkout': {
+    title: 'Checkout — Finalizar pedido',
+    description:
+      'Informe conta, endereço, frete, pagamento e preferências para concluir a compra ou assinatura.',
+  },
+  '/checkout/confirmacao': {
+    title: 'Pedido confirmado',
+    description:
+      'Confirmação do pedido com ciclo de cobrança, envio e rastreio do True Crime Club.',
+  },
 }
 
 export const initialCart: Cart = {
