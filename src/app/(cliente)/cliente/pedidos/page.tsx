@@ -1,11 +1,11 @@
-import Link from "next/link"
+import Link from 'next/link'
 
+import { listOrders } from '@/src/lib/domain/repositories'
 import {
   formatCurrency,
   formatOrderStatus,
   formatPaymentStatus,
-} from "@/src/lib/formatters"
-import { listOrders } from "@/src/lib/domain/repositories"
+} from '@/src/lib/formatters'
 
 export default function PedidosPage() {
   const orders = listOrders()
@@ -14,8 +14,8 @@ export default function PedidosPage() {
     <div>
       <h1 className="font-heading text-2xl font-semibold">Meus pedidos</h1>
       <p className="mt-2 text-sm text-muted-foreground">
-        Acompanhe status de pagamento, despacho e rastreio. Cobrança e envio seguem ciclos
-        distintos.
+        Acompanhe status de pagamento, despacho e rastreio. Cobrança e envio
+        seguem ciclos distintos.
       </p>
 
       <div className="mt-8 space-y-4">
@@ -32,7 +32,7 @@ export default function PedidosPage() {
               </p>
             </div>
             <p className="mt-2 text-sm text-muted-foreground">
-              Pagamento: {formatPaymentStatus(order.paymentStatus)} —{" "}
+              Pagamento: {formatPaymentStatus(order.paymentStatus)} —{' '}
               {formatCurrency(order.total)}
             </p>
           </Link>

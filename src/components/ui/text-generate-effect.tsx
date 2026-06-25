@@ -1,9 +1,9 @@
-"use client"
+'use client'
 
-import { useEffect, useRef } from "react"
-import { motion, stagger, useAnimate, useInView } from "motion/react"
+import { motion, stagger, useAnimate, useInView } from 'motion/react'
+import { useEffect, useRef } from 'react'
 
-import { cn } from "@/src/lib/utils"
+import { cn } from '@/src/lib/utils'
 
 interface TextGenerateEffectProps {
   words: string
@@ -32,21 +32,21 @@ export function TextGenerateEffect({
   const containerRef = useRef<HTMLDivElement>(null)
   const isInView = useInView(containerRef, { once, amount })
   const shouldAnimate = immediate || isInView
-  const wordsArray = words.split(" ")
+  const wordsArray = words.split(' ')
 
   useEffect(() => {
     if (!shouldAnimate) return
 
     animate(
-      "span",
+      'span',
       {
         opacity: 1,
-        filter: filter ? "blur(0px)" : "none",
+        filter: filter ? 'blur(0px)' : 'none',
       },
       {
         duration,
         delay: stagger(staggerDelay),
-      }
+      },
     )
   }, [shouldAnimate, animate, filter, duration, staggerDelay])
 
@@ -58,10 +58,10 @@ export function TextGenerateEffect({
             key={`${word}-${idx}`}
             className="opacity-0"
             style={{
-              filter: filter ? "blur(10px)" : "none",
+              filter: filter ? 'blur(10px)' : 'none',
             }}
           >
-            {word}{" "}
+            {word}{' '}
           </motion.span>
         ))}
       </motion.div>

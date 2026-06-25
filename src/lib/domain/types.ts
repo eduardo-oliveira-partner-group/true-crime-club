@@ -1,10 +1,10 @@
-export type ProductType = "product" | "box"
+export type ProductType = 'product' | 'box'
 
 export type AvailabilityStatus =
-  | "available"
-  | "limited"
-  | "out_of_stock"
-  | "coming_soon"
+  | 'available'
+  | 'limited'
+  | 'out_of_stock'
+  | 'coming_soon'
 
 export interface Product {
   id: string
@@ -27,13 +27,13 @@ export interface Product {
 }
 
 export interface Box extends Product {
-  type: "box"
+  type: 'box'
   editionMonth: string
   cycleNumber: number
   categoriesIncluded: string[]
 }
 
-export type BillingInterval = "monthly" | "annual" | "one_time"
+export type BillingInterval = 'monthly' | 'annual' | 'one_time'
 
 export interface SubscriptionPlan {
   id: string
@@ -75,7 +75,7 @@ export interface Address {
   isDefault: boolean
 }
 
-export type PaymentMethodType = "credit_card" | "pix"
+export type PaymentMethodType = 'credit_card' | 'pix'
 
 export interface PaymentMethod {
   id: string
@@ -107,20 +107,20 @@ export interface Cart {
 }
 
 export type OrderStatus =
-  | "pending_payment"
-  | "paid"
-  | "processing"
-  | "awaiting_shipment"
-  | "shipped"
-  | "delivered"
-  | "cancelled"
+  | 'pending_payment'
+  | 'paid'
+  | 'processing'
+  | 'awaiting_shipment'
+  | 'shipped'
+  | 'delivered'
+  | 'cancelled'
 
 export type PaymentStatus =
-  | "pending"
-  | "paid"
-  | "refused"
-  | "expired"
-  | "refunded"
+  | 'pending'
+  | 'paid'
+  | 'refused'
+  | 'expired'
+  | 'refunded'
 
 export interface Order {
   id: string
@@ -166,11 +166,11 @@ export interface Invoice {
 }
 
 export type SubscriptionStatus =
-  | "active"
-  | "pending_payment"
-  | "cancelled"
-  | "paused"
-  | "past_due"
+  | 'active'
+  | 'pending_payment'
+  | 'cancelled'
+  | 'paused'
+  | 'past_due'
 
 export interface Subscription {
   id: string
@@ -188,12 +188,12 @@ export interface Subscription {
   cancelledAt?: string
 }
 
-export type ContentStatus = "liberado" | "bloqueado"
+export type ContentStatus = 'liberado' | 'bloqueado'
 
 export interface CaseFile {
   id: string
   name: string
-  type: "pdf" | "image" | "audio" | "video"
+  type: 'pdf' | 'image' | 'audio' | 'video'
   downloadUrl: string
   sizeLabel?: string
 }
@@ -207,13 +207,13 @@ export interface ExclusiveContent {
   cycleNumber: number
   releaseCycle?: number
   blockedReason?: string
-  type: "clue" | "video" | "document" | "article"
+  type: 'clue' | 'video' | 'document' | 'article'
   files?: CaseFile[]
 }
 
 export interface DynamicContentBlock {
   key: string
-  type: "text" | "banner" | "image" | "html"
+  type: 'text' | 'banner' | 'image' | 'html'
   value: string
   route?: string
 }

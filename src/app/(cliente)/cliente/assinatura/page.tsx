@@ -1,18 +1,20 @@
-import Link from "next/link"
+import Link from 'next/link'
 
-import { Button } from "@/src/components/ui/button"
-import { getSubscription } from "@/src/lib/domain/repositories"
+import { Button } from '@/src/components/ui/button'
+import { getSubscription } from '@/src/lib/domain/repositories'
 import {
   formatCurrency,
   formatDate,
   formatSubscriptionStatus,
-} from "@/src/lib/formatters"
+} from '@/src/lib/formatters'
 
 export default function AssinaturaClientePage() {
   const subscription = getSubscription()
 
   if (!subscription) {
-    return <p className="text-muted-foreground">Nenhuma assinatura encontrada.</p>
+    return (
+      <p className="text-muted-foreground">Nenhuma assinatura encontrada.</p>
+    )
   }
 
   return (
@@ -30,7 +32,9 @@ export default function AssinaturaClientePage() {
 
         <div className="rounded-xl border border-border p-4">
           <p className="text-sm text-muted-foreground">Próxima cobrança</p>
-          <p className="font-medium">{formatDate(subscription.nextBillingDate)}</p>
+          <p className="font-medium">
+            {formatDate(subscription.nextBillingDate)}
+          </p>
           <p className="text-sm text-muted-foreground">
             {formatCurrency(subscription.nextBillingAmount)}
           </p>

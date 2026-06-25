@@ -1,15 +1,25 @@
-import Link from "next/link"
-import { notFound } from "next/navigation"
+import Link from 'next/link'
+import { notFound } from 'next/navigation'
 
-import { Button } from "@/src/components/ui/button"
-import { addCartItem, getProductBySlug, listProducts } from "@/src/lib/domain/repositories"
-import { formatAvailability, formatCurrency, formatEditionMonth } from "@/src/lib/formatters"
+import { Button } from '@/src/components/ui/button'
+import {
+  addCartItem,
+  getProductBySlug,
+  listProducts,
+} from '@/src/lib/domain/repositories'
+import {
+  formatAvailability,
+  formatCurrency,
+  formatEditionMonth,
+} from '@/src/lib/formatters'
 
 interface ProductDetailPageProps {
   params: Promise<{ slug: string }>
 }
 
-export default async function ProductDetailPage({ params }: ProductDetailPageProps) {
+export default async function ProductDetailPage({
+  params,
+}: ProductDetailPageProps) {
   const { slug } = await params
   const product = getProductBySlug(slug)
 
@@ -38,14 +48,18 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
           <p className="text-sm text-muted-foreground">
             {formatAvailability(product.availability)}
           </p>
-          <h1 className="font-heading text-3xl font-semibold">{product.name}</h1>
+          <h1 className="font-heading text-3xl font-semibold">
+            {product.name}
+          </h1>
           {product.editionMonth ? (
             <p className="text-sm text-muted-foreground">
               Edição de {formatEditionMonth(product.editionMonth)}
             </p>
           ) : null}
           <p className="text-muted-foreground">{product.description}</p>
-          <p className="text-2xl font-semibold">{formatCurrency(product.price)}</p>
+          <p className="text-2xl font-semibold">
+            {formatCurrency(product.price)}
+          </p>
           {product.subscriberPrice ? (
             <p className="text-sm text-muted-foreground">
               Preço assinante: {formatCurrency(product.subscriberPrice)}
@@ -62,12 +76,12 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
 
           <form
             action={async () => {
-              "use server"
+              'use server'
               addCartItem({ productId: product.id })
             }}
           >
             <Button type="submit" disabled={!product.inStock}>
-              {product.inStock ? "Adicionar ao carrinho" : "Indisponível"}
+              {product.inStock ? 'Adicionar ao carrinho' : 'Indisponível'}
             </Button>
           </form>
         </div>

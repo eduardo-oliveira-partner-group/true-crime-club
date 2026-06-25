@@ -1,5 +1,5 @@
-import { PublicFooter } from "@/src/components/layout/public-footer"
-import { PublicHeader } from "@/src/components/layout/public-header"
+import { PublicFooter } from '@/src/components/layout/public-footer'
+import { PublicHeader } from '@/src/components/layout/public-header'
 
 export default function FrontOfficeLayout({
   children,

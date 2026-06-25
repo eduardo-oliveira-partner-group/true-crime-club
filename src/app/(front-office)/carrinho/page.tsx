@@ -1,6 +1,6 @@
-import Link from "next/link"
+import Link from 'next/link'
 
-import { Button } from "@/src/components/ui/button"
+import { Button } from '@/src/components/ui/button'
 import {
   applyCoupon,
   calculateShipping,
@@ -8,8 +8,8 @@ import {
   getCartTotals,
   removeCartItem,
   updateCartItemQuantity,
-} from "@/src/lib/domain/repositories"
-import { formatCurrency } from "@/src/lib/formatters"
+} from '@/src/lib/domain/repositories'
+import { formatCurrency } from '@/src/lib/formatters'
 
 export default function CarrinhoPage() {
   const cart = getCart()
@@ -42,19 +42,23 @@ export default function CarrinhoPage() {
               <div className="flex items-center gap-2">
                 <form
                   action={async (formData) => {
-                    "use server"
-                    const qty = Number(formData.get("quantity"))
+                    'use server'
+                    const qty = Number(formData.get('quantity'))
                     updateCartItemQuantity(item.id, qty)
                   }}
                 >
-                  <input type="hidden" name="quantity" value={item.quantity + 1} />
+                  <input
+                    type="hidden"
+                    name="quantity"
+                    value={item.quantity + 1}
+                  />
                   <Button type="submit" variant="outline" size="sm">
                     +
                   </Button>
                 </form>
                 <form
                   action={async () => {
-                    "use server"
+                    'use server'
                     removeCartItem(item.id)
                   }}
                 >
@@ -69,8 +73,8 @@ export default function CarrinhoPage() {
           <form
             className="flex gap-2"
             action={async (formData) => {
-              "use server"
-              applyCoupon(String(formData.get("coupon") ?? ""))
+              'use server'
+              applyCoupon(String(formData.get('coupon') ?? ''))
             }}
           >
             <input
@@ -86,10 +90,12 @@ export default function CarrinhoPage() {
           <div className="rounded-xl bg-muted/40 p-4 text-sm">
             <p>Subtotal: {formatCurrency(totals.subtotal)}</p>
             <p>Desconto: {formatCurrency(totals.discount)}</p>
-            <p className="font-semibold">Total: {formatCurrency(totals.total)}</p>
+            <p className="font-semibold">
+              Total: {formatCurrency(totals.total)}
+            </p>
             <p className="mt-2 text-muted-foreground">
-              Frete estimado (05435-020):{" "}
-              {formatCurrency(calculateShipping("05435020").price)}
+              Frete estimado (05435-020):{' '}
+              {formatCurrency(calculateShipping('05435020').price)}
             </p>
           </div>
 

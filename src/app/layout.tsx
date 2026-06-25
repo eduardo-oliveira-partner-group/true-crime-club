@@ -1,27 +1,28 @@
-import type { Metadata } from "next"
-import { Geist_Mono, Inter, Libre_Baskerville } from "next/font/google"
+import './globals.css'
 
-import "./globals.css"
-import { ThemeProvider } from "@/src/components/theme-provider"
-import { cn } from "@/src/lib/utils";
+import type { Metadata } from 'next'
+import { Geist_Mono, Inter, Libre_Baskerville } from 'next/font/google'
+
+import { ThemeProvider } from '@/src/components/theme-provider'
+import { cn } from '@/src/lib/utils'
 
 const libreBaskervilleHeading = Libre_Baskerville({
-  subsets: ["latin"],
-  weight: ["700"],
-  variable: "--font-heading",
+  subsets: ['latin'],
+  weight: ['700'],
+  variable: '--font-heading',
 })
 
-const inter = Inter({subsets:['latin'],variable:'--font-sans'})
+const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })
 
 const fontMono = Geist_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
+  subsets: ['latin'],
+  variable: '--font-mono',
 })
 
 export const metadata: Metadata = {
   title: {
-    default: "True Crime Club",
-    template: "%s | True Crime Club",
+    default: 'True Crime Club',
+    template: '%s | True Crime Club',
   },
 }
 
@@ -35,9 +36,9 @@ export default function RootLayout({
       lang="pt-BR"
       suppressHydrationWarning
       className={cn(
-        "antialiased",
+        'antialiased',
         fontMono.variable,
-        "font-sans",
+        'font-sans',
         inter.variable,
         libreBaskervilleHeading.variable,
       )}

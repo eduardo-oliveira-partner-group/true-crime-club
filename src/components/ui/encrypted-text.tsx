@@ -1,9 +1,9 @@
-"use client"
+'use client'
 
-import React, { useEffect, useRef, useState } from "react"
-import { motion, useInView } from "motion/react"
+import { motion, useInView } from 'motion/react'
+import React, { useEffect, useRef, useState } from 'react'
 
-import { cn } from "@/src/lib/utils"
+import { cn } from '@/src/lib/utils'
 
 type EncryptedTextProps = {
   text: string
@@ -29,7 +29,7 @@ type EncryptedTextProps = {
 }
 
 const DEFAULT_CHARSET =
-  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-={}[];:,.<>/?"
+  'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-={}[];:,.<>/?'
 
 function generateRandomCharacter(charset: string): string {
   const index = Math.floor(Math.random() * charset.length)
@@ -42,7 +42,7 @@ function deterministicCharacter(
   charset: string,
 ): string {
   const ch = original[index]
-  if (ch === " ") return " "
+  if (ch === ' ') return ' '
 
   let hash = 0
   const seed = `${original}:${index}`
@@ -57,23 +57,20 @@ function generateDeterministicGibberish(
   original: string,
   charset: string,
 ): string {
-  if (!original) return ""
-  let result = ""
+  if (!original) return ''
+  let result = ''
   for (let i = 0; i < original.length; i += 1) {
     result += deterministicCharacter(original, i, charset)
   }
   return result
 }
 
-function generateRandomGibberish(
-  original: string,
-  charset: string,
-): string {
-  if (!original) return ""
-  let result = ""
+function generateRandomGibberish(original: string, charset: string): string {
+  if (!original) return ''
+  let result = ''
   for (let i = 0; i < original.length; i += 1) {
     const ch = original[i]
-    result += ch === " " ? " " : generateRandomCharacter(charset)
+    result += ch === ' ' ? ' ' : generateRandomCharacter(charset)
   }
   return result
 }
@@ -96,7 +93,7 @@ export const EncryptedText: React.FC<EncryptedTextProps> = ({
   const startTimeRef = useRef<number>(0)
   const lastFlipTimeRef = useRef<number>(0)
   const [scrambleChars, setScrambleChars] = useState<string[]>(() =>
-    text ? generateDeterministicGibberish(text, charset).split("") : [],
+    text ? generateDeterministicGibberish(text, charset).split('') : [],
   )
 
   useEffect(() => {
@@ -113,8 +110,8 @@ export const EncryptedText: React.FC<EncryptedTextProps> = ({
 
       if (!initialized) {
         initialized = true
-        const initial = text ? generateRandomGibberish(text, charset) : ""
-        setScrambleChars(initial.split(""))
+        const initial = text ? generateRandomGibberish(text, charset) : ''
+        setScrambleChars(initial.split(''))
         setRevealCount(0)
       }
 
@@ -139,9 +136,7 @@ export const EncryptedText: React.FC<EncryptedTextProps> = ({
           for (let index = 0; index < totalLength; index += 1) {
             if (index >= currentRevealCount) {
               next[index] =
-                text[index] !== " "
-                  ? generateRandomCharacter(charset)
-                  : " "
+                text[index] !== ' ' ? generateRandomCharacter(charset) : ' '
             }
           }
           return next
@@ -171,12 +166,12 @@ export const EncryptedText: React.FC<EncryptedTextProps> = ({
       aria-label={text}
       role="text"
     >
-      {text.split("").map((char, index) => {
+      {text.split('').map((char, index) => {
         const isRevealed = index < revealCount
         const displayChar = isRevealed
           ? char
-          : char === " "
-            ? " "
+          : char === ' '
+            ? ' '
             : (scrambleChars[index] ??
               deterministicCharacter(text, index, charset))
 

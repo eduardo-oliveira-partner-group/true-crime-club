@@ -1,7 +1,7 @@
-import Link from "next/link"
+import Link from 'next/link'
 
-import { Button } from "@/src/components/ui/button"
-import { getCurrentCustomer } from "@/src/lib/domain/repositories"
+import { Button } from '@/src/components/ui/button'
+import { getCurrentCustomer } from '@/src/lib/domain/repositories'
 
 export default function LoginPage() {
   const customer = getCurrentCustomer()

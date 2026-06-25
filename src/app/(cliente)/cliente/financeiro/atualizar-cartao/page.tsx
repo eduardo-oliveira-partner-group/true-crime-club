@@ -1,7 +1,7 @@
-import Link from "next/link"
+import Link from 'next/link'
 
-import { Button } from "@/src/components/ui/button"
-import { updateCard } from "@/src/lib/domain/repositories"
+import { Button } from '@/src/components/ui/button'
+import { updateCard } from '@/src/lib/domain/repositories'
 
 export default function AtualizarCartaoPage() {
   return (
@@ -18,11 +18,11 @@ export default function AtualizarCartaoPage() {
       <form
         className="mt-6 max-w-md space-y-4"
         action={async (formData) => {
-          "use server"
+          'use server'
           updateCard({
-            holderName: String(formData.get("holder") ?? ""),
-            lastFour: String(formData.get("lastFour") ?? "0000").slice(-4),
-            brand: String(formData.get("brand") ?? "Visa"),
+            holderName: String(formData.get('holder') ?? ''),
+            lastFour: String(formData.get('lastFour') ?? '0000').slice(-4),
+            brand: String(formData.get('brand') ?? 'Visa'),
           })
         }}
       >

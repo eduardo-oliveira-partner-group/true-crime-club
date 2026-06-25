@@ -1,8 +1,11 @@
-import Link from "next/link"
+import Link from 'next/link'
 
-import { Button } from "@/src/components/ui/button"
-import { cancelSubscription, getSubscription } from "@/src/lib/domain/repositories"
-import { formatSubscriptionStatus } from "@/src/lib/formatters"
+import { Button } from '@/src/components/ui/button'
+import {
+  cancelSubscription,
+  getSubscription,
+} from '@/src/lib/domain/repositories'
+import { formatSubscriptionStatus } from '@/src/lib/formatters'
 
 export default function CancelarAssinaturaPage() {
   const subscription = getSubscription()
@@ -13,7 +16,9 @@ export default function CancelarAssinaturaPage() {
         <Link href="/cliente/assinatura">← Voltar</Link>
       </Button>
 
-      <h1 className="font-heading text-2xl font-semibold">Cancelar assinatura</h1>
+      <h1 className="font-heading text-2xl font-semibold">
+        Cancelar assinatura
+      </h1>
       <p className="mt-2 text-sm text-muted-foreground">
         Simulação de cancelamento — nenhuma ação real será executada.
       </p>
@@ -28,7 +33,7 @@ export default function CancelarAssinaturaPage() {
       <form
         className="mt-6"
         action={async () => {
-          "use server"
+          'use server'
           cancelSubscription()
         }}
       >

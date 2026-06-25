@@ -1,16 +1,16 @@
-"use client"
+'use client'
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
-import { cn } from "@/src/lib/utils"
-import { getCurrentCustomer } from "@/src/lib/domain/repositories"
+import { getCurrentCustomer } from '@/src/lib/domain/repositories'
+import { cn } from '@/src/lib/utils'
 
 const navItems = [
-  { href: "/cliente/pedidos", label: "Pedidos" },
-  { href: "/cliente/assinatura", label: "Assinatura" },
-  { href: "/cliente/financeiro", label: "Financeiro" },
-  { href: "/cliente/conteudos", label: "Conteúdos" },
+  { href: '/cliente/pedidos', label: 'Pedidos' },
+  { href: '/cliente/assinatura', label: 'Assinatura' },
+  { href: '/cliente/financeiro', label: 'Financeiro' },
+  { href: '/cliente/conteudos', label: 'Conteúdos' },
 ]
 
 export function ClientShell({ children }: { children: React.ReactNode }) {
@@ -25,7 +25,7 @@ export function ClientShell({ children }: { children: React.ReactNode }) {
             True Crime Club
           </Link>
           <div className="text-right text-sm">
-            <p className="font-medium">{customer?.name ?? "Visitante"}</p>
+            <p className="font-medium">{customer?.name ?? 'Visitante'}</p>
             <p className="text-xs text-muted-foreground">{customer?.email}</p>
           </div>
         </div>
@@ -41,10 +41,10 @@ export function ClientShell({ children }: { children: React.ReactNode }) {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "shrink-0 rounded-lg px-3 py-2 text-sm transition-colors",
+                    'shrink-0 rounded-lg px-3 py-2 text-sm transition-colors',
                     active
-                      ? "bg-primary text-primary-foreground"
-                      : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-muted-foreground hover:bg-muted hover:text-foreground',
                   )}
                 >
                   {item.label}

@@ -1,6 +1,6 @@
-import Link from "next/link"
+import Link from 'next/link'
 
-import { Button } from "@/src/components/ui/button"
+import { Button } from '@/src/components/ui/button'
 
 export default function CadastroPage() {
   return (
@@ -36,7 +36,7 @@ export default function CadastroPage() {
       </form>
 
       <p className="mt-4 text-center text-sm text-muted-foreground">
-        Já tem conta?{" "}
+        Já tem conta?{' '}
         <Link href="/login" className="text-primary hover:underline">
           Entrar
         </Link>

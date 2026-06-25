@@ -1,18 +1,50 @@
-import { defineConfig, globalIgnores } from "eslint/config";
-import nextVitals from "eslint-config-next/core-web-vitals";
-import nextTs from "eslint-config-next/typescript";
+import { defineConfig, globalIgnores } from 'eslint/config'
+import nextVitals from 'eslint-config-next/core-web-vitals'
+import nextTs from 'eslint-config-next/typescript'
+import prettierConfig from 'eslint-config-prettier'
+import prettierPlugin from 'eslint-plugin-prettier'
+import simpleImportSort from 'eslint-plugin-simple-import-sort'
 
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
-  // Override default ignores of eslint-config-next.
-  globalIgnores([
-    // Default ignores of eslint-config-next:
-    ".next/**",
-    "out/**",
-    "build/**",
-    "next-env.d.ts",
-  ]),
-]);
+  prettierConfig,
+  {
+    plugins: {
+      'simple-import-sort': simpleImportSort,
+      prettier: prettierPlugin,
+    },
+    rules: {
+      'prettier/prettier': [
+        'error',
+        {
+          printWidth: 80,
+          tabWidth: 2,
+          singleQuote: true,
+          trailingComma: 'all',
+          arrowParens: 'always',
+          semi: false,
+          endOfLine: 'auto',
+        },
+      ],
+      'simple-import-sort/imports': 'error',
+      'simple-import-sort/exports': 'error',
+      '@typescript-eslint/no-require-imports': 'off',
+      '@typescript-eslint/no-unused-expressions': 'off',
 
-export default eslintConfig;
+      'react-hooks/static-components': 'off',
+      'react-hooks/set-state-in-effect': 'off',
+
+      'react-hooks/incompatible-library': 'warn',
+      'react-hooks/preserve-manual-memoization': 'warn',
+      'react-hooks/immutability': 'warn',
+      'react-hooks/refs': 'warn',
+      'react-hooks/globals': 'warn',
+      'react-hooks/purity': 'warn',
+    },
+  },
+
+  globalIgnores(['.next/**', 'out/**', 'build/**', 'next-env.d.ts']),
+])
+
+export default eslintConfig

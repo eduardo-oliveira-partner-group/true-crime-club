@@ -1,24 +1,24 @@
-import Link from "next/link"
+import Link from 'next/link'
 
-import { Button } from "@/src/components/ui/button"
+import { Button } from '@/src/components/ui/button'
 import {
   listInvoices,
   listPayments,
   renewPixPayment,
-} from "@/src/lib/domain/repositories"
+} from '@/src/lib/domain/repositories'
 import {
   formatCurrency,
   formatDate,
   formatPaymentStatus,
-} from "@/src/lib/formatters"
+} from '@/src/lib/formatters'
 
 export default function FinanceiroPage() {
   const payments = listPayments()
   const invoices = listInvoices()
   const pendingPix = payments.find(
-    (p) => p.method === "pix" && p.status === "pending",
+    (p) => p.method === 'pix' && p.status === 'pending',
   )
-  const refused = payments.find((p) => p.status === "refused")
+  const refused = payments.find((p) => p.status === 'refused')
 
   return (
     <div>
@@ -29,9 +29,12 @@ export default function FinanceiroPage() {
 
       {refused ? (
         <div className="mt-6 rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm">
-          Pagamento recusado: {refused.refusalReason ?? "Verifique seu meio de pagamento."}
+          Pagamento recusado:{' '}
+          {refused.refusalReason ?? 'Verifique seu meio de pagamento.'}
           <Button asChild variant="outline" size="sm" className="mt-3">
-            <Link href="/cliente/financeiro/atualizar-cartao">Atualizar cartão</Link>
+            <Link href="/cliente/financeiro/atualizar-cartao">
+              Atualizar cartão
+            </Link>
           </Button>
         </div>
       ) : null}
@@ -42,7 +45,7 @@ export default function FinanceiroPage() {
           <form
             className="mt-3"
             action={async () => {
-              "use server"
+              'use server'
               renewPixPayment(pendingPix.id)
             }}
           >

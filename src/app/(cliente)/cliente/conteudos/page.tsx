@@ -1,11 +1,15 @@
-import Link from "next/link"
+import Link from 'next/link'
 
 import {
   getActiveCase,
   getSubscriberProgress,
   listClues,
-} from "@/src/lib/domain/repositories"
-import { formatContentStatus, formatDate, formatPercent } from "@/src/lib/formatters"
+} from '@/src/lib/domain/repositories'
+import {
+  formatContentStatus,
+  formatDate,
+  formatPercent,
+} from '@/src/lib/formatters'
 
 export default function ConteudosPage() {
   const activeCase = getActiveCase()
@@ -14,9 +18,13 @@ export default function ConteudosPage() {
 
   return (
     <div>
-      <h1 className="font-heading text-2xl font-semibold">Conteúdos exclusivos</h1>
+      <h1 className="font-heading text-2xl font-semibold">
+        Conteúdos exclusivos
+      </h1>
       {activeCase ? (
-        <p className="mt-2 text-sm text-muted-foreground">{activeCase.description}</p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          {activeCase.description}
+        </p>
       ) : null}
 
       {progress ? (
@@ -53,7 +61,9 @@ export default function ConteudosPage() {
                 {formatContentStatus(clue.status)}
               </span>
             </div>
-            <p className="mt-1 text-sm text-muted-foreground">Ciclo {clue.cycleNumber}</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Ciclo {clue.cycleNumber}
+            </p>
           </Link>
         ))}
       </div>

@@ -17,13 +17,13 @@ import {
   mockSubscription,
   SHIPPING_RATES,
   VALID_COUPONS,
-} from "./mock-data"
+} from './mock-data'
 import {
   getActiveScenario,
   getScenarioErrorMessage,
   isScenario,
   shouldReturnEmpty,
-} from "./scenarios"
+} from './scenarios'
 import type {
   Address,
   Cart,
@@ -44,14 +44,14 @@ import type {
   SubscriberProgress,
   Subscription,
   SubscriptionPlan,
-} from "./types"
+} from './types'
 
 let cartState: Cart = structuredClone(initialCart)
 let subscriptionState: Subscription = structuredClone(mockSubscription)
 let paymentsState: Payment[] = structuredClone(mockPayments)
 
 function throwIfError(): void {
-  if (isScenario("error")) {
+  if (isScenario('error')) {
     throw new Error(getScenarioErrorMessage())
   }
 }
@@ -74,11 +74,11 @@ export function listProducts(options?: {
     products = products.filter((p) => p.categories.includes(options.category!))
   }
 
-  if (isScenario("product_unavailable")) {
+  if (isScenario('product_unavailable')) {
     products = products.map((p) => ({
       ...p,
       inStock: false,
-      availability: "out_of_stock" as const,
+      availability: 'out_of_stock' as const,
     }))
   }
 
@@ -89,11 +89,11 @@ export function listProducts(options?: {
 export function getProductBySlug(slug: string): Product | null {
   throwIfError()
   const product = mockProducts.find((p) => p.slug === slug) ?? null
-  if (!product && isScenario("empty")) {
+  if (!product && isScenario('empty')) {
     return null
   }
-  if (isScenario("product_unavailable") && product) {
-    return { ...product, inStock: false, availability: "out_of_stock" }
+  if (isScenario('product_unavailable') && product) {
+    return { ...product, inStock: false, availability: 'out_of_stock' }
   }
   return product
 }
@@ -121,10 +121,10 @@ export function addCartItem(input: {
   throwIfError()
   const product = mockProducts.find((p) => p.id === input.productId)
   if (!product) {
-    throw new Error("Produto não encontrado.")
+    throw new Error('Produto não encontrado.')
   }
-  if (!product.inStock || isScenario("product_unavailable")) {
-    throw new Error("Produto indisponível no momento.")
+  if (!product.inStock || isScenario('product_unavailable')) {
+    throw new Error('Produto indisponível no momento.')
   }
 
   const quantity = input.quantity ?? 1
@@ -135,7 +135,7 @@ export function addCartItem(input: {
     existing.quantity += quantity
   } else {
     const item: CartItem = {
-      id: generateId("ci"),
+      id: generateId('ci'),
       productId: product.id,
       productSlug: product.slug,
       productName: product.name,
@@ -154,7 +154,7 @@ export function updateCartItemQuantity(itemId: string, quantity: number): Cart {
   throwIfError()
   const item = cartState.items.find((i) => i.id === itemId)
   if (!item) {
-    throw new Error("Item não encontrado no carrinho.")
+    throw new Error('Item não encontrado no carrinho.')
   }
   if (quantity <= 0) {
     cartState.items = cartState.items.filter((i) => i.id !== itemId)
@@ -172,14 +172,14 @@ export function removeCartItem(itemId: string): Cart {
 
 export function calculateShipping(zipCode: string): ShippingEstimate {
   throwIfError()
-  const normalized = zipCode.replace(/\D/g, "")
+  const normalized = zipCode.replace(/\D/g, '')
   const rate =
     SHIPPING_RATES[normalized] ??
     SHIPPING_RATES[`${normalized.slice(0, 5)}-${normalized.slice(5)}`] ??
     SHIPPING_RATES.default
 
   return {
-    region: normalized ? `CEP ${normalized}` : "Informe o CEP",
+    region: normalized ? `CEP ${normalized}` : 'Informe o CEP',
     price: rate.price,
     estimatedDays: rate.days,
   }
@@ -197,7 +197,7 @@ export function applyCoupon(code: string): CouponResult {
       valid: false,
       code: normalized,
       discount: 0,
-      message: "Cupom inválido ou expirado.",
+      message: 'Cupom inválido ou expirado.',
     }
   }
 
@@ -208,7 +208,7 @@ export function applyCoupon(code: string): CouponResult {
     valid: true,
     code: normalized,
     discount,
-    message: "Cupom aplicado com sucesso.",
+    message: 'Cupom aplicado com sucesso.',
   }
 }
 
@@ -234,25 +234,25 @@ export function createOrder(input?: {
   const now = new Date()
 
   const order: Order = {
-    id: generateId("ord"),
-    orderNumber: `TCC-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}-${String(Math.floor(Math.random() * 9000) + 1000)}`,
+    id: generateId('ord'),
+    orderNumber: `TCC-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}-${String(Math.floor(Math.random() * 9000) + 1000)}`,
     customerId: input?.customerId ?? mockCustomer.id,
     items: structuredClone(cart.items),
-    status: isScenario("pending", "pix_pending") ? "pending_payment" : "paid",
-    paymentStatus: isScenario("payment_refused")
-      ? "refused"
-      : isScenario("pending", "pix_pending")
-        ? "pending"
-        : "paid",
+    status: isScenario('pending', 'pix_pending') ? 'pending_payment' : 'paid',
+    paymentStatus: isScenario('payment_refused')
+      ? 'refused'
+      : isScenario('pending', 'pix_pending')
+        ? 'pending'
+        : 'paid',
     subtotal,
     shipping: input?.shipping ?? shipping,
     discount,
     total,
     createdAt: now.toISOString(),
-    billingCycleNote: "Cobrança processada no mês da compra.",
+    billingCycleNote: 'Cobrança processada no mês da compra.',
     shippingCycleNote:
-      "Envio previsto para o mês seguinte — o rastreio será enviado por e-mail após o despacho.",
-    invoicePlaceholder: "Nota fiscal disponível após confirmação do pagamento.",
+      'Envio previsto para o mês seguinte — o rastreio será enviado por e-mail após o despacho.',
+    invoicePlaceholder: 'Nota fiscal disponível após confirmação do pagamento.',
   }
 
   mockOrders.unshift(order)
@@ -263,7 +263,7 @@ export function createOrder(input?: {
 
 export function getCurrentCustomer(): Customer | null {
   throwIfError()
-  if (isScenario("empty")) {
+  if (isScenario('empty')) {
     return null
   }
   return mockCustomer
@@ -294,29 +294,29 @@ export function getOrderById(id: string): Order | null {
 
 export function getSubscription(): Subscription | null {
   throwIfError()
-  if (isScenario("empty")) {
+  if (isScenario('empty')) {
     return null
   }
-  if (isScenario("subscription_cancelled")) {
+  if (isScenario('subscription_cancelled')) {
     return {
       ...subscriptionState,
-      status: "cancelled",
+      status: 'cancelled',
       canCancel: false,
       canReactivate: false,
       cancelledAt: new Date().toISOString(),
     }
   }
-  if (isScenario("reactivation_available")) {
+  if (isScenario('reactivation_available')) {
     return {
       ...subscriptionState,
-      status: "cancelled",
+      status: 'cancelled',
       canCancel: false,
       canReactivate: true,
       cancelledAt: new Date().toISOString(),
     }
   }
-  if (isScenario("pending", "pix_pending", "payment_refused")) {
-    return { ...subscriptionState, status: "pending_payment" }
+  if (isScenario('pending', 'pix_pending', 'payment_refused')) {
+    return { ...subscriptionState, status: 'pending_payment' }
   }
   return subscriptionState
 }
@@ -325,7 +325,7 @@ export function cancelSubscription(): Subscription {
   throwIfError()
   subscriptionState = {
     ...subscriptionState,
-    status: "cancelled",
+    status: 'cancelled',
     canCancel: false,
     canReactivate: true,
     cancelledAt: new Date().toISOString(),
@@ -337,7 +337,7 @@ export function reactivateSubscription(): Subscription {
   throwIfError()
   subscriptionState = {
     ...subscriptionState,
-    status: "active",
+    status: 'active',
     canCancel: true,
     canReactivate: false,
     cancelledAt: undefined,
@@ -349,22 +349,22 @@ export function listPayments(): Payment[] {
   throwIfError()
   let payments = [...paymentsState]
 
-  if (isScenario("payment_refused")) {
+  if (isScenario('payment_refused')) {
     payments = payments.map((p, index) =>
       index === 0
         ? {
             ...p,
-            status: "refused" as const,
-            refusalReason: "Cartão recusado pelo emissor. Tente outro meio.",
+            status: 'refused' as const,
+            refusalReason: 'Cartão recusado pelo emissor. Tente outro meio.',
           }
         : p,
     )
   }
-  if (isScenario("pix_pending")) {
+  if (isScenario('pix_pending')) {
     payments = payments.map((p) =>
-      p.method === "pix" && p.status === "pending"
+      p.method === 'pix' && p.status === 'pending'
         ? p
-        : { ...p, status: "pending" as const },
+        : { ...p, status: 'pending' as const },
     )
   }
 
@@ -382,12 +382,12 @@ export function renewPixPayment(paymentId: string): Payment {
   throwIfError()
   const payment = paymentsState.find((p) => p.id === paymentId)
   if (!payment) {
-    throw new Error("Pagamento não encontrado.")
+    throw new Error('Pagamento não encontrado.')
   }
 
   const renewed: Payment = {
     ...payment,
-    status: "pending",
+    status: 'pending',
     pixQrCode: `00020126580014BR.GOV.BCB.PIX0136mock-renewed-${paymentId}`,
     pixExpiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
     refusalReason: undefined,
@@ -404,8 +404,8 @@ export function updateCard(input: {
 }): PaymentMethod {
   throwIfError()
   const updated: PaymentMethod = {
-    id: "pm-001",
-    type: "credit_card",
+    id: 'pm-001',
+    type: 'credit_card',
     label: `${input.brand} terminando em ${input.lastFour}`,
     lastFour: input.lastFour,
     brand: input.brand,
@@ -418,11 +418,15 @@ export function listExclusiveContent(): ExclusiveContent[] {
   throwIfError()
   let content = [...mockExclusiveContent]
 
-  if (isScenario("blocked")) {
+  if (isScenario('blocked')) {
     content = content.map((c) =>
-      c.status === "liberado"
+      c.status === 'liberado'
         ? c
-        : { ...c, status: "bloqueado" as const, blockedReason: "Libera no próximo ciclo" },
+        : {
+            ...c,
+            status: 'bloqueado' as const,
+            blockedReason: 'Libera no próximo ciclo',
+          },
     )
   }
 
@@ -430,7 +434,9 @@ export function listExclusiveContent(): ExclusiveContent[] {
   return result ?? content
 }
 
-export function getExclusiveContentBySlug(slug: string): ExclusiveContent | null {
+export function getExclusiveContentBySlug(
+  slug: string,
+): ExclusiveContent | null {
   throwIfError()
   return mockExclusiveContent.find((c) => c.slug === slug) ?? null
 }
@@ -452,7 +458,7 @@ export function getSeoEntry(path: string): SeoEntry | null {
 
 export function getActiveCase(): Case | null {
   throwIfError()
-  if (isScenario("empty")) {
+  if (isScenario('empty')) {
     return null
   }
   return mockActiveCase
@@ -464,10 +470,14 @@ export function listClues(caseId?: string): Clue[] {
     ? mockClues.filter((c) => c.caseId === caseId)
     : [...mockClues]
 
-  if (isScenario("blocked")) {
+  if (isScenario('blocked')) {
     clues = clues.map((c, index) =>
       index >= 2
-        ? { ...c, status: "bloqueado" as const, blockedReason: "Libera no próximo ciclo" }
+        ? {
+            ...c,
+            status: 'bloqueado' as const,
+            blockedReason: 'Libera no próximo ciclo',
+          }
         : c,
     )
   }
@@ -481,9 +491,11 @@ export function getClueBySlug(slug: string): Clue | null {
   return mockClues.find((c) => c.slug === slug) ?? null
 }
 
-export function getSubscriberProgress(caseId?: string): SubscriberProgress | null {
+export function getSubscriberProgress(
+  caseId?: string,
+): SubscriberProgress | null {
   throwIfError()
-  if (isScenario("empty")) {
+  if (isScenario('empty')) {
     return null
   }
   if (caseId && mockSubscriberProgress.caseId !== caseId) {

@@ -1,6 +1,6 @@
-import Link from "next/link"
+import Link from 'next/link'
 
-import { Button } from "@/src/components/ui/button"
+import { Button } from '@/src/components/ui/button'
 import {
   createOrder,
   getCart,
@@ -8,8 +8,8 @@ import {
   getCurrentCustomer,
   listAddresses,
   listPaymentMethods,
-} from "@/src/lib/domain/repositories"
-import { formatCurrency } from "@/src/lib/formatters"
+} from '@/src/lib/domain/repositories'
+import { formatCurrency } from '@/src/lib/formatters'
 
 export default function CheckoutPage() {
   const cart = getCart()
@@ -40,8 +40,12 @@ export default function CheckoutPage() {
           <div className="rounded-xl border border-border p-4">
             <h2 className="font-medium">Endereço</h2>
             {addresses.map((address) => (
-              <p key={address.id} className="mt-2 text-sm text-muted-foreground">
-                {address.street}, {address.number} — {address.city}/{address.state}
+              <p
+                key={address.id}
+                className="mt-2 text-sm text-muted-foreground"
+              >
+                {address.street}, {address.number} — {address.city}/
+                {address.state}
               </p>
             ))}
           </div>
@@ -73,11 +77,15 @@ export default function CheckoutPage() {
           <form
             className="mt-6"
             action={async () => {
-              "use server"
+              'use server'
               createOrder()
             }}
           >
-            <Button type="submit" className="w-full" disabled={cart.items.length === 0}>
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={cart.items.length === 0}
+            >
               Finalizar pedido mockado
             </Button>
           </form>

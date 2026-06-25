@@ -1,16 +1,16 @@
-"use client"
+'use client'
 
-import { memo, useCallback, useEffect, useRef } from "react"
-import { animate } from "motion/react"
+import { animate } from 'motion/react'
+import { memo, useCallback, useEffect, useRef } from 'react'
 
-import { cn } from "@/src/lib/utils"
+import { cn } from '@/src/lib/utils'
 
 interface GlowingEffectProps {
   blur?: number
   inactiveZone?: number
   proximity?: number
   spread?: number
-  variant?: "default" | "white"
+  variant?: 'default' | 'white'
   glow?: boolean
   className?: string
   disabled?: boolean
@@ -24,7 +24,7 @@ const GlowingEffect = memo(
     inactiveZone = 0.7,
     proximity = 0,
     spread = 20,
-    variant = "default",
+    variant = 'default',
     glow = false,
     className,
     movementDuration = 2,
@@ -58,12 +58,12 @@ const GlowingEffect = memo(
           const center = [left + width * 0.5, top + height * 0.5]
           const distanceFromCenter = Math.hypot(
             mouseX - center[0],
-            mouseY - center[1]
+            mouseY - center[1],
           )
           const inactiveRadius = 0.5 * Math.min(width, height) * inactiveZone
 
           if (distanceFromCenter < inactiveRadius) {
-            element.style.setProperty("--active", "0")
+            element.style.setProperty('--active', '0')
             return
           }
 
@@ -73,12 +73,12 @@ const GlowingEffect = memo(
             mouseY > top - proximity &&
             mouseY < top + height + proximity
 
-          element.style.setProperty("--active", isActive ? "1" : "0")
+          element.style.setProperty('--active', isActive ? '1' : '0')
 
           if (!isActive) return
 
           const currentAngle =
-            parseFloat(element.style.getPropertyValue("--start")) || 0
+            parseFloat(element.style.getPropertyValue('--start')) || 0
           const targetAngle =
             (180 * Math.atan2(mouseY - center[1], mouseX - center[0])) /
               Math.PI +
@@ -91,12 +91,12 @@ const GlowingEffect = memo(
             duration: movementDuration,
             ease: [0.16, 1, 0.3, 1],
             onUpdate: (value) => {
-              element.style.setProperty("--start", String(value))
+              element.style.setProperty('--start', String(value))
             },
           })
         })
       },
-      [inactiveZone, proximity, movementDuration]
+      [inactiveZone, proximity, movementDuration],
     )
 
     useEffect(() => {
@@ -105,8 +105,8 @@ const GlowingEffect = memo(
       const handleScroll = () => handleMove()
       const handlePointerMove = (e: PointerEvent) => handleMove(e)
 
-      window.addEventListener("scroll", handleScroll, { passive: true })
-      document.body.addEventListener("pointermove", handlePointerMove, {
+      window.addEventListener('scroll', handleScroll, { passive: true })
+      document.body.addEventListener('pointermove', handlePointerMove, {
         passive: true,
       })
 
@@ -114,8 +114,8 @@ const GlowingEffect = memo(
         if (animationFrameRef.current) {
           cancelAnimationFrame(animationFrameRef.current)
         }
-        window.removeEventListener("scroll", handleScroll)
-        document.body.removeEventListener("pointermove", handlePointerMove)
+        window.removeEventListener('scroll', handleScroll)
+        document.body.removeEventListener('pointermove', handlePointerMove)
       }
     }, [handleMove, disabled])
 
@@ -123,24 +123,24 @@ const GlowingEffect = memo(
       <>
         <div
           className={cn(
-            "pointer-events-none absolute -inset-px hidden rounded-[inherit] border opacity-0 transition-opacity",
-            glow && "opacity-100",
-            variant === "white" && "border-white",
-            disabled && "block!"
+            'pointer-events-none absolute -inset-px hidden rounded-[inherit] border opacity-0 transition-opacity',
+            glow && 'opacity-100',
+            variant === 'white' && 'border-white',
+            disabled && 'block!',
           )}
         />
         <div
           ref={containerRef}
           style={
             {
-              "--blur": `${blur}px`,
-              "--spread": spread,
-              "--start": "0",
-              "--active": "0",
-              "--glowingeffect-border-width": `${borderWidth}px`,
-              "--repeating-conic-gradient-times": "5",
-              "--gradient":
-                variant === "white"
+              '--blur': `${blur}px`,
+              '--spread': spread,
+              '--start': '0',
+              '--active': '0',
+              '--glowingeffect-border-width': `${borderWidth}px`,
+              '--repeating-conic-gradient-times': '5',
+              '--gradient':
+                variant === 'white'
                   ? `repeating-conic-gradient(
                   from 236.84deg at 50% 50%,
                   var(--black),
@@ -161,32 +161,32 @@ const GlowingEffect = memo(
             } as React.CSSProperties
           }
           className={cn(
-            "pointer-events-none absolute inset-0 rounded-[inherit] opacity-100 transition-opacity",
-            glow && "opacity-100",
-            blur > 0 && "blur-(--blur) ",
+            'pointer-events-none absolute inset-0 rounded-[inherit] opacity-100 transition-opacity',
+            glow && 'opacity-100',
+            blur > 0 && 'blur-(--blur)',
             className,
-            disabled && "hidden!"
+            disabled && 'hidden!',
           )}
         >
           <div
             className={cn(
-              "glow",
-              "rounded-[inherit]",
-              'after:content-[""] after:rounded-[inherit] after:absolute after:-inset-(--glowingeffect-border-width)',
-              "after:[border:var(--glowingeffect-border-width)_solid_transparent]",
-              "after:[background:var(--gradient)] after:bg-fixed",
-              "after:opacity-(--active) after:transition-opacity after:duration-300",
-              "after:[mask-clip:padding-box,border-box]",
-              "after:mask-intersect",
-              "after:mask-[linear-gradient(#0000,#0000),conic-gradient(from_calc((var(--start)-var(--spread))*1deg),#00000000_0deg,#fff,#00000000_calc(var(--spread)*2deg))]"
+              'glow',
+              'rounded-[inherit]',
+              'after:absolute after:-inset-(--glowingeffect-border-width) after:rounded-[inherit] after:content-[""]',
+              'after:[border:var(--glowingeffect-border-width)_solid_transparent]',
+              'after:bg-fixed after:[background:var(--gradient)]',
+              'after:opacity-(--active) after:transition-opacity after:duration-300',
+              'after:[mask-clip:padding-box,border-box]',
+              'after:mask-intersect',
+              'after:mask-[linear-gradient(#0000,#0000),conic-gradient(from_calc((var(--start)-var(--spread))*1deg),#00000000_0deg,#fff,#00000000_calc(var(--spread)*2deg))]',
             )}
           />
         </div>
       </>
     )
-  }
+  },
 )
 
-GlowingEffect.displayName = "GlowingEffect"
+GlowingEffect.displayName = 'GlowingEffect'
 
 export { GlowingEffect }

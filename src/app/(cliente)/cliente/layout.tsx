@@ -1,4 +1,4 @@
-import { ClientShell } from "@/src/components/layout/client-shell"
+import { ClientShell } from '@/src/components/layout/client-shell'
 
 export default function ClienteLayout({
   children,

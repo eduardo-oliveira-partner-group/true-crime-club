@@ -1,38 +1,38 @@
-import Link from "next/link"
 import {
   IconBrandInstagram,
   IconCircleCheck,
   IconFingerprint,
   IconMail,
   IconPhone,
-} from "@tabler/icons-react"
+} from '@tabler/icons-react'
+import Link from 'next/link'
 
-import { BrandLogo } from "@/src/components/layout/brand-logo"
-import { getDynamicContent } from "@/src/lib/domain/repositories"
+import { BrandLogo } from '@/src/components/layout/brand-logo'
+import { getDynamicContent } from '@/src/lib/domain/repositories'
 
 const clubLinks = [
-  { href: "/assinatura", label: "Assinatura e planos" },
-  { href: "/assinatura", label: "Garantir minha vaga" },
-  { href: "/faq", label: "Dúvidas frequentes" },
+  { href: '/assinatura', label: 'Assinatura e planos' },
+  { href: '/assinatura', label: 'Garantir minha vaga' },
+  { href: '/faq', label: 'Dúvidas frequentes' },
 ]
 
 const exploreLinks = [
-  { href: "/loja", label: "Loja completa" },
-  { href: "/loja", label: "Boxes avulsas" },
-  { href: "/cadastro", label: "Criar conta" },
-  { href: "/login", label: "Entrar na conta" },
+  { href: '/loja', label: 'Loja completa' },
+  { href: '/loja', label: 'Boxes avulsas' },
+  { href: '/cadastro', label: 'Criar conta' },
+  { href: '/login', label: 'Entrar na conta' },
 ]
 
 const legalLinks = [
-  { href: "/termos", label: "Termos e condições" },
-  { href: "/politica-de-privacidade", label: "Política de privacidade" },
+  { href: '/termos', label: 'Termos e condições' },
+  { href: '/politica-de-privacidade', label: 'Política de privacidade' },
 ]
 
 const trustItems = [
-  "Primeiro clube do Brasil",
-  "Pistas mensais",
-  "Evento ao vivo com a comunidade",
-  "Cancelamento flexível",
+  'Primeiro clube do Brasil',
+  'Pistas mensais',
+  'Evento ao vivo com a comunidade',
+  'Cancelamento flexível',
 ]
 
 function FooterSection({
@@ -44,7 +44,7 @@ function FooterSection({
 }) {
   return (
     <div className="space-y-4">
-      <h3 className="text-xs font-semibold uppercase tracking-[0.22em] text-[#d7b56d]">
+      <h3 className="text-xs font-semibold tracking-[0.22em] text-[#d7b56d] uppercase">
         {title}
       </h3>
       {children}
@@ -53,8 +53,8 @@ function FooterSection({
 }
 
 export function PublicFooter() {
-  const heroBadge = getDynamicContent("home.hero.badge")
-  const trustSupport = getDynamicContent("home.trust.support")
+  const heroBadge = getDynamicContent('home.hero.badge')
+  const trustSupport = getDynamicContent('home.trust.support')
 
   return (
     <footer className="border-t border-[#fffaf0]/10 bg-[#090807] text-[#fffaf0]">
@@ -153,16 +153,16 @@ export function PublicFooter() {
             </ul>
             <p className="text-xs leading-5 text-[#a89882]">
               {trustSupport?.value ??
-                "Suporte humano de segunda a sexta, das 9h às 18h."}
+                'Suporte humano de segunda a sexta, das 9h às 18h.'}
             </p>
           </FooterSection>
         </div>
 
         <div className="mt-10 border border-[#fffaf0]/10 bg-[#171211]/60 p-5 sm:p-6">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#d7b56d]">
+          <p className="text-xs font-semibold tracking-[0.2em] text-[#d7b56d] uppercase">
             Endereço
           </p>
-          <address className="mt-2 space-y-0.5 text-sm not-italic leading-6 text-[#d7c9b5]">
+          <address className="mt-2 space-y-0.5 text-sm leading-6 text-[#d7c9b5] not-italic">
             <p>Av. Tamboré, 287 - Tamboré,</p>
             <p>Barueri - SP, 06460-000, Torre Norte — 10º Andar</p>
           </address>
@@ -171,7 +171,10 @@ export function PublicFooter() {
 
       <div className="border-t border-[#fffaf0]/10 px-4 py-4 sm:px-6">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 text-center text-xs text-[#a89882] sm:flex-row sm:text-left">
-          <p>© {new Date().getFullYear()} True Crime Club. Todos os direitos reservados.</p>
+          <p>
+            © {new Date().getFullYear()} True Crime Club. Todos os direitos
+            reservados.
+          </p>
           <ul className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
             {legalLinks.map((link) => (
               <li key={link.href}>

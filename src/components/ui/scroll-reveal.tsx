@@ -1,9 +1,9 @@
-"use client"
+'use client'
 
-import { type ReactNode, useRef } from "react"
-import { motion, useInView } from "motion/react"
+import { motion, useInView } from 'motion/react'
+import { type ReactNode, useRef } from 'react'
 
-import { cn } from "@/src/lib/utils"
+import { cn } from '@/src/lib/utils'
 
 const ease = [0.21, 0.47, 0.32, 0.98] as const
 
@@ -72,7 +72,7 @@ export function ScrollRevealGroup({
     <motion.div
       ref={ref}
       initial="hidden"
-      animate={isVisible ? "visible" : "hidden"}
+      animate={isVisible ? 'visible' : 'hidden'}
       variants={{
         hidden: {},
         visible: {

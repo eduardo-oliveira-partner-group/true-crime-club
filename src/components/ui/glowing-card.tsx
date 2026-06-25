@@ -1,8 +1,7 @@
-import type { ReactNode } from "react"
+import type { ReactNode } from 'react'
 
-import { cn } from "@/src/lib/utils"
-
-import { GlowingEffect } from "@/src/components/ui/glowing-effect"
+import { GlowingEffect } from '@/src/components/ui/glowing-effect'
+import { cn } from '@/src/lib/utils'
 
 interface GlowingCardProps {
   children: ReactNode
@@ -10,9 +9,18 @@ interface GlowingCardProps {
   innerClassName?: string
 }
 
-export function GlowingCard({ children, className, innerClassName }: GlowingCardProps) {
+export function GlowingCard({
+  children,
+  className,
+  innerClassName,
+}: GlowingCardProps) {
   return (
-    <div className={cn("relative h-full border border-[#fffaf0]/14 p-px", className)}>
+    <div
+      className={cn(
+        'relative h-full border border-[#fffaf0]/14 p-px',
+        className,
+      )}
+    >
       <GlowingEffect
         spread={40}
         glow
@@ -22,8 +30,8 @@ export function GlowingCard({ children, className, innerClassName }: GlowingCard
       />
       <div
         className={cn(
-          "relative flex h-full flex-col bg-[#171211] p-5",
-          innerClassName
+          'relative flex h-full flex-col bg-[#171211] p-5',
+          innerClassName,
         )}
       >
         {children}

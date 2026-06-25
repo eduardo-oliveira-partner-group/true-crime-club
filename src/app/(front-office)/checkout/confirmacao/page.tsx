@@ -1,12 +1,12 @@
-import Link from "next/link"
+import Link from 'next/link'
 
-import { Button } from "@/src/components/ui/button"
-import { listOrders } from "@/src/lib/domain/repositories"
+import { Button } from '@/src/components/ui/button'
+import { listOrders } from '@/src/lib/domain/repositories'
 import {
   formatCurrency,
   formatOrderStatus,
   formatPaymentStatus,
-} from "@/src/lib/formatters"
+} from '@/src/lib/formatters'
 
 export default function ConfirmacaoPage() {
   const orders = listOrders()
@@ -26,13 +26,19 @@ export default function ConfirmacaoPage() {
   return (
     <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6">
       <div className="rounded-2xl border border-border bg-card p-8 text-center">
-        <p className="text-sm font-medium text-brand-accent">Pedido confirmado</p>
-        <h1 className="mt-2 font-heading text-3xl font-semibold">{order.orderNumber}</h1>
+        <p className="text-sm font-medium text-brand-accent">
+          Pedido confirmado
+        </p>
+        <h1 className="mt-2 font-heading text-3xl font-semibold">
+          {order.orderNumber}
+        </h1>
         <p className="mt-4 text-muted-foreground">
-          Status: {formatOrderStatus(order.status)} — Pagamento:{" "}
+          Status: {formatOrderStatus(order.status)} — Pagamento:{' '}
           {formatPaymentStatus(order.paymentStatus)}
         </p>
-        <p className="mt-2 text-2xl font-semibold">{formatCurrency(order.total)}</p>
+        <p className="mt-2 text-2xl font-semibold">
+          {formatCurrency(order.total)}
+        </p>
       </div>
 
       <div className="mt-8 space-y-4 rounded-xl border border-border p-6 text-sm">

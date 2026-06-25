@@ -1,20 +1,22 @@
-import Link from "next/link"
-import { notFound } from "next/navigation"
+import Link from 'next/link'
+import { notFound } from 'next/navigation'
 
-import { Button } from "@/src/components/ui/button"
-import { getOrderById } from "@/src/lib/domain/repositories"
+import { Button } from '@/src/components/ui/button'
+import { getOrderById } from '@/src/lib/domain/repositories'
 import {
   formatCurrency,
   formatDate,
   formatOrderStatus,
   formatPaymentStatus,
-} from "@/src/lib/formatters"
+} from '@/src/lib/formatters'
 
 interface PedidoDetailPageProps {
   params: Promise<{ id: string }>
 }
 
-export default async function PedidoDetailPage({ params }: PedidoDetailPageProps) {
+export default async function PedidoDetailPage({
+  params,
+}: PedidoDetailPageProps) {
   const { id } = await params
   const order = getOrderById(id)
 
@@ -28,7 +30,9 @@ export default async function PedidoDetailPage({ params }: PedidoDetailPageProps
         <Link href="/cliente/pedidos">← Voltar aos pedidos</Link>
       </Button>
 
-      <h1 className="font-heading text-2xl font-semibold">{order.orderNumber}</h1>
+      <h1 className="font-heading text-2xl font-semibold">
+        {order.orderNumber}
+      </h1>
       <p className="mt-2 text-sm text-muted-foreground">
         Realizado em {formatDate(order.createdAt)}
       </p>
@@ -49,9 +53,12 @@ export default async function PedidoDetailPage({ params }: PedidoDetailPageProps
         <p className="mt-2">{order.shippingCycleNote}</p>
         {order.trackingCode ? (
           <p className="mt-2">
-            Rastreio:{" "}
+            Rastreio:{' '}
             {order.trackingUrl ? (
-              <a href={order.trackingUrl} className="text-primary hover:underline">
+              <a
+                href={order.trackingUrl}
+                className="text-primary hover:underline"
+              >
                 {order.trackingCode}
               </a>
             ) : (

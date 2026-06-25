@@ -1,15 +1,17 @@
-import Link from "next/link"
-import { notFound } from "next/navigation"
+import Link from 'next/link'
+import { notFound } from 'next/navigation'
 
-import { Button } from "@/src/components/ui/button"
-import { getClueBySlug } from "@/src/lib/domain/repositories"
-import { formatContentStatus } from "@/src/lib/formatters"
+import { Button } from '@/src/components/ui/button'
+import { getClueBySlug } from '@/src/lib/domain/repositories'
+import { formatContentStatus } from '@/src/lib/formatters'
 
 interface ConteudoDetailPageProps {
   params: Promise<{ slug: string }>
 }
 
-export default async function ConteudoDetailPage({ params }: ConteudoDetailPageProps) {
+export default async function ConteudoDetailPage({
+  params,
+}: ConteudoDetailPageProps) {
   const { slug } = await params
   const clue = getClueBySlug(slug)
 
@@ -17,7 +19,7 @@ export default async function ConteudoDetailPage({ params }: ConteudoDetailPageP
     notFound()
   }
 
-  const isBlocked = clue.status === "bloqueado"
+  const isBlocked = clue.status === 'bloqueado'
 
   return (
     <div>
@@ -35,7 +37,7 @@ export default async function ConteudoDetailPage({ params }: ConteudoDetailPageP
         <div className="mt-6 rounded-xl border border-dashed border-border bg-muted/30 p-6 text-center">
           <p className="font-medium">Conteúdo bloqueado</p>
           <p className="mt-2 text-sm text-muted-foreground">
-            {clue.blockedReason ?? "Libera no próximo ciclo"}
+            {clue.blockedReason ?? 'Libera no próximo ciclo'}
           </p>
         </div>
       ) : (

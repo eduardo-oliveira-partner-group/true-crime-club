@@ -1,14 +1,14 @@
-import Link from "next/link"
-import { IconShoppingCart, IconUser } from "@tabler/icons-react"
+import { IconShoppingCart, IconUser } from '@tabler/icons-react'
+import Link from 'next/link'
 
-import { BrandLogo } from "@/src/components/layout/brand-logo"
-import { Button } from "@/src/components/ui/button"
-import { getCart } from "@/src/lib/domain/repositories"
+import { BrandLogo } from '@/src/components/layout/brand-logo'
+import { Button } from '@/src/components/ui/button'
+import { getCart } from '@/src/lib/domain/repositories'
 
 const navLinks = [
-  { href: "/loja", label: "Loja" },
-  { href: "/assinatura", label: "Assine" },
-  { href: "/faq", label: "Dúvidas" },
+  { href: '/loja', label: 'Loja' },
+  { href: '/assinatura', label: 'Assine' },
+  { href: '/faq', label: 'Dúvidas' },
 ]
 
 export function PublicHeader() {

@@ -1,7 +1,7 @@
-import Image from "next/image"
+import Image from 'next/image'
 
-import logo from "@/src/assets/images/brand/logo.png"
-import { cn } from "@/src/lib/utils"
+import logo from '@/src/assets/images/brand/logo.png'
+import { cn } from '@/src/lib/utils'
 
 type BrandLogoProps = {
   className?: string
@@ -13,7 +13,7 @@ export function BrandLogo({ className, priority }: BrandLogoProps) {
     <Image
       src={logo}
       alt="True Crime Club"
-      className={cn("h-8 w-auto", className)}
+      className={cn('h-8 w-auto', className)}
       priority={priority}
     />
   )
