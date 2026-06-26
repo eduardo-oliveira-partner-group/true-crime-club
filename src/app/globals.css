@@ -443,3 +443,30 @@
     transform: translate(0.5px, 0.3px);
   }
 }
+
+/* Custom Scrollbars for CRT Terminal */
+.terminal-crt-container ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.terminal-crt-container ::-webkit-scrollbar-track {
+  background: #050b06;
+  border-left: 1px solid rgba(98, 216, 78, 0.15);
+}
+
+.terminal-crt-container ::-webkit-scrollbar-thumb {
+  background: rgba(98, 216, 78, 0.25);
+  border: 1px solid rgba(98, 216, 78, 0.5);
+  border-radius: 2px;
+}
+
+.terminal-crt-container ::-webkit-scrollbar-thumb:hover {
+  background: rgba(98, 216, 78, 0.45);
+  box-shadow: 0 0 6px rgba(98, 216, 78, 0.4);
+}
+
+.terminal-crt-container {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(98, 216, 78, 0.25) #050b06;
+}
