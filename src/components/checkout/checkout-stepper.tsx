@@ -1,6 +1,8 @@
 'use client'
 
 import {
+  IconArrowLeft,
+  IconArrowRight,
   IconCheck,
   IconCircleCheck,
   IconCreditCard,
@@ -63,12 +65,12 @@ const shirtSizes = ['PP', 'P', 'M', 'G', 'GG', 'XGG']
 const shoeSizes = ['36', '37', '38', '39', '40', '41', '42', '43', '44']
 
 const steps = [
-  { key: 'conta', label: 'Conta', Icon: IconUser },
-  { key: 'endereco', label: 'Endereço', Icon: IconMapPin },
-  { key: 'frete', label: 'Frete', Icon: IconTruck },
-  { key: 'pagamento', label: 'Pagamento', Icon: IconCreditCard },
-  { key: 'preferencias', label: 'Preferências', Icon: IconShirt },
-  { key: 'revisao', label: 'Revisão', Icon: IconPackage },
+  { key: 'conta', label: 'Conta', code: '01', Icon: IconUser },
+  { key: 'endereco', label: 'Endereço', code: '02', Icon: IconMapPin },
+  { key: 'frete', label: 'Frete', code: '03', Icon: IconTruck },
+  { key: 'pagamento', label: 'Pagamento', code: '04', Icon: IconCreditCard },
+  { key: 'preferencias', label: 'Preferências', code: '05', Icon: IconShirt },
+  { key: 'revisao', label: 'Revisão', code: '06', Icon: IconPackage },
 ] as const
 
 type StepKey = (typeof steps)[number]['key']
@@ -104,6 +106,7 @@ export function CheckoutStepper({
 
   const currentIndex = steps.findIndex((step) => step.key === current)
   const isLast = currentIndex === steps.length - 1
+  const currentStep = steps[currentIndex]
 
   function goTo(step: StepKey) {
     setCurrent(step)
@@ -139,271 +142,262 @@ export function CheckoutStepper({
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-7">
       <StepperHeader current={current} />
 
-      <div className="rounded-2xl border border-border bg-card p-6">
-        {current === 'conta' ? (
-          <Section title="Conta">
-            {customer ? (
-              <p className="text-sm text-muted-foreground">
-                {customer.name} — {customer.email}
+      <div className="border border-[#fffaf0]/12 bg-[#0b0908] shadow-[0_20px_48px_rgba(0,0,0,0.38)]">
+        <div className="flex items-center justify-between border-b border-[#fffaf0]/12 px-5 py-4 sm:px-6">
+          <div className="flex items-center gap-3">
+            <span className="flex size-9 items-center justify-center border border-[#d7b56d]/45 bg-[#171211] text-[#d7b56d]">
+              <currentStep.Icon className="size-4.5" />
+            </span>
+            <div>
+              <p className="font-mono text-[0.6rem] tracking-[0.18em] text-[#fffaf0]/45 uppercase">
+                Etapa {currentStep.code} / 06
               </p>
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                Faça login para continuar.
+              <p className="font-heading text-base font-semibold text-[#fffaf0]">
+                {currentStep.label}
               </p>
-            )}
-            <Button asChild variant="link" className="h-auto p-0">
-              <Link href="/login">Alterar conta</Link>
-            </Button>
-          </Section>
-        ) : null}
-
-        {current === 'endereco' ? (
-          <Section title="Endereço de entrega">
-            <div className="space-y-2">
-              {addresses.length === 0 ? (
-                <p className="text-sm text-muted-foreground">
-                  Nenhum endereço cadastrado.
-                </p>
-              ) : (
-                addresses.map((address) => (
-                  <label
-                    key={address.id}
-                    className={cn(
-                      'flex cursor-pointer items-start gap-3 rounded-xl border p-4 text-sm',
-                      selectedAddressId === address.id
-                        ? 'border-brand-accent bg-brand-muted/40'
-                        : 'border-border',
-                    )}
-                  >
-                    <input
-                      type="radio"
-                      name="address"
-                      value={address.id}
-                      checked={selectedAddressId === address.id}
-                      onChange={() => setSelectedAddressId(address.id)}
-                      className="mt-1"
-                    />
-                    <span>
-                      <span className="font-medium">{address.label}</span>
-                      <br />
-                      <span className="text-muted-foreground">
-                        {address.street}, {address.number} — {address.city}/
-                        {address.state} · CEP {address.zipCode}
-                      </span>
-                    </span>
-                  </label>
-                ))
-              )}
             </div>
-          </Section>
-        ) : null}
+          </div>
+        </div>
 
-        {current === 'frete' ? (
-          <Section title="Frete">
-            <div className="space-y-2">
-              {shippingOptions.map((option) => (
-                <label
-                  key={option.id}
-                  className={cn(
-                    'flex cursor-pointer items-start gap-3 rounded-xl border p-4 text-sm',
-                    selectedShippingId === option.id
-                      ? 'border-brand-accent bg-brand-muted/40'
-                      : 'border-border',
-                  )}
-                >
-                  <input
-                    type="radio"
-                    name="shipping"
-                    value={option.id}
-                    checked={selectedShippingId === option.id}
-                    onChange={() => setSelectedShippingId(option.id)}
-                    className="mt-1"
-                  />
-                  <span className="flex-1">
-                    <span className="font-medium">{option.label}</span>
-                    <br />
-                    <span className="text-muted-foreground">
-                      {option.estimatedDays}
-                    </span>
-                  </span>
-                  <span className="font-medium">
-                    {option.price === 0 ? 'Grátis' : `R$ ${option.price}`}
-                  </span>
-                </label>
-              ))}
-            </div>
-          </Section>
-        ) : null}
-
-        {current === 'pagamento' ? (
-          <Section title="Pagamento">
-            <div className="space-y-2">
-              {paymentOptions.map((option) => (
-                <label
-                  key={option.id}
-                  className={cn(
-                    'flex cursor-pointer items-start gap-3 rounded-xl border p-4 text-sm',
-                    selectedPaymentId === option.id
-                      ? 'border-brand-accent bg-brand-muted/40'
-                      : 'border-border',
-                  )}
-                >
-                  <input
-                    type="radio"
-                    name="payment"
-                    value={option.id}
-                    checked={selectedPaymentId === option.id}
-                    onChange={() => setSelectedPaymentId(option.id)}
-                    className="mt-1"
-                  />
-                  <span>
-                    <span className="font-medium">{option.label}</span>
-                    <br />
-                    <span className="text-muted-foreground">
-                      {option.type === 'pix'
-                        ? 'Pagamento via Pix (mockado)'
-                        : 'Cartão de crédito (mockado)'}
-                    </span>
-                  </span>
-                </label>
-              ))}
-            </div>
-            <p className="mt-3 text-xs text-muted-foreground">
-              Ambiente de validação — nenhum pagamento real será processado.
-            </p>
-          </Section>
-        ) : null}
-
-        {current === 'preferencias' ? (
-          <Section title="Preferências do assinante">
-            {isSubscriptionFlow ? (
-              <>
-                <p className="text-sm text-muted-foreground">
-                  {planName
-                    ? `Para o ${planName}, capturamos suas preferências para curadoria das boxes.`
-                    : 'Capturamos suas preferências para curadoria das boxes.'}
-                </p>
-                <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                  <Field label="Tamanho de camiseta">
-                    <select
-                      value={preferences.shirtSize}
-                      onChange={(e) =>
-                        setPreferences((prev) => ({
-                          ...prev,
-                          shirtSize: e.target.value,
-                        }))
-                      }
-                      className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm"
-                    >
-                      <option value="">Prefiro não informar</option>
-                      {shirtSizes.map((size) => (
-                        <option key={size} value={size}>
-                          {size}
-                        </option>
-                      ))}
-                    </select>
-                  </Field>
-                  <Field label="Tamanho de calçado">
-                    <select
-                      value={preferences.shoeSize}
-                      onChange={(e) =>
-                        setPreferences((prev) => ({
-                          ...prev,
-                          shoeSize: e.target.value,
-                        }))
-                      }
-                      className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm"
-                    >
-                      <option value="">Prefiro não informar</option>
-                      {shoeSizes.map((size) => (
-                        <option key={size} value={size}>
-                          {size}
-                        </option>
-                      ))}
-                    </select>
-                  </Field>
+        <div className="p-5 sm:p-6">
+          {current === 'conta' ? (
+            <Section
+              title="Identificação do assinante"
+              eyebrow="Conta"
+              code="STEP-01"
+            >
+              {customer ? (
+                <div className="border border-[#fffaf0]/12 bg-[#171211] p-4">
+                  <p className="font-heading text-sm font-semibold text-[#fffaf0]">
+                    {customer.name}
+                  </p>
+                  <p className="mt-1 text-sm text-[#c8bdad]">
+                    {customer.email}
+                  </p>
                 </div>
-                <Field label="Notas para curadoria">
-                  <textarea
-                    value={preferences.notes}
-                    onChange={(e) =>
-                      setPreferences((prev) => ({
-                        ...prev,
-                        notes: e.target.value,
-                      }))
-                    }
-                    rows={3}
-                    placeholder="Preferências de cores, estilo, alergias, etc."
-                    className="mt-4 w-full rounded-md border border-border bg-background p-3 text-sm"
-                  />
-                </Field>
-              </>
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                Etapa exclusiva para assinantes. Para compra avulsa, siga para a
-                revisão.
-              </p>
-            )}
-          </Section>
-        ) : null}
+              ) : (
+                <div className="border border-dashed border-[#d84132]/40 bg-[#d84132]/8 p-4">
+                  <p className="text-sm text-[#ffb0a5]">
+                    Faça login para continuar o checkout.
+                  </p>
+                </div>
+              )}
+              <Button
+                asChild
+                variant="link"
+                className="mt-3 h-auto p-0 text-[#d7b56d] hover:text-[#f0e8dd]"
+              >
+                <Link href="/login">Alterar conta</Link>
+              </Button>
+            </Section>
+          ) : null}
 
-        {current === 'revisao' ? (
-          <Section title="Revisão">
-            <Review
-              label="Endereço"
-              value={
-                addresses.find((a) => a.id === selectedAddressId)?.label ?? '—'
-              }
-              detail={
-                addresses.find((a) => a.id === selectedAddressId)
-                  ? `${addresses.find((a) => a.id === selectedAddressId)?.street}, ${addresses.find((a) => a.id === selectedAddressId)?.number} — ${addresses.find((a) => a.id === selectedAddressId)?.city}/${addresses.find((a) => a.id === selectedAddressId)?.state}`
-                  : undefined
-              }
-            />
-            <Review
-              label="Frete"
-              value={
-                shippingOptions.find((s) => s.id === selectedShippingId)
-                  ?.label ?? '—'
-              }
-              detail={
-                shippingOptions.find((s) => s.id === selectedShippingId)
-                  ?.estimatedDays
-              }
-            />
-            <Review
-              label="Pagamento"
-              value={
-                paymentOptions.find((p) => p.id === selectedPaymentId)?.label ??
-                '—'
-              }
-            />
-            {isSubscriptionFlow ? (
+          {current === 'endereco' ? (
+            <Section
+              title="Endereço de entrega"
+              eyebrow="Endereço"
+              code="STEP-02"
+            >
+              <div className="space-y-3">
+                {addresses.length === 0 ? (
+                  <p className="text-sm text-[#c8bdad]">
+                    Nenhum endereço cadastrado.
+                  </p>
+                ) : (
+                  addresses.map((address) => (
+                    <OptionCard
+                      key={address.id}
+                      selected={selectedAddressId === address.id}
+                      onSelect={() => setSelectedAddressId(address.id)}
+                      name="address"
+                      title={address.label}
+                      detail={`${address.street}, ${address.number} — ${address.city}/${address.state} · CEP ${address.zipCode}`}
+                    />
+                  ))
+                )}
+              </div>
+            </Section>
+          ) : null}
+
+          {current === 'frete' ? (
+            <Section title="Frete" eyebrow="Envio" code="STEP-03">
+              <div className="space-y-3">
+                {shippingOptions.map((option) => (
+                  <OptionCard
+                    key={option.id}
+                    selected={selectedShippingId === option.id}
+                    onSelect={() => setSelectedShippingId(option.id)}
+                    name="shipping"
+                    title={option.label}
+                    detail={option.estimatedDays}
+                    trailing={
+                      <span
+                        className={cn(
+                          'font-heading text-sm font-bold',
+                          option.price === 0
+                            ? 'text-[#d7b56d]'
+                            : 'text-[#fffaf0]',
+                        )}
+                      >
+                        {option.price === 0 ? 'Grátis' : `R$ ${option.price}`}
+                      </span>
+                    }
+                  />
+                ))}
+              </div>
+            </Section>
+          ) : null}
+
+          {current === 'pagamento' ? (
+            <Section title="Pagamento" eyebrow="Cobrança" code="STEP-04">
+              <div className="space-y-3">
+                {paymentOptions.map((option) => (
+                  <OptionCard
+                    key={option.id}
+                    selected={selectedPaymentId === option.id}
+                    onSelect={() => setSelectedPaymentId(option.id)}
+                    name="payment"
+                    title={option.label}
+                    detail={
+                      option.type === 'pix'
+                        ? 'Pagamento via Pix (mockado)'
+                        : 'Cartão de crédito (mockado)'
+                    }
+                  />
+                ))}
+              </div>
+              <p className="mt-4 text-[0.7rem]/5 text-[#bfb4a3]">
+                Ambiente de validação — nenhum pagamento real será processado.
+              </p>
+            </Section>
+          ) : null}
+
+          {current === 'preferencias' ? (
+            <Section
+              title="Preferências do assinante"
+              eyebrow="Curadoria"
+              code="STEP-05"
+            >
+              {isSubscriptionFlow ? (
+                <>
+                  <p className="text-sm text-[#c8bdad]">
+                    {planName
+                      ? `Para o ${planName}, capturamos suas preferências para curadoria das boxes.`
+                      : 'Capturamos suas preferências para curadoria das boxes.'}
+                  </p>
+                  <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                    <Field label="Tamanho de camiseta">
+                      <SelectInput
+                        value={preferences.shirtSize ?? ''}
+                        onChange={(value) =>
+                          setPreferences((prev) => ({
+                            ...prev,
+                            shirtSize: value,
+                          }))
+                        }
+                        options={shirtSizes}
+                        placeholder="Prefiro não informar"
+                      />
+                    </Field>
+                    <Field label="Tamanho de calçado">
+                      <SelectInput
+                        value={preferences.shoeSize ?? ''}
+                        onChange={(value) =>
+                          setPreferences((prev) => ({
+                            ...prev,
+                            shoeSize: value,
+                          }))
+                        }
+                        options={shoeSizes}
+                        placeholder="Prefiro não informar"
+                      />
+                    </Field>
+                  </div>
+                  <Field label="Notas para curadoria">
+                    <textarea
+                      value={preferences.notes}
+                      onChange={(e) =>
+                        setPreferences((prev) => ({
+                          ...prev,
+                          notes: e.target.value,
+                        }))
+                      }
+                      rows={3}
+                      placeholder="Preferências de cores, estilo, alergias, etc."
+                      className="mt-4 w-full resize-none border border-[#fffaf0]/14 bg-[#171211] p-3 text-sm text-[#f0e8dd] placeholder:text-[#bfb4a3]/60 focus:border-[#d7b56d]/60 focus:outline-none"
+                    />
+                  </Field>
+                </>
+              ) : (
+                <p className="text-sm text-[#c8bdad]">
+                  Etapa exclusiva para assinantes. Para compra avulsa, siga para
+                  a revisão.
+                </p>
+              )}
+            </Section>
+          ) : null}
+
+          {current === 'revisao' ? (
+            <Section title="Revisão final" eyebrow="Confirmação" code="STEP-06">
               <Review
-                label="Preferências"
+                label="Endereço"
                 value={
-                  [
-                    preferences.shirtSize
-                      ? `Camiseta ${preferences.shirtSize}`
-                      : null,
-                    preferences.shoeSize
-                      ? `Calçado ${preferences.shoeSize}`
-                      : null,
-                    preferences.notes ? 'Notas informadas' : null,
-                  ]
-                    .filter(Boolean)
-                    .join(' · ') || 'Sem preferências informadas'
+                  addresses.find((a) => a.id === selectedAddressId)?.label ??
+                  '—'
+                }
+                detail={
+                  addresses.find((a) => a.id === selectedAddressId)
+                    ? `${addresses.find((a) => a.id === selectedAddressId)?.street}, ${addresses.find((a) => a.id === selectedAddressId)?.number} — ${addresses.find((a) => a.id === selectedAddressId)?.city}/${addresses.find((a) => a.id === selectedAddressId)?.state}`
+                    : undefined
                 }
               />
-            ) : null}
-            {error ? (
-              <p className="mt-4 text-sm text-destructive">{error}</p>
-            ) : null}
-          </Section>
-        ) : null}
+              <Review
+                label="Frete"
+                value={
+                  shippingOptions.find((s) => s.id === selectedShippingId)
+                    ?.label ?? '—'
+                }
+                detail={
+                  shippingOptions.find((s) => s.id === selectedShippingId)
+                    ?.estimatedDays
+                }
+              />
+              <Review
+                label="Pagamento"
+                value={
+                  paymentOptions.find((p) => p.id === selectedPaymentId)
+                    ?.label ?? '—'
+                }
+              />
+              {isSubscriptionFlow ? (
+                <Review
+                  label="Preferências"
+                  value={
+                    [
+                      preferences.shirtSize
+                        ? `Camiseta ${preferences.shirtSize}`
+                        : null,
+                      preferences.shoeSize
+                        ? `Calçado ${preferences.shoeSize}`
+                        : null,
+                      preferences.notes ? 'Notas informadas' : null,
+                    ]
+                      .filter(Boolean)
+                      .join(' · ') || 'Sem preferências informadas'
+                  }
+                />
+              ) : null}
+              {error ? (
+                <p className="mt-4 border border-[#d84132]/45 bg-[#d84132]/10 px-3 py-2 text-sm text-[#ffb0a5]">
+                  {error}
+                </p>
+              ) : null}
+            </Section>
+          ) : null}
+        </div>
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -412,7 +406,9 @@ export function CheckoutStepper({
           variant="outline"
           onClick={back}
           disabled={currentIndex === 0 || submitting}
+          className="h-11 gap-1.5 border-[#fffaf0]/20 bg-transparent px-5 text-[#d7c9b5] hover:bg-[#fffaf0]/8 hover:text-[#fffaf0]"
         >
+          <IconArrowLeft className="size-4" />
           Voltar
         </Button>
         {isLast ? (
@@ -420,13 +416,19 @@ export function CheckoutStepper({
             type="button"
             onClick={handleSubmit}
             disabled={submitting}
-            className="bg-[#d84132] text-white hover:bg-[#b93227]"
+            className="h-11 gap-1.5 bg-[#d84132] px-6 text-white shadow-[0_0_26px_rgba(216,65,50,0.32)] hover:bg-[#b93227]"
           >
             {submitting ? 'Finalizando…' : 'Finalizar pedido mockado'}
+            <IconArrowRight className="size-4" />
           </Button>
         ) : (
-          <Button type="button" onClick={next}>
+          <Button
+            type="button"
+            onClick={next}
+            className="h-11 gap-1.5 bg-[#d7b56d] px-6 text-[#171211] hover:bg-[#c9a65c]"
+          >
             Avançar
+            <IconArrowRight className="size-4" />
           </Button>
         )}
       </div>
@@ -445,22 +447,22 @@ function StepperHeader({ current }: { current: StepKey }) {
           <li key={step.key}>
             <div
               className={cn(
-                'flex items-center gap-2 rounded-md border px-3 py-2 text-xs',
+                'flex items-center gap-2.5 border px-3 py-2.5 text-xs transition-colors',
                 isActive
-                  ? 'border-brand-accent bg-brand-muted/40 font-medium'
+                  ? 'border-[#d7b56d]/55 bg-[#171211] text-[#fffaf0]'
                   : isDone
-                    ? 'border-border text-muted-foreground'
-                    : 'border-border/60 text-muted-foreground/70',
+                    ? 'border-[#fffaf0]/14 bg-[#0b0908] text-[#c8bdad]'
+                    : 'border-[#fffaf0]/8 bg-[#0b0908] text-[#fffaf0]/45',
               )}
             >
               <span
                 className={cn(
-                  'flex size-6 shrink-0 items-center justify-center rounded-full border',
+                  'flex size-6 shrink-0 items-center justify-center border',
                   isActive
-                    ? 'border-brand-accent text-brand-accent'
+                    ? 'border-[#d7b56d] bg-[#d7b56d]/15 text-[#d7b56d]'
                     : isDone
-                      ? 'border-brand-accent bg-brand-accent text-background'
-                      : 'border-border',
+                      ? 'border-[#d7b56d]/60 bg-[#d7b56d] text-[#171211]'
+                      : 'border-[#fffaf0]/20 text-[#fffaf0]/45',
                 )}
               >
                 {isDone ? (
@@ -480,14 +482,30 @@ function StepperHeader({ current }: { current: StepKey }) {
 
 function Section({
   title,
+  eyebrow,
+  code,
   children,
 }: {
   title: string
+  eyebrow: string
+  code: string
   children: React.ReactNode
 }) {
   return (
-    <section className="space-y-3">
-      <h2 className="font-heading text-lg font-semibold">{title}</h2>
+    <section className="space-y-4">
+      <div className="flex items-end justify-between gap-4 border-b border-[#fffaf0]/10 pb-3">
+        <div>
+          <p className="text-[0.65rem] font-semibold tracking-[0.18em] text-[#d7b56d] uppercase">
+            {eyebrow}
+          </p>
+          <h2 className="mt-1 font-heading text-lg font-semibold text-[#fffaf0]">
+            {title}
+          </h2>
+        </div>
+        <p className="font-mono text-[0.6rem] tracking-[0.16em] text-[#fffaf0]/35 uppercase">
+          {code}
+        </p>
+      </div>
       {children}
     </section>
   )
@@ -502,10 +520,81 @@ function Field({
 }) {
   return (
     <label className="block space-y-1.5">
-      <span className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+      <span className="text-[0.65rem] font-semibold tracking-[0.18em] text-[#d7b56d] uppercase">
         {label}
       </span>
       {children}
+    </label>
+  )
+}
+
+function SelectInput({
+  value,
+  onChange,
+  options,
+  placeholder,
+}: {
+  value: string
+  onChange: (value: string) => void
+  options: string[]
+  placeholder: string
+}) {
+  return (
+    <select
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className="h-10 w-full border border-[#fffaf0]/14 bg-[#171211] px-3 text-sm text-[#f0e8dd] focus:border-[#d7b56d]/60 focus:outline-none"
+    >
+      <option value="">{placeholder}</option>
+      {options.map((option) => (
+        <option key={option} value={option}>
+          {option}
+        </option>
+      ))}
+    </select>
+  )
+}
+
+function OptionCard({
+  selected,
+  onSelect,
+  name,
+  title,
+  detail,
+  trailing,
+}: {
+  selected: boolean
+  onSelect: () => void
+  name: string
+  title: string
+  detail?: string
+  trailing?: React.ReactNode
+}) {
+  return (
+    <label
+      className={cn(
+        'flex cursor-pointer items-start gap-3 border p-4 text-sm transition-colors',
+        selected
+          ? 'border-[#d7b56d]/60 bg-[#d7b56d]/8'
+          : 'border-[#fffaf0]/12 bg-[#171211] hover:border-[#fffaf0]/24',
+      )}
+    >
+      <input
+        type="radio"
+        name={name}
+        checked={selected}
+        onChange={onSelect}
+        className="mt-1 accent-[#d7b56d]"
+      />
+      <span className="flex flex-1 items-start justify-between gap-4">
+        <span>
+          <span className="font-medium text-[#f0e8dd]">{title}</span>
+          {detail ? (
+            <span className="mt-1 block text-[#c8bdad]">{detail}</span>
+          ) : null}
+        </span>
+        {trailing}
+      </span>
     </label>
   )
 }
@@ -520,15 +609,15 @@ function Review({
   detail?: string
 }) {
   return (
-    <div className="flex items-start justify-between gap-4 border-b border-border py-3 text-sm last:border-0">
+    <div className="flex items-start justify-between gap-4 border-b border-[#fffaf0]/10 py-3 last:border-0">
       <div>
-        <p className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+        <p className="text-[0.65rem] font-semibold tracking-[0.18em] text-[#d7b56d] uppercase">
           {label}
         </p>
-        <p className="mt-1 font-medium">{value}</p>
-        {detail ? <p className="text-muted-foreground">{detail}</p> : null}
+        <p className="mt-1 font-medium text-[#f0e8dd]">{value}</p>
+        {detail ? <p className="text-[#c8bdad]">{detail}</p> : null}
       </div>
-      <IconCircleCheck className="size-5 text-brand-accent" />
+      <IconCircleCheck className="size-5 text-[#d7b56d]" />
     </div>
   )
 }

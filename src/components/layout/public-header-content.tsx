@@ -10,6 +10,7 @@ import { Button } from '@/src/components/ui/button'
 import { cn } from '@/src/lib/utils'
 
 const navLinks = [
+  { href: '/', label: 'Home' },
   { href: '/loja', label: 'Loja' },
   { href: '/assinatura', label: 'Assine' },
   { href: '/faq', label: 'Dúvidas' },
