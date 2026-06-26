@@ -1,4 +1,3 @@
-import type { Product } from '@/src/lib/domain/types'
 import { cn } from '@/src/lib/utils'
 
 interface ProductDetailIncludedPreviewProps {
