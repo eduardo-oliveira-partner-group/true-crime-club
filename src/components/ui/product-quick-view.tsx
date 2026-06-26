@@ -2,6 +2,7 @@
 
 import {
   IconCalendarEvent,
+  IconExternalLink,
   IconPackage,
   IconShoppingBag,
   IconX,
@@ -14,6 +15,12 @@ import { createPortal } from 'react-dom'
 
 import { handleAddToCart } from '@/src/app/actions'
 import { Button } from '@/src/components/ui/button'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/src/components/ui/tooltip'
 import type { Product } from '@/src/lib/domain/types'
 import {
   formatAvailability,
@@ -294,23 +301,38 @@ export function ProductQuickView({
             </div>
           ) : null}
 
-          <div className="mt-8 hidden flex-col gap-4 border-t border-[#fffaf0]/10 pt-6 lg:flex lg:flex-row lg:items-end lg:justify-between">
+          <div className="mt-8 hidden flex-col gap-4 border-t border-[#fffaf0]/10 pt-6 lg:flex xl:flex-row xl:items-end xl:justify-between">
             <PriceBlock product={product} />
-            <div className="flex flex-wrap gap-3">
-              <Button
-                asChild
-                variant="outline"
-                className="rounded-none border-[#fffaf0]/22 bg-[#fffaf0]/6 text-[#fffaf0] hover:bg-[#fffaf0]/12 hover:text-[#fffaf0]"
-              >
-                <Link href={`/loja/${product.slug}`}>Ver página completa</Link>
-              </Button>
+            <div className="flex w-full gap-3 xl:w-auto xl:min-w-88">
+              <TooltipProvider delayDuration={150}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      asChild
+                      size="icon"
+                      variant="outline"
+                      className="rounded-none border-[#fffaf0]/22 bg-[#fffaf0]/6 text-[#fffaf0] hover:bg-[#fffaf0]/12 hover:text-[#fffaf0]"
+                    >
+                      <Link
+                        href={`/loja/${product.slug}`}
+                        aria-label="Ver página completa"
+                      >
+                        <IconExternalLink />
+                      </Link>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">
+                    Ver página completa
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
               <Button
                 type="button"
                 disabled={!product.inStock || isAdding}
                 onClick={onAddToCart}
-                className="rounded-none bg-[#d84132] px-5 text-white hover:bg-[#b83227] disabled:opacity-50"
+                className="flex-1 rounded-none bg-[#d84132] px-5 text-white hover:bg-[#b83227] disabled:opacity-50"
               >
-                <IconShoppingBag className="size-4" />
+                <IconShoppingBag data-icon="inline-start" />
                 {isAdding
                   ? 'Adicionando...'
                   : product.inStock
@@ -325,13 +347,28 @@ export function ProductQuickView({
           <div className="flex items-end justify-between gap-3">
             <PriceBlock product={product} compact />
             <div className="flex shrink-0 gap-2">
-              <Button
-                asChild
-                variant="outline"
-                className="h-9 rounded-none border-[#fffaf0]/22 bg-[#fffaf0]/6 px-3 py-1 text-xs text-[#fffaf0] hover:bg-[#fffaf0]/12 hover:text-[#fffaf0]"
-              >
-                <Link href={`/loja/${product.slug}`}>Ver mais</Link>
-              </Button>
+              <TooltipProvider delayDuration={150}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      asChild
+                      size="icon"
+                      variant="outline"
+                      className="rounded-none border-[#fffaf0]/22 bg-[#fffaf0]/6 text-[#fffaf0] hover:bg-[#fffaf0]/12 hover:text-[#fffaf0]"
+                    >
+                      <Link
+                        href={`/loja/${product.slug}`}
+                        aria-label="Ver página completa"
+                      >
+                        <IconExternalLink />
+                      </Link>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">
+                    Ver página completa
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
               <Button
                 type="button"
                 size="icon"
@@ -346,7 +383,7 @@ export function ProductQuickView({
                       : 'Produto esgotado'
                 }
               >
-                <IconShoppingBag className="size-4" />
+                <IconShoppingBag />
               </Button>
             </div>
           </div>

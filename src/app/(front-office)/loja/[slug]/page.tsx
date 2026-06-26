@@ -1,21 +1,33 @@
+import {
+  IconCalendarEvent,
+  IconFingerprint,
+  IconPackage,
+} from '@tabler/icons-react'
 import type { Metadata } from 'next'
-import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 import { Breadcrumbs } from '@/src/components/seo/breadcrumbs'
 import { ProductJsonLd } from '@/src/components/seo/product-json-ld'
-import { Button } from '@/src/components/ui/button'
+import { ProductDetailActions } from '@/src/components/shop/product-detail-actions'
+import { ProductDetailGallery } from '@/src/components/shop/product-detail-gallery'
+import { ProductDetailIncludedPreview } from '@/src/components/shop/product-detail-included-preview'
+import { ProductDetailPricing } from '@/src/components/shop/product-detail-pricing'
+import { RelatedProductCard } from '@/src/components/shop/related-product-card'
 import {
-  addCartItem,
+  DetailDatum,
+  ProductKicker,
+} from '@/src/components/ui/product-quick-view'
+import {
+  ScrollReveal,
+  ScrollRevealGroup,
+  ScrollRevealItem,
+} from '@/src/components/ui/scroll-reveal'
+import {
   getProductBySlug,
   getSeoEntry,
   listProducts,
 } from '@/src/lib/domain/repositories'
-import {
-  formatAvailability,
-  formatCurrency,
-  formatEditionMonth,
-} from '@/src/lib/formatters'
+import { formatEditionMonth } from '@/src/lib/formatters'
 import { buildMetadata } from '@/src/lib/seo'
 
 interface ProductDetailPageProps {
@@ -45,6 +57,16 @@ export async function generateMetadata({
   })
 }
 
+function getReferenceCode(
+  product: NonNullable<ReturnType<typeof getProductBySlug>>,
+) {
+  if (product.type === 'box' && product.cycleNumber) {
+    return `EVID-${String(product.cycleNumber).padStart(2, '0')}`
+  }
+
+  return product.id.replace('prod-', 'ITEM-').toUpperCase()
+}
+
 export default async function ProductDetailPage({
   params,
 }: ProductDetailPageProps) {
@@ -56,7 +78,8 @@ export default async function ProductDetailPage({
   }
 
   const related = listProducts().filter(
-    (p) => product.relatedProductIds?.includes(p.id) && p.id !== product.id,
+    (item) =>
+      product.relatedProductIds?.includes(item.id) && item.id !== product.id,
   )
 
   const breadcrumbItems = [
@@ -66,72 +89,244 @@ export default async function ProductDetailPage({
   ]
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-      <Breadcrumbs items={breadcrumbItems} className="mb-6" />
+    <div className="bg-[#090807] text-[#fffaf0]">
       <ProductJsonLd product={product} path={`/loja/${product.slug}`} />
 
-      <div className="grid gap-10 lg:grid-cols-2">
-        <div className="aspect-square rounded-2xl bg-brand-muted/40" />
+      <section className="relative isolate overflow-hidden border-b border-[#fffaf0]/10 bg-[#090807]">
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_12%_10%,rgba(216,65,50,0.12),transparent_32%),radial-gradient(circle_at_88%_18%,rgba(215,181,109,0.1),transparent_28%),linear-gradient(90deg,rgba(255,250,240,0.035)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.035)_1px,transparent_1px)] bg-size-[auto,auto,42px_42px,42px_42px]" />
 
-        <div className="space-y-4">
-          <p className="text-sm text-muted-foreground">
-            {formatAvailability(product.availability)}
-          </p>
-          <h1 className="font-heading text-3xl font-semibold">
-            {product.name}
-          </h1>
-          {product.editionMonth ? (
-            <p className="text-sm text-muted-foreground">
-              Edição de {formatEditionMonth(product.editionMonth)}
-            </p>
-          ) : null}
-          <p className="text-muted-foreground">{product.description}</p>
-          <p className="text-2xl font-semibold">
-            {formatCurrency(product.price)}
-          </p>
-          {product.subscriberPrice ? (
-            <p className="text-sm text-muted-foreground">
-              Preço assinante: {formatCurrency(product.subscriberPrice)}
-            </p>
-          ) : null}
+        <div className="relative z-10 mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:py-16">
+          <ScrollReveal>
+            <Breadcrumbs items={breadcrumbItems} className="mb-8" />
+          </ScrollReveal>
 
-          {product.includedItems?.length ? (
-            <ul className="list-inside list-disc text-sm text-muted-foreground">
-              {product.includedItems.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          ) : null}
+          <ScrollReveal delay={0.06}>
+            <article className="relative overflow-hidden border border-[#fffaf0]/14 bg-[#0b0908]/92 shadow-[0_24px_64px_rgba(0,0,0,0.38)] lg:grid lg:grid-cols-2 lg:items-stretch">
+              <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(255,250,240,0.03)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.03)_1px,transparent_1px)] bg-size-[38px_38px]" />
 
-          <form
-            action={async () => {
-              'use server'
-              addCartItem({ productId: product.id })
-            }}
-          >
-            <Button type="submit" disabled={!product.inStock}>
-              {product.inStock ? 'Adicionar ao carrinho' : 'Indisponível'}
-            </Button>
-          </form>
+              <div className="relative z-10 flex flex-col border-b border-[#fffaf0]/10 lg:border-r lg:border-b-0">
+                <ProductDetailGallery product={product} />
+
+                <div className="hidden flex-col gap-4 border-t border-[#fffaf0]/10 bg-[#0c0a09]/60 p-5 sm:p-6 lg:mt-auto lg:flex">
+                  <ProductDetailPricing
+                    product={product}
+                    variant="inline"
+                    className="border-0 pt-0"
+                  />
+                  <ProductDetailActions
+                    productId={product.id}
+                    inStock={product.inStock}
+                  />
+                </div>
+              </div>
+
+              <div className="relative z-10 flex flex-col">
+                <header className="flex flex-wrap items-start justify-between gap-4 border-b border-[#fffaf0]/10 p-5 sm:px-7">
+                  <div className="flex items-center gap-3">
+                    <div className="flex size-10 items-center justify-center border border-[#fffaf0]/14 bg-[#fffaf0]/7 text-[#d7b56d]">
+                      <IconPackage className="size-5" />
+                    </div>
+                    <div>
+                      <p className="text-[0.65rem] font-semibold tracking-[0.2em] text-[#d7b56d] uppercase">
+                        Ficha do arquivo
+                      </p>
+                      <p className="font-mono text-xs text-[#fffaf0]/45">
+                        {getReferenceCode(product)}
+                      </p>
+                    </div>
+                  </div>
+                </header>
+
+                <div className="flex flex-1 flex-col px-5 py-6 sm:px-7 sm:py-8">
+                  <div className="space-y-6">
+                    <ProductKicker product={product} />
+
+                    <h1 className="font-heading text-3xl/tight font-semibold tracking-wide text-[#fffaf0] uppercase sm:text-4xl">
+                      {product.name}
+                    </h1>
+
+                    <div className="grid gap-3 border-y border-[#fffaf0]/10 py-5 text-sm text-[#d7c9b5] sm:grid-cols-2">
+                      {product.editionMonth ? (
+                        <DetailDatum
+                          icon={<IconCalendarEvent className="size-4" />}
+                          label="Edição"
+                          value={formatEditionMonth(product.editionMonth)}
+                        />
+                      ) : (
+                        <DetailDatum
+                          icon={<IconFingerprint className="size-4" />}
+                          label="Categoria"
+                          value={product.categories[0] ?? 'produto'}
+                        />
+                      )}
+                      <DetailDatum
+                        icon={<IconPackage className="size-4" />}
+                        label="Tipo"
+                        value={
+                          product.type === 'box'
+                            ? 'Box avulsa'
+                            : 'Produto extra'
+                        }
+                      />
+                    </div>
+
+                    <p className="text-base/7 text-[#d7c9b5]">
+                      {product.description}
+                    </p>
+                  </div>
+
+                  {product.includedItems?.length ? (
+                    <ProductDetailIncludedPreview
+                      items={product.includedItems}
+                      className="mt-6 hidden lg:block"
+                    />
+                  ) : (
+                    <div className="mt-auto hidden border-t border-[#fffaf0]/10 pt-5 lg:block">
+                      <p className="text-xs font-semibold tracking-[0.2em] text-[#d7b56d] uppercase">
+                        Nota do arquivo
+                      </p>
+                      <p className="mt-2 text-sm/6 text-[#d7c9b5]">
+                        Peça curada pelo True Crime Club para ampliar a coleção
+                        e manter a experiência investigativa entre entregas.
+                      </p>
+                    </div>
+                  )}
+
+                  <div className="mt-auto space-y-6 pt-6 lg:hidden">
+                    <ProductDetailPricing product={product} variant="inline" />
+                    <ProductDetailActions
+                      productId={product.id}
+                      inStock={product.inStock}
+                    />
+                  </div>
+                </div>
+              </div>
+            </article>
+          </ScrollReveal>
         </div>
-      </div>
+      </section>
+
+      {product.includedItems?.length ? (
+        <section className="relative isolate overflow-hidden border-b border-[#fffaf0]/10 bg-[#171211] lg:hidden">
+          <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.035)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.035)_1px,transparent_1px)] bg-size-[56px_56px]" />
+
+          <div className="relative z-10 mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-20">
+            <ScrollReveal>
+              <div className="mb-8 max-w-2xl space-y-4">
+                <div className="flex items-center gap-4">
+                  <p className="text-xs font-semibold tracking-[0.22em] text-[#d7b56d] uppercase">
+                    Conteúdo do arquivo
+                  </p>
+                  <span className="hidden h-px flex-1 bg-[#d7b56d]/45 sm:block" />
+                </div>
+                <h2 className="font-heading text-2xl/tight font-semibold tracking-tight text-[#fffaf0] sm:text-3xl">
+                  O que compõe esta entrega.
+                </h2>
+                <p className="text-sm/6 text-[#d7c9b5]">
+                  Cada item foi curado para ampliar a experiência investigativa
+                  e manter o valor percebido da coleção.
+                </p>
+              </div>
+            </ScrollReveal>
+
+            <ScrollReveal delay={0.08}>
+              <div className="border border-[#fffaf0]/12 bg-[#0c0a09]/88 p-6 shadow-[0_20px_48px_rgba(0,0,0,0.32)] sm:p-8">
+                <ul className="grid gap-3 sm:grid-cols-2">
+                  {product.includedItems.map((item) => (
+                    <li
+                      key={item}
+                      className="flex gap-3 border border-[#fffaf0]/10 bg-[#090807]/72 px-4 py-3 text-sm/6 text-[#d7c9b5]"
+                    >
+                      <span className="mt-2 size-1.5 shrink-0 bg-[#d84132]" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </ScrollReveal>
+          </div>
+        </section>
+      ) : null}
+
+      <section className="relative isolate overflow-hidden bg-[#0b0908]">
+        <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.03)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.03)_1px,transparent_1px)] bg-size-[56px_56px]" />
+
+        <div className="relative z-10 mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-16">
+          <ScrollReveal>
+            <div className="border border-[#fffaf0]/12 bg-[#0c0a09]/88 p-6 shadow-[0_20px_48px_rgba(0,0,0,0.32)] sm:p-8">
+              <p className="text-xs font-semibold tracking-[0.22em] text-[#d7b56d] uppercase">
+                Regras de compra
+              </p>
+              <h2 className="mt-3 font-heading text-xl font-semibold text-[#fffaf0] sm:text-2xl">
+                Antes de adicionar ao carrinho
+              </h2>
+              <ul className="mt-5 grid gap-3 text-sm/6 text-[#d7c9b5] sm:grid-cols-2">
+                <li className="flex gap-3">
+                  <span className="mt-2 size-1.5 shrink-0 bg-[#d7b56d]" />
+                  <span>
+                    Boxes avulsas são enviadas conforme disponibilidade de
+                    estoque e prazo informado no checkout.
+                  </span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="mt-2 size-1.5 shrink-0 bg-[#d7b56d]" />
+                  <span>
+                    Preços de assinante exigem plano ativo no True Crime Club.
+                  </span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="mt-2 size-1.5 shrink-0 bg-[#d7b56d]" />
+                  <span>
+                    Itens esgotados ou indisponíveis não podem ser adicionados
+                    ao carrinho.
+                  </span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="mt-2 size-1.5 shrink-0 bg-[#d7b56d]" />
+                  <span>
+                    Frete e formas de pagamento são confirmados na etapa final
+                    da compra.
+                  </span>
+                </li>
+              </ul>
+            </div>
+          </ScrollReveal>
+        </div>
+      </section>
 
       {related.length > 0 ? (
-        <section className="mt-16">
-          <h2 className="font-heading text-xl font-semibold">Relacionados</h2>
-          <div className="mt-4 grid gap-4 sm:grid-cols-2">
-            {related.map((item) => (
-              <Link
-                key={item.id}
-                href={`/loja/${item.slug}`}
-                className="rounded-xl border border-border p-4 hover:bg-muted/40"
-              >
-                <p className="font-medium">{item.name}</p>
-                <p className="text-sm text-muted-foreground">
-                  {formatCurrency(item.price)}
+        <section className="relative isolate overflow-hidden border-t border-[#fffaf0]/10 bg-[#171211]">
+          <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_14%_8%,rgba(216,65,50,0.1),transparent_30%),linear-gradient(90deg,rgba(255,250,240,0.035)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.035)_1px,transparent_1px)] bg-size-[auto,56px_56px,56px_56px]" />
+
+          <div className="relative z-10 mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-20">
+            <ScrollReveal>
+              <div className="mb-10 max-w-2xl space-y-4">
+                <div className="flex items-center gap-4">
+                  <p className="text-xs font-semibold tracking-[0.22em] text-[#d7b56d] uppercase">
+                    Arquivos relacionados
+                  </p>
+                  <span className="hidden h-px flex-1 bg-[#d7b56d]/45 sm:block" />
+                </div>
+                <h2 className="font-heading text-2xl/tight font-semibold tracking-tight text-[#fffaf0] sm:text-3xl">
+                  Continue montando o dossie.
+                </h2>
+                <p className="text-sm/6 text-[#d7c9b5]">
+                  Outras peças do arquivo que complementam esta entrega ou
+                  ajudam a completar a coleção.
                 </p>
-              </Link>
-            ))}
+              </div>
+            </ScrollReveal>
+
+            <ScrollRevealGroup
+              className="grid gap-5 sm:grid-cols-2"
+              staggerChildren={0.08}
+            >
+              {related.map((item) => (
+                <ScrollRevealItem key={item.id}>
+                  <RelatedProductCard product={item} />
+                </ScrollRevealItem>
+              ))}
+            </ScrollRevealGroup>
           </div>
         </section>
       ) : null}

@@ -17,6 +17,17 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 import { Button } from '@/src/components/ui/button'
+import {
+  Step,
+  Stepper,
+  type StepperStepIndicatorProps,
+} from '@/src/components/ui/stepper'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/src/components/ui/tooltip'
 import { cn } from '@/src/lib/utils'
 
 export interface CheckoutAddress {
@@ -73,8 +84,6 @@ const steps = [
   { key: 'revisao', label: 'Revisão', code: '06', Icon: IconPackage },
 ] as const
 
-type StepKey = (typeof steps)[number]['key']
-
 export function CheckoutStepper({
   customer,
   addresses,
@@ -86,7 +95,7 @@ export function CheckoutStepper({
   onCreateOrder,
 }: CheckoutStepperProps) {
   const router = useRouter()
-  const [current, setCurrent] = useState<StepKey>('conta')
+  const [currentStep, setCurrentStep] = useState(1)
   const [selectedAddressId, setSelectedAddressId] = useState(
     addresses[0]?.id ?? '',
   )
@@ -103,26 +112,11 @@ export function CheckoutStepper({
   })
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [stepperKey, setStepperKey] = useState(0)
 
-  const currentIndex = steps.findIndex((step) => step.key === current)
-  const isLast = currentIndex === steps.length - 1
-  const currentStep = steps[currentIndex]
+  const isLastStep = currentStep === steps.length
 
-  function goTo(step: StepKey) {
-    setCurrent(step)
-  }
-
-  function next() {
-    if (isLast) return
-    goTo(steps[currentIndex + 1].key)
-  }
-
-  function back() {
-    if (currentIndex === 0) return
-    goTo(steps[currentIndex - 1].key)
-  }
-
-  async function handleSubmit() {
+  async function handleFinalStepCompleted() {
     setError(null)
     setSubmitting(true)
     try {
@@ -138,345 +132,365 @@ export function CheckoutStepper({
           : 'Não foi possível finalizar o pedido. Tente novamente.',
       )
       setSubmitting(false)
+      // remonta o Stepper voltando para a etapa de revisão (última)
+      setCurrentStep(steps.length)
+      setStepperKey((k) => k + 1)
     }
   }
 
+  const selectedAddress = addresses.find((a) => a.id === selectedAddressId)
+  const selectedShipping = shippingOptions.find(
+    (s) => s.id === selectedShippingId,
+  )
+  const selectedPayment = paymentOptions.find((p) => p.id === selectedPaymentId)
+
   return (
     <div className="space-y-7">
-      <StepperHeader current={current} />
-
       <div className="border border-[#fffaf0]/12 bg-[#0b0908] shadow-[0_20px_48px_rgba(0,0,0,0.38)]">
-        <div className="flex items-center justify-between border-b border-[#fffaf0]/12 px-5 py-4 sm:px-6">
-          <div className="flex items-center gap-3">
-            <span className="flex size-9 items-center justify-center border border-[#d7b56d]/45 bg-[#171211] text-[#d7b56d]">
-              <currentStep.Icon className="size-4.5" />
-            </span>
-            <div>
-              <p className="font-mono text-[0.6rem] tracking-[0.18em] text-[#fffaf0]/45 uppercase">
-                Etapa {currentStep.code} / 06
-              </p>
-              <p className="font-heading text-base font-semibold text-[#fffaf0]">
-                {currentStep.label}
-              </p>
-            </div>
-          </div>
+        <div className="flex items-center justify-between border-b border-[#fffaf0]/12 px-5 py-3.5 sm:px-6">
+          <span className="flex size-8 items-center justify-center border border-[#d7b56d]/45 bg-[#171211] text-[#d7b56d]">
+            {(() => {
+              const StepIcon = steps[currentStep - 1]?.Icon ?? IconPackage
+              return <StepIcon className="size-4" />
+            })()}
+          </span>
+          <p className="font-mono text-[0.6rem] tracking-[0.18em] text-[#fffaf0]/45 uppercase">
+            {steps[currentStep - 1]?.code}/06 · {steps[currentStep - 1]?.label}
+          </p>
         </div>
 
         <div className="p-5 sm:p-6">
-          {current === 'conta' ? (
-            <Section
-              title="Identificação do assinante"
-              eyebrow="Conta"
-              code="STEP-01"
-            >
-              {customer ? (
-                <div className="border border-[#fffaf0]/12 bg-[#171211] p-4">
-                  <p className="font-heading text-sm font-semibold text-[#fffaf0]">
-                    {customer.name}
-                  </p>
-                  <p className="mt-1 text-sm text-[#c8bdad]">
-                    {customer.email}
-                  </p>
-                </div>
+          <Stepper
+            key={stepperKey}
+            initialStep={currentStep}
+            onStepChange={(step) => {
+              setError(null)
+              setCurrentStep(step)
+            }}
+            onFinalStepCompleted={handleFinalStepCompleted}
+            stepCircleContainerClassName="space-y-6"
+            stepContainerClassName="pb-5"
+            contentClassName="pb-2"
+            footerClassName="border-t border-[#fffaf0]/10 pt-5"
+            backButtonText={
+              <>
+                <IconArrowLeft className="size-4" />
+                Voltar
+              </>
+            }
+            nextButtonText={
+              <>
+                Avançar
+                <IconArrowRight className="size-4" />
+              </>
+            }
+            completeButtonText={
+              submitting ? (
+                'Finalizando…'
               ) : (
-                <div className="border border-dashed border-[#d84132]/40 bg-[#d84132]/8 p-4">
-                  <p className="text-sm text-[#ffb0a5]">
-                    Faça login para continuar o checkout.
-                  </p>
-                </div>
-              )}
-              <Button
-                asChild
-                variant="link"
-                className="mt-3 h-auto p-0 text-[#d7b56d] hover:text-[#f0e8dd]"
-              >
-                <Link href="/login">Alterar conta</Link>
-              </Button>
-            </Section>
-          ) : null}
-
-          {current === 'endereco' ? (
-            <Section
-              title="Endereço de entrega"
-              eyebrow="Endereço"
-              code="STEP-02"
-            >
-              <div className="space-y-3">
-                {addresses.length === 0 ? (
-                  <p className="text-sm text-[#c8bdad]">
-                    Nenhum endereço cadastrado.
-                  </p>
-                ) : (
-                  addresses.map((address) => (
-                    <OptionCard
-                      key={address.id}
-                      selected={selectedAddressId === address.id}
-                      onSelect={() => setSelectedAddressId(address.id)}
-                      name="address"
-                      title={address.label}
-                      detail={`${address.street}, ${address.number} — ${address.city}/${address.state} · CEP ${address.zipCode}`}
-                    />
-                  ))
-                )}
-              </div>
-            </Section>
-          ) : null}
-
-          {current === 'frete' ? (
-            <Section title="Frete" eyebrow="Envio" code="STEP-03">
-              <div className="space-y-3">
-                {shippingOptions.map((option) => (
-                  <OptionCard
-                    key={option.id}
-                    selected={selectedShippingId === option.id}
-                    onSelect={() => setSelectedShippingId(option.id)}
-                    name="shipping"
-                    title={option.label}
-                    detail={option.estimatedDays}
-                    trailing={
-                      <span
-                        className={cn(
-                          'font-heading text-sm font-bold',
-                          option.price === 0
-                            ? 'text-[#d7b56d]'
-                            : 'text-[#fffaf0]',
-                        )}
-                      >
-                        {option.price === 0 ? 'Grátis' : `R$ ${option.price}`}
-                      </span>
-                    }
-                  />
-                ))}
-              </div>
-            </Section>
-          ) : null}
-
-          {current === 'pagamento' ? (
-            <Section title="Pagamento" eyebrow="Cobrança" code="STEP-04">
-              <div className="space-y-3">
-                {paymentOptions.map((option) => (
-                  <OptionCard
-                    key={option.id}
-                    selected={selectedPaymentId === option.id}
-                    onSelect={() => setSelectedPaymentId(option.id)}
-                    name="payment"
-                    title={option.label}
-                    detail={
-                      option.type === 'pix'
-                        ? 'Pagamento via Pix (mockado)'
-                        : 'Cartão de crédito (mockado)'
-                    }
-                  />
-                ))}
-              </div>
-              <p className="mt-4 text-[0.7rem]/5 text-[#bfb4a3]">
-                Ambiente de validação — nenhum pagamento real será processado.
-              </p>
-            </Section>
-          ) : null}
-
-          {current === 'preferencias' ? (
-            <Section
-              title="Preferências do assinante"
-              eyebrow="Curadoria"
-              code="STEP-05"
-            >
-              {isSubscriptionFlow ? (
                 <>
-                  <p className="text-sm text-[#c8bdad]">
-                    {planName
-                      ? `Para o ${planName}, capturamos suas preferências para curadoria das boxes.`
-                      : 'Capturamos suas preferências para curadoria das boxes.'}
-                  </p>
-                  <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                    <Field label="Tamanho de camiseta">
-                      <SelectInput
-                        value={preferences.shirtSize ?? ''}
-                        onChange={(value) =>
-                          setPreferences((prev) => ({
-                            ...prev,
-                            shirtSize: value,
-                          }))
-                        }
-                        options={shirtSizes}
-                        placeholder="Prefiro não informar"
-                      />
-                    </Field>
-                    <Field label="Tamanho de calçado">
-                      <SelectInput
-                        value={preferences.shoeSize ?? ''}
-                        onChange={(value) =>
-                          setPreferences((prev) => ({
-                            ...prev,
-                            shoeSize: value,
-                          }))
-                        }
-                        options={shoeSizes}
-                        placeholder="Prefiro não informar"
-                      />
-                    </Field>
-                  </div>
-                  <Field label="Notas para curadoria">
-                    <textarea
-                      value={preferences.notes}
-                      onChange={(e) =>
-                        setPreferences((prev) => ({
-                          ...prev,
-                          notes: e.target.value,
-                        }))
-                      }
-                      rows={3}
-                      placeholder="Preferências de cores, estilo, alergias, etc."
-                      className="mt-4 w-full resize-none border border-[#fffaf0]/14 bg-[#171211] p-3 text-sm text-[#f0e8dd] placeholder:text-[#bfb4a3]/60 focus:border-[#d7b56d]/60 focus:outline-none"
-                    />
-                  </Field>
+                  Finalizar pedido
+                  <IconArrowRight className="size-4" />
                 </>
-              ) : (
-                <p className="text-sm text-[#c8bdad]">
-                  Etapa exclusiva para assinantes. Para compra avulsa, siga para
-                  a revisão.
-                </p>
-              )}
-            </Section>
-          ) : null}
+              )
+            }
+            backButtonProps={{ disabled: submitting }}
+            nextButtonProps={{
+              disabled: submitting,
+              className: isLastStep ? 'is-complete' : undefined,
+            }}
+            renderStepIndicator={(props) => (
+              <StepIndicatorWithTooltip {...props} />
+            )}
+          >
+            {/* 01 — Conta */}
+            <Step>
+              <Section
+                title="Identificação do assinante"
+                eyebrow="Conta"
+                code="STEP-01"
+              >
+                {customer ? (
+                  <div className="border border-[#fffaf0]/12 bg-[#171211] p-4">
+                    <p className="font-heading text-sm font-semibold text-[#fffaf0]">
+                      {customer.name}
+                    </p>
+                    <p className="mt-1 text-sm text-[#c8bdad]">
+                      {customer.email}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="border border-dashed border-[#d84132]/40 bg-[#d84132]/8 p-4">
+                    <p className="text-sm text-[#ffb0a5]">
+                      Faça login para continuar o checkout.
+                    </p>
+                  </div>
+                )}
+                <Button
+                  asChild
+                  variant="link"
+                  className="mt-3 h-auto p-0 text-[#d7b56d] hover:text-[#f0e8dd]"
+                >
+                  <Link href="/login">Alterar conta</Link>
+                </Button>
+              </Section>
+            </Step>
 
-          {current === 'revisao' ? (
-            <Section title="Revisão final" eyebrow="Confirmação" code="STEP-06">
-              <Review
-                label="Endereço"
-                value={
-                  addresses.find((a) => a.id === selectedAddressId)?.label ??
-                  '—'
-                }
-                detail={
-                  addresses.find((a) => a.id === selectedAddressId)
-                    ? `${addresses.find((a) => a.id === selectedAddressId)?.street}, ${addresses.find((a) => a.id === selectedAddressId)?.number} — ${addresses.find((a) => a.id === selectedAddressId)?.city}/${addresses.find((a) => a.id === selectedAddressId)?.state}`
-                    : undefined
-                }
-              />
-              <Review
-                label="Frete"
-                value={
-                  shippingOptions.find((s) => s.id === selectedShippingId)
-                    ?.label ?? '—'
-                }
-                detail={
-                  shippingOptions.find((s) => s.id === selectedShippingId)
-                    ?.estimatedDays
-                }
-              />
-              <Review
-                label="Pagamento"
-                value={
-                  paymentOptions.find((p) => p.id === selectedPaymentId)
-                    ?.label ?? '—'
-                }
-              />
-              {isSubscriptionFlow ? (
+            {/* 02 — Endereço */}
+            <Step>
+              <Section
+                title="Endereço de entrega"
+                eyebrow="Endereço"
+                code="STEP-02"
+              >
+                <div className="space-y-3">
+                  {addresses.length === 0 ? (
+                    <p className="text-sm text-[#c8bdad]">
+                      Nenhum endereço cadastrado.
+                    </p>
+                  ) : (
+                    addresses.map((address) => (
+                      <OptionCard
+                        key={address.id}
+                        selected={selectedAddressId === address.id}
+                        onSelect={() => setSelectedAddressId(address.id)}
+                        name="address"
+                        title={address.label}
+                        detail={`${address.street}, ${address.number} — ${address.city}/${address.state} · CEP ${address.zipCode}`}
+                      />
+                    ))
+                  )}
+                </div>
+              </Section>
+            </Step>
+
+            {/* 03 — Frete */}
+            <Step>
+              <Section title="Frete" eyebrow="Envio" code="STEP-03">
+                <div className="space-y-3">
+                  {shippingOptions.map((option) => (
+                    <OptionCard
+                      key={option.id}
+                      selected={selectedShippingId === option.id}
+                      onSelect={() => setSelectedShippingId(option.id)}
+                      name="shipping"
+                      title={option.label}
+                      detail={option.estimatedDays}
+                      trailing={
+                        <span
+                          className={cn(
+                            'font-heading text-sm font-bold',
+                            option.price === 0
+                              ? 'text-[#d7b56d]'
+                              : 'text-[#fffaf0]',
+                          )}
+                        >
+                          {option.price === 0 ? 'Grátis' : `R$ ${option.price}`}
+                        </span>
+                      }
+                    />
+                  ))}
+                </div>
+              </Section>
+            </Step>
+
+            {/* 04 — Pagamento */}
+            <Step>
+              <Section title="Pagamento" eyebrow="Cobrança" code="STEP-04">
+                <div className="space-y-3">
+                  {paymentOptions.map((option) => (
+                    <OptionCard
+                      key={option.id}
+                      selected={selectedPaymentId === option.id}
+                      onSelect={() => setSelectedPaymentId(option.id)}
+                      name="payment"
+                      title={option.label}
+                      detail={
+                        option.type === 'pix'
+                          ? 'Pagamento via Pix (mockado)'
+                          : 'Cartão de crédito (mockado)'
+                      }
+                    />
+                  ))}
+                </div>
+                <p className="mt-4 text-[0.7rem]/5 text-[#bfb4a3]">
+                  Ambiente de validação — nenhum pagamento real será processado.
+                </p>
+              </Section>
+            </Step>
+
+            {/* 05 — Preferências */}
+            <Step>
+              <Section
+                title="Preferências do assinante"
+                eyebrow="Curadoria"
+                code="STEP-05"
+              >
+                {isSubscriptionFlow ? (
+                  <>
+                    <p className="text-sm text-[#c8bdad]">
+                      {planName
+                        ? `Para o ${planName}, capturamos suas preferências para curadoria das boxes.`
+                        : 'Capturamos suas preferências para curadoria das boxes.'}
+                    </p>
+                    <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                      <Field label="Tamanho de camiseta">
+                        <SelectInput
+                          value={preferences.shirtSize ?? ''}
+                          onChange={(value) =>
+                            setPreferences((prev) => ({
+                              ...prev,
+                              shirtSize: value,
+                            }))
+                          }
+                          options={shirtSizes}
+                          placeholder="Prefiro não informar"
+                        />
+                      </Field>
+                      <Field label="Tamanho de calçado">
+                        <SelectInput
+                          value={preferences.shoeSize ?? ''}
+                          onChange={(value) =>
+                            setPreferences((prev) => ({
+                              ...prev,
+                              shoeSize: value,
+                            }))
+                          }
+                          options={shoeSizes}
+                          placeholder="Prefiro não informar"
+                        />
+                      </Field>
+                    </div>
+                    <Field label="Notas para curadoria">
+                      <textarea
+                        value={preferences.notes}
+                        onChange={(e) =>
+                          setPreferences((prev) => ({
+                            ...prev,
+                            notes: e.target.value,
+                          }))
+                        }
+                        rows={3}
+                        placeholder="Preferências de cores, estilo, alergias, etc."
+                        className="mt-4 w-full resize-none border border-[#fffaf0]/14 bg-[#171211] p-3 text-sm text-[#f0e8dd] placeholder:text-[#bfb4a3]/60 focus:border-[#d7b56d]/60 focus:outline-none"
+                      />
+                    </Field>
+                  </>
+                ) : (
+                  <p className="text-sm text-[#c8bdad]">
+                    Etapa exclusiva para assinantes. Para compra avulsa, siga
+                    para a revisão.
+                  </p>
+                )}
+              </Section>
+            </Step>
+
+            {/* 06 — Revisão */}
+            <Step>
+              <Section
+                title="Revisão final"
+                eyebrow="Confirmação"
+                code="STEP-06"
+              >
                 <Review
-                  label="Preferências"
-                  value={
-                    [
-                      preferences.shirtSize
-                        ? `Camiseta ${preferences.shirtSize}`
-                        : null,
-                      preferences.shoeSize
-                        ? `Calçado ${preferences.shoeSize}`
-                        : null,
-                      preferences.notes ? 'Notas informadas' : null,
-                    ]
-                      .filter(Boolean)
-                      .join(' · ') || 'Sem preferências informadas'
+                  label="Endereço"
+                  value={selectedAddress?.label ?? '—'}
+                  detail={
+                    selectedAddress
+                      ? `${selectedAddress.street}, ${selectedAddress.number} — ${selectedAddress.city}/${selectedAddress.state}`
+                      : undefined
                   }
                 />
-              ) : null}
-              {error ? (
-                <p className="mt-4 border border-[#d84132]/45 bg-[#d84132]/10 px-3 py-2 text-sm text-[#ffb0a5]">
-                  {error}
-                </p>
-              ) : null}
-            </Section>
-          ) : null}
+                <Review
+                  label="Frete"
+                  value={selectedShipping?.label ?? '—'}
+                  detail={selectedShipping?.estimatedDays}
+                />
+                <Review
+                  label="Pagamento"
+                  value={selectedPayment?.label ?? '—'}
+                />
+                {isSubscriptionFlow ? (
+                  <Review
+                    label="Preferências"
+                    value={
+                      [
+                        preferences.shirtSize
+                          ? `Camiseta ${preferences.shirtSize}`
+                          : null,
+                        preferences.shoeSize
+                          ? `Calçado ${preferences.shoeSize}`
+                          : null,
+                        preferences.notes ? 'Notas informadas' : null,
+                      ]
+                        .filter(Boolean)
+                        .join(' · ') || 'Sem preferências informadas'
+                    }
+                  />
+                ) : null}
+                {error ? (
+                  <p className="mt-4 border border-[#d84132]/45 bg-[#d84132]/10 px-3 py-2 text-sm text-[#ffb0a5]">
+                    {error}
+                  </p>
+                ) : null}
+              </Section>
+            </Step>
+          </Stepper>
         </div>
-      </div>
-
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={back}
-          disabled={currentIndex === 0 || submitting}
-          className="h-11 gap-1.5 border-[#fffaf0]/20 bg-transparent px-5 text-[#d7c9b5] hover:bg-[#fffaf0]/8 hover:text-[#fffaf0]"
-        >
-          <IconArrowLeft className="size-4" />
-          Voltar
-        </Button>
-        {isLast ? (
-          <Button
-            type="button"
-            onClick={handleSubmit}
-            disabled={submitting}
-            className="h-11 gap-1.5 bg-[#d84132] px-6 text-white shadow-[0_0_26px_rgba(216,65,50,0.32)] hover:bg-[#b93227]"
-          >
-            {submitting ? 'Finalizando…' : 'Finalizar pedido mockado'}
-            <IconArrowRight className="size-4" />
-          </Button>
-        ) : (
-          <Button
-            type="button"
-            onClick={next}
-            className="h-11 gap-1.5 bg-[#d7b56d] px-6 text-[#171211] hover:bg-[#c9a65c]"
-          >
-            Avançar
-            <IconArrowRight className="size-4" />
-          </Button>
-        )}
       </div>
     </div>
   )
 }
 
-function StepperHeader({ current }: { current: StepKey }) {
+function StepIndicatorWithTooltip({
+  step,
+  currentStep,
+  onStepClick,
+}: StepperStepIndicatorProps) {
+  const stepMeta = steps[step - 1]
+  const StepIcon = stepMeta?.Icon ?? IconPackage
+  const status =
+    currentStep === step
+      ? 'active'
+      : currentStep < step
+        ? 'inactive'
+        : 'complete'
+
   return (
-    <ol className="grid gap-2 sm:grid-cols-6">
-      {steps.map((step, index) => {
-        const isActive = step.key === current
-        const isDone = steps.findIndex((s) => s.key === current) > index
-        const StepIcon = step.Icon
-        return (
-          <li key={step.key}>
-            <div
-              className={cn(
-                'flex items-center gap-2.5 border px-3 py-2.5 text-xs transition-colors',
-                isActive
-                  ? 'border-[#d7b56d]/55 bg-[#171211] text-[#fffaf0]'
-                  : isDone
-                    ? 'border-[#fffaf0]/14 bg-[#0b0908] text-[#c8bdad]'
-                    : 'border-[#fffaf0]/8 bg-[#0b0908] text-[#fffaf0]/45',
-              )}
-            >
-              <span
-                className={cn(
-                  'flex size-6 shrink-0 items-center justify-center border',
-                  isActive
-                    ? 'border-[#d7b56d] bg-[#d7b56d]/15 text-[#d7b56d]'
-                    : isDone
-                      ? 'border-[#d7b56d]/60 bg-[#d7b56d] text-[#171211]'
-                      : 'border-[#fffaf0]/20 text-[#fffaf0]/45',
-                )}
-              >
-                {isDone ? (
-                  <IconCheck className="size-3.5" />
-                ) : (
-                  <StepIcon className="size-3.5" />
-                )}
-              </span>
-              <span className="hidden sm:inline">{step.label}</span>
-            </div>
-          </li>
-        )
-      })}
-    </ol>
+    <TooltipProvider delayDuration={150}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            type="button"
+            onClick={() => onStepClick(step)}
+            aria-label={`Etapa ${stepMeta?.code} — ${stepMeta?.label}`}
+            aria-current={status === 'active' ? 'step' : undefined}
+            className={cn(
+              'flex size-8 shrink-0 items-center justify-center border transition-colors focus-visible:ring-2 focus-visible:ring-[#d7b56d]/50 focus-visible:outline-none',
+              status === 'active'
+                ? 'border-[#d7b56d] bg-[#d7b56d]/15 text-[#d7b56d]'
+                : status === 'complete'
+                  ? 'border-[#d7b56d]/60 bg-[#d7b56d] text-[#171211]'
+                  : 'border-[#fffaf0]/20 text-[#fffaf0]/45 hover:border-[#fffaf0]/35 hover:text-[#fffaf0]/70',
+            )}
+          >
+            {status === 'complete' ? (
+              <IconCheck className="size-4" />
+            ) : (
+              <StepIcon className="size-4" />
+            )}
+          </button>
+        </TooltipTrigger>
+        <TooltipContent side="bottom">
+          <span className="font-mono text-[0.6rem] tracking-[0.18em] text-[#d7b56d] uppercase">
+            {stepMeta?.code}/06
+          </span>
+          <span className="mt-1 block font-heading text-sm font-semibold text-[#fffaf0]">
+            {stepMeta?.label}
+          </span>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   )
 }
 
