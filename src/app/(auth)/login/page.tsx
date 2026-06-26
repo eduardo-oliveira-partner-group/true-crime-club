@@ -1,11 +1,22 @@
+'use client'
+
 import { IconArrowRight, IconFingerprint, IconLock } from '@tabler/icons-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { FormEvent } from 'react'
 
 import { Button } from '@/src/components/ui/button'
 import { getCurrentCustomer } from '@/src/lib/domain/repositories'
 
 export default function LoginPage() {
   const customer = getCurrentCustomer()
+  const router = useRouter()
+
+  const handleLogin = (e: FormEvent) => {
+    e.preventDefault()
+    localStorage.setItem('isLoggedIn', 'true')
+    router.push('/cliente/pedidos')
+  }
 
   return (
     <div className="relative border border-[#b98542]/45 bg-[#171211] p-6 shadow-[0_24px_64px_rgba(0,0,0,0.45)] sm:p-8">
@@ -36,7 +47,7 @@ export default function LoginPage() {
         seu dossiê pessoal.
       </p>
 
-      <form className="mt-6 space-y-5">
+      <form className="mt-6 space-y-5" onSubmit={handleLogin}>
         <div>
           <label
             className="text-xs font-semibold tracking-[0.2em] text-[#c8bdad] uppercase"
@@ -47,7 +58,7 @@ export default function LoginPage() {
           <input
             id="email"
             type="email"
-            defaultValue={customer?.email}
+            defaultValue={customer?.email ?? ''}
             className="mt-2 w-full border border-[#fffaf0]/14 bg-[#0c0a09] px-4 py-3 text-sm text-[#fffaf0] transition outline-none placeholder:text-[#bfb4a3]/60 focus:border-[#d7b56d]/70 focus:bg-[#0b0908]"
           />
         </div>
@@ -65,15 +76,13 @@ export default function LoginPage() {
           />
         </div>
         <Button
-          asChild
+          type="submit"
           size="lg"
           className="w-full bg-[#d84132] text-white shadow-[0_0_26px_rgba(216,65,50,0.35)] hover:bg-[#b93227]"
         >
-          <Link href="/cliente/pedidos">
-            <IconLock className="size-4" />
-            Entrar no clube (mock)
-            <IconArrowRight className="size-4" />
-          </Link>
+          <IconLock className="size-4" />
+          Entrar no clube (mock)
+          <IconArrowRight className="size-4" />
         </Button>
       </form>
 

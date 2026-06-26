@@ -23,8 +23,13 @@ type PublicHeaderContentProps = {
 export function PublicHeaderContent({ itemCount }: PublicHeaderContentProps) {
   const pathname = usePathname()
   const [isScrolled, setIsScrolled] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
   const shouldOverlayContent = pathname === '/'
   const shouldShowBackdrop = isScrolled || !shouldOverlayContent
+
+  useEffect(() => {
+    setIsLoggedIn(localStorage.getItem('isLoggedIn') === 'true')
+  }, [])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -65,6 +70,15 @@ export function PublicHeaderContent({ itemCount }: PublicHeaderContentProps) {
                 {link.label}
               </Link>
             ))}
+            {isLoggedIn && (
+              <Link
+                href="/casos"
+                data-text="Casos"
+                className="glitch-text text-xs font-semibold tracking-[0.18em] text-[#62d84e] uppercase drop-shadow-[0_0_8px_rgba(98,216,78,0.35)] transition-all hover:text-[#7fff6b]"
+              >
+                Casos
+              </Link>
+            )}
           </nav>
 
           <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
@@ -74,7 +88,10 @@ export function PublicHeaderContent({ itemCount }: PublicHeaderContentProps) {
               className="text-[#fffaf0] hover:bg-[#fffaf0]/10 hover:text-[#fffaf0]"
               asChild
             >
-              <Link href="/login" aria-label="Conta">
+              <Link
+                href={isLoggedIn ? '/cliente/perfil' : '/login'}
+                aria-label="Conta"
+              >
                 <IconUser className="size-4" />
                 <span className="hidden sm:inline">Conta</span>
               </Link>
@@ -113,6 +130,15 @@ export function PublicHeaderContent({ itemCount }: PublicHeaderContentProps) {
               {link.label}
             </Link>
           ))}
+          {isLoggedIn && (
+            <Link
+              href="/casos"
+              data-text="Casos"
+              className="glitch-text shrink-0 text-xs font-semibold tracking-[0.16em] text-[#62d84e] uppercase transition-colors hover:text-[#7fff6b]"
+            >
+              Casos
+            </Link>
+          )}
         </nav>
       </header>
 

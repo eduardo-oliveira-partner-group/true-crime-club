@@ -8,7 +8,7 @@ export default function FrontOfficeLayout({
   children: React.ReactNode
 }>) {
   return (
-    <div className="flex min-h-svh flex-col bg-[#090807] text-[#fffaf0]">
+    <div className="dark flex min-h-svh flex-col bg-[#090807] text-[#fffaf0]">
       <PublicHeader />
       <main className="flex-1">{children}</main>
       <PublicFooter />

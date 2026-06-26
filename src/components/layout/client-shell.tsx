@@ -3,8 +3,10 @@
 import {
   IconBoxSeam,
   IconCreditCard,
-  IconFileText,
   IconHome,
+  IconLogout,
+  IconUser,
+  IconUsers,
 } from '@tabler/icons-react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -15,10 +17,11 @@ import { getCurrentCustomer } from '@/src/lib/domain/repositories'
 import { cn } from '@/src/lib/utils'
 
 const navItems = [
-  { href: '/cliente/pedidos', label: 'Pedidos', icon: IconBoxSeam },
-  { href: '/cliente/assinatura', label: 'Assinatura', icon: IconHome },
-  { href: '/cliente/financeiro', label: 'Financeiro', icon: IconCreditCard },
-  { href: '/cliente/conteudos', label: 'Conteúdos', icon: IconFileText },
+  { href: '/cliente/perfil', label: 'Minha conta', icon: IconUser },
+  { href: '/cliente/pedidos', label: 'Meus pedidos', icon: IconBoxSeam },
+  { href: '/cliente/assinatura', label: 'Minhas assinaturas', icon: IconHome },
+  { href: '/cliente/cartoes', label: 'Meus cartões', icon: IconCreditCard },
+  { href: '/casos', label: 'Casos', icon: IconUsers, isGreen: true },
 ]
 
 export function ClientShell({ children }: { children: React.ReactNode }) {
@@ -26,7 +29,7 @@ export function ClientShell({ children }: { children: React.ReactNode }) {
   const customer = getCurrentCustomer()
 
   return (
-    <div className="relative isolate min-h-svh bg-[#090807] text-[#fffaf0]">
+    <div className="dark relative isolate min-h-svh bg-[#090807] text-[#fffaf0]">
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.028)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.028)_1px,transparent_1px)] bg-size-[56px_56px]" />
 
       <header className="border-b border-[#fffaf0]/12 bg-[#0b0908]/80 backdrop-blur-sm">
@@ -62,7 +65,9 @@ export function ClientShell({ children }: { children: React.ReactNode }) {
                     'group flex shrink-0 items-center gap-2.5 border px-3 py-2.5 text-sm transition-colors',
                     active
                       ? 'border-[#d7b56d]/45 bg-[#171211] text-[#fffaf0]'
-                      : 'border-transparent text-[#c8bdad] hover:border-[#fffaf0]/12 hover:bg-[#171211]/60 hover:text-[#fffaf0]',
+                      : item.isGreen
+                        ? 'glitch-btn-container border-transparent text-[#62d84e] hover:border-[#62d84e]/20 hover:bg-[#171211]/60'
+                        : 'border-transparent text-[#c8bdad] hover:border-[#fffaf0]/12 hover:bg-[#171211]/60 hover:text-[#fffaf0]',
                   )}
                 >
                   <Icon
@@ -70,13 +75,33 @@ export function ClientShell({ children }: { children: React.ReactNode }) {
                       'size-4 shrink-0',
                       active
                         ? 'text-[#d7b56d]'
-                        : 'text-[#bfb4a3] group-hover:text-[#d7b56d]',
+                        : item.isGreen
+                          ? 'glitch-icon text-[#62d84e]'
+                          : 'text-[#bfb4a3] group-hover:text-[#d7b56d]',
                     )}
                   />
-                  {item.label}
+                  <span
+                    data-text={item.label}
+                    className={cn(
+                      item.isGreen &&
+                        'glitch-text font-semibold text-[#62d84e] drop-shadow-[0_0_6px_rgba(98,216,78,0.25)]',
+                    )}
+                  >
+                    {item.label}
+                  </span>
                 </Link>
               )
             })}
+            <button
+              onClick={() => {
+                localStorage.removeItem('isLoggedIn')
+                window.location.href = '/'
+              }}
+              className="group flex shrink-0 cursor-pointer items-center gap-2.5 border border-transparent px-3 py-2.5 text-left text-sm text-[#ffb0a5] transition-colors hover:border-[#d84132]/25 hover:bg-[#d84132]/8 lg:mt-6"
+            >
+              <IconLogout className="size-4 shrink-0 text-[#ffb0a5]" />
+              Sair
+            </button>
           </nav>
         </aside>
 
