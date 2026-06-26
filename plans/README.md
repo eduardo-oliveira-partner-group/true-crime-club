@@ -8,6 +8,7 @@ Gerado com o skill improve em 2026-06-24. Reconcile completo em 2026-06-25 @ `fc
 |------|--------|------------|---------|------------|--------|
 | 001 | Implementar as telas do Front Office com mocks, SEO e contratos futuros | P1 | L | - | **DONE** — verificado @ `fc79de0`; gates exit 0 |
 | 002 | Transformar a Home em uma experiência de abertura da caixa | P1 | L | - | **IN PROGRESS** — ~90%; lacuna hero mobile + QA manual |
+| 003 | Integração das telas da Área do Cliente com a identidade True Crime | P1 | M | 001 | **TODO** |
 
 Valores de status: TODO | IN PROGRESS | DONE | BLOCKED (com motivo em uma linha) | REJECTED (com justificativa em uma linha)
 
