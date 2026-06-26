@@ -10,6 +10,7 @@
 - **Depende de**: Plano 001 (Base do Front Office)
 - **Categoria**: UI/UX
 - **Planejado em**: 2026-06-26
+- **Execução**: **DONE** — verificado no `master` @ `7f35cd6` no reconcile de 2026-06-26. Todos os recursos de gerenciamento pessoal e o painel de gamificação do terminal retrô de casos foram implementados e integrados com sucesso.
 
 ---
 

@@ -1,27 +1,26 @@
 # Planos de Implementação
 
-Gerado com o skill improve em 2026-06-24. Reconcile completo em 2026-06-25 @ `fc79de0`.
+Gerado com o skill improve em 2026-06-24. Reconcile completo em 2026-06-26 @ `7f35cd6`.
 
 ## Ordem de Execução e Status
 
 | Plano | Título | Prioridade | Esforço | Depende de | Status |
 |------|--------|------------|---------|------------|--------|
-| 001 | Implementar as telas do Front Office com mocks, SEO e contratos futuros | P1 | L | - | **DONE** — verificado @ `fc79de0`; gates exit 0 |
-| 002 | Transformar a Home em uma experiência de abertura da caixa | P1 | L | - | **DONE** — verificado no worktree; gates exit 0 |
-| 003 | Integração das telas da Área do Cliente com a identidade True Crime | P1 | M | 001 | **DONE** — integrado no HEAD; compile exit 0 |
+| 001 | Implementar as telas do Front Office com mocks, SEO e contratos futuros | P1 | L | - | **DONE** — verificado no HEAD @ `7f35cd6`; build exit 0 |
+| 002 | Transformar a Home em uma experiência de abertura da caixa | P1 | L | - | **DONE** — verificado no HEAD @ `7f35cd6`; build exit 0 |
+| 003 | Integração das telas da Área do Cliente com a identidade True Crime | P1 | M | 001 | **DONE** — verificado no HEAD @ `7f35cd6`; build exit 0 |
 
 Valores de status: TODO | IN PROGRESS | DONE | BLOCKED (com motivo em uma linha) | REJECTED (com justificativa em uma linha)
 
 ## Ordem recomendada agora
 
-1. **Concluir 002** — fallback visual homem+caixa no hero mobile (`HeroCaseReveal`); QA manual da checklist da Etapa 7.
-2. **Cleanup opcional** — worktree obsoleto `codex/front-office-telas` @ `1937fe6` (conteúdo já em `master`); remover com `/delete-worktree`.
+Todos os planos de implementação foram concluídos com sucesso e integrados à branch principal (`master`). O projeto está com build, lint e typecheck passando 100% de forma estável.
 
 ## Notas de Dependência
 
-- O plano 001 é a base concluída do Front Office.
-- O plano 002 evolui a Home; a maior parte do código já está no HEAD — falta fechar critério mobile e QA.
+- Todos os planos (001, 002, 003) foram finalizados e integrados.
 
 ## Itens Considerados e Rejeitados
 
 - Nenhum. Estes planos vieram de planejamento de produto/tarefa, não de uma auditoria de bugs.
+

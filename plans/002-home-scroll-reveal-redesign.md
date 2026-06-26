@@ -21,7 +21,7 @@
 - **Depende de**: nenhum
 - **Categoria**: direção
 - **Planejado em**: commit `fc79de0`, 2026-06-25 (reconcile; baseline original `e8847fa`)
-- **Execução**: IN PROGRESS — implementação substancial no HEAD; lacuna documentada no hero mobile (ver reconcile)
+- **Execução**: **DONE** — verificado no `master` @ `7f35cd6` no reconcile de 2026-06-26. Todos os critérios de conclusão e gates de build/typecheck/lint passaram de forma estável.
 
 ## Por que isso importa
 

@@ -19,7 +19,7 @@
 - **Depende de**: nenhum
 - **Categoria**: direção
 - **Planejado em**: commit `fc79de0`, 2026-06-25 (reconcile final; baselines anteriores `d80f959`, `fe41adc`)
-- **Execução**: **DONE** — verificado no `master` @ `fc79de0`. Commits `9316088`..`1937fe6` integrados; gates `pnpm typecheck`/`pnpm lint`/`pnpm build` exit 0 reconfirmados em reconcile 2026-06-25. Worktree `codex/front-office-telas` @ `1937fe6` está obsoleto — pode remover com `/delete-worktree`.
+- **Execução**: **DONE** — verificado no `master` @ `7f35cd6` no reconcile de 2026-06-26. Todos os gates `pnpm typecheck`/`pnpm lint`/`pnpm build` exit 0 foram reconfirmados de forma bem-sucedida.
 
 ## Por que isso importa
 
