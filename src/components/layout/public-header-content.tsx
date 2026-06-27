@@ -1,6 +1,11 @@
 'use client'
 
-import { IconShoppingCart, IconUser } from '@tabler/icons-react'
+import {
+  IconMenu2,
+  IconShoppingCart,
+  IconUser,
+  IconX,
+} from '@tabler/icons-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -24,6 +29,7 @@ export function PublicHeaderContent({ itemCount }: PublicHeaderContentProps) {
   const pathname = usePathname()
   const [isScrolled, setIsScrolled] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
   const shouldOverlayContent = pathname === '/'
   const shouldShowBackdrop = isScrolled || !shouldOverlayContent
 
@@ -41,6 +47,17 @@ export function PublicHeaderContent({ itemCount }: PublicHeaderContentProps) {
 
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [isMenuOpen])
 
   return (
     <>
@@ -112,38 +129,111 @@ export function PublicHeaderContent({ itemCount }: PublicHeaderContentProps) {
                 ) : null}
               </Link>
             </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-[#fffaf0] hover:bg-[#fffaf0]/10 hover:text-[#fffaf0] md:hidden"
+              onClick={() => setIsMenuOpen(true)}
+              aria-label="Abrir menu"
+            >
+              <IconMenu2 className="size-5" />
+            </Button>
           </div>
         </div>
-
-        <nav
-          className={cn(
-            'flex max-w-full gap-4 overflow-x-auto border-t px-3 py-2 transition-colors md:hidden',
-            shouldShowBackdrop ? 'border-[#fffaf0]/10' : 'border-transparent',
-          )}
-        >
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="shrink-0 text-xs font-semibold tracking-[0.16em] text-[#d7c9b5] uppercase transition-colors hover:text-[#fffaf0]"
-            >
-              {link.label}
-            </Link>
-          ))}
-          {isLoggedIn && (
-            <Link
-              href="/casos"
-              data-text="Casos"
-              className="glitch-text shrink-0 text-xs font-semibold tracking-[0.16em] text-[#62d84e] uppercase transition-colors hover:text-[#7fff6b]"
-            >
-              Casos
-            </Link>
-          )}
-        </nav>
       </header>
 
+      {/* Mobile Drawer (Sidebar) */}
+      <div
+        className={cn(
+          'fixed inset-0 z-50 transition-opacity duration-300 md:hidden',
+          isMenuOpen
+            ? 'pointer-events-auto opacity-100'
+            : 'pointer-events-none opacity-0',
+        )}
+      >
+        {/* Backdrop overlay */}
+        <div
+          className="absolute inset-0 bg-[#090807]/80 backdrop-blur-sm transition-opacity duration-300"
+          onClick={() => setIsMenuOpen(false)}
+        />
+
+        {/* Sidebar container */}
+        <div
+          className={cn(
+            'absolute inset-y-0 right-0 flex w-72 flex-col justify-between border-l border-[#fffaf0]/12 bg-[#0b0908] p-6 shadow-[0_0_50px_rgba(0,0,0,0.8)] transition-transform duration-300 ease-out',
+            isMenuOpen ? 'translate-x-0' : 'translate-x-full',
+          )}
+        >
+          <div className="flex flex-col gap-8">
+            <div className="flex items-center justify-between">
+              <Link href="/" onClick={() => setIsMenuOpen(false)}>
+                <BrandLogo className="h-7 w-auto" />
+              </Link>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-[#fffaf0] hover:bg-[#fffaf0]/10"
+                onClick={() => setIsMenuOpen(false)}
+                aria-label="Fechar menu"
+              >
+                <IconX className="size-5" />
+              </Button>
+            </div>
+
+            <nav className="flex flex-col gap-5">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setIsMenuOpen(false)}
+                  className={cn(
+                    'border-b border-[#fffaf0]/5 py-2 text-xs font-semibold tracking-[0.18em] text-[#d7c9b5] uppercase transition-colors hover:text-[#fffaf0]',
+                    pathname === link.href &&
+                      'border-l-2 border-[#d7b56d]/50 pl-1 text-[#fffaf0]',
+                  )}
+                >
+                  {link.label}
+                </Link>
+              ))}
+              {isLoggedIn && (
+                <Link
+                  href="/casos"
+                  onClick={() => setIsMenuOpen(false)}
+                  className={cn(
+                    'glitch-text border-b border-[#fffaf0]/5 py-2 text-xs font-semibold tracking-[0.18em] text-[#62d84e] uppercase drop-shadow-[0_0_8px_rgba(98,216,78,0.35)] transition-all hover:text-[#7fff6b]',
+                    pathname === '/casos' && 'border-l-2 border-[#62d84e] pl-1',
+                  )}
+                >
+                  Casos
+                </Link>
+              )}
+            </nav>
+          </div>
+
+          {/* Footer of Drawer */}
+          <div className="flex flex-col gap-4 border-t border-[#fffaf0]/10 pt-6">
+            <Link
+              href={isLoggedIn ? '/cliente/perfil' : '/login'}
+              onClick={() => setIsMenuOpen(false)}
+              className="flex items-center gap-3 text-xs font-semibold tracking-[0.12em] text-[#d7c9b5] uppercase transition-colors hover:text-[#fffaf0]"
+            >
+              <IconUser className="size-4 text-[#d7b56d]" />
+              <span>Minha Conta</span>
+            </Link>
+            <Link
+              href="/carrinho"
+              onClick={() => setIsMenuOpen(false)}
+              className="flex items-center gap-3 text-xs font-semibold tracking-[0.12em] text-[#d7c9b5] uppercase transition-colors hover:text-[#fffaf0]"
+            >
+              <IconShoppingCart className="size-4 text-[#d7b56d]" />
+              <span>Carrinho ({itemCount})</span>
+            </Link>
+          </div>
+        </div>
+      </div>
+
       {!shouldOverlayContent ? (
-        <div aria-hidden="true" className="h-[99px] md:h-[65px]" />
+        <div aria-hidden="true" className="h-[65px]" />
       ) : null}
     </>
   )

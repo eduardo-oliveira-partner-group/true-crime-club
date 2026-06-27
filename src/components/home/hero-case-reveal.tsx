@@ -268,11 +268,11 @@ export function HeroCaseReveal({ badge, title }: HeroCaseRevealProps) {
         <div className="relative z-10 mx-auto flex max-w-7xl items-start px-4 py-16 sm:px-6 lg:min-h-screen lg:items-center lg:px-10 lg:py-20">
           <div className="relative z-10 w-full max-w-2xl space-y-7 lg:max-w-160 xl:max-w-172">
             <ScrollReveal immediate delay={0.05}>
-              <div className="inline-grid max-w-full grid-cols-[4.75rem_minmax(0,1fr)] border border-[#b8945f]/55 bg-[#080604]/72 text-[#c9a66a] shadow-[0_0_0_1px_rgba(255,250,240,0.04)_inset,0_18px_54px_rgba(0,0,0,0.4)] backdrop-blur-sm">
-                <span className="grid min-h-16 place-items-center border-r border-[#b8945f]/35 bg-[#d7c7a5]/14">
-                  <IconFingerprint className="size-9 text-[#e8d39b] drop-shadow-[0_0_14px_rgba(215,181,109,0.48)]" />
+              <div className="inline-grid max-w-full grid-cols-[3.5rem_minmax(0,1fr)] border border-[#b8945f]/55 bg-[#080604]/72 text-[#c9a66a] shadow-[0_0_0_1px_rgba(255,250,240,0.04)_inset,0_18px_54px_rgba(0,0,0,0.4)] backdrop-blur-sm sm:grid-cols-[4.75rem_minmax(0,1fr)]">
+                <span className="grid min-h-12 place-items-center border-r border-[#b8945f]/35 bg-[#d7c7a5]/14 sm:min-h-16">
+                  <IconFingerprint className="size-6 text-[#e8d39b] drop-shadow-[0_0_14px_rgba(215,181,109,0.48)] sm:size-9" />
                 </span>
-                <span className="flex items-center px-6 py-3 font-heading text-sm/7 font-semibold tracking-[0.24em] uppercase">
+                <span className="flex items-center px-4 py-2 font-heading text-[10px]/4 font-semibold tracking-[0.16em] uppercase sm:px-6 sm:py-3 sm:text-sm/7 sm:tracking-[0.24em]">
                   {badge}
                 </span>
               </div>
