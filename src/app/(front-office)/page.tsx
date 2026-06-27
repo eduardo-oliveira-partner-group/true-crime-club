@@ -23,9 +23,10 @@ import finalCtaDossierPlate from '@/src/assets/images/home/final-cta-dossier-pla
 import investigationContinuousBg from '@/src/assets/images/home/investigation-continuous-bg.png'
 import plansDossierPlate from '@/src/assets/images/home/plans-dossier-plate.png'
 import previousBoxesBanner from '@/src/assets/images/home/previous-boxes-banner.png'
+import { CorkboardTimeline } from '@/src/components/home/corkboard-timeline'
+import { EvidenceInventoryGrid } from '@/src/components/home/evidence-inventory-grid'
 import { FeatureDossierCard } from '@/src/components/home/feature-dossier-card'
 import { HeroCaseReveal } from '@/src/components/home/hero-case-reveal'
-import { HowItWorksStepCard } from '@/src/components/home/how-it-works-step-card'
 import { PlanDossierCard } from '@/src/components/home/plan-dossier-card'
 import { PreviousBoxesShowcase } from '@/src/components/home/previous-boxes-showcase'
 import { Button } from '@/src/components/ui/button'
@@ -58,24 +59,36 @@ const clubHighlights = [
     title: 'Box temática mensal',
     description:
       'Todo mês, sua caixa chega como um presente exclusivo — surpresas pensadas por quem vive true crime e cuida de cada detalhe.',
+    tabLabel: 'Entrega mensal',
+    caseRef: 'CLUB-01',
+    highlightLabel: 'Experiência',
   },
   {
     icon: IconFingerprint,
     title: 'Pistas colecionáveis',
     description:
       'A cada edição, uma nova pista do caso fictício do ano: dicas, evidências e documentos que se acumulam até a revelação final.',
+    tabLabel: 'Narrativa coletiva',
+    caseRef: 'CLUB-02',
+    highlightLabel: 'Investigação',
   },
   {
     icon: IconClipboardText,
     title: 'Conteúdos exclusivos',
     description:
       'Trechos de livros raros, vídeos especiais e materiais digitais reservados a quem está dentro do clube.',
+    tabLabel: 'Conteúdo reservado',
+    caseRef: 'CLUB-03',
+    highlightLabel: 'Exclusividade',
   },
   {
     icon: IconSparkles,
     title: 'Edições limitadas',
     description:
       'Boxes avulsas, extras e lançamentos especiais para completar a coleção ou presentear quem também ama mistério.',
+    tabLabel: 'Coleção especial',
+    caseRef: 'CLUB-04',
+    highlightLabel: 'Coleção',
   },
 ]
 
@@ -114,19 +127,16 @@ const boxCategories = [
 
 const howItWorks = [
   {
-    icon: IconCreditCard,
     title: 'Assine',
     description:
       'Escolha o plano mensal ou anual e confirme seus dados de entrega.',
   },
   {
-    icon: IconPackage,
     title: 'Receba em casa',
     description:
       'A cobrança acontece no mês da compra e o envio da box é preparado para o ciclo seguinte.',
   },
   {
-    icon: IconChecklist,
     title: 'Investigue',
     description:
       'Abra a caixa, acompanhe os conteúdos exclusivos e registre suas teorias até a revelação final.',
@@ -261,82 +271,156 @@ export default function HomePage() {
         />
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_18%_22%,rgba(216,65,50,0.16),transparent_28%),radial-gradient(circle_at_80%_12%,rgba(215,181,109,0.1),transparent_30%),linear-gradient(180deg,rgba(11,9,8,0.82)_0%,rgba(11,9,8,0.58)_42%,rgba(11,9,8,0.86)_100%),linear-gradient(135deg,rgba(11,9,8,0.72)_0%,rgba(19,13,11,0.55)_46%,rgba(9,8,7,0.78)_100%)]" />
         <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.035)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.035)_1px,transparent_1px)] bg-size-[56px_56px]" />
-
-        <div className="relative z-10 mx-auto flex max-w-6xl flex-col gap-10 px-4 py-16 sm:px-6 lg:py-24">
-          <div className="mx-auto max-w-4xl space-y-4 text-center">
-            <ScrollReveal>
-              <p className="text-xs font-semibold tracking-[0.24em] text-[#d7b56d] uppercase">
-                O que é o Club?
-              </p>
-            </ScrollReveal>
-            <ScrollReveal delay={0.08}>
-              <h2 className="mx-auto max-w-2xl font-heading text-3xl leading-[1.15] font-black tracking-wide text-[#fffaf0] uppercase sm:text-4xl">
-                Muito além de uma caixa.
-                <br />
-                <span className="text-[#d7b56d]">
-                  Uma imersão mensal
-                  <br />
-                  em true crime.
-                </span>
-              </h2>
-            </ScrollReveal>
-            <TextGenerateEffect
-              words="Unimos qualidade e conteúdo para quem busca profundidade e exclusividade no universo true crime. Cada entrega é uma experiência completa — da abertura da caixa ao design impecável de cada item colecionável."
-              textClassName="mx-auto max-w-3xl text-base leading-7 text-[#d7c9b5]"
-              staggerDelay={0.05}
-            />
-            <ScrollReveal delay={0.12}>
-              <div className="mx-auto flex max-w-2xl items-start gap-4 border border-[#fffaf0]/12 bg-[#171211]/72 p-5 text-left backdrop-blur-sm sm:p-6">
-                <div className="flex size-10 shrink-0 items-center justify-center bg-[#d84132]/20 text-[#ffb0a5]">
-                  <IconUsers className="size-5" />
-                </div>
-                <div>
-                  <p className="text-xs font-semibold tracking-[0.2em] text-[#d7b56d] uppercase">
-                    Curadoria com paixão
+        <div className="relative z-10 mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-24">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 lg:items-start">
+            
+            {/* Left Column - Intro & Curadoria Box (Sticky on Desktop) */}
+            <div className="lg:col-span-5 lg:sticky lg:top-24 space-y-6">
+              <div className="space-y-4">
+                <ScrollReveal>
+                  <p className="text-xs font-semibold tracking-[0.24em] text-[#d7b56d] uppercase">
+                    O que é o Club?
                   </p>
-                  <p className="mt-2 text-sm/6 text-[#d7c9b5]">
-                    Todo mês, sua caixa chega cheia de surpresas pensadas por
-                    designers que vivem true crime e colocam o coração em cada
-                    detalhe — do conceito ao acabamento final.
-                  </p>
+                </ScrollReveal>
+                <ScrollReveal delay={0.08}>
+                  <h2 className="font-heading text-3xl leading-[1.15] font-black tracking-wide text-[#fffaf0] uppercase sm:text-4xl">
+                    Muito além de uma caixa.
+                    <br />
+                    <span className="text-[#d7b56d]">
+                      Uma imersão mensal
+                      <br />
+                      em true crime.
+                    </span>
+                  </h2>
+                </ScrollReveal>
+                <TextGenerateEffect
+                  words="Unimos qualidade e conteúdo para quem busca profundidade e exclusividade no universo true crime. Cada entrega é uma experiência completa — da abertura da caixa ao design impecável de cada item colecionável."
+                  textClassName="text-base leading-7 text-[#d7c9b5]"
+                  staggerDelay={0.05}
+                />
+              </div>
+
+              <ScrollReveal delay={0.12}>
+                <div className="relative flex items-start gap-4 border border-[#fffaf0]/12 bg-[#171211]/72 p-5 backdrop-blur-sm sm:p-6 shadow-[0_16px_36px_rgba(0,0,0,0.4)] overflow-hidden group">
+                  {/* Decorative forensic stamp overlay */}
+                  <div className="absolute right-4 top-4 border border-dashed border-[#d84132]/25 text-[#d84132]/35 px-2 py-0.5 rotate-[-8deg] uppercase font-mono font-bold text-[9px] tracking-wider select-none pointer-events-none group-hover:border-[#d84132]/45 group-hover:text-[#d84132]/60 transition-colors duration-300">
+                    CURADORIA HOMOLOGADA
+                  </div>
+                  
+                  <div className="flex size-10 shrink-0 items-center justify-center bg-[#d84132]/20 text-[#ffb0a5] border border-[#d84132]/30">
+                    <IconUsers className="size-5" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold tracking-[0.2em] text-[#d7b56d] uppercase">
+                      Curadoria com paixão
+                    </p>
+                    <p className="mt-2 text-sm/6 text-[#d7c9b5]">
+                      Todo mês, sua caixa chega cheia de surpresas pensadas por
+                      designers que vivem true crime e colocam o coração em cada
+                      detalhe — do conceito ao acabamento final.
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </ScrollReveal>
-          </div>
+              </ScrollReveal>
 
-          <div className="space-y-6">
-            <ScrollRevealGroup
-              className="grid items-stretch gap-5 sm:grid-cols-2"
-              staggerChildren={0.08}
-            >
-              {clubHighlights.map((feature, index) => (
-                <ScrollRevealItem key={feature.title} className="h-full">
-                  <FeatureDossierCard
-                    icon={feature.icon}
-                    title={feature.title}
-                    description={feature.description}
-                    index={index}
-                    variant="club"
-                    total={clubHighlights.length}
-                  />
-                </ScrollRevealItem>
-              ))}
-            </ScrollRevealGroup>
+              <ScrollReveal delay={0.15}>
+                <div className="max-w-xs pt-2">
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="h-11 w-full justify-between border-[#fffaf0]/18 bg-[#fffaf0]/6 px-5 text-[#fffaf0] hover:bg-[#fffaf0]/12 hover:text-[#fffaf0]"
+                  >
+                    <Link href="/assinatura">
+                      Conhecer planos
+                      <IconArrowRight className="size-4" />
+                    </Link>
+                  </Button>
+                </div>
+              </ScrollReveal>
+            </div>
 
-            <ScrollReveal delay={0.15}>
-              <div className="mx-auto max-w-md">
-                <Button
-                  asChild
-                  variant="outline"
-                  className="h-12 w-full justify-between border-[#fffaf0]/18 bg-[#fffaf0]/6 px-5 text-[#fffaf0] hover:bg-[#fffaf0]/12 hover:text-[#fffaf0]"
-                >
-                  <Link href="/assinatura">
-                    Conhecer planos
-                    <IconArrowRight className="size-4" />
-                  </Link>
-                </Button>
-              </div>
-            </ScrollReveal>
+            {/* Right Column - Timeline / Vertical Folders Archive */}
+            <div className="lg:col-span-7 space-y-6 relative pl-0 sm:pl-8">
+              {/* Connector vertical line on desktop/tablet */}
+              <div 
+                className="absolute left-[31px] top-8 bottom-8 w-[2px] bg-linear-to-b from-[#d84132]/50 via-[#d7b56d]/30 to-transparent hidden sm:block pointer-events-none z-0" 
+                aria-hidden="true"
+              />
+
+              <ScrollRevealGroup
+                className="space-y-5"
+                staggerChildren={0.08}
+              >
+                {clubHighlights.map((feature, index) => {
+                  const HighlightIcon = feature.icon
+                  const isGold = index === clubHighlights.length - 1
+                  
+                  return (
+                    <ScrollRevealItem key={feature.title}>
+                      <div className="flex gap-4 relative group z-10">
+                        {/* Bullet number tab on the line */}
+                        <div 
+                          className={cn(
+                            "relative shrink-0 hidden sm:flex size-16 items-center justify-center border font-heading text-lg font-black tracking-tight transition-all duration-300",
+                            isGold 
+                              ? "bg-[#171211] border-[#d7b56d]/30 text-[#d7b56d] group-hover:border-[#d7b56d] group-hover:bg-[#d7b56d]/10" 
+                              : "bg-[#171211] border-[#fffaf0]/12 text-[#d7c9b5]/85 group-hover:border-[#d84132] group-hover:text-[#ffb0a5] group-hover:bg-[#d84132]/5"
+                          )}
+                        >
+                          0{index + 1}
+                        </div>
+
+                        {/* Folder Tab Card */}
+                        <div 
+                          className={cn(
+                            "flex-1 border bg-[#0c0a09]/80 p-5 backdrop-blur-sm transition-all duration-300 hover:translate-x-2 shadow-[0_12px_28px_rgba(0,0,0,0.38)]",
+                            isGold 
+                              ? "border-[#d7b56d]/30 hover:border-[#d7b56d]/70 hover:bg-[#1a1412]" 
+                              : "border-[#fffaf0]/8 hover:border-[#d84132]/40 hover:bg-[#171211]/90"
+                          )}
+                        >
+                          <div className="flex items-center justify-between gap-3 border-b border-[#fffaf0]/8 pb-2.5 mb-3.5">
+                            <span 
+                              className={cn(
+                                "text-[10px] font-mono tracking-wider font-semibold uppercase",
+                                isGold ? "text-[#d7b56d]" : "text-[#d7c9b5]/80"
+                              )}
+                            >
+                              {feature.tabLabel}
+                            </span>
+                            <span className="text-[9px] font-mono text-[#fffaf0]/30 select-none">
+                              {feature.caseRef}
+                            </span>
+                          </div>
+
+                          <div className="flex items-start gap-4">
+                            <div 
+                              className={cn(
+                                "shrink-0 size-9 flex items-center justify-center border transition-colors duration-300",
+                                isGold 
+                                  ? "bg-[#d7b56d]/10 text-[#d7b56d] border-[#d7b56d]/25 group-hover:text-[#fff] group-hover:bg-[#d7b56d]/20" 
+                                  : "bg-[#d84132]/10 text-[#ffb0a5] border-[#d84132]/18 group-hover:text-[#fff] group-hover:bg-[#d84132]/20"
+                              )}
+                            >
+                              <HighlightIcon className="size-4.5" />
+                            </div>
+                            <div>
+                              <h3 className="font-heading font-bold text-base text-[#fffaf0] group-hover:text-[#d7b56d] transition-colors duration-300">
+                                {feature.title}
+                              </h3>
+                              <p className="mt-2 text-sm/6 text-[#d7c9b5]/90">
+                                {feature.description}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </ScrollRevealItem>
+                  )
+                })}
+              </ScrollRevealGroup>
+            </div>
+
           </div>
         </div>
       </section>
@@ -372,29 +456,7 @@ export default function HomePage() {
             />
           </div>
 
-          <ScrollRevealGroup
-            className="grid items-stretch gap-5 sm:grid-cols-6"
-            staggerChildren={0.07}
-          >
-            {boxCategories.map((category, index) => (
-              <ScrollRevealItem
-                key={category.title}
-                className={cn(
-                  'h-full',
-                  index < 2 ? 'sm:col-span-3' : 'sm:col-span-2',
-                )}
-              >
-                <FeatureDossierCard
-                  icon={category.icon}
-                  title={category.title}
-                  description={category.description}
-                  index={index}
-                  variant="box"
-                  total={boxCategories.length}
-                />
-              </ScrollRevealItem>
-            ))}
-          </ScrollRevealGroup>
+          <EvidenceInventoryGrid categories={boxCategories} />
 
           <ScrollReveal delay={0.15}>
             <div className="mx-auto mt-8 max-w-3xl border border-[#d7b56d]/25 bg-[#171211]/88 p-5 backdrop-blur-sm sm:p-6">
@@ -427,97 +489,65 @@ export default function HomePage() {
         />
         <div className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(5,4,3,0.72)_0%,rgba(5,4,3,0.55)_45%,rgba(5,4,3,0.82)_100%),linear-gradient(90deg,rgba(5,4,3,0.88)_0%,rgba(5,4,3,0.35)_42%,rgba(5,4,3,0.2)_100%)]" />
 
-        <div className="relative z-10 mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-20">
-          <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14 xl:gap-16">
-            <div className="space-y-6 lg:max-w-xl">
-              <div className="flex items-center gap-4">
-                <p className="text-xs font-semibold tracking-[0.3em] text-[#d7b56d] uppercase">
-                  Investigação contínua
+        <div className="relative z-10 mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:py-24">
+          <div className="flex flex-col items-center text-center space-y-8">
+            <div className="space-y-6 flex flex-col items-center">
+              <ScrollReveal>
+                <div className="flex items-center justify-center gap-4">
+                  <span className="h-px w-8 bg-[#d7b56d]/55" />
+                  <p className="text-xs font-semibold tracking-[0.3em] text-[#d7b56d] uppercase">
+                    Investigação contínua
+                  </p>
+                  <span className="h-px w-8 bg-[#d7b56d]/55" />
+                </div>
+              </ScrollReveal>
+
+              <ScrollReveal delay={0.08}>
+                <h2 className="mx-auto max-w-2xl font-heading text-3xl/tight font-black text-[#f0e8dd] sm:text-4xl lg:text-[2.75rem] lg:leading-[1.12]">
+                  Uma pista por mês.
+                  <br />
+                  Um caso inteiro para desvendar.
+                </h2>
+              </ScrollReveal>
+
+              <ScrollReveal delay={0.12}>
+                <p className="mx-auto max-w-2xl text-base/7 text-[#c8bdad] sm:text-lg/8">
+                  Receba dicas, evidências, documentos e revelações que se
+                  acumulam ao longo do ano — até desvendar o crime juntos, em
+                  tempo real, com toda a comunidade do clube.
                 </p>
-                <span className="hidden h-px flex-1 bg-[#d7b56d]/55 sm:block" />
-              </div>
-
-              <h2 className="font-heading text-3xl/tight font-black text-[#f0e8dd] sm:text-4xl lg:text-[2.75rem] lg:leading-[1.08] xl:text-5xl">
-                Uma pista por mês. Um caso inteiro para desvendar.
-              </h2>
-
-              <p className="max-w-lg text-base/7 text-[#c8bdad] sm:text-lg/8">
-                Receba dicas, evidências, documentos e revelações que se
-                acumulam ao longo do ano — até desvendar o crime juntos, em
-                tempo real, com toda a comunidade do clube.
-              </p>
+              </ScrollReveal>
 
               {liveEventDate ? (
-                <div className="max-w-lg border border-[#b98542]/40 bg-[#070604]/75 p-4 backdrop-blur-sm sm:p-5">
-                  <p className="text-xs font-semibold tracking-[0.22em] text-[#d7b56d] uppercase">
-                    Evento ao vivo
-                  </p>
-                  <p className="mt-2 font-heading text-lg font-semibold text-[#f0e8dd]">
-                    {liveEventTitle}
-                  </p>
-                  <p className="mt-1 text-sm/6 text-[#c8bdad]">
-                    {formatDate(liveEventDate)} — revelação final com a
-                    comunidade
-                  </p>
-                </div>
+                <ScrollReveal delay={0.16}>
+                  <div className="mx-auto max-w-md border border-[#b98542]/40 bg-[#070604]/75 p-5 backdrop-blur-sm">
+                    <p className="text-xs font-semibold tracking-[0.22em] text-[#d7b56d] uppercase">
+                      Evento ao vivo
+                    </p>
+                    <p className="mt-2 font-heading text-lg font-semibold text-[#f0e8dd]">
+                      {liveEventTitle}
+                    </p>
+                    <p className="mt-1 text-sm/6 text-[#c8bdad]">
+                      {formatDate(liveEventDate)} — revelação final com a
+                      comunidade
+                    </p>
+                  </div>
+                </ScrollReveal>
               ) : null}
             </div>
 
-            <div className="border border-[#b98542]/55 bg-[#070604]/82 p-6 text-[#f0e8dd] shadow-[0_24px_64px_rgba(0,0,0,0.45)] backdrop-blur-sm sm:p-8 lg:mx-auto lg:w-full lg:max-w-md xl:max-w-lg">
-              <div className="relative">
-                <IconCalendarEvent className="absolute top-0 right-0 size-10 text-[#e24132] sm:size-11" />
-                <div className="pr-14">
-                  <p className="text-xs font-semibold tracking-[0.27em] text-[#d7b56d] uppercase sm:text-sm">
-                    Progresso do caso
-                  </p>
-                  <h3 className="mt-4 font-heading text-3xl/tight font-black text-[#f0e8dd] sm:text-4xl">
-                    {progress
-                      ? `${progress.percentComplete}% investigado`
-                      : 'Caso aberto'}
-                  </h3>
-                </div>
-
-                <div className="mt-8 h-px bg-[#a78a5a]/35" />
-
-                <div className="grid grid-cols-3 border-b border-[#a78a5a]/35 py-6 text-center sm:py-8">
-                  <div className="border-r border-[#a78a5a]/35 px-2 sm:px-3">
-                    <p className="font-heading text-3xl leading-none font-black sm:text-4xl">
-                      {progress?.currentCycle ?? 1}
-                    </p>
-                    <p className="mt-2 text-sm text-[#c8bdad] sm:text-base">
-                      ciclo
-                    </p>
-                  </div>
-                  <div className="border-r border-[#a78a5a]/35 px-2 sm:px-3">
-                    <p className="font-heading text-3xl leading-none font-black sm:text-4xl">
-                      {progress?.collectedClues ?? 0}
-                    </p>
-                    <p className="mt-2 text-sm text-[#c8bdad] sm:text-base">
-                      pistas
-                    </p>
-                  </div>
-                  <div className="px-2 sm:px-3">
-                    <p className="font-heading text-3xl leading-none font-black sm:text-4xl">
-                      {activeCase?.totalClues ?? progress?.totalClues ?? 12}
-                    </p>
-                    <p className="mt-2 text-sm text-[#c8bdad] sm:text-base">
-                      no ano
-                    </p>
-                  </div>
-                </div>
-
-                <Button
-                  asChild
-                  size="lg"
-                  className="mt-6 w-full bg-[#d84132] text-white shadow-[0_0_26px_rgba(216,65,50,0.35)] hover:bg-[#b93227] sm:mt-8"
-                >
-                  <Link href="/assinatura">
-                    Garantir minha vaga no clube
-                    <IconArrowRight className="size-4" />
-                  </Link>
-                </Button>
-              </div>
-            </div>
+            <ScrollReveal delay={0.2}>
+              <Button
+                asChild
+                size="lg"
+                className="bg-[#d84132] text-white shadow-[0_0_26px_rgba(216,65,50,0.35)] hover:bg-[#b93227] px-8 py-6 text-base"
+              >
+                <Link href="/assinatura">
+                  Garantir minha vaga no clube
+                  <IconArrowRight className="ml-2 size-5" />
+                </Link>
+              </Button>
+            </ScrollReveal>
           </div>
         </div>
       </section>
@@ -542,21 +572,7 @@ export default function HomePage() {
             </ScrollReveal>
           </div>
 
-          <ScrollRevealGroup
-            className="grid items-stretch gap-5 md:grid-cols-3 lg:gap-6"
-            staggerChildren={0.12}
-          >
-            {howItWorks.map((step, index) => (
-              <ScrollRevealItem key={step.title} className="h-full">
-                <HowItWorksStepCard
-                  icon={step.icon}
-                  title={step.title}
-                  description={step.description}
-                  stepIndex={index}
-                />
-              </ScrollRevealItem>
-            ))}
-          </ScrollRevealGroup>
+          <CorkboardTimeline steps={howItWorks} />
         </div>
       </section>
 
