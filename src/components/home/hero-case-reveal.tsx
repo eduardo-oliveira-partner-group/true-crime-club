@@ -25,23 +25,6 @@ import {
 
 const heroOpeningVideoSrc = '/videos/hero-opening-scrub.mp4'
 const VIDEO_FRAME_DURATION = 1 / 24
-const DESKTOP_HERO_MEDIA_QUERY = '(min-width: 1024px)'
-
-function useDesktopHero() {
-  const [isDesktopHero, setIsDesktopHero] = useState(false)
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia(DESKTOP_HERO_MEDIA_QUERY)
-    const update = () => setIsDesktopHero(mediaQuery.matches)
-
-    update()
-    mediaQuery.addEventListener('change', update)
-
-    return () => mediaQuery.removeEventListener('change', update)
-  }, [])
-
-  return isDesktopHero
-}
 
 async function primeVideoForScrubbing(video: HTMLVideoElement) {
   video.muted = true
@@ -114,7 +97,6 @@ export function HeroCaseReveal({ badge, title }: HeroCaseRevealProps) {
   const isPrimingVideoRef = useRef(false)
   const hasInitializedVideoRef = useRef(false)
   const [isVideoReady, setIsVideoReady] = useState(false)
-  const isDesktopHero = useDesktopHero()
   const prefersReducedMotion = useReducedMotion()
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -163,18 +145,13 @@ export function HeroCaseReveal({ badge, title }: HeroCaseRevealProps) {
   )
 
   useMotionValueEvent(scrollYProgress, 'change', (progress) => {
-    if (!isDesktopHero || prefersReducedMotion || !isVideoReady) return
+    if (prefersReducedMotion || !isVideoReady) return
     scheduleVideoSeek(progress)
   })
 
   const handleVideoReady = useCallback(async () => {
     const video = videoRef.current
-    if (
-      !isDesktopHero ||
-      !video ||
-      isPrimingVideoRef.current ||
-      hasInitializedVideoRef.current
-    ) {
+    if (!video || isPrimingVideoRef.current || hasInitializedVideoRef.current) {
       return
     }
 
@@ -196,19 +173,7 @@ export function HeroCaseReveal({ badge, title }: HeroCaseRevealProps) {
     }
 
     seekVideoToProgress(scrollYProgress.get())
-  }, [
-    isDesktopHero,
-    prefersReducedMotion,
-    scrollYProgress,
-    seekVideoToProgress,
-  ])
-
-  useEffect(() => {
-    if (isDesktopHero) return
-
-    hasInitializedVideoRef.current = false
-    setIsVideoReady(false)
-  }, [isDesktopHero])
+  }, [prefersReducedMotion, scrollYProgress, seekVideoToProgress])
 
   useEffect(() => {
     return () => {
@@ -221,39 +186,30 @@ export function HeroCaseReveal({ badge, title }: HeroCaseRevealProps) {
   return (
     <section
       ref={sectionRef}
-      className="relative isolate overflow-clip border-b border-[#2d201b]/15 bg-[#090807] text-[#fffaf0] motion-reduce:min-h-screen max-lg:min-h-0 lg:min-h-[250vh]"
+      className="relative isolate min-h-[200vh] overflow-clip border-b border-[#2d201b]/15 bg-[#090807] text-[#fffaf0] motion-reduce:min-h-screen lg:min-h-[250vh]"
     >
-      <div className="max-lg:relative lg:sticky lg:top-0 lg:min-h-screen lg:overflow-hidden">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 z-0 lg:hidden"
+      <div className="sticky top-0 min-h-screen overflow-hidden">
+        <motion.div
+          className="absolute inset-x-0 top-0 z-0 h-[34vh] overflow-hidden sm:h-[38vh] lg:inset-0 lg:h-auto"
+          style={{ scale: boxScale }}
         >
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_22%,rgba(216,65,50,0.16),transparent_28%),radial-gradient(circle_at_80%_12%,rgba(215,181,109,0.1),transparent_30%)]" />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,250,240,0.035)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.035)_1px,transparent_1px)] bg-size-[56px_56px]" />
-        </div>
+          <video
+            ref={videoRef}
+            src={heroOpeningVideoSrc}
+            muted
+            playsInline
+            preload="auto"
+            disablePictureInPicture
+            aria-hidden
+            tabIndex={-1}
+            onLoadedData={handleVideoReady}
+            className="absolute inset-0 size-full transform-[translateZ(0)] object-cover object-[68%_center]"
+          />
+        </motion.div>
 
-        {isDesktopHero ? (
-          <motion.div
-            className="absolute inset-0 z-0 overflow-hidden"
-            style={{ scale: boxScale }}
-          >
-            <video
-              ref={videoRef}
-              src={heroOpeningVideoSrc}
-              muted
-              playsInline
-              preload="auto"
-              disablePictureInPicture
-              aria-hidden
-              tabIndex={-1}
-              onLoadedData={handleVideoReady}
-              className="absolute inset-0 size-full transform-[translateZ(0)] object-cover object-[68%_center]"
-            />
-          </motion.div>
-        ) : null}
-
-        <div className="pointer-events-none absolute inset-0 z-1 hidden bg-[linear-gradient(90deg,#090807_0%,rgba(9,8,7,0.96)_24%,rgba(9,8,7,0.62)_52%,rgba(9,8,7,0.18)_100%)] lg:block" />
-        <div className="pointer-events-none absolute inset-0 z-1 hidden bg-[radial-gradient(circle_at_18%_20%,rgba(216,65,50,0.22),transparent_24%),linear-gradient(90deg,rgba(255,250,240,0.035)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.035)_1px,transparent_1px)] bg-size-[auto,42px_42px,42px_42px] lg:block" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-1 h-[34vh] bg-[linear-gradient(90deg,#090807_0%,rgba(9,8,7,0.96)_24%,rgba(9,8,7,0.62)_52%,rgba(9,8,7,0.18)_100%)] sm:h-[38vh] lg:inset-0 lg:h-auto" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-1 h-[34vh] bg-[radial-gradient(circle_at_18%_20%,rgba(216,65,50,0.22),transparent_24%),linear-gradient(90deg,rgba(255,250,240,0.035)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.035)_1px,transparent_1px)] bg-size-[auto,42px_42px,42px_42px] sm:h-[38vh] lg:inset-0 lg:h-auto" />
+        <div className="pointer-events-none absolute inset-x-0 top-[34vh] z-1 h-14 -translate-y-full bg-[linear-gradient(0deg,#090807_0%,rgba(9,8,7,0)_100%)] sm:top-[38vh] lg:hidden" />
         <motion.div
           aria-hidden
           className="pointer-events-none absolute inset-x-0 bottom-0 z-2 hidden h-[30vh] bg-[linear-gradient(0deg,#090807_0%,rgba(9,8,7,0.92)_34%,rgba(9,8,7,0)_100%)] lg:block"
@@ -265,100 +221,106 @@ export function HeroCaseReveal({ badge, title }: HeroCaseRevealProps) {
           style={{ opacity: finalGateOpacity }}
         />
 
-        <div className="relative z-10 mx-auto flex max-w-7xl items-start px-4 py-16 sm:px-6 lg:min-h-screen lg:items-center lg:px-10 lg:py-20">
-          <div className="relative z-10 w-full max-w-2xl space-y-7 lg:max-w-160 xl:max-w-172">
-            <ScrollReveal immediate delay={0.05}>
-              <div className="inline-grid max-w-full grid-cols-[3.5rem_minmax(0,1fr)] border border-[#b8945f]/55 bg-[#080604]/72 text-[#c9a66a] shadow-[0_0_0_1px_rgba(255,250,240,0.04)_inset,0_18px_54px_rgba(0,0,0,0.4)] backdrop-blur-sm sm:grid-cols-[4.75rem_minmax(0,1fr)]">
-                <span className="grid min-h-12 place-items-center border-r border-[#b8945f]/35 bg-[#d7c7a5]/14 sm:min-h-16">
-                  <IconFingerprint className="size-6 text-[#e8d39b] drop-shadow-[0_0_14px_rgba(215,181,109,0.48)] sm:size-9" />
-                </span>
-                <span className="flex items-center px-4 py-2 font-heading text-[10px]/4 font-semibold tracking-[0.16em] uppercase sm:px-6 sm:py-3 sm:text-sm/7 sm:tracking-[0.24em]">
-                  {badge}
-                </span>
-              </div>
-            </ScrollReveal>
+        <div className="relative z-10 mx-auto flex min-h-screen max-w-7xl flex-col px-4 sm:px-6 lg:items-center lg:justify-center lg:px-10 lg:py-20">
+          <div
+            aria-hidden
+            className="h-[34vh] shrink-0 sm:h-[38vh] lg:hidden"
+          />
+          <div className="mt-auto flex w-full flex-1 flex-col justify-end pb-4 sm:pb-6 lg:mt-0 lg:flex-none lg:justify-center">
+            <div className="relative z-10 w-full max-w-2xl space-y-7 lg:max-w-160 xl:max-w-172">
+              <ScrollReveal immediate delay={0.05}>
+                <div className="inline-grid max-w-full grid-cols-[3.5rem_minmax(0,1fr)] border border-[#b8945f]/55 bg-[#080604]/72 text-[#c9a66a] shadow-[0_0_0_1px_rgba(255,250,240,0.04)_inset,0_18px_54px_rgba(0,0,0,0.4)] backdrop-blur-sm sm:grid-cols-[4.75rem_minmax(0,1fr)]">
+                  <span className="grid min-h-12 place-items-center border-r border-[#b8945f]/35 bg-[#d7c7a5]/14 sm:min-h-16">
+                    <IconFingerprint className="size-6 text-[#e8d39b] drop-shadow-[0_0_14px_rgba(215,181,109,0.48)] sm:size-9" />
+                  </span>
+                  <span className="flex items-center px-4 py-2 font-heading text-[10px]/4 font-semibold tracking-[0.16em] uppercase sm:px-6 sm:py-3 sm:text-sm/7 sm:tracking-[0.24em]">
+                    {badge}
+                  </span>
+                </div>
+              </ScrollReveal>
 
-            <div className="space-y-7 sm:space-y-8">
-              <ScrollReveal immediate delay={0.15} y={20}>
-                <h1
-                  className="max-w-3xl font-heading text-[clamp(2.55rem,12vw,3.35rem)] leading-[0.88] font-black tracking-normal text-[#efe7d8] uppercase drop-shadow-[0_2px_0_rgba(0,0,0,0.88)] sm:text-[clamp(4.45rem,8vw,6.25rem)] lg:text-[clamp(4.7rem,5.35vw,6.35rem)]"
-                  aria-label={title}
+              <div className="space-y-7 sm:space-y-8">
+                <ScrollReveal immediate delay={0.15} y={20}>
+                  <h1
+                    className="max-w-3xl font-heading text-[clamp(2.55rem,12vw,3.35rem)] leading-[0.88] font-black tracking-normal text-[#efe7d8] uppercase drop-shadow-[0_2px_0_rgba(0,0,0,0.88)] sm:text-[clamp(4.45rem,8vw,6.25rem)] lg:text-[clamp(4.7rem,5.35vw,6.35rem)]"
+                    aria-label={title}
+                  >
+                    <span className="block">
+                      Investigue<span className="text-[#c8382b]">.</span>
+                    </span>
+                    <span className="block">
+                      Colete<span className="text-[#c8382b]">.</span>
+                    </span>
+                    <span className="block">
+                      Desvende<span className="text-[#c8382b]">.</span>
+                    </span>
+                  </h1>
+                </ScrollReveal>
+
+                <ScrollReveal immediate delay={0.32}>
+                  <p className="max-w-md border-l-2 border-[#c8382b] py-1 pl-5 text-base/7 text-[#d8d0c4] sm:text-lg">
+                    Uma experiência mensal que transforma você em parte da
+                    investigação. Pistas, conteúdos exclusivos e itens
+                    colecionáveis entregues na sua casa.
+                  </p>
+                </ScrollReveal>
+
+                <ScrollReveal immediate delay={0.45}>
+                  <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap">
+                    <Button
+                      asChild
+                      size="lg"
+                      className="relative h-14 w-full rounded-none border border-[#e25b45]/75 bg-[#bf3a2b] px-7 font-heading text-sm font-semibold tracking-[0.2em] text-[#fff5e6] uppercase shadow-[0_0_32px_rgba(216,65,50,0.28)] hover:bg-[#d44937] sm:w-auto sm:min-w-56"
+                    >
+                      <Link href="/assinatura">
+                        <IconFingerprint className="size-5" />
+                        Quero minha box
+                        <span className="pointer-events-none absolute top-2 right-2 size-2 border-t border-r border-[#f4d8b0]/80" />
+                        <span className="pointer-events-none absolute right-2 bottom-2 size-2 border-r border-b border-[#f4d8b0]/80" />
+                      </Link>
+                    </Button>
+                    <Button
+                      asChild
+                      variant="outline"
+                      size="lg"
+                      className="h-14 w-full rounded-none border-[#a98453]/70 bg-[#080604]/48 px-7 font-heading text-sm font-semibold tracking-[0.2em] text-[#d7b56d] uppercase backdrop-blur-sm hover:bg-[#d7b56d]/10 hover:text-[#f3dfb0] sm:w-auto sm:min-w-52"
+                    >
+                      <Link href="/loja">
+                        Saiba mais
+                        <IconArrowRight className="size-6" />
+                      </Link>
+                    </Button>
+                  </div>
+                </ScrollReveal>
+
+                <ScrollRevealGroup
+                  immediate
+                  delayChildren={0.55}
+                  staggerChildren={0.1}
                 >
-                  <span className="block">
-                    Investigue<span className="text-[#c8382b]">.</span>
-                  </span>
-                  <span className="block">
-                    Colete<span className="text-[#c8382b]">.</span>
-                  </span>
-                  <span className="block">
-                    Desvende<span className="text-[#c8382b]">.</span>
-                  </span>
-                </h1>
-              </ScrollReveal>
+                  <div className="grid max-w-3xl border border-[#a98453]/42 bg-[#080604]/48 backdrop-blur-sm sm:grid-cols-3">
+                    {heroBenefits.map((benefit) => {
+                      const BenefitIcon = benefit.icon
 
-              <ScrollReveal immediate delay={0.32}>
-                <p className="max-w-md border-l-2 border-[#c8382b] py-1 pl-5 text-base/7 text-[#d8d0c4] sm:text-lg">
-                  Uma experiência mensal que transforma você em parte da
-                  investigação. Pistas, conteúdos exclusivos e itens
-                  colecionáveis entregues na sua casa.
-                </p>
-              </ScrollReveal>
-
-              <ScrollReveal immediate delay={0.45}>
-                <div className="flex flex-wrap gap-4">
-                  <Button
-                    asChild
-                    size="lg"
-                    className="relative h-14 rounded-none border border-[#e25b45]/75 bg-[#bf3a2b] px-7 font-heading text-sm font-semibold tracking-[0.2em] text-[#fff5e6] uppercase shadow-[0_0_32px_rgba(216,65,50,0.28)] hover:bg-[#d44937] sm:min-w-56"
-                  >
-                    <Link href="/assinatura">
-                      <IconFingerprint className="size-5" />
-                      Quero minha box
-                      <span className="pointer-events-none absolute top-2 right-2 size-2 border-t border-r border-[#f4d8b0]/80" />
-                      <span className="pointer-events-none absolute right-2 bottom-2 size-2 border-r border-b border-[#f4d8b0]/80" />
-                    </Link>
-                  </Button>
-                  <Button
-                    asChild
-                    variant="outline"
-                    size="lg"
-                    className="h-14 rounded-none border-[#a98453]/70 bg-[#080604]/48 px-7 font-heading text-sm font-semibold tracking-[0.2em] text-[#d7b56d] uppercase backdrop-blur-sm hover:bg-[#d7b56d]/10 hover:text-[#f3dfb0] sm:min-w-52"
-                  >
-                    <Link href="/loja">
-                      Saiba mais
-                      <IconArrowRight className="size-6" />
-                    </Link>
-                  </Button>
-                </div>
-              </ScrollReveal>
-
-              <ScrollRevealGroup
-                immediate
-                delayChildren={0.55}
-                staggerChildren={0.1}
-              >
-                <div className="grid max-w-3xl border border-[#a98453]/42 bg-[#080604]/48 backdrop-blur-sm sm:grid-cols-3">
-                  {heroBenefits.map((benefit) => {
-                    const BenefitIcon = benefit.icon
-
-                    return (
-                      <ScrollRevealItem key={benefit.title}>
-                        <div className="flex h-full gap-4 border-[#a98453]/26 p-5 sm:border-r sm:last:border-r-0">
-                          <BenefitIcon className="mt-1 size-9 shrink-0 text-[#d7b56d]" />
-                          <div>
-                            <p className="font-heading text-xs font-semibold tracking-[0.18em] text-[#d7b56d] uppercase">
-                              {benefit.title}
-                            </p>
-                            <p className="mt-2 text-sm/5 text-[#bfb4a3]">
-                              {benefit.description}
-                            </p>
+                      return (
+                        <ScrollRevealItem key={benefit.title}>
+                          <div className="flex h-full gap-4 border-[#a98453]/26 p-5 sm:border-r sm:last:border-r-0">
+                            <BenefitIcon className="mt-1 size-9 shrink-0 text-[#d7b56d]" />
+                            <div>
+                              <p className="font-heading text-xs font-semibold tracking-[0.18em] text-[#d7b56d] uppercase">
+                                {benefit.title}
+                              </p>
+                              <p className="mt-2 text-sm/5 text-[#bfb4a3]">
+                                {benefit.description}
+                              </p>
+                            </div>
                           </div>
-                        </div>
-                      </ScrollRevealItem>
-                    )
-                  })}
-                </div>
-              </ScrollRevealGroup>
+                        </ScrollRevealItem>
+                      )
+                    })}
+                  </div>
+                </ScrollRevealGroup>
+              </div>
             </div>
           </div>
         </div>

@@ -272,10 +272,9 @@ export default function HomePage() {
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_18%_22%,rgba(216,65,50,0.16),transparent_28%),radial-gradient(circle_at_80%_12%,rgba(215,181,109,0.1),transparent_30%),linear-gradient(180deg,rgba(11,9,8,0.82)_0%,rgba(11,9,8,0.58)_42%,rgba(11,9,8,0.86)_100%),linear-gradient(135deg,rgba(11,9,8,0.72)_0%,rgba(19,13,11,0.55)_46%,rgba(9,8,7,0.78)_100%)]" />
         <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.035)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.035)_1px,transparent_1px)] bg-size-[56px_56px]" />
         <div className="relative z-10 mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-24">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 lg:items-start">
-            
+          <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:items-start lg:gap-12">
             {/* Left Column - Intro & Curadoria Box (Sticky on Desktop) */}
-            <div className="lg:col-span-5 lg:sticky lg:top-24 space-y-6">
+            <div className="space-y-6 lg:sticky lg:top-24 lg:col-span-5">
               <div className="space-y-4">
                 <ScrollReveal>
                   <p className="text-xs font-semibold tracking-[0.24em] text-[#d7b56d] uppercase">
@@ -301,13 +300,13 @@ export default function HomePage() {
               </div>
 
               <ScrollReveal delay={0.12}>
-                <div className="relative flex items-start gap-4 border border-[#fffaf0]/12 bg-[#171211]/72 p-5 backdrop-blur-sm sm:p-6 shadow-[0_16px_36px_rgba(0,0,0,0.4)] overflow-hidden group">
+                <div className="group relative flex items-start gap-4 overflow-hidden border border-[#fffaf0]/12 bg-[#171211]/72 p-5 shadow-[0_16px_36px_rgba(0,0,0,0.4)] backdrop-blur-sm sm:p-6">
                   {/* Decorative forensic stamp overlay */}
-                  <div className="absolute right-4 top-4 border border-dashed border-[#d84132]/25 text-[#d84132]/35 px-2 py-0.5 rotate-[-8deg] uppercase font-mono font-bold text-[9px] tracking-wider select-none pointer-events-none group-hover:border-[#d84132]/45 group-hover:text-[#d84132]/60 transition-colors duration-300">
+                  <div className="pointer-events-none absolute top-4 right-4 rotate-[-8deg] border border-dashed border-[#d84132]/25 px-2 py-0.5 font-mono text-[9px] font-bold tracking-wider text-[#d84132]/35 uppercase transition-colors duration-300 select-none group-hover:border-[#d84132]/45 group-hover:text-[#d84132]/60">
                     CURADORIA HOMOLOGADA
                   </div>
-                  
-                  <div className="flex size-10 shrink-0 items-center justify-center bg-[#d84132]/20 text-[#ffb0a5] border border-[#d84132]/30">
+
+                  <div className="flex size-10 shrink-0 items-center justify-center border border-[#d84132]/30 bg-[#d84132]/20 text-[#ffb0a5]">
                     <IconUsers className="size-5" />
                   </div>
                   <div>
@@ -340,72 +339,69 @@ export default function HomePage() {
             </div>
 
             {/* Right Column - Timeline / Vertical Folders Archive */}
-            <div className="lg:col-span-7 space-y-6 relative pl-0 sm:pl-8">
+            <div className="relative space-y-6 pl-0 sm:pl-8 lg:col-span-7">
               {/* Connector vertical line on desktop/tablet */}
-              <div 
-                className="absolute left-[31px] top-8 bottom-8 w-[2px] bg-linear-to-b from-[#d84132]/50 via-[#d7b56d]/30 to-transparent hidden sm:block pointer-events-none z-0" 
+              <div
+                className="pointer-events-none absolute inset-y-8 left-[31px] z-0 hidden w-[2px] bg-linear-to-b from-[#d84132]/50 via-[#d7b56d]/30 to-transparent sm:block"
                 aria-hidden="true"
               />
 
-              <ScrollRevealGroup
-                className="space-y-5"
-                staggerChildren={0.08}
-              >
+              <ScrollRevealGroup className="space-y-5" staggerChildren={0.08}>
                 {clubHighlights.map((feature, index) => {
                   const HighlightIcon = feature.icon
                   const isGold = index === clubHighlights.length - 1
-                  
+
                   return (
                     <ScrollRevealItem key={feature.title}>
-                      <div className="flex gap-4 relative group z-10">
+                      <div className="group relative z-10 flex gap-4">
                         {/* Bullet number tab on the line */}
-                        <div 
+                        <div
                           className={cn(
-                            "relative shrink-0 hidden sm:flex size-16 items-center justify-center border font-heading text-lg font-black tracking-tight transition-all duration-300",
-                            isGold 
-                              ? "bg-[#171211] border-[#d7b56d]/30 text-[#d7b56d] group-hover:border-[#d7b56d] group-hover:bg-[#d7b56d]/10" 
-                              : "bg-[#171211] border-[#fffaf0]/12 text-[#d7c9b5]/85 group-hover:border-[#d84132] group-hover:text-[#ffb0a5] group-hover:bg-[#d84132]/5"
+                            'relative hidden size-16 shrink-0 items-center justify-center border font-heading text-lg font-black tracking-tight transition-all duration-300 sm:flex',
+                            isGold
+                              ? 'border-[#d7b56d]/30 bg-[#171211] text-[#d7b56d] group-hover:border-[#d7b56d] group-hover:bg-[#d7b56d]/10'
+                              : 'border-[#fffaf0]/12 bg-[#171211] text-[#d7c9b5]/85 group-hover:border-[#d84132] group-hover:bg-[#d84132]/5 group-hover:text-[#ffb0a5]',
                           )}
                         >
                           0{index + 1}
                         </div>
 
                         {/* Folder Tab Card */}
-                        <div 
+                        <div
                           className={cn(
-                            "flex-1 border bg-[#0c0a09]/80 p-5 backdrop-blur-sm transition-all duration-300 hover:translate-x-2 shadow-[0_12px_28px_rgba(0,0,0,0.38)]",
-                            isGold 
-                              ? "border-[#d7b56d]/30 hover:border-[#d7b56d]/70 hover:bg-[#1a1412]" 
-                              : "border-[#fffaf0]/8 hover:border-[#d84132]/40 hover:bg-[#171211]/90"
+                            'flex-1 border bg-[#0c0a09]/80 p-5 shadow-[0_12px_28px_rgba(0,0,0,0.38)] backdrop-blur-sm transition-all duration-300 hover:translate-x-2',
+                            isGold
+                              ? 'border-[#d7b56d]/30 hover:border-[#d7b56d]/70 hover:bg-[#1a1412]'
+                              : 'border-[#fffaf0]/8 hover:border-[#d84132]/40 hover:bg-[#171211]/90',
                           )}
                         >
-                          <div className="flex items-center justify-between gap-3 border-b border-[#fffaf0]/8 pb-2.5 mb-3.5">
-                            <span 
+                          <div className="mb-3.5 flex items-center justify-between gap-3 border-b border-[#fffaf0]/8 pb-2.5">
+                            <span
                               className={cn(
-                                "text-[10px] font-mono tracking-wider font-semibold uppercase",
-                                isGold ? "text-[#d7b56d]" : "text-[#d7c9b5]/80"
+                                'font-mono text-[10px] font-semibold tracking-wider uppercase',
+                                isGold ? 'text-[#d7b56d]' : 'text-[#d7c9b5]/80',
                               )}
                             >
                               {feature.tabLabel}
                             </span>
-                            <span className="text-[9px] font-mono text-[#fffaf0]/30 select-none">
+                            <span className="font-mono text-[9px] text-[#fffaf0]/30 select-none">
                               {feature.caseRef}
                             </span>
                           </div>
 
                           <div className="flex items-start gap-4">
-                            <div 
+                            <div
                               className={cn(
-                                "shrink-0 size-9 flex items-center justify-center border transition-colors duration-300",
-                                isGold 
-                                  ? "bg-[#d7b56d]/10 text-[#d7b56d] border-[#d7b56d]/25 group-hover:text-[#fff] group-hover:bg-[#d7b56d]/20" 
-                                  : "bg-[#d84132]/10 text-[#ffb0a5] border-[#d84132]/18 group-hover:text-[#fff] group-hover:bg-[#d84132]/20"
+                                'flex size-9 shrink-0 items-center justify-center border transition-colors duration-300',
+                                isGold
+                                  ? 'border-[#d7b56d]/25 bg-[#d7b56d]/10 text-[#d7b56d] group-hover:bg-[#d7b56d]/20 group-hover:text-white'
+                                  : 'border-[#d84132]/18 bg-[#d84132]/10 text-[#ffb0a5] group-hover:bg-[#d84132]/20 group-hover:text-white',
                               )}
                             >
                               <HighlightIcon className="size-4.5" />
                             </div>
                             <div>
-                              <h3 className="font-heading font-bold text-base text-[#fffaf0] group-hover:text-[#d7b56d] transition-colors duration-300">
+                              <h3 className="font-heading text-base font-bold text-[#fffaf0] transition-colors duration-300 group-hover:text-[#d7b56d]">
                                 {feature.title}
                               </h3>
                               <p className="mt-2 text-sm/6 text-[#d7c9b5]/90">
@@ -420,7 +416,6 @@ export default function HomePage() {
                 })}
               </ScrollRevealGroup>
             </div>
-
           </div>
         </div>
       </section>
@@ -490,8 +485,8 @@ export default function HomePage() {
         <div className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(5,4,3,0.72)_0%,rgba(5,4,3,0.55)_45%,rgba(5,4,3,0.82)_100%),linear-gradient(90deg,rgba(5,4,3,0.88)_0%,rgba(5,4,3,0.35)_42%,rgba(5,4,3,0.2)_100%)]" />
 
         <div className="relative z-10 mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:py-24">
-          <div className="flex flex-col items-center text-center space-y-8">
-            <div className="space-y-6 flex flex-col items-center">
+          <div className="flex flex-col items-center space-y-8 text-center">
+            <div className="flex flex-col items-center space-y-6">
               <ScrollReveal>
                 <div className="flex items-center justify-center gap-4">
                   <span className="h-px w-8 bg-[#d7b56d]/55" />
@@ -540,7 +535,7 @@ export default function HomePage() {
               <Button
                 asChild
                 size="lg"
-                className="bg-[#d84132] text-white shadow-[0_0_26px_rgba(216,65,50,0.35)] hover:bg-[#b93227] px-8 py-6 text-base"
+                className="bg-[#d84132] px-8 py-6 text-base text-white shadow-[0_0_26px_rgba(216,65,50,0.35)] hover:bg-[#b93227]"
               >
                 <Link href="/assinatura">
                   Garantir minha vaga no clube
