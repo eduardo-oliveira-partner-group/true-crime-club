@@ -1,7 +1,7 @@
 import './globals.css'
 
 import type { Metadata } from 'next'
-import { Geist_Mono, Inter, Libre_Baskerville } from 'next/font/google'
+import { Geist_Mono, Handjet, Inter, Libre_Baskerville } from 'next/font/google'
 
 import { SmoothScrollProvider } from '@/src/components/smooth-scroll-provider'
 import { ThemeProvider } from '@/src/components/theme-provider'
@@ -18,6 +18,11 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })
 const fontMono = Geist_Mono({
   subsets: ['latin'],
   variable: '--font-mono',
+})
+
+const handjet = Handjet({
+  subsets: ['latin'],
+  variable: '--font-handjet',
 })
 
 export const metadata: Metadata = {
@@ -42,6 +47,7 @@ export default function RootLayout({
         'font-sans',
         inter.variable,
         libreBaskervilleHeading.variable,
+        handjet.variable,
       )}
     >
       <body>

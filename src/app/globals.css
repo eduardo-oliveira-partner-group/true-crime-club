@@ -85,6 +85,7 @@
 @theme inline {
     --font-sans: var(--font-sans);
     --font-heading: var(--font-heading);
+    --font-handjet: var(--font-handjet);
     --color-brand-accent: var(--brand-accent);
     --color-brand-accent-foreground: var(--brand-accent-foreground);
     --color-brand-muted: var(--brand-muted);
@@ -133,6 +134,12 @@
   * {
     @apply border-border outline-ring/50;
     }
+  html,
+  body {
+    max-width: 100%;
+    overflow-x: clip;
+    overscroll-behavior: none;
+  }
   body {
     @apply bg-background text-foreground;
     }
@@ -140,7 +147,7 @@
     cursor: pointer;
     }
   html {
-    @apply font-sans;
+    @apply font-sans bg-background text-foreground;
     }
 
   @media (prefers-reduced-motion: no-preference) {
@@ -151,6 +158,14 @@
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading), var(--font-sans), sans-serif;
     }
+  .font-handjet h1,
+  .font-handjet h2,
+  .font-handjet h3,
+  .font-handjet h4,
+  .font-handjet h5,
+  .font-handjet h6 {
+    font-family: var(--font-handjet), sans-serif;
+  }
 }
 
 /* CRT Retro Terminal Styles */
