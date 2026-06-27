@@ -21,7 +21,6 @@ async function fetcher(endpoint: string, options: RequestInit = {}) {
 
   if (isServer) {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const { cookies } = require('next/headers')
       const cookieStore = await cookies()
       const cookieHeader = cookieStore.toString()
