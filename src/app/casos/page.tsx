@@ -18,6 +18,8 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import CRTEffect from 'vault66-crt-effect'
 
+import { apiClient } from '@/src/lib/api-client'
+
 // Layout Stages
 type ViewStage =
   | 'investigador-root'
@@ -204,13 +206,23 @@ export default function CasosPage() {
 
   // Auth check on mount
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true'
-    if (!isLoggedIn) {
-      router.push('/login')
-    } else {
-      setIsAuthenticated(true)
-    }
-    setLoadingAuth(false)
+    apiClient.auth
+      .me()
+      .then((customer) => {
+        if (customer) {
+          setIsAuthenticated(true)
+          localStorage.setItem('isLoggedIn', 'true')
+        } else {
+          router.push('/login')
+        }
+      })
+      .catch(() => {
+        localStorage.removeItem('isLoggedIn')
+        router.push('/login')
+      })
+      .finally(() => {
+        setLoadingAuth(false)
+      })
   }, [router])
 
   // Pause audio when modal closes or changes

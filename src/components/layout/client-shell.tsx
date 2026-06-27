@@ -16,7 +16,8 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 import logo from '@/src/assets/images/brand/logo.png'
-import { getCurrentCustomer } from '@/src/lib/domain/repositories'
+import { apiClient } from '@/src/lib/api-client'
+import type { Customer } from '@/src/lib/domain/types'
 import { cn } from '@/src/lib/utils'
 
 const navItems = [
@@ -29,8 +30,15 @@ const navItems = [
 
 export function ClientShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  const customer = getCurrentCustomer()
+  const [customer, setCustomer] = useState<Customer | null>(null)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+
+  useEffect(() => {
+    apiClient.auth
+      .me()
+      .then(setCustomer)
+      .catch(() => {})
+  }, [])
 
   useEffect(() => {
     if (isMenuOpen) {
@@ -153,8 +161,13 @@ export function ClientShell({ children }: { children: React.ReactNode }) {
 
           <div className="border-t border-[#fffaf0]/10 pt-6">
             <button
-              onClick={() => {
+              onClick={async () => {
                 setIsMenuOpen(false)
+                try {
+                  await apiClient.auth.logout()
+                } catch (e) {
+                  console.error(e)
+                }
                 localStorage.removeItem('isLoggedIn')
                 window.location.href = '/'
               }}
@@ -212,7 +225,12 @@ export function ClientShell({ children }: { children: React.ReactNode }) {
               )
             })}
             <button
-              onClick={() => {
+              onClick={async () => {
+                try {
+                  await apiClient.auth.logout()
+                } catch (e) {
+                  console.error(e)
+                }
                 localStorage.removeItem('isLoggedIn')
                 window.location.href = '/'
               }}

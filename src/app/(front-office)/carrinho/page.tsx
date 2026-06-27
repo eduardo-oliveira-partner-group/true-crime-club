@@ -9,19 +9,14 @@ import {
   IconTrash,
   IconTruck,
 } from '@tabler/icons-react'
+import { revalidatePath } from 'next/cache'
 import Image from 'next/image'
 import Link from 'next/link'
 
 import { Button } from '@/src/components/ui/button'
-import {
-  applyCoupon,
-  calculateShipping,
-  getCart,
-  getCartTotals,
-  getSeoEntry,
-  removeCartItem,
-  updateCartItemQuantity,
-} from '@/src/lib/domain/repositories'
+import { apiClient } from '@/src/lib/api-client'
+import { getSeoEntry } from '@/src/lib/domain/repositories'
+import type { Cart, CartItem } from '@/src/lib/domain/types'
 import { formatCurrency } from '@/src/lib/formatters'
 import { getProductImage } from '@/src/lib/product-images'
 import { buildMetadata } from '@/src/lib/seo'
@@ -35,12 +30,20 @@ export const metadata = buildMetadata({
   noindex: true,
 })
 
-export default function CarrinhoPage() {
-  const cart = getCart()
-  const totals = getCartTotals(cart)
-  const shipping = calculateShipping(sampleZipCode.replace(/\D/g, ''))
+export default async function CarrinhoPage() {
+  const cart = (await apiClient.cart.get()) as Cart & {
+    subtotal: number
+    discount: number
+    shipping: number
+    total: number
+  }
+  const totals = cart
+  const shipping = await apiClient.checkout.calculateShipping(sampleZipCode)
   const grandTotal = totals.total + shipping.price
-  const itemCount = cart.items.reduce((sum, item) => sum + item.quantity, 0)
+  const itemCount = cart.items.reduce(
+    (sum: number, item: CartItem) => sum + item.quantity,
+    0,
+  )
   const dossierCode = `CART-${String(cart.items.length).padStart(2, '0')}`
 
   return (
@@ -77,7 +80,7 @@ export default function CarrinhoPage() {
         ) : (
           <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_0.42fr] lg:gap-10">
             <section aria-label="Itens do carrinho" className="space-y-4">
-              {cart.items.map((item) => (
+              {cart.items.map((item: CartItem) => (
                 <CartLineItem key={item.id} item={item} />
               ))}
 
@@ -211,7 +214,8 @@ function CartLineItem({
             <form
               action={async () => {
                 'use server'
-                removeCartItem(item.id)
+                await apiClient.cart.removeItem(item.id)
+                revalidatePath('/carrinho')
               }}
             >
               <Button
@@ -250,7 +254,11 @@ function QuantityControls({
         <form
           action={async () => {
             'use server'
-            updateCartItemQuantity(itemId, Math.max(quantity - 1, 1))
+            await apiClient.cart.updateQuantity(
+              itemId,
+              Math.max(quantity - 1, 1),
+            )
+            revalidatePath('/carrinho')
           }}
         >
           <button
@@ -271,7 +279,8 @@ function QuantityControls({
         <form
           action={async () => {
             'use server'
-            updateCartItemQuantity(itemId, quantity + 1)
+            await apiClient.cart.updateQuantity(itemId, quantity + 1)
+            revalidatePath('/carrinho')
           }}
         >
           <button
@@ -409,7 +418,8 @@ function CouponForm() {
     <form
       action={async (formData) => {
         'use server'
-        applyCoupon(String(formData.get('coupon') ?? ''))
+        await apiClient.cart.applyCoupon(String(formData.get('coupon') ?? ''))
+        revalidatePath('/carrinho')
       }}
       className="mt-2 space-y-2"
     >

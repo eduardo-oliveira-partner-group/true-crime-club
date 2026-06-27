@@ -2,15 +2,31 @@
 
 import { IconCreditCard, IconPlus, IconTrash } from '@tabler/icons-react'
 import { useState } from 'react'
+import { useEffect } from 'react'
 
 import { Button } from '@/src/components/ui/button'
-import { listPaymentMethods } from '@/src/lib/domain/repositories'
+import { apiClient } from '@/src/lib/api-client'
 import type { PaymentMethod } from '@/src/lib/domain/types'
 
 export default function CartoesPage() {
-  const [cards, setCards] = useState<PaymentMethod[]>(
-    listPaymentMethods().filter((pm) => pm.type === 'credit_card'),
-  )
+  const [cards, setCards] = useState<PaymentMethod[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    apiClient.customer
+      .getProfile()
+      .then((data) => {
+        if (data.paymentMethods) {
+          setCards(
+            (data.paymentMethods as PaymentMethod[]).filter(
+              (pm) => pm.type === 'credit_card',
+            ),
+          )
+        }
+      })
+      .catch((e) => console.error(e))
+      .finally(() => setLoading(false))
+  }, [])
 
   const [showAddForm, setShowAddForm] = useState(false)
   const [cardNumber, setCardNumber] = useState('')
@@ -49,6 +65,14 @@ export default function CartoesPage() {
 
   const handleDeleteCard = (id: string) => {
     setCards(cards.filter((card) => card.id !== id))
+  }
+
+  if (loading) {
+    return (
+      <div className="flex h-48 animate-pulse items-center justify-center font-mono text-sm tracking-widest text-[#bfb4a3] uppercase">
+        Carregando formas de pagamento...
+      </div>
+    )
   }
 
   return (

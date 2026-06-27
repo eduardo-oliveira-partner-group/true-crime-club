@@ -8,33 +8,22 @@ import {
   IconX,
 } from '@tabler/icons-react'
 import { useState } from 'react'
+import { useEffect } from 'react'
 
 import { Button } from '@/src/components/ui/button'
-import {
-  getCurrentCustomer,
-  listAddresses,
-} from '@/src/lib/domain/repositories'
+import { apiClient } from '@/src/lib/api-client'
 import type { Address } from '@/src/lib/domain/types'
 
 export default function PerfilPage() {
-  const customer = getCurrentCustomer()
-
   // State for Customer Info
-  const [name, setName] = useState(customer?.name ?? 'Mariana Silva')
-  const [phone, setPhone] = useState(customer?.phone ?? '(11) 98765-4321')
-  const [email, setEmail] = useState(
-    customer?.email ?? 'mariana.silva@email.com',
-  )
+  const [name, setName] = useState('Mariana Silva')
+  const [phone, setPhone] = useState('(11) 98765-4321')
+  const [email, setEmail] = useState('mariana.silva@email.com')
   const [cpf, setCpf] = useState('321.654.987-00')
-  const [shirtSize, setShirtSize] = useState(
-    customer?.preferences?.shirtSize ?? 'M',
-  )
-  const [shoeSize, setShoeSize] = useState(
-    customer?.preferences?.shoeSize ?? '38',
-  )
+  const [shirtSize, setShirtSize] = useState('M')
+  const [shoeSize, setShoeSize] = useState('38')
   const [notes, setNotes] = useState(
-    customer?.preferences?.notes ??
-      'Prefere tons escuros nas peças de vestuário.',
+    'Prefere tons escuros nas peças de vestuário.',
   )
 
   // Edit Modes
@@ -43,16 +32,16 @@ export default function PerfilPage() {
   const [editPrefs, setEditPrefs] = useState(false)
 
   // Temporary edit states
-  const [tempName, setTempName] = useState(name)
-  const [tempCpf, setTempCpf] = useState(cpf)
-  const [tempEmail, setTempEmail] = useState(email)
-  const [tempPhone, setTempPhone] = useState(phone)
-  const [tempShirt, setTempShirt] = useState(shirtSize)
-  const [tempShoe, setTempShoe] = useState(shoeSize)
-  const [tempNotes, setTempNotes] = useState(notes)
+  const [tempName, setTempName] = useState('')
+  const [tempCpf, setTempCpf] = useState('')
+  const [tempEmail, setTempEmail] = useState('')
+  const [tempPhone, setTempPhone] = useState('')
+  const [tempShirt, setTempShirt] = useState('')
+  const [tempShoe, setTempShoe] = useState('')
+  const [tempNotes, setTempNotes] = useState('')
 
   // Addresses State
-  const [addresses, setAddresses] = useState<Address[]>(listAddresses())
+  const [addresses, setAddresses] = useState<Address[]>([])
   const [showAddAddress, setShowAddAddress] = useState(false)
   const [newAddrLabel, setNewAddrLabel] = useState('')
   const [newAddrStreet, setNewAddrStreet] = useState('')
@@ -63,58 +52,126 @@ export default function PerfilPage() {
   const [newAddrState, setNewAddrState] = useState('')
   const [newAddrZip, setNewAddrZip] = useState('')
 
-  const handleSaveBasics = () => {
-    setName(tempName)
-    setCpf(tempCpf)
-    setEditBasics(false)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    apiClient.customer
+      .getProfile()
+      .then((data) => {
+        if (data.customer) {
+          setName(data.customer.name || '')
+          setPhone(data.customer.phone || '')
+          setEmail(data.customer.email || '')
+          setShirtSize(data.customer.preferences?.shirtSize || 'M')
+          setShoeSize(data.customer.preferences?.shoeSize || '38')
+          setNotes(data.customer.preferences?.notes || '')
+
+          setTempName(data.customer.name || '')
+          setTempEmail(data.customer.email || '')
+          setTempPhone(data.customer.phone || '')
+          setTempShirt(data.customer.preferences?.shirtSize || 'M')
+          setTempShoe(data.customer.preferences?.shoeSize || '38')
+          setTempNotes(data.customer.preferences?.notes || '')
+        }
+        if (data.addresses) {
+          setAddresses(data.addresses)
+        }
+      })
+      .catch((e) => console.error(e))
+      .finally(() => setLoading(false))
+  }, [])
+
+  const handleSaveBasics = async () => {
+    try {
+      await apiClient.customer.updateProfile({ name: tempName })
+      setName(tempName)
+      setCpf(tempCpf)
+      setEditBasics(false)
+    } catch (e) {
+      console.error(e)
+    }
   }
 
-  const handleSaveContact = () => {
-    setEmail(tempEmail)
-    setPhone(tempPhone)
-    setEditContact(false)
+  const handleSaveContact = async () => {
+    try {
+      await apiClient.customer.updateProfile({
+        email: tempEmail,
+        phone: tempPhone,
+      })
+      setEmail(tempEmail)
+      setPhone(tempPhone)
+      setEditContact(false)
+    } catch (e) {
+      console.error(e)
+    }
   }
 
-  const handleSavePrefs = () => {
-    setShirtSize(tempShirt)
-    setShoeSize(tempShoe)
-    setNotes(tempNotes)
-    setEditPrefs(false)
+  const handleSavePrefs = async () => {
+    try {
+      await apiClient.customer.updateProfile({
+        preferences: {
+          shirtSize: tempShirt,
+          shoeSize: tempShoe,
+          notes: tempNotes,
+        },
+      })
+      setShirtSize(tempShirt)
+      setShoeSize(tempShoe)
+      setNotes(tempNotes)
+      setEditPrefs(false)
+    } catch (e) {
+      console.error(e)
+    }
   }
 
-  const handleDeleteAddress = (id: string) => {
-    setAddresses(addresses.filter((addr) => addr.id !== id))
+  const handleDeleteAddress = async (id: string) => {
+    try {
+      const updatedList = await apiClient.customer.deleteAddress(id)
+      setAddresses(updatedList)
+    } catch (e) {
+      console.error(e)
+    }
   }
 
-  const handleAddAddress = (e: React.FormEvent) => {
+  const handleAddAddress = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!newAddrLabel || !newAddrStreet || !newAddrNumber || !newAddrZip) return
 
-    const newAddress: Address = {
-      id: `addr-${Date.now()}`,
-      label: newAddrLabel,
-      street: newAddrStreet,
-      number: newAddrNumber,
-      complement: newAddrComplement,
-      neighborhood: newAddrNeighborhood,
-      city: newAddrCity,
-      state: newAddrState,
-      zipCode: newAddrZip,
-      isDefault: addresses.length === 0,
+    try {
+      const updatedList = await apiClient.customer.addAddress({
+        label: newAddrLabel,
+        street: newAddrStreet,
+        number: newAddrNumber,
+        complement: newAddrComplement,
+        neighborhood: newAddrNeighborhood,
+        city: newAddrCity,
+        state: newAddrState,
+        zipCode: newAddrZip,
+      })
+
+      setAddresses(updatedList)
+      setShowAddAddress(false)
+
+      // Reset fields
+      setNewAddrLabel('')
+      setNewAddrStreet('')
+      setNewAddrNumber('')
+      setNewAddrComplement('')
+      setNewAddrNeighborhood('')
+      setNewAddrCity('')
+      setNewAddrState('')
+      setNewAddrZip('')
+    } catch (e) {
+      console.error(e)
     }
+  }
 
-    setAddresses([...addresses, newAddress])
-    setShowAddAddress(false)
-
-    // Reset fields
-    setNewAddrLabel('')
-    setNewAddrStreet('')
-    setNewAddrNumber('')
-    setNewAddrComplement('')
-    setNewAddrNeighborhood('')
-    setNewAddrCity('')
-    setNewAddrState('')
-    setNewAddrZip('')
+  if (loading) {
+    return (
+      <div className="flex h-48 animate-pulse items-center justify-center font-mono text-sm tracking-widest text-[#bfb4a3] uppercase">
+        Carregando informações da conta...
+      </div>
+    )
   }
 
   return (

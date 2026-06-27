@@ -2,15 +2,18 @@ import { IconArrowRight } from '@tabler/icons-react'
 import Link from 'next/link'
 
 import { Button } from '@/src/components/ui/button'
-import { getSubscription } from '@/src/lib/domain/repositories'
+import { apiClient } from '@/src/lib/api-client'
 import {
   formatCurrency,
   formatDate,
   formatSubscriptionStatus,
 } from '@/src/lib/formatters'
 
-export default function AssinaturaClientePage() {
-  const subscription = getSubscription()
+export default async function AssinaturaClientePage() {
+  let subscription = null
+  try {
+    subscription = await apiClient.customer.getSubscription()
+  } catch {}
 
   if (!subscription) {
     return (

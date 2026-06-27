@@ -1,7 +1,8 @@
 import { IconArrowRight } from '@tabler/icons-react'
 import Link from 'next/link'
 
-import { listOrders } from '@/src/lib/domain/repositories'
+import { apiClient } from '@/src/lib/api-client'
+import type { Order } from '@/src/lib/domain/types'
 import {
   formatCurrency,
   formatOrderStatus,
@@ -17,8 +18,11 @@ const statusTone: Record<string, string> = {
   cancelado: 'text-[#bfb4a3] border-[#fffaf0]/20 bg-[#fffaf0]/5',
 }
 
-export default function PedidosPage() {
-  const orders = listOrders()
+export default async function PedidosPage() {
+  let orders: Order[] = []
+  try {
+    orders = await apiClient.customer.listOrders()
+  } catch {}
 
   return (
     <div>
@@ -34,7 +38,7 @@ export default function PedidosPage() {
       </p>
 
       <div className="mt-8 space-y-4">
-        {orders.map((order) => {
+        {orders.map((order: Order) => {
           const tone =
             statusTone[order.status] ??
             'text-[#c8bdad] border-[#fffaf0]/18 bg-[#fffaf0]/5'

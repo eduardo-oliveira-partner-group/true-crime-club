@@ -9,7 +9,8 @@ import {
   PriceBlock,
 } from '@/src/components/ui/product-quick-view'
 import { ScrollReveal } from '@/src/components/ui/scroll-reveal'
-import { getSeoEntry, listProducts } from '@/src/lib/domain/repositories'
+import { apiClient } from '@/src/lib/api-client'
+import { getSeoEntry } from '@/src/lib/domain/repositories'
 import type { Product } from '@/src/lib/domain/types'
 import { getProductImage } from '@/src/lib/product-images'
 import { buildMetadata } from '@/src/lib/seo'
@@ -26,8 +27,9 @@ const stats = [
   { label: 'curadoria TCC', value: '100%' },
 ]
 
-export default function LojaPage() {
-  const products = listProducts()
+export default async function LojaPage() {
+  const products: Product[] = await apiClient.products.list()
+
   const boxProducts = products.filter((product) => product.type === 'box')
   const extraProducts = products.filter((product) => product.type !== 'box')
   const featuredBox =

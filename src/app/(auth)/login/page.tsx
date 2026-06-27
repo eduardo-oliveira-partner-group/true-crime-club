@@ -3,19 +3,36 @@
 import { IconArrowRight, IconFingerprint, IconLock } from '@tabler/icons-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { FormEvent } from 'react'
+import { FormEvent, useEffect, useState } from 'react'
 
 import { Button } from '@/src/components/ui/button'
-import { getCurrentCustomer } from '@/src/lib/domain/repositories'
+import { apiClient } from '@/src/lib/api-client'
 
 export default function LoginPage() {
-  const customer = getCurrentCustomer()
+  const [emailValue, setEmailValue] = useState('')
   const router = useRouter()
 
-  const handleLogin = (e: FormEvent) => {
+  useEffect(() => {
+    apiClient.auth
+      .me()
+      .then((customer) => {
+        if (customer && customer.email) {
+          setEmailValue(customer.email)
+        }
+      })
+      .catch(() => {})
+  }, [])
+
+  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    localStorage.setItem('isLoggedIn', 'true')
-    router.push('/cliente/pedidos')
+    const email = e.currentTarget.email.value
+    try {
+      await apiClient.auth.login({ email })
+      localStorage.setItem('isLoggedIn', 'true')
+      router.push('/cliente/pedidos')
+    } catch (err) {
+      console.error(err)
+    }
   }
 
   return (
@@ -58,7 +75,9 @@ export default function LoginPage() {
           <input
             id="email"
             type="email"
-            defaultValue={customer?.email ?? ''}
+            name="email"
+            value={emailValue}
+            onChange={(e) => setEmailValue(e.target.value)}
             className="mt-2 w-full border border-[#fffaf0]/14 bg-[#0c0a09] px-4 py-3 text-sm text-[#fffaf0] transition outline-none placeholder:text-[#bfb4a3]/60 focus:border-[#d7b56d]/70 focus:bg-[#0b0908]"
           />
         </div>

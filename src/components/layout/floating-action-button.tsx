@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useEffect, useState } from 'react'
 
 export function FloatingActionButton() {
   const [isVisible, setIsVisible] = useState(false)
@@ -36,7 +36,7 @@ export function FloatingActionButton() {
 
   return (
     <div
-      className={`fixed right-5 bottom-5 z-50 transition-all duration-300 max-sm:right-3.5 max-sm:bottom-3.5 max-sm:left-3.5 ${
+      className={`fixed right-5 bottom-5 z-50 transition-all duration-300 max-sm:inset-x-3.5 max-sm:bottom-3.5 ${
         isVisible
           ? 'translate-y-0 scale-100 opacity-100'
           : 'pointer-events-none translate-y-6 scale-95 opacity-0'
@@ -44,7 +44,7 @@ export function FloatingActionButton() {
     >
       <Link
         href="/assinatura"
-        className="inline-flex w-full items-center justify-center gap-[11px] border border-[#211c18]/25 bg-[#c5271f] px-6 py-4 font-mono text-sm font-bold tracking-[0.04em] text-[#fbf9f6] uppercase shadow-[0_16px_38px_-10px_rgba(33,28,24,0.55)] transition-all hover:bg-[#a91d16] max-sm:py-3.5 rounded-[13px]"
+        className="inline-flex w-full items-center justify-center gap-[11px] rounded-[13px] border border-[#211c18]/25 bg-[#c5271f] px-6 py-4 font-mono text-sm font-bold tracking-[0.04em] text-[#fbf9f6] uppercase shadow-[0_16px_38px_-10px_rgba(33,28,24,0.55)] transition-all hover:bg-[#a91d16] max-sm:py-3.5"
       >
         <svg
           width="20"

@@ -6,18 +6,14 @@ import {
   type SubscriberPreferencesValue,
 } from '@/src/components/checkout/checkout-stepper'
 import { Button } from '@/src/components/ui/button'
-import {
-  calculateShipping,
-  createOrder,
-  getCart,
-  getCartTotals,
-  getCurrentCustomer,
-  getPlanBySlug,
-  getSeoEntry,
-  listAddresses,
-  listPaymentMethods,
-  updateSubscriberPreferences,
-} from '@/src/lib/domain/repositories'
+import { apiClient } from '@/src/lib/api-client'
+import { getSeoEntry } from '@/src/lib/domain/repositories'
+import type {
+  Address,
+  CartItem,
+  Customer,
+  PaymentMethod,
+} from '@/src/lib/domain/types'
 import { formatCurrency } from '@/src/lib/formatters'
 import { buildMetadata } from '@/src/lib/seo'
 
@@ -35,15 +31,42 @@ export default async function CheckoutPage({
   searchParams,
 }: CheckoutPageProps) {
   const { plano } = await searchParams
-  const plan = plano ? getPlanBySlug(plano) : null
+  let plan = null
+  if (plano) {
+    try {
+      plan = await apiClient.plans.getBySlug(plano)
+    } catch {}
+  }
   const isSubscriptionFlow = Boolean(plan)
 
-  const cart = getCart()
-  const totals = getCartTotals(cart)
-  const customer = getCurrentCustomer()
-  const addresses = listAddresses()
-  const paymentMethods = listPaymentMethods()
-  const shipping = calculateShipping(addresses[0]?.zipCode ?? '')
+  const cart = await apiClient.cart.get()
+  const totals = cart
+
+  let profile: {
+    customer: Customer | null
+    addresses: Address[]
+    paymentMethods: PaymentMethod[]
+  } = {
+    customer: null,
+    addresses: [],
+    paymentMethods: [],
+  }
+  try {
+    profile = await apiClient.customer.getProfile()
+  } catch {}
+
+  const customer = profile.customer
+  const addresses = profile.addresses || []
+  const paymentMethods = profile.paymentMethods || []
+
+  let shipping = { price: 0, estimatedDays: '5-8 dias úteis' }
+  if (addresses[0]?.zipCode) {
+    try {
+      shipping = await apiClient.checkout.calculateShipping(
+        addresses[0].zipCode,
+      )
+    } catch {}
+  }
 
   const shippingOptions = [
     {
@@ -155,7 +178,7 @@ export default async function CheckoutPage({
                   isSubscriptionFlow={isSubscriptionFlow}
                   planName={plan?.name}
                   planPrice={plan?.price}
-                  items={cart.items.map((item) => ({
+                  items={cart.items.map((item: CartItem) => ({
                     id: item.id,
                     label: `${item.productName} × ${item.quantity}`,
                     value: formatCurrency(item.unitPrice * item.quantity),
@@ -262,10 +285,10 @@ function OrderSummary({
 
 async function savePreferences(preferences: SubscriberPreferencesValue) {
   'use server'
-  updateSubscriberPreferences(preferences)
+  await apiClient.customer.updateProfile({ preferences })
 }
 
 async function submitOrder() {
   'use server'
-  createOrder()
+  await apiClient.checkout.createOrder()
 }

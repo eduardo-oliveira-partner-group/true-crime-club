@@ -3,7 +3,8 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 import { Button } from '@/src/components/ui/button'
-import { getOrderById } from '@/src/lib/domain/repositories'
+import { apiClient } from '@/src/lib/api-client'
+import type { CartItem } from '@/src/lib/domain/types'
 import {
   formatCurrency,
   formatDate,
@@ -19,7 +20,10 @@ export default async function PedidoDetailPage({
   params,
 }: PedidoDetailPageProps) {
   const { id } = await params
-  const order = getOrderById(id)
+  let order = null
+  try {
+    order = await apiClient.customer.getOrder(id)
+  } catch {}
 
   if (!order) {
     notFound()
@@ -100,7 +104,7 @@ export default async function PedidoDetailPage({
           Itens do dossiê
         </p>
         <ul className="mt-4 divide-y divide-[#fffaf0]/10">
-          {order.items.map((item) => (
+          {order.items.map((item: CartItem) => (
             <li
               key={item.id}
               className="flex items-center justify-between py-3 text-sm"

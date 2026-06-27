@@ -12,6 +12,7 @@ import { useEffect, useState } from 'react'
 
 import { BrandLogo } from '@/src/components/layout/brand-logo'
 import { Button } from '@/src/components/ui/button'
+import { apiClient } from '@/src/lib/api-client'
 import { cn } from '@/src/lib/utils'
 
 const navLinks = [
@@ -34,7 +35,21 @@ export function PublicHeaderContent({ itemCount }: PublicHeaderContentProps) {
   const shouldShowBackdrop = isScrolled || !shouldOverlayContent
 
   useEffect(() => {
-    setIsLoggedIn(localStorage.getItem('isLoggedIn') === 'true')
+    const localLoggedIn = localStorage.getItem('isLoggedIn') === 'true'
+    setIsLoggedIn(localLoggedIn)
+
+    apiClient.auth
+      .me()
+      .then((customer) => {
+        if (customer) {
+          setIsLoggedIn(true)
+          localStorage.setItem('isLoggedIn', 'true')
+        }
+      })
+      .catch(() => {
+        setIsLoggedIn(false)
+        localStorage.removeItem('isLoggedIn')
+      })
   }, [])
 
   useEffect(() => {

@@ -2,10 +2,10 @@
 
 import { revalidatePath } from 'next/cache'
 
-import { addCartItem } from '@/src/lib/domain/repositories'
+import { apiClient } from '@/src/lib/api-client'
 
 export async function handleAddToCart(productId: string) {
-  addCartItem({ productId })
+  await apiClient.cart.addItem(productId)
   revalidatePath('/carrinho')
   revalidatePath('/loja')
   revalidatePath('/')

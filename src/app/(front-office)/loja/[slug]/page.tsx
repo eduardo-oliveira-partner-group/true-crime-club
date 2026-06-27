@@ -22,11 +22,9 @@ import {
   ScrollRevealGroup,
   ScrollRevealItem,
 } from '@/src/components/ui/scroll-reveal'
-import {
-  getProductBySlug,
-  getSeoEntry,
-  listProducts,
-} from '@/src/lib/domain/repositories'
+import { apiClient } from '@/src/lib/api-client'
+import { getSeoEntry } from '@/src/lib/domain/repositories'
+import type { Product } from '@/src/lib/domain/types'
 import { formatEditionMonth } from '@/src/lib/formatters'
 import { buildMetadata } from '@/src/lib/seo'
 
@@ -38,7 +36,10 @@ export async function generateMetadata({
   params,
 }: ProductDetailPageProps): Promise<Metadata> {
   const { slug } = await params
-  const product = getProductBySlug(slug)
+  let product = null
+  try {
+    product = await apiClient.products.getBySlug(slug)
+  } catch {}
 
   if (!product) {
     return buildMetadata({
@@ -57,9 +58,7 @@ export async function generateMetadata({
   })
 }
 
-function getReferenceCode(
-  product: NonNullable<ReturnType<typeof getProductBySlug>>,
-) {
+function getReferenceCode(product: Product) {
   if (product.type === 'box' && product.cycleNumber) {
     return `EVID-${String(product.cycleNumber).padStart(2, '0')}`
   }
@@ -71,13 +70,23 @@ export default async function ProductDetailPage({
   params,
 }: ProductDetailPageProps) {
   const { slug } = await params
-  const product = getProductBySlug(slug)
+  let product = null
+  try {
+    product = await apiClient.products.getBySlug(slug)
+  } catch {
+    notFound()
+  }
 
   if (!product) {
     notFound()
   }
 
-  const related = listProducts().filter(
+  let productsList: Product[] = []
+  try {
+    productsList = await apiClient.products.list()
+  } catch {}
+
+  const related = productsList.filter(
     (item) =>
       product.relatedProductIds?.includes(item.id) && item.id !== product.id,
   )
@@ -232,7 +241,7 @@ export default async function ProductDetailPage({
             <ScrollReveal delay={0.08}>
               <div className="border border-[#fffaf0]/12 bg-[#0c0a09]/88 p-6 shadow-[0_20px_48px_rgba(0,0,0,0.32)] sm:p-8">
                 <ul className="grid gap-3 sm:grid-cols-2">
-                  {product.includedItems.map((item) => (
+                  {product.includedItems?.map((item: string) => (
                     <li
                       key={item}
                       className="flex gap-3 border border-[#fffaf0]/10 bg-[#090807]/72 px-4 py-3 text-sm/6 text-[#d7c9b5]"
