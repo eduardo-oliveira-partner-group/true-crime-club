@@ -15,8 +15,8 @@ import {
   IconLockOpen,
   IconLogout,
   IconMusic,
-  IconPause,
-  IconPlay,
+  IconPlayerPause,
+  IconPlayerPlay,
   IconTerminal,
   IconVideo,
 } from '@tabler/icons-react'
@@ -1188,9 +1188,9 @@ export default function CasosPage() {
                               aria-label={isPlayingAudio ? 'Pausar' : 'Tocar'}
                             >
                               {isPlayingAudio ? (
-                                <IconPause className="size-7 fill-[#62d84e] text-[#62d84e]" />
+                                <IconPlayerPause className="size-7 fill-[#62d84e] text-[#62d84e]" />
                               ) : (
-                                <IconPlay className="size-7 fill-[#62d84e] text-[#62d84e] pl-0.5" />
+                                <IconPlayerPlay className="size-7 fill-[#62d84e] pl-0.5 text-[#62d84e]" />
                               )}
                             </button>
 
