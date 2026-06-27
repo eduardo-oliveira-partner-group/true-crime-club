@@ -63,7 +63,8 @@ export function PublicHeaderContent({ itemCount }: PublicHeaderContentProps) {
     <>
       <header
         className={cn(
-          'fixed inset-x-0 top-0 z-50 border-b transition-all duration-300 ease-out',
+          'fixed inset-x-0 z-50 border-b transition-all duration-300 ease-out',
+          pathname === '/' && !isScrolled ? 'top-[38px]' : 'top-0',
           shouldShowBackdrop
             ? 'border-[#fffaf0]/12 bg-[#090807]/82 shadow-[0_18px_48px_rgba(0,0,0,0.28)] backdrop-blur-xl supports-backdrop-filter:bg-[#090807]/72'
             : 'border-transparent bg-transparent',

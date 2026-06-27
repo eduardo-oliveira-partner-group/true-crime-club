@@ -133,6 +133,85 @@ const howItWorks = [
   },
 ]
 
+function YellowAlertMarquee() {
+  const items = [
+    'O CASO VICTÓRIA MONTEIRO — CAIXA 03 DE 12',
+    'ASSINE ATÉ DIA 28 PRA ENTRAR NESTE CASO',
+    'MAIS DE 1000 INVESTIGADORES NO CLUBE',
+  ]
+  const repeatedItems = [...items, ...items, ...items]
+
+  return (
+    <div className="w-full overflow-hidden border-b border-[#211C18]/15 bg-[#BF3A2B] py-[9px] whitespace-nowrap text-[#FBF9F6]">
+      <div className="animate-marquee inline-flex [--marquee-duration:80s]">
+        {/* Copy 1 */}
+        <div className="flex shrink-0 items-center font-mono text-[13px] tracking-[0.06em] uppercase">
+          {repeatedItems.map((item, idx) => (
+            <span key={`c1-${idx}`} className="flex items-center">
+              <span className="pr-[42px]">{item}</span>
+              <span className="pr-[42px]">●</span>
+            </span>
+          ))}
+        </div>
+        {/* Copy 2 */}
+        <div
+          className="flex shrink-0 items-center font-mono text-[13px] tracking-[0.06em] uppercase"
+          aria-hidden="true"
+        >
+          {repeatedItems.map((item, idx) => (
+            <span key={`c2-${idx}`} className="flex items-center">
+              <span className="pr-[42px]">{item}</span>
+              <span className="pr-[42px]">●</span>
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function DarkDividerMarquee() {
+  const items = [
+    { text: 'PISTAS REAIS', starColor: '#EFBC18' },
+    { text: 'ITENS COLECIONÁVEIS', starColor: '#C5271F' },
+    { text: '12 CAIXAS, UMA VERDADE', starColor: '#1AA587' },
+    { text: 'COMUNIDADE QUE TEORIZA', starColor: '#5E5EA2' },
+  ]
+  const repeatedItems = [...items, ...items, ...items]
+
+  return (
+    <div className="mt-0 w-full overflow-hidden border-y border-[#211C18]/15 bg-[#211C18] py-[14px] whitespace-nowrap text-[#EDE4DD]">
+      <div className="animate-marquee inline-flex [--marquee-duration:120s]">
+        {/* Copy 1 */}
+        <div className="flex shrink-0 items-center font-heading text-lg font-bold tracking-[0.01em] uppercase sm:text-[22px]">
+          {repeatedItems.map((item, idx) => (
+            <span key={`d1-${idx}`} className="flex items-center">
+              <span className="px-[28px]">{item.text}</span>
+              <span className="px-[28px]" style={{ color: item.starColor }}>
+                ✶
+              </span>
+            </span>
+          ))}
+        </div>
+        {/* Copy 2 */}
+        <div
+          className="flex shrink-0 items-center font-heading text-lg font-bold tracking-[0.01em] uppercase sm:text-[22px]"
+          aria-hidden="true"
+        >
+          {repeatedItems.map((item, idx) => (
+            <span key={`d2-${idx}`} className="flex items-center">
+              <span className="px-[28px]">{item.text}</span>
+              <span className="px-[28px]" style={{ color: item.starColor }}>
+                ✶
+              </span>
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function HomePage() {
   const heroTitle = getDynamicContent('home.hero.title')
   const heroBadge = getDynamicContent('home.hero.badge')
@@ -152,6 +231,7 @@ export default function HomePage() {
 
   return (
     <div className="bg-[#090807] text-[#fffaf0]">
+      <YellowAlertMarquee />
       <HeroCaseReveal
         badge={heroBadge?.value ?? 'Primeiro Clube de True Crime do Brasil'}
         title={heroTitle?.value ?? 'Investigue. Colete. Desvende.'}
@@ -167,6 +247,8 @@ export default function HomePage() {
             : 'Nova box mensal'
         }
       />
+
+      <DarkDividerMarquee />
 
       <section className="relative isolate overflow-hidden border-b border-[#fffaf0]/10 bg-[#0b0908]">
         <Image

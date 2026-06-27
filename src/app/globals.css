@@ -485,3 +485,20 @@
   scrollbar-width: thin;
   scrollbar-color: rgba(98, 216, 78, 0.25) #050b06;
 }
+
+/* Animação para Carrosel de Texto Infinito (Marquee) */
+@keyframes mq {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.animate-marquee {
+  display: inline-flex;
+  white-space: nowrap;
+  will-change: transform;
+  animation: mq var(--marquee-duration, 30s) linear infinite;
+}
