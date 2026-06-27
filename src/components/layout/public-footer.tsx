@@ -21,6 +21,7 @@ const exploreLinks = [
   { href: '/loja', label: 'Boxes avulsas' },
   { href: '/design-sugerido', label: 'Design sugerido 1' },
   { href: '/design-sugerido-v2', label: 'Design sugerido 2' },
+  { href: '/design-sugerido-v3', label: 'Design sugerido 3' },
   { href: '/cadastro', label: 'Criar conta' },
   { href: '/login', label: 'Entrar na conta' },
 ]
