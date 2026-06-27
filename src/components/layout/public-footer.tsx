@@ -19,11 +19,29 @@ const clubLinks = [
 const exploreLinks = [
   { href: '/loja', label: 'Loja completa' },
   { href: '/loja', label: 'Boxes avulsas' },
-  { href: '/design-sugerido', label: 'Design sugerido 1' },
-  { href: '/design-sugerido-v2', label: 'Design sugerido 2' },
-  { href: '/design-sugerido-v3', label: 'Design sugerido 3' },
   { href: '/cadastro', label: 'Criar conta' },
   { href: '/login', label: 'Entrar na conta' },
+]
+
+const designPreviewLinks = [
+  {
+    href: '/design-sugerido',
+    version: 'v1',
+    label: 'Proposta original',
+    description: 'Layout base da landing page',
+  },
+  {
+    href: '/design-sugerido-v2',
+    version: 'v2',
+    label: 'Proposta refinada',
+    description: 'Hero animado e microinterações',
+  },
+  {
+    href: '/design-sugerido-v3',
+    version: 'v3',
+    label: 'Dossiê de investigação',
+    description: 'Tema de arquivo e pasta manila',
+  },
 ]
 
 const legalLinks = [
@@ -161,7 +179,7 @@ export function PublicFooter() {
           </FooterSection>
         </div>
 
-        <div className="mt-10 border border-[#fffaf0]/10 bg-[#171211]/60 p-5 sm:p-6">
+        <div className="mt-4 border border-[#fffaf0]/10 bg-[#171211]/60 p-5 sm:p-6">
           <p className="text-xs font-semibold tracking-[0.2em] text-[#d7b56d] uppercase">
             Endereço
           </p>
@@ -169,6 +187,44 @@ export function PublicFooter() {
             <p>Av. Tamboré, 287 - Tamboré,</p>
             <p>Barueri - SP, 06460-000, Torre Norte — 10º Andar</p>
           </address>
+        </div>
+
+        <div className="mt-10 border border-[#fffaf0]/10 bg-[#171211]/60 p-5 sm:p-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-xs font-semibold tracking-[0.2em] text-[#d7b56d] uppercase">
+                Versões de Design
+              </p>
+              <p className="mt-1 max-w-xl text-xs/5 text-[#a89882]">
+                Propostas de homepage para revisão e comparação.
+              </p>
+            </div>
+            <p className="text-[10px] font-semibold tracking-[0.18em] text-[#6f6458] uppercase">
+              Pré-visualização interna
+            </p>
+          </div>
+          <ul className="mt-4 grid gap-3 sm:grid-cols-3">
+            {designPreviewLinks.map((link) => (
+              <li key={link.href}>
+                <Link
+                  href={link.href}
+                  className="group flex h-full flex-col gap-1 rounded-sm border border-[#fffaf0]/10 bg-[#090807]/70 px-4 py-3 transition-colors hover:border-[#d7b56d]/35 hover:bg-[#090807]"
+                >
+                  <span className="flex items-center gap-2">
+                    <span className="inline-flex min-w-7 items-center justify-center rounded-sm border border-[#d7b56d]/30 bg-[#d7b56d]/10 px-1.5 py-0.5 text-[10px] font-semibold tracking-[0.12em] text-[#d7b56d] uppercase">
+                      {link.version}
+                    </span>
+                    <span className="text-sm font-medium text-[#fffaf0] transition-colors group-hover:text-[#d7b56d]">
+                      {link.label}
+                    </span>
+                  </span>
+                  <span className="text-xs/5 text-[#a89882]">
+                    {link.description}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
 
