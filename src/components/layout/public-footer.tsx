@@ -19,7 +19,8 @@ const clubLinks = [
 const exploreLinks = [
   { href: '/loja', label: 'Loja completa' },
   { href: '/loja', label: 'Boxes avulsas' },
-  { href: '/design-sugerido', label: 'Design sugerido' },
+  { href: '/design-sugerido', label: 'Design sugerido 1' },
+  { href: '/design-sugerido-v2', label: 'Design sugerido 2' },
   { href: '/cadastro', label: 'Criar conta' },
   { href: '/login', label: 'Entrar na conta' },
 ]
