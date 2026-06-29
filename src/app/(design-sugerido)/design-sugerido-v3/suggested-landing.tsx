@@ -19,6 +19,7 @@ import {
   IconX,
   type TablerIcon,
 } from '@tabler/icons-react'
+import { motion } from 'motion/react'
 import Image, { type StaticImageData } from 'next/image'
 import Link from 'next/link'
 import {
@@ -478,7 +479,13 @@ function Hero() {
             style={{ '--hero-delay': '0.52s' } as CSSProperties}
           >
             <Link href="/assinatura" className={styles.primaryButton}>
-              Quero assinar <IconArrowRight size={16} stroke={2} className={styles.arrow} aria-hidden />
+              Quero assinar{' '}
+              <IconArrowRight
+                size={16}
+                stroke={2}
+                className={styles.arrow}
+                aria-hidden
+              />
             </Link>
             <a href="#funciona" className={styles.secondaryButton}>
               Como funciona
@@ -582,6 +589,8 @@ function ClubIntro() {
 }
 
 function BoxContents() {
+  const [hoveredBoxIndex, setHoveredBoxIndex] = useState<number | null>(null)
+
   return (
     <section className={styles.section}>
       <SectionEyebrow>02 — Dentro da caixa</SectionEyebrow>
@@ -590,14 +599,68 @@ function BoxContents() {
       </h2>
       <div className={styles.boxBoard}>
         <div className={styles.boxGrid}>
-          <div className={styles.boardString} aria-hidden="true" />
+          {/* SVG connecting line, hidden on mobile */}
+          <svg
+            width="100%"
+            className="pointer-events-none absolute inset-x-0 top-0 z-2 hidden h-16 overflow-visible opacity-60 md:block"
+            aria-hidden="true"
+          >
+            <motion.line
+              animate={{
+                x1: 'calc(12.5% - 7.5px)',
+                y1: hoveredBoxIndex === 0 ? '19px' : '29px',
+                x2: 'calc(37.5% - 2.5px)',
+                y2: hoveredBoxIndex === 1 ? '19px' : '29px',
+              }}
+              transition={SPRING_TRANSITION}
+              stroke="var(--red)"
+              strokeWidth="2"
+              strokeDasharray="7 4"
+            />
+            <motion.line
+              animate={{
+                x1: 'calc(37.5% - 2.5px)',
+                y1: hoveredBoxIndex === 1 ? '19px' : '29px',
+                x2: 'calc(62.5% + 2.5px)',
+                y2: hoveredBoxIndex === 2 ? '19px' : '29px',
+              }}
+              transition={SPRING_TRANSITION}
+              stroke="var(--red)"
+              strokeWidth="2"
+              strokeDasharray="7 4"
+            />
+            <motion.line
+              animate={{
+                x1: 'calc(62.5% + 2.5px)',
+                y1: hoveredBoxIndex === 2 ? '19px' : '29px',
+                x2: 'calc(87.5% + 7.5px)',
+                y2: hoveredBoxIndex === 3 ? '19px' : '29px',
+              }}
+              transition={SPRING_TRANSITION}
+              stroke="var(--red)"
+              strokeWidth="2"
+              strokeDasharray="7 4"
+            />
+          </svg>
+
           {boxItems.map((item, index) => (
-            <FeatureCardItem key={item.code} item={item} index={index} />
+            <FeatureCardItem
+              key={item.code}
+              item={item}
+              index={index}
+              hoveredBoxIndex={hoveredBoxIndex}
+              onMouseEnter={() => setHoveredBoxIndex(index)}
+              onMouseLeave={() => setHoveredBoxIndex(null)}
+            />
           ))}
-          {boxItems.map((item) => (
-            <span
+          {boxItems.map((item, index) => (
+            <motion.span
               key={`${item.code}-board-pin`}
               className={styles.boardPin}
+              animate={{
+                y: hoveredBoxIndex === index ? -10 : 0,
+              }}
+              transition={SPRING_TRANSITION}
               style={
                 {
                   '--pin': item.color,
@@ -615,16 +678,34 @@ function BoxContents() {
 function FeatureCardItem({
   item,
   index,
+  hoveredBoxIndex,
+  onMouseEnter,
+  onMouseLeave,
 }: {
   item: (typeof boxItems)[number]
   index: number
+  hoveredBoxIndex: number | null
+  onMouseEnter: () => void
+  onMouseLeave: () => void
 }) {
   const Icon = item.icon
   const reveal = useReveal(index * 80)
+  const isHovered = hoveredBoxIndex === index
+
   return (
-    <div className={styles.featureCardSlot} {...reveal}>
-      <article
-        className={`${styles.featureCard} ${index % 2 ? styles.tiltRight : styles.tiltLeft}`}
+    <div
+      className={styles.featureCardSlot}
+      {...reveal}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+    >
+      <motion.article
+        animate={{
+          y: isHovered ? -10 : 0,
+          rotate: isHovered ? 0 : index % 2 ? 1.4 : -1.4,
+        }}
+        transition={SPRING_TRANSITION}
+        className={styles.featureCard}
       >
         <div className={styles.featureTop}>
           <Icon color={item.color} size={40} stroke={1.5} aria-hidden />
@@ -632,15 +713,22 @@ function FeatureCardItem({
         </div>
         <h3>{item.title}</h3>
         <p>{item.description}</p>
-      </article>
+      </motion.article>
       <span
-        className={styles.cardPin}
+        className={`${styles.cardPin} md:hidden`}
         style={{ '--pin': item.color } as CSSProperties}
         aria-hidden="true"
       />
     </div>
   )
 }
+
+const SPRING_TRANSITION = {
+  type: 'spring',
+  stiffness: 85,
+  damping: 13,
+  mass: 0.7,
+} as const
 
 function HowItWorks() {
   return (
@@ -796,7 +884,12 @@ function PlanCards() {
             />
             <Link href="/assinatura" className={styles.annualButton}>
               Assinar anual{' '}
-              <IconArrowRight size={16} stroke={2} className={styles.arrow} aria-hidden />
+              <IconArrowRight
+                size={16}
+                stroke={2}
+                className={styles.arrow}
+                aria-hidden
+              />
             </Link>
           </div>
         </article>
@@ -864,7 +957,12 @@ function StandaloneEdition() {
             {/* TODO: trocar pelo slug real da edição Copa do Mundo quando o produto existir na loja. */}
             <a href="#">
               Comprar agora{' '}
-              <IconArrowRight size={16} stroke={2} className={styles.arrow} aria-hidden />
+              <IconArrowRight
+                size={16}
+                stroke={2}
+                className={styles.arrow}
+                aria-hidden
+              />
             </a>
           </div>
         </div>
@@ -873,7 +971,12 @@ function StandaloneEdition() {
         <span />
         <a href="#arquivos">
           ver edições anteriores nos arquivos{' '}
-          <IconArrowRight size={14} stroke={2} className={styles.arrow} aria-hidden />
+          <IconArrowRight
+            size={14}
+            stroke={2}
+            className={styles.arrow}
+            aria-hidden
+          />
         </a>
       </div>
     </section>
@@ -898,7 +1001,12 @@ function ArchiveBand() {
         <div className={styles.archiveButtonWrap}>
           <Link href="/loja" className={styles.archiveButton}>
             Acessar todos os arquivos{' '}
-            <IconArrowRight size={16} stroke={2} className={styles.arrow} aria-hidden />
+            <IconArrowRight
+              size={16}
+              stroke={2}
+              className={styles.arrow}
+              aria-hidden
+            />
           </Link>
         </div>
       </div>
@@ -966,7 +1074,12 @@ function FinalCta() {
       <h2>Pronto pra descobrir do que as pessoas são capazes?</h2>
       <Link href="/assinatura" className={styles.primaryButton}>
         Entrar no clube{' '}
-        <IconArrowRight size={16} stroke={2} className={styles.arrow} aria-hidden />
+        <IconArrowRight
+          size={16}
+          stroke={2}
+          className={styles.arrow}
+          aria-hidden
+        />
       </Link>
       <p className={styles.finalDeadline}>PRAZO FINAL · 28/JUN · 23H59</p>
     </section>
@@ -1071,7 +1184,12 @@ function SuggestedFab({ isVisible }: { isVisible: boolean }) {
       <Link href="/assinatura">
         <IconBoxSeam size={20} stroke={1.75} aria-hidden />
         Entrar no clube
-        <IconArrowRight size={16} stroke={2} className={styles.arrow} aria-hidden />
+        <IconArrowRight
+          size={16}
+          stroke={2}
+          className={styles.arrow}
+          aria-hidden
+        />
       </Link>
     </div>
   )
