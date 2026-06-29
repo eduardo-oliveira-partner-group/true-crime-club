@@ -495,7 +495,10 @@ export default function CasosPage() {
               <div className="grid grid-cols-1 gap-6 md:grid-cols-[240px_1fr] md:gap-10">
                 {/* Left Column: Boxes list */}
                 <div className="border-b border-[#62b543]/20 pb-4 md:border-y md:border-b-0 md:border-[#62b543] md:py-2 md:pb-0">
-                  <aside className="custom-scrollbar flex max-h-[280px] flex-col gap-2 overflow-y-auto pr-2 md:max-h-[320px]">
+                  <aside
+                    data-lenis-prevent
+                    className="custom-scrollbar flex max-h-[280px] flex-col gap-2 overflow-y-auto pr-2 md:max-h-[320px]"
+                  >
                     {(() => {
                       const allBoxes = Array.from(
                         { length: 12 },
@@ -685,7 +688,10 @@ export default function CasosPage() {
               </div>
 
               {/* Modal Body */}
-              <div className="max-h-[55vh] flex-1 overflow-y-auto bg-black/20 p-4 md:p-6">
+              <div
+                data-lenis-prevent
+                className="max-h-[55vh] flex-1 overflow-y-auto bg-black/20 p-4 md:p-6"
+              >
                 {/* TEXT VIEW */}
                 {selectedFile.type === 'text' && (
                   <div className="rounded border border-[#62b543]/20 bg-black/40 p-4 text-lg/relaxed whitespace-pre-wrap text-[#62b543]/90 select-text">
@@ -695,7 +701,10 @@ export default function CasosPage() {
 
                 {/* SHEET (SPREADSHEET) VIEW */}
                 {selectedFile.type === 'sheet' && (
-                  <div className="overflow-x-auto rounded border border-[#62b543]/30 bg-black/40">
+                  <div
+                    data-lenis-prevent
+                    className="overflow-x-auto rounded border border-[#62b543]/30 bg-black/40"
+                  >
                     <table className="w-full border-collapse text-left text-lg text-[#62b543]/90">
                       <thead>
                         <tr className="border-b border-[#62b543]/30 bg-[#62b543]/10">
@@ -803,7 +812,10 @@ export default function CasosPage() {
                                 }}
                               />
                             </div>
-                            <div className="max-h-16 space-y-0.5 overflow-y-auto rounded bg-black/40 p-2 text-[9px] text-[#62b543]/70">
+                            <div
+                              data-lenis-prevent
+                              className="max-h-16 space-y-0.5 overflow-y-auto rounded bg-black/40 p-2 text-[9px] text-[#62b543]/70"
+                            >
                               {(audioRecoveryLogs[selectedFile.id] || []).map(
                                 (log, idx) => (
                                   <div key={idx}>{log}</div>
