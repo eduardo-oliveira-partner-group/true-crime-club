@@ -36,8 +36,15 @@ import archiveBox02 from '@/src/assets/images/design-sugerido/box-02.png'
 import archiveBox03 from '@/src/assets/images/design-sugerido/box-03.png'
 import archiveBox04 from '@/src/assets/images/design-sugerido/box-04.png'
 import standaloneEdition from '@/src/assets/images/design-sugerido/edicao-copa.png'
+import featuredSilhuetas from '@/src/assets/images/design-sugerido/featured-silhuetas.png'
 import heroImage from '@/src/assets/images/design-sugerido/hero.jpg'
 import logo from '@/src/assets/images/design-sugerido/logo.png'
+import logoBetoRibeiro from '@/src/assets/images/design-sugerido/logo-beto-ribeiro.png'
+import logoCorreioBraziliense from '@/src/assets/images/design-sugerido/logo-correio-braziliense.png'
+import logoIstoE from '@/src/assets/images/design-sugerido/logo-istoe.png'
+import logoJanelaPublicitaria from '@/src/assets/images/design-sugerido/logo-janela-publicitaria.png'
+import logoPoltronaNerd from '@/src/assets/images/design-sugerido/logo-poltrona-nerd.png'
+import logoVejaSp from '@/src/assets/images/design-sugerido/logo-veja-sp.png'
 
 import styles from './page.module.css'
 
@@ -197,6 +204,15 @@ type SuggestedLandingProps = {
   fontClassName: string
 }
 
+const featuredByLogos = [
+  { src: logoBetoRibeiro, alt: 'Beto Ribeiro' },
+  { src: logoVejaSp, alt: 'Veja São Paulo' },
+  { src: logoIstoE, alt: 'ISTOÉ' },
+  { src: logoCorreioBraziliense, alt: 'Correio Braziliense' },
+  { src: logoJanelaPublicitaria, alt: 'Janela Publicitária' },
+  { src: logoPoltronaNerd, alt: 'Poltrona Nerd' },
+]
+
 export function SuggestedLanding({ fontClassName }: SuggestedLandingProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [showFab, setShowFab] = useState(false)
@@ -283,6 +299,9 @@ export function SuggestedLanding({ fontClassName }: SuggestedLandingProps) {
         <RibbonMarquee />
         <Reveal>
           <ClubIntro />
+        </Reveal>
+        <Reveal>
+          <FeaturedBy />
         </Reveal>
         <Reveal>
           <BoxContents />
@@ -579,6 +598,38 @@ function ClubIntro() {
         </div>
         <div className={styles.introStamp} aria-hidden="true">
           ARQUIVO PRIVADO
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function FeaturedBy() {
+  return (
+    <section className={styles.featuredBy} aria-label="Veiculado na imprensa">
+      <div className={styles.featuredByScene}>
+        <div className={styles.featuredBySceneInner}>
+          <Image
+            src={featuredSilhuetas}
+            alt="Dois investigadores em conversa"
+            className={styles.featuredBySilhuetas}
+            sizes="(max-width: 860px) 90vw, 420px"
+            priority={false}
+          />
+        </div>
+      </div>
+      <div className={styles.featuredByBar}>
+        <span className={styles.featuredByHeading}>FEATURED BY</span>
+        <div className={styles.featuredByLogos}>
+          {featuredByLogos.map((item) => (
+            <Image
+              key={item.alt}
+              src={item.src}
+              alt={item.alt}
+              className={styles.featuredByLogo}
+              sizes="(max-width: 540px) 45vw, 180px"
+            />
+          ))}
         </div>
       </div>
     </section>
