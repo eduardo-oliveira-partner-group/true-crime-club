@@ -22,8 +22,11 @@ import {
   ScrollRevealGroup,
   ScrollRevealItem,
 } from '@/src/components/ui/scroll-reveal'
-import { apiClient } from '@/src/lib/api-client'
-import { getSeoEntry } from '@/src/lib/domain/repositories'
+import {
+  getProductBySlug,
+  getSeoEntry,
+  listProducts,
+} from '@/src/lib/domain/repositories'
 import type { Product } from '@/src/lib/domain/types'
 import { formatEditionMonth } from '@/src/lib/formatters'
 import { buildMetadata } from '@/src/lib/seo'
@@ -36,10 +39,7 @@ export async function generateMetadata({
   params,
 }: ProductDetailPageProps): Promise<Metadata> {
   const { slug } = await params
-  let product = null
-  try {
-    product = await apiClient.products.getBySlug(slug)
-  } catch {}
+  const product = getProductBySlug(slug)
 
   if (!product) {
     return buildMetadata({
@@ -70,21 +70,13 @@ export default async function ProductDetailPage({
   params,
 }: ProductDetailPageProps) {
   const { slug } = await params
-  let product = null
-  try {
-    product = await apiClient.products.getBySlug(slug)
-  } catch {
-    notFound()
-  }
+  const product = getProductBySlug(slug)
 
   if (!product) {
     notFound()
   }
 
-  let productsList: Product[] = []
-  try {
-    productsList = await apiClient.products.list()
-  } catch {}
+  const productsList: Product[] = listProducts()
 
   const related = productsList.filter(
     (item) =>

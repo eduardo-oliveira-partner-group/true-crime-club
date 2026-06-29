@@ -2,14 +2,10 @@ import {
   IconArrowRight,
   IconBook,
   IconBoxSeam,
-  IconCalendarEvent,
-  IconChecklist,
   IconClipboardText,
-  IconCreditCard,
   IconFingerprint,
   IconHome,
   IconNotebook,
-  IconPackage,
   IconShirt,
   IconSparkles,
   IconUsers,
@@ -25,7 +21,6 @@ import plansDossierPlate from '@/src/assets/images/home/plans-dossier-plate.png'
 import previousBoxesBanner from '@/src/assets/images/home/previous-boxes-banner.png'
 import { CorkboardTimeline } from '@/src/components/home/corkboard-timeline'
 import { EvidenceInventoryGrid } from '@/src/components/home/evidence-inventory-grid'
-import { FeatureDossierCard } from '@/src/components/home/feature-dossier-card'
 import { HeroCaseReveal } from '@/src/components/home/hero-case-reveal'
 import { PlanDossierCard } from '@/src/components/home/plan-dossier-card'
 import { PreviousBoxesShowcase } from '@/src/components/home/previous-boxes-showcase'

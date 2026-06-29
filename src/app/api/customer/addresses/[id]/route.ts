@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import { mockAddresses } from '@/src/lib/domain/mock-data'
+import { deleteCustomerAddress } from '@/src/lib/server/customer'
 
 export async function DELETE(
   request: Request,
@@ -8,13 +8,7 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params
-    const index = mockAddresses.findIndex((addr) => addr.id === id)
-
-    if (index !== -1) {
-      mockAddresses.splice(index, 1)
-    }
-
-    return NextResponse.json(mockAddresses)
+    return NextResponse.json(deleteCustomerAddress(id))
   } catch (error) {
     const err = error as Error
     return NextResponse.json(

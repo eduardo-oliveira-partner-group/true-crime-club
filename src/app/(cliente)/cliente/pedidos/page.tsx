@@ -1,13 +1,13 @@
 import { IconArrowRight } from '@tabler/icons-react'
 import Link from 'next/link'
 
-import { apiClient } from '@/src/lib/api-client'
 import type { Order } from '@/src/lib/domain/types'
 import {
   formatCurrency,
   formatOrderStatus,
   formatPaymentStatus,
 } from '@/src/lib/formatters'
+import { listOrders } from '@/src/lib/server/customer'
 import { cn } from '@/src/lib/utils'
 
 const statusTone: Record<string, string> = {
@@ -19,10 +19,7 @@ const statusTone: Record<string, string> = {
 }
 
 export default async function PedidosPage() {
-  let orders: Order[] = []
-  try {
-    orders = await apiClient.customer.listOrders()
-  } catch {}
+  const orders: Order[] = listOrders()
 
   return (
     <div>

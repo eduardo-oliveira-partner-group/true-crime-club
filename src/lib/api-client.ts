@@ -1,43 +1,15 @@
-const isServer = typeof window === 'undefined'
-
-function getBaseUrl() {
-  if (!isServer) return '/api'
-
-  if (process.env.NEXT_PUBLIC_API_URL) {
-    return process.env.NEXT_PUBLIC_API_URL
-  }
-
-  const port = process.env.PORT || '3000'
-  return `http://localhost:${port}/api`
-}
-
 async function fetcher(endpoint: string, options: RequestInit = {}) {
-  const url = `${getBaseUrl()}${endpoint}`
+  const url = `/api${endpoint}`
   const headers = new Headers(options.headers || {})
 
   if (!headers.has('Content-Type') && !(options.body instanceof FormData)) {
     headers.set('Content-Type', 'application/json')
   }
 
-  if (isServer) {
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const { cookies } = require('next/headers')
-      const cookieStore = await cookies()
-      const cookieHeader = cookieStore.toString()
-      if (cookieHeader) {
-        headers.set('Cookie', cookieHeader)
-      }
-    } catch {
-      // Ignora erro se cookies() for chamado fora do contexto de requisição do Next.js
-    }
-  } else {
-    options.credentials = options.credentials || 'include'
-  }
-
   const response = await fetch(url, {
     ...options,
     headers,
+    credentials: 'include',
   })
 
   if (!response.ok) {

@@ -1,35 +1,19 @@
 import { NextResponse } from 'next/server'
 
-import { mockCustomer } from '@/src/lib/domain/mock-data'
 import {
-  getCurrentCustomer,
-  listAddresses,
-  listPaymentMethods,
-} from '@/src/lib/domain/repositories'
+  getCustomerProfile,
+  updateCustomerProfile,
+} from '@/src/lib/server/customer'
 
 export async function GET() {
-  const customer = getCurrentCustomer()
-  const addresses = listAddresses()
-  const paymentMethods = listPaymentMethods()
-  return NextResponse.json({ customer, addresses, paymentMethods })
+  return NextResponse.json(getCustomerProfile())
 }
 
 export async function PUT(request: Request) {
   try {
     const { name, email, phone, preferences } = await request.json()
-
-    // Mutaciona o mockCustomer diretamente para persistir as alterações na sessão do servidor
-    if (name !== undefined) mockCustomer.name = name
-    if (email !== undefined) mockCustomer.email = email
-    if (phone !== undefined) mockCustomer.phone = phone
-    if (preferences !== undefined) {
-      mockCustomer.preferences = {
-        ...mockCustomer.preferences,
-        ...preferences,
-      }
-    }
-
-    return NextResponse.json(mockCustomer)
+    const customer = updateCustomerProfile({ name, email, phone, preferences })
+    return NextResponse.json(customer)
   } catch (error) {
     const err = error as Error
     return NextResponse.json(

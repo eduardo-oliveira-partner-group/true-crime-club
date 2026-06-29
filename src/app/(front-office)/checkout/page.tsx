@@ -6,16 +6,19 @@ import {
   type SubscriberPreferencesValue,
 } from '@/src/components/checkout/checkout-stepper'
 import { Button } from '@/src/components/ui/button'
-import { apiClient } from '@/src/lib/api-client'
-import { getSeoEntry } from '@/src/lib/domain/repositories'
-import type {
-  Address,
-  CartItem,
-  Customer,
-  PaymentMethod,
-} from '@/src/lib/domain/types'
+import { getPlanBySlug, getSeoEntry } from '@/src/lib/domain/repositories'
+import type { CartItem } from '@/src/lib/domain/types'
 import { formatCurrency } from '@/src/lib/formatters'
 import { buildMetadata } from '@/src/lib/seo'
+import {
+  calculateShipping,
+  createOrder,
+  getCartWithTotals,
+} from '@/src/lib/server/cart'
+import {
+  getCustomerProfile,
+  updateCustomerProfile,
+} from '@/src/lib/server/customer'
 
 export const metadata: Metadata = buildMetadata({
   path: '/checkout',
@@ -31,41 +34,21 @@ export default async function CheckoutPage({
   searchParams,
 }: CheckoutPageProps) {
   const { plano } = await searchParams
-  let plan = null
-  if (plano) {
-    try {
-      plan = await apiClient.plans.getBySlug(plano)
-    } catch {}
-  }
+  const plan = plano ? getPlanBySlug(plano) : null
   const isSubscriptionFlow = Boolean(plan)
 
-  const cart = await apiClient.cart.get()
+  const cart = getCartWithTotals()
   const totals = cart
 
-  let profile: {
-    customer: Customer | null
-    addresses: Address[]
-    paymentMethods: PaymentMethod[]
-  } = {
-    customer: null,
-    addresses: [],
-    paymentMethods: [],
-  }
-  try {
-    profile = await apiClient.customer.getProfile()
-  } catch {}
+  const profile = getCustomerProfile()
 
   const customer = profile.customer
   const addresses = profile.addresses || []
   const paymentMethods = profile.paymentMethods || []
 
-  let shipping = { price: 0, estimatedDays: '5-8 dias úteis' }
+  let shipping = { price: 0, estimatedDays: '5-8 dias úteis', region: '' }
   if (addresses[0]?.zipCode) {
-    try {
-      shipping = await apiClient.checkout.calculateShipping(
-        addresses[0].zipCode,
-      )
-    } catch {}
+    shipping = calculateShipping(addresses[0].zipCode)
   }
 
   const shippingOptions = [
@@ -285,10 +268,10 @@ function OrderSummary({
 
 async function savePreferences(preferences: SubscriberPreferencesValue) {
   'use server'
-  await apiClient.customer.updateProfile({ preferences })
+  updateCustomerProfile({ preferences })
 }
 
 async function submitOrder() {
   'use server'
-  await apiClient.checkout.createOrder()
+  createOrder()
 }

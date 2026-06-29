@@ -3,7 +3,6 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 import { Button } from '@/src/components/ui/button'
-import { apiClient } from '@/src/lib/api-client'
 import type { CartItem } from '@/src/lib/domain/types'
 import {
   formatCurrency,
@@ -11,6 +10,7 @@ import {
   formatOrderStatus,
   formatPaymentStatus,
 } from '@/src/lib/formatters'
+import { getOrderById } from '@/src/lib/server/customer'
 
 interface PedidoDetailPageProps {
   params: Promise<{ id: string }>
@@ -20,10 +20,7 @@ export default async function PedidoDetailPage({
   params,
 }: PedidoDetailPageProps) {
   const { id } = await params
-  let order = null
-  try {
-    order = await apiClient.customer.getOrder(id)
-  } catch {}
+  const order = getOrderById(id)
 
   if (!order) {
     notFound()

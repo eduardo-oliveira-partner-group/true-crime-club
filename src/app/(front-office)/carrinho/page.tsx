@@ -14,12 +14,18 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import { Button } from '@/src/components/ui/button'
-import { apiClient } from '@/src/lib/api-client'
 import { getSeoEntry } from '@/src/lib/domain/repositories'
-import type { Cart, CartItem } from '@/src/lib/domain/types'
+import type { CartItem } from '@/src/lib/domain/types'
 import { formatCurrency } from '@/src/lib/formatters'
 import { getProductImage } from '@/src/lib/product-images'
 import { buildMetadata } from '@/src/lib/seo'
+import {
+  applyCoupon,
+  calculateShipping,
+  getCartWithTotals,
+  removeCartItemWithTotals,
+  updateCartItemQuantityWithTotals,
+} from '@/src/lib/server/cart'
 import { cn } from '@/src/lib/utils'
 
 const sampleZipCode = '05435-020'
@@ -31,14 +37,9 @@ export const metadata = buildMetadata({
 })
 
 export default async function CarrinhoPage() {
-  const cart = (await apiClient.cart.get()) as Cart & {
-    subtotal: number
-    discount: number
-    shipping: number
-    total: number
-  }
+  const cart = getCartWithTotals()
   const totals = cart
-  const shipping = await apiClient.checkout.calculateShipping(sampleZipCode)
+  const shipping = calculateShipping(sampleZipCode)
   const grandTotal = totals.total + shipping.price
   const itemCount = cart.items.reduce(
     (sum: number, item: CartItem) => sum + item.quantity,
@@ -214,7 +215,7 @@ function CartLineItem({
             <form
               action={async () => {
                 'use server'
-                await apiClient.cart.removeItem(item.id)
+                removeCartItemWithTotals(item.id)
                 revalidatePath('/carrinho')
               }}
             >
@@ -254,10 +255,7 @@ function QuantityControls({
         <form
           action={async () => {
             'use server'
-            await apiClient.cart.updateQuantity(
-              itemId,
-              Math.max(quantity - 1, 1),
-            )
+            updateCartItemQuantityWithTotals(itemId, Math.max(quantity - 1, 1))
             revalidatePath('/carrinho')
           }}
         >
@@ -279,7 +277,7 @@ function QuantityControls({
         <form
           action={async () => {
             'use server'
-            await apiClient.cart.updateQuantity(itemId, quantity + 1)
+            updateCartItemQuantityWithTotals(itemId, quantity + 1)
             revalidatePath('/carrinho')
           }}
         >
@@ -418,7 +416,7 @@ function CouponForm() {
     <form
       action={async (formData) => {
         'use server'
-        await apiClient.cart.applyCoupon(String(formData.get('coupon') ?? ''))
+        applyCoupon(String(formData.get('coupon') ?? ''))
         revalidatePath('/carrinho')
       }}
       className="mt-2 space-y-2"

@@ -1,10 +1,9 @@
 import { NextResponse } from 'next/server'
 
 import {
-  getCartTotals,
-  removeCartItem,
-  updateCartItemQuantity,
-} from '@/src/lib/domain/repositories'
+  removeCartItemWithTotals,
+  updateCartItemQuantityWithTotals,
+} from '@/src/lib/server/cart'
 
 export async function PUT(
   request: Request,
@@ -13,9 +12,7 @@ export async function PUT(
   try {
     const { itemId } = await params
     const { quantity } = await request.json()
-    const updatedCart = updateCartItemQuantity(itemId, quantity)
-    const totals = getCartTotals(updatedCart)
-    return NextResponse.json({ ...updatedCart, ...totals })
+    return NextResponse.json(updateCartItemQuantityWithTotals(itemId, quantity))
   } catch (error) {
     const err = error as Error
     return NextResponse.json(
@@ -31,9 +28,7 @@ export async function DELETE(
 ) {
   try {
     const { itemId } = await params
-    const updatedCart = removeCartItem(itemId)
-    const totals = getCartTotals(updatedCart)
-    return NextResponse.json({ ...updatedCart, ...totals })
+    return NextResponse.json(removeCartItemWithTotals(itemId))
   } catch (error) {
     const err = error as Error
     return NextResponse.json(
