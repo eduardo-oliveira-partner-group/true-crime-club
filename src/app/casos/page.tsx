@@ -422,7 +422,7 @@ export default function CasosPage() {
           {/* ---------------- STAGE 2: CASOS LIST ---------------- */}
           {viewStage === 'casos-list' && (
             <div className="flex flex-1 flex-col items-center justify-center py-6">
-              <div className="grid w-full max-w-4xl grid-cols-1 gap-8 px-4 md:grid-cols-3 md:gap-16">
+              <div className="grid w-full max-w-4xl grid-cols-1 gap-8 px-4 md:gap-16">
                 {/* Caso Victoria Monteiro */}
                 <button
                   onClick={() => {
@@ -433,15 +433,15 @@ export default function CasosPage() {
                   <img
                     src="/imagens/icons/Caso_VictoriaMonteiro.png"
                     alt="Caso Victoria"
-                    className="mb-3 size-32 object-contain transition-transform group-hover:scale-105 md:size-40"
+                    className="mb-3 size-24 object-contain transition-transform group-hover:scale-105 md:size-32"
                   />
-                  <span className="text-center text-2xl font-bold tracking-wide group-hover:underline md:text-3xl">
+                  <span className="text-center text-2xl font-bold tracking-wide group-hover:underline">
                     Caso - Victória Monteiro
                   </span>
                 </button>
 
                 {/* Caso X */}
-                <div className="flex flex-col items-center justify-center opacity-60">
+                {/* <div className="flex flex-col items-center justify-center opacity-60">
                   <img
                     src="/imagens/icons/Caso_VictoriaMonteiro.png"
                     alt="Caso X"
@@ -450,10 +450,10 @@ export default function CasosPage() {
                   <span className="text-center text-2xl font-bold tracking-wide md:text-3xl">
                     Caso - X
                   </span>
-                </div>
+                </div> */}
 
                 {/* Caso Y */}
-                <div className="flex flex-col items-center justify-center opacity-60">
+                {/* <div className="flex flex-col items-center justify-center opacity-60">
                   <img
                     src="/imagens/icons/Caso_VictoriaMonteiro.png"
                     alt="Caso Y"
@@ -462,7 +462,7 @@ export default function CasosPage() {
                   <span className="text-center text-2xl font-bold tracking-wide md:text-3xl">
                     Caso - Y
                   </span>
-                </div>
+                </div> */}
               </div>
             </div>
           )}
