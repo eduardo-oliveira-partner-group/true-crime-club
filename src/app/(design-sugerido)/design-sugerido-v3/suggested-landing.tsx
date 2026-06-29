@@ -527,12 +527,9 @@ function RibbonMarquee() {
         {items.map((item, index) => (
           <span key={`${item.label}-${index}`} className={styles.ribbonItem}>
             <span>{item.label}</span>
-            <IconSparkles
-              size={14}
-              color={item.color}
-              stroke={1.75}
-              aria-hidden
-            />
+            <span style={{ color: item.color }} aria-hidden="true">
+              ✶
+            </span>
           </span>
         ))}
       </div>

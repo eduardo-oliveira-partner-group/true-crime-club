@@ -682,8 +682,9 @@
   padding: 0 28px;
 }
 
-.ribbonItem svg {
-  flex: none;
+.ribbonItem span:last-child {
+  font-size: 14px;
+  vertical-align: middle;
 }
 
 /* --- shared section frames ----------------------------------------- */
