@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import {
   Archivo,
-  Fraunces,
   Hanken_Grotesk,
   Space_Mono,
   Special_Elite,
@@ -10,12 +9,6 @@ import {
 import { buildMetadata } from '@/src/lib/seo'
 
 import { SuggestedLanding } from './suggested-landing'
-
-const fraunces = Fraunces({
-  subsets: ['latin'],
-  variable: '--design-font-heading',
-  display: 'swap',
-})
 
 const hankenGrotesk = Hanken_Grotesk({
   subsets: ['latin'],
@@ -41,7 +34,7 @@ const specialElite = Special_Elite({
 const archivo = Archivo({
   subsets: ['latin'],
   weight: ['700', '800', '900'],
-  variable: '--design-font-display',
+  variable: '--design-font-heading',
   display: 'swap',
 })
 
@@ -54,7 +47,7 @@ export const metadata: Metadata = buildMetadata({
 export default function DesignSugeridoPage() {
   return (
     <SuggestedLanding
-      fontClassName={`${fraunces.variable} ${hankenGrotesk.variable} ${spaceMono.variable} ${specialElite.variable} ${archivo.variable}`}
+      fontClassName={`${hankenGrotesk.variable} ${spaceMono.variable} ${specialElite.variable} ${archivo.variable}`}
     />
   )
 }
