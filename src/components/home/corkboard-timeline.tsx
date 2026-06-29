@@ -129,9 +129,10 @@ export function CorkboardTimeline({ steps }: CorkboardTimelineProps) {
                 }}
                 transition={SPRING_TRANSITION}
                 className={cn(
-                  'group relative flex h-full flex-col border border-[#fffaf0]/12 bg-[#130f0e] p-6 pt-8',
-                  'shadow-[0_16px_40px_rgba(0,0,0,0.6)] backdrop-blur-sm transition-[border-color,box-shadow] duration-300 ease-out',
-                  'hover:border-[#d84132]/45 hover:shadow-[0_24px_56px_rgba(216,65,50,0.22)]',
+                  'group relative flex h-full flex-col border border-[#211c18]/12 bg-[#fffaf2] p-6 pt-8',
+                  'shadow-[0_9px_18px_rgba(63,46,34,0.07)] backdrop-blur-sm transition-[border-color,box-shadow] duration-300 ease-out',
+                  'hover:border-[#b5332a]/42 hover:shadow-[0_10px_20px_rgba(181,51,42,0.07)]',
+                  'dark:border-[#fffaf0]/12 dark:bg-[#130f0e] dark:shadow-[0_16px_40px_rgba(0,0,0,0.6)] dark:hover:border-[#d84132]/45 dark:hover:shadow-[0_24px_56px_rgba(216,65,50,0.22)]',
                 )}
                 onMouseEnter={() => setHoveredIndex(index)}
                 onMouseLeave={() => setHoveredIndex(null)}
@@ -148,7 +149,7 @@ export function CorkboardTimeline({ steps }: CorkboardTimelineProps) {
                 />
 
                 {/* Technical Dossier Tab Header */}
-                <div className="mb-5 flex items-center justify-between border-b border-[#fffaf0]/8 pb-3 font-mono text-[10px] tracking-wider text-[#d7c9b5]/40">
+                <div className="mb-5 flex items-center justify-between border-b border-[#211c18]/10 pb-3 font-mono text-[10px] tracking-wider text-[#5f5147]/58 dark:border-[#fffaf0]/8 dark:text-[#d7c9b5]/40">
                   <span>{meta.tabLabel}</span>
                   <span>{meta.code}</span>
                 </div>
@@ -170,23 +171,23 @@ export function CorkboardTimeline({ steps }: CorkboardTimelineProps) {
                 {/* Card Main Info */}
                 <div className="relative z-20 flex flex-1 flex-col">
                   {/* Pinned Card Icon */}
-                  <div className="mb-4 inline-flex size-11 items-center justify-center border border-[#fffaf0]/8 bg-[#211c18] text-[#d7b56d] transition-all duration-300 group-hover:border-[#d84132]/30 group-hover:bg-[#d84132]/10 group-hover:text-[#ffb0a5]">
+                  <div className="mb-4 inline-flex size-11 items-center justify-center border border-[#211c18]/10 bg-[#efe4d4] text-[#8f6126] transition-all duration-300 group-hover:border-[#b5332a]/30 group-hover:bg-[#b5332a]/10 group-hover:text-[#9f2d25] dark:border-[#fffaf0]/8 dark:bg-[#211c18] dark:text-[#d7b56d] dark:group-hover:border-[#d84132]/30 dark:group-hover:bg-[#d84132]/10 dark:group-hover:text-[#ffb0a5]">
                     <StepIcon className="size-5 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6" />
                   </div>
 
-                  <h3 className="font-heading text-lg font-bold tracking-tight text-[#fffaf0] transition-colors duration-300 group-hover:text-[#d84132]">
+                  <h3 className="font-heading text-lg font-bold tracking-tight text-[#211c18] transition-colors duration-300 group-hover:text-[#b5332a] dark:text-[#fffaf0] dark:group-hover:text-[#d84132]">
                     {index + 1}. {step.title}
                   </h3>
 
-                  <p className="mt-3 flex-1 text-sm/6 text-[#d7c9b5]/90">
+                  <p className="mt-3 flex-1 text-sm/6 text-[#5f5147] dark:text-[#d7c9b5]/90">
                     {step.description}
                   </p>
                 </div>
 
                 {/* Step indicator in footer */}
-                <div className="mt-6 flex items-center justify-between border-t border-[#fffaf0]/8 pt-3 font-mono text-[9px] text-[#d7c9b5]/20">
+                <div className="mt-6 flex items-center justify-between border-t border-[#211c18]/10 pt-3 font-mono text-[9px] text-[#5f5147]/36 dark:border-[#fffaf0]/8 dark:text-[#d7c9b5]/20">
                   <span>CONFIDENTIALITY ASSURED</span>
-                  <span className="font-semibold text-[#d84132]/40">
+                  <span className="font-semibold text-[#b5332a]/52 dark:text-[#d84132]/40">
                     PASSO 0{index + 1}
                   </span>
                 </div>

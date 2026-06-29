@@ -17,7 +17,7 @@ export function GlowingCard({
   return (
     <div
       className={cn(
-        'relative h-full border border-[#fffaf0]/14 p-px',
+        'relative h-full border border-[#211c18]/14 p-px dark:border-[#fffaf0]/14',
         className,
       )}
     >
@@ -30,7 +30,7 @@ export function GlowingCard({
       />
       <div
         className={cn(
-          'relative flex h-full flex-col bg-[#171211] p-5',
+          'relative flex h-full flex-col bg-[#fffaf2] p-5 dark:bg-[#171211]',
           innerClassName,
         )}
       >
@@ -61,7 +61,9 @@ export function GlowingFeatureCard({
         {icon}
       </div>
       <h3 className="mt-5 font-heading text-lg font-semibold">{title}</h3>
-      <p className="mt-2 text-sm/6 text-[#d7c9b5]">{description}</p>
+      <p className="mt-2 text-sm/6 text-[#5f5147] dark:text-[#d7c9b5]">
+        {description}
+      </p>
     </GlowingCard>
   )
 }

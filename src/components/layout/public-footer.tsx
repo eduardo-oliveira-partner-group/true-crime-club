@@ -66,7 +66,7 @@ function FooterSection({
 }) {
   return (
     <div className="space-y-4">
-      <h3 className="text-xs font-semibold tracking-[0.22em] text-[#d7b56d] uppercase">
+      <h3 className="text-xs font-semibold tracking-[0.22em] text-[#8f6126] uppercase dark:text-[#d7b56d]">
         {title}
       </h3>
       {children}
@@ -79,7 +79,7 @@ export function PublicFooter() {
   const trustSupport = getDynamicContent('home.trust.support')
 
   return (
-    <footer className="border-t border-[#fffaf0]/10 bg-[#090807] text-[#fffaf0]">
+    <footer className="border-t border-[#211c18]/10 bg-[#f4f1ec] text-[#211c18] dark:border-[#fffaf0]/10 dark:bg-[#090807] dark:text-[#fffaf0]">
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:py-14">
         <div className="grid gap-10 lg:grid-cols-[1.35fr_repeat(3,minmax(0,1fr))]">
           <div className="space-y-5">
@@ -94,7 +94,7 @@ export function PublicFooter() {
               </span>
             </div> */}
 
-            <p className="max-w-sm text-sm/6 text-[#d7c9b5]">
+            <p className="max-w-sm text-sm/6 text-[#5f5147] dark:text-[#d7c9b5]">
               Caixa temática mensal com itens colecionáveis, pistas de um caso
               fictício anual e conteúdos exclusivos para quem vive true crime.
             </p>
@@ -115,7 +115,7 @@ export function PublicFooter() {
                 <li key={`${link.href}-${link.label}`}>
                   <Link
                     href={link.href}
-                    className="text-sm text-[#d7c9b5] transition-colors hover:text-[#fffaf0]"
+                    className="text-sm text-[#5f5147] transition-colors hover:text-[#211c18] dark:text-[#d7c9b5] dark:hover:text-[#fffaf0]"
                   >
                     {link.label}
                   </Link>
@@ -130,7 +130,7 @@ export function PublicFooter() {
                 <li key={`${link.href}-${link.label}`}>
                   <Link
                     href={link.href}
-                    className="text-sm text-[#d7c9b5] transition-colors hover:text-[#fffaf0]"
+                    className="text-sm text-[#5f5147] transition-colors hover:text-[#211c18] dark:text-[#d7c9b5] dark:hover:text-[#fffaf0]"
                   >
                     {link.label}
                   </Link>
@@ -144,9 +144,9 @@ export function PublicFooter() {
               <li>
                 <a
                   href="mailto:contato@truecrime.club"
-                  className="inline-flex items-center gap-2 text-sm text-[#d7c9b5] transition-colors hover:text-[#fffaf0]"
+                  className="inline-flex items-center gap-2 text-sm text-[#5f5147] transition-colors hover:text-[#211c18] dark:text-[#d7c9b5] dark:hover:text-[#fffaf0]"
                 >
-                  <IconMail className="size-4 shrink-0 text-[#d84132]" />
+                  <IconMail className="size-4 shrink-0 text-[#b5332a] dark:text-[#d84132]" />
                   contato@truecrime.club
                 </a>
               </li>
@@ -155,9 +155,9 @@ export function PublicFooter() {
                   href="https://wa.me/5511960185171"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-sm text-[#d7c9b5] transition-colors hover:text-[#fffaf0]"
+                  className="inline-flex items-center gap-2 text-sm text-[#5f5147] transition-colors hover:text-[#211c18] dark:text-[#d7c9b5] dark:hover:text-[#fffaf0]"
                 >
-                  <IconPhone className="size-4 shrink-0 text-[#d84132]" />
+                  <IconPhone className="size-4 shrink-0 text-[#b5332a] dark:text-[#d84132]" />
                   (11) 96018-5171
                 </a>
               </li>
@@ -166,41 +166,41 @@ export function PublicFooter() {
                   href="https://instagram.com/oficialtruecrime.club"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-sm text-[#d7c9b5] transition-colors hover:text-[#fffaf0]"
+                  className="inline-flex items-center gap-2 text-sm text-[#5f5147] transition-colors hover:text-[#211c18] dark:text-[#d7c9b5] dark:hover:text-[#fffaf0]"
                 >
-                  <IconBrandInstagram className="size-4 shrink-0 text-[#d84132]" />
+                  <IconBrandInstagram className="size-4 shrink-0 text-[#b5332a] dark:text-[#d84132]" />
                   @oficialtruecrime.club
                 </a>
               </li>
             </ul>
-            <p className="text-xs/5 text-[#a89882]">
+            <p className="text-xs/5 text-[#6e6055] dark:text-[#a89882]">
               {trustSupport?.value ??
                 'Suporte humano de segunda a sexta, das 9h às 18h.'}
             </p>
           </FooterSection>
         </div>
 
-        <div className="mt-4 border border-[#fffaf0]/10 bg-[#171211]/60 p-5 sm:p-6">
-          <p className="text-xs font-semibold tracking-[0.2em] text-[#d7b56d] uppercase">
+        <div className="mt-4 border border-[#211c18]/10 bg-[#fffaf2]/70 p-5 sm:p-6 dark:border-[#fffaf0]/10 dark:bg-[#171211]/60">
+          <p className="text-xs font-semibold tracking-[0.2em] text-[#8f6126] uppercase dark:text-[#d7b56d]">
             Endereço
           </p>
-          <address className="mt-2 space-y-0.5 text-sm/6 text-[#d7c9b5] not-italic">
+          <address className="mt-2 space-y-0.5 text-sm/6 text-[#5f5147] not-italic dark:text-[#d7c9b5]">
             <p>Av. Tamboré, 287 - Tamboré,</p>
             <p>Barueri - SP, 06460-000, Torre Norte — 10º Andar</p>
           </address>
         </div>
 
-        <div className="mt-10 border border-[#fffaf0]/10 bg-[#171211]/60 p-5 sm:p-6">
+        <div className="mt-10 border border-[#211c18]/10 bg-[#fffaf2]/70 p-5 sm:p-6 dark:border-[#fffaf0]/10 dark:bg-[#171211]/60">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="text-xs font-semibold tracking-[0.2em] text-[#d7b56d] uppercase">
+              <p className="text-xs font-semibold tracking-[0.2em] text-[#8f6126] uppercase dark:text-[#d7b56d]">
                 Versões de Design
               </p>
-              <p className="mt-1 max-w-xl text-xs/5 text-[#a89882]">
+              <p className="mt-1 max-w-xl text-xs/5 text-[#6e6055] dark:text-[#a89882]">
                 Propostas de homepage para revisão e comparação.
               </p>
             </div>
-            <p className="text-[10px] font-semibold tracking-[0.18em] text-[#6f6458] uppercase">
+            <p className="text-[10px] font-semibold tracking-[0.18em] text-[#76675b] uppercase dark:text-[#6f6458]">
               Pré-visualização interna
             </p>
           </div>
@@ -209,17 +209,17 @@ export function PublicFooter() {
               <li key={link.href}>
                 <Link
                   href={link.href}
-                  className="group flex h-full flex-col gap-1 rounded-sm border border-[#fffaf0]/10 bg-[#090807]/70 px-4 py-3 transition-colors hover:border-[#d7b56d]/35 hover:bg-[#090807]"
+                  className="group flex h-full flex-col gap-1 rounded-sm border border-[#211c18]/10 bg-[#f4f1ec]/80 px-4 py-3 transition-colors hover:border-[#9a662a]/35 hover:bg-[#fffaf2] dark:border-[#fffaf0]/10 dark:bg-[#090807]/70 dark:hover:border-[#d7b56d]/35 dark:hover:bg-[#090807]"
                 >
                   <span className="flex items-center gap-2">
-                    <span className="inline-flex min-w-7 items-center justify-center rounded-sm border border-[#d7b56d]/30 bg-[#d7b56d]/10 px-1.5 py-0.5 text-[10px] font-semibold tracking-[0.12em] text-[#d7b56d] uppercase">
+                    <span className="inline-flex min-w-7 items-center justify-center rounded-sm border border-[#9a662a]/30 bg-[#9a662a]/10 px-1.5 py-0.5 text-[10px] font-semibold tracking-[0.12em] text-[#8f6126] uppercase dark:border-[#d7b56d]/30 dark:bg-[#d7b56d]/10 dark:text-[#d7b56d]">
                       {link.version}
                     </span>
-                    <span className="text-sm font-medium text-[#fffaf0] transition-colors group-hover:text-[#d7b56d]">
+                    <span className="text-sm font-medium text-[#211c18] transition-colors group-hover:text-[#8f6126] dark:text-[#fffaf0] dark:group-hover:text-[#d7b56d]">
                       {link.label}
                     </span>
                   </span>
-                  <span className="text-xs/5 text-[#a89882]">
+                  <span className="text-xs/5 text-[#6e6055] dark:text-[#a89882]">
                     {link.description}
                   </span>
                 </Link>
@@ -229,8 +229,8 @@ export function PublicFooter() {
         </div>
       </div>
 
-      <div className="border-t border-[#fffaf0]/10 p-4 sm:px-6">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 text-center text-xs text-[#a89882] sm:flex-row sm:text-left">
+      <div className="border-t border-[#211c18]/10 p-4 sm:px-6 dark:border-[#fffaf0]/10">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 text-center text-xs text-[#6e6055] sm:flex-row sm:text-left dark:text-[#a89882]">
           <p>
             © {new Date().getFullYear()} True Crime Club. Todos os direitos
             reservados.
@@ -240,7 +240,7 @@ export function PublicFooter() {
               <li key={link.href}>
                 <Link
                   href={link.href}
-                  className="transition-colors hover:text-[#fffaf0]"
+                  className="transition-colors hover:text-[#211c18] dark:hover:text-[#fffaf0]"
                 >
                   {link.label}
                 </Link>

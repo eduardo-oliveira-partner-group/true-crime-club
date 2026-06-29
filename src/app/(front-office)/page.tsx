@@ -185,7 +185,7 @@ function DarkDividerMarquee() {
   const repeatedItems = [...items, ...items, ...items]
 
   return (
-    <div className="mt-0 w-full overflow-hidden border-y border-[#211C18]/15 bg-[#211C18] py-[14px] whitespace-nowrap text-[#EDE4DD]">
+    <div className="mt-0 w-full overflow-hidden border-y border-[#211C18]/15 bg-[#2a221d] py-[14px] whitespace-nowrap text-[#f4eadc] dark:bg-[#211C18] dark:text-[#EDE4DD]">
       <div className="animate-marquee inline-flex [--marquee-duration:120s]">
         {/* Copy 1 */}
         <div className="flex shrink-0 items-center font-heading text-lg font-bold tracking-[0.01em] uppercase sm:text-[22px]">
@@ -235,7 +235,7 @@ export default function HomePage() {
     progress?.liveEventTitle ?? activeCase?.liveEventTitle ?? 'Grande Revelação'
 
   return (
-    <div className="bg-[#090807] text-[#fffaf0]">
+    <div className="bg-[#f4f1ec] text-[#211c18] dark:bg-[#090807] dark:text-[#fffaf0]">
       <YellowAlertMarquee />
       <HeroCaseReveal
         badge={heroBadge?.value ?? 'Primeiro Clube de True Crime do Brasil'}
@@ -255,32 +255,32 @@ export default function HomePage() {
 
       <DarkDividerMarquee />
 
-      <section className="relative isolate overflow-hidden border-b border-[#fffaf0]/10 bg-[#0b0908]">
+      <section className="relative isolate overflow-hidden border-b border-[#211c18]/12 bg-[#ede6db] dark:border-[#fffaf0]/10 dark:bg-[#0b0908]">
         <Image
           src={clubOverviewBg}
           alt=""
           fill
           placeholder="blur"
           sizes="100vw"
-          className="absolute inset-0 -z-20 object-cover object-center brightness-[0.52] saturate-[0.85]"
+          className="absolute inset-0 -z-20 object-cover object-center brightness-[0.98] saturate-[0.68] dark:brightness-[0.52] dark:saturate-[0.85]"
         />
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_18%_22%,rgba(216,65,50,0.16),transparent_28%),radial-gradient(circle_at_80%_12%,rgba(215,181,109,0.1),transparent_30%),linear-gradient(180deg,rgba(11,9,8,0.82)_0%,rgba(11,9,8,0.58)_42%,rgba(11,9,8,0.86)_100%),linear-gradient(135deg,rgba(11,9,8,0.72)_0%,rgba(19,13,11,0.55)_46%,rgba(9,8,7,0.78)_100%)]" />
-        <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.035)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.035)_1px,transparent_1px)] bg-size-[56px_56px]" />
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_18%_22%,rgba(181,45,36,0.055),transparent_30%),radial-gradient(circle_at_80%_12%,rgba(151,102,38,0.06),transparent_32%),linear-gradient(180deg,rgba(244,241,236,0.94)_0%,rgba(237,230,219,0.86)_42%,rgba(244,241,236,0.96)_100%)] dark:bg-[radial-gradient(circle_at_18%_22%,rgba(216,65,50,0.16),transparent_28%),radial-gradient(circle_at_80%_12%,rgba(215,181,109,0.1),transparent_30%),linear-gradient(180deg,rgba(11,9,8,0.82)_0%,rgba(11,9,8,0.58)_42%,rgba(11,9,8,0.86)_100%),linear-gradient(135deg,rgba(11,9,8,0.72)_0%,rgba(19,13,11,0.55)_46%,rgba(9,8,7,0.78)_100%)]" />
+        <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(33,28,24,0.026)_1px,transparent_1px),linear-gradient(rgba(33,28,24,0.026)_1px,transparent_1px)] bg-size-[56px_56px] dark:bg-[linear-gradient(90deg,rgba(255,250,240,0.035)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.035)_1px,transparent_1px)]" />
         <div className="relative z-10 mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-24">
           <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:items-start lg:gap-12">
             {/* Left Column - Intro & Curadoria Box (Sticky on Desktop) */}
             <div className="space-y-6 lg:sticky lg:top-24 lg:col-span-5">
               <div className="space-y-4">
                 <ScrollReveal>
-                  <p className="text-xs font-semibold tracking-[0.24em] text-[#d7b56d] uppercase">
+                  <p className="text-xs font-semibold tracking-[0.24em] text-[#8f6126] uppercase dark:text-[#d7b56d]">
                     O que é o Club?
                   </p>
                 </ScrollReveal>
                 <ScrollReveal delay={0.08}>
-                  <h2 className="font-heading text-3xl leading-[1.15] font-black tracking-wide text-[#fffaf0] uppercase sm:text-4xl">
+                  <h2 className="font-heading text-3xl leading-[1.15] font-black tracking-wide text-[#211c18] uppercase sm:text-4xl dark:text-[#fffaf0]">
                     Muito além de uma caixa.
                     <br />
-                    <span className="text-[#d7b56d]">
+                    <span className="text-[#9a662a] dark:text-[#d7b56d]">
                       Uma imersão
                       <br />
                       em true crime.
@@ -289,26 +289,26 @@ export default function HomePage() {
                 </ScrollReveal>
                 <TextGenerateEffect
                   words="Unimos qualidade e conteúdo para quem busca profundidade e exclusividade no universo true crime. Cada entrega é uma experiência completa — da abertura da caixa ao design impecável de cada item colecionável."
-                  textClassName="text-base leading-7 text-[#d7c9b5]"
+                  textClassName="text-base leading-7 text-[#5f5147] dark:text-[#d7c9b5]"
                   staggerDelay={0.05}
                 />
               </div>
 
               <ScrollReveal delay={0.12}>
-                <div className="group relative flex items-start gap-4 overflow-hidden border border-[#fffaf0]/12 bg-[#171211]/72 p-5 shadow-[0_16px_36px_rgba(0,0,0,0.4)] backdrop-blur-sm sm:p-6">
+                <div className="group relative flex items-start gap-4 overflow-hidden border border-[#211c18]/14 bg-[#fffaf2]/86 p-5 shadow-[0_8px_16px_rgba(63,46,34,0.07)] backdrop-blur-sm sm:p-6 dark:border-[#fffaf0]/12 dark:bg-[#171211]/72 dark:shadow-[0_16px_36px_rgba(0,0,0,0.4)]">
                   {/* Decorative forensic stamp overlay */}
-                  <div className="pointer-events-none absolute top-4 right-4 rotate-[-8deg] border border-dashed border-[#d84132]/25 px-2 py-0.5 font-mono text-[9px] font-bold tracking-wider text-[#d84132]/35 uppercase transition-colors duration-300 select-none group-hover:border-[#d84132]/45 group-hover:text-[#d84132]/60">
+                  <div className="pointer-events-none absolute top-4 right-4 rotate-[-8deg] border border-dashed border-[#b5332a]/30 px-2 py-0.5 font-mono text-[9px] font-bold tracking-wider text-[#b5332a]/45 uppercase transition-colors duration-300 select-none group-hover:border-[#b5332a]/55 group-hover:text-[#b5332a]/70 dark:border-[#d84132]/25 dark:text-[#d84132]/35 dark:group-hover:border-[#d84132]/45 dark:group-hover:text-[#d84132]/60">
                     CURADORIA HOMOLOGADA
                   </div>
 
-                  <div className="flex size-10 shrink-0 items-center justify-center border border-[#d84132]/30 bg-[#d84132]/20 text-[#ffb0a5]">
+                  <div className="flex size-10 shrink-0 items-center justify-center border border-[#b5332a]/25 bg-[#b5332a]/10 text-[#9f2d25] dark:border-[#d84132]/30 dark:bg-[#d84132]/20 dark:text-[#ffb0a5]">
                     <IconUsers className="size-5" />
                   </div>
                   <div>
-                    <p className="text-xs font-semibold tracking-[0.2em] text-[#d7b56d] uppercase">
+                    <p className="text-xs font-semibold tracking-[0.2em] text-[#8f6126] uppercase dark:text-[#d7b56d]">
                       Curadoria com paixão
                     </p>
-                    <p className="mt-2 text-sm/6 text-[#d7c9b5]">
+                    <p className="mt-2 text-sm/6 text-[#5f5147] dark:text-[#d7c9b5]">
                       Todo mês, sua caixa chega cheia de surpresas pensadas por
                       designers que vivem true crime e colocam o coração em cada
                       detalhe — do conceito ao acabamento final.
@@ -322,7 +322,7 @@ export default function HomePage() {
                   <Button
                     asChild
                     variant="outline"
-                    className="h-11 w-full justify-between border-[#fffaf0]/18 bg-[#fffaf0]/6 px-5 text-[#fffaf0] hover:bg-[#fffaf0]/12 hover:text-[#fffaf0]"
+                    className="h-11 w-full justify-between border-[#211c18]/18 bg-[#fffaf2]/70 px-5 text-[#211c18] hover:bg-[#fffaf2] hover:text-[#211c18] dark:border-[#fffaf0]/18 dark:bg-[#fffaf0]/6 dark:text-[#fffaf0] dark:hover:bg-[#fffaf0]/12 dark:hover:text-[#fffaf0]"
                   >
                     <Link href="/assinatura">
                       Conhecer planos
@@ -337,7 +337,7 @@ export default function HomePage() {
             <div className="relative space-y-6 pl-0 sm:pl-8 lg:col-span-7">
               {/* Connector vertical line on desktop/tablet */}
               <div
-                className="pointer-events-none absolute inset-y-8 left-[31px] z-0 hidden w-[2px] bg-linear-to-b from-[#d84132]/50 via-[#d7b56d]/30 to-transparent sm:block"
+                className="pointer-events-none absolute inset-y-8 left-[31px] z-0 hidden w-[2px] bg-linear-to-b from-[#b5332a]/42 via-[#9a662a]/35 to-transparent sm:block dark:from-[#d84132]/50 dark:via-[#d7b56d]/30"
                 aria-hidden="true"
               />
 
@@ -354,8 +354,8 @@ export default function HomePage() {
                           className={cn(
                             'relative hidden size-16 shrink-0 items-center justify-center border font-heading text-lg font-black tracking-tight transition-all duration-300 sm:flex',
                             isGold
-                              ? 'border-[#d7b56d]/30 bg-[#171211] text-[#d7b56d] group-hover:border-[#d7b56d] group-hover:bg-[#d7b56d]/10'
-                              : 'border-[#fffaf0]/12 bg-[#171211] text-[#d7c9b5]/85 group-hover:border-[#d84132] group-hover:bg-[#d84132]/5 group-hover:text-[#ffb0a5]',
+                              ? 'border-[#9a662a]/35 bg-[#fffaf2] text-[#8f6126] group-hover:border-[#9a662a] group-hover:bg-[#9a662a]/10 dark:border-[#d7b56d]/30 dark:bg-[#171211] dark:text-[#d7b56d] dark:group-hover:border-[#d7b56d] dark:group-hover:bg-[#d7b56d]/10'
+                              : 'border-[#211c18]/12 bg-[#fffaf2] text-[#5f5147] group-hover:border-[#b5332a] group-hover:bg-[#b5332a]/5 group-hover:text-[#9f2d25] dark:border-[#fffaf0]/12 dark:bg-[#171211] dark:text-[#d7c9b5]/85 dark:group-hover:border-[#d84132] dark:group-hover:bg-[#d84132]/5 dark:group-hover:text-[#ffb0a5]',
                           )}
                         >
                           0{index + 1}
@@ -364,22 +364,24 @@ export default function HomePage() {
                         {/* Folder Tab Card */}
                         <div
                           className={cn(
-                            'flex-1 border bg-[#0c0a09]/80 p-5 shadow-[0_12px_28px_rgba(0,0,0,0.38)] backdrop-blur-sm transition-all duration-300 hover:translate-x-2',
+                            'flex-1 border bg-[#fffaf2]/86 p-5 shadow-[0_8px_16px_rgba(63,46,34,0.06)] backdrop-blur-sm transition-all duration-300 hover:translate-x-2 dark:bg-[#0c0a09]/80 dark:shadow-[0_12px_28px_rgba(0,0,0,0.38)]',
                             isGold
-                              ? 'border-[#d7b56d]/30 hover:border-[#d7b56d]/70 hover:bg-[#1a1412]'
-                              : 'border-[#fffaf0]/8 hover:border-[#d84132]/40 hover:bg-[#171211]/90',
+                              ? 'border-[#9a662a]/30 hover:border-[#9a662a]/65 hover:bg-[#f8efe0] dark:border-[#d7b56d]/30 dark:hover:border-[#d7b56d]/70 dark:hover:bg-[#1a1412]'
+                              : 'border-[#211c18]/10 hover:border-[#b5332a]/40 hover:bg-[#fff7ea] dark:border-[#fffaf0]/8 dark:hover:border-[#d84132]/40 dark:hover:bg-[#171211]/90',
                           )}
                         >
-                          <div className="mb-3.5 flex items-center justify-between gap-3 border-b border-[#fffaf0]/8 pb-2.5">
+                          <div className="mb-3.5 flex items-center justify-between gap-3 border-b border-[#211c18]/10 pb-2.5 dark:border-[#fffaf0]/8">
                             <span
                               className={cn(
                                 'font-mono text-[10px] font-semibold tracking-wider uppercase',
-                                isGold ? 'text-[#d7b56d]' : 'text-[#d7c9b5]/80',
+                                isGold
+                                  ? 'text-[#8f6126] dark:text-[#d7b56d]'
+                                  : 'text-[#5f5147]/80 dark:text-[#d7c9b5]/80',
                               )}
                             >
                               {feature.tabLabel}
                             </span>
-                            <span className="font-mono text-[9px] text-[#fffaf0]/30 select-none">
+                            <span className="font-mono text-[9px] text-[#211c18]/34 select-none dark:text-[#fffaf0]/30">
                               {feature.caseRef}
                             </span>
                           </div>
@@ -389,17 +391,17 @@ export default function HomePage() {
                               className={cn(
                                 'flex size-9 shrink-0 items-center justify-center border transition-colors duration-300',
                                 isGold
-                                  ? 'border-[#d7b56d]/25 bg-[#d7b56d]/10 text-[#d7b56d] group-hover:bg-[#d7b56d]/20 group-hover:text-white'
-                                  : 'border-[#d84132]/18 bg-[#d84132]/10 text-[#ffb0a5] group-hover:bg-[#d84132]/20 group-hover:text-white',
+                                  ? 'border-[#9a662a]/25 bg-[#9a662a]/10 text-[#8f6126] group-hover:bg-[#9a662a]/18 group-hover:text-[#211c18] dark:border-[#d7b56d]/25 dark:bg-[#d7b56d]/10 dark:text-[#d7b56d] dark:group-hover:bg-[#d7b56d]/20 dark:group-hover:text-white'
+                                  : 'border-[#b5332a]/18 bg-[#b5332a]/10 text-[#9f2d25] group-hover:bg-[#b5332a]/18 group-hover:text-[#211c18] dark:border-[#d84132]/18 dark:bg-[#d84132]/10 dark:text-[#ffb0a5] dark:group-hover:bg-[#d84132]/20 dark:group-hover:text-white',
                               )}
                             >
                               <HighlightIcon className="size-4.5" />
                             </div>
                             <div>
-                              <h3 className="font-heading text-base font-bold text-[#fffaf0] transition-colors duration-300 group-hover:text-[#d7b56d]">
+                              <h3 className="font-heading text-base font-bold text-[#211c18] transition-colors duration-300 group-hover:text-[#8f6126] dark:text-[#fffaf0] dark:group-hover:text-[#d7b56d]">
                                 {feature.title}
                               </h3>
-                              <p className="mt-2 text-sm/6 text-[#d7c9b5]/90">
+                              <p className="mt-2 text-sm/6 text-[#5f5147] dark:text-[#d7c9b5]/90">
                                 {feature.description}
                               </p>
                             </div>
@@ -415,33 +417,33 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="relative isolate overflow-hidden border-b border-[#fffaf0]/10 bg-[#090807]">
+      <section className="relative isolate overflow-hidden border-b border-[#211c18]/12 bg-[#f4f1ec] dark:border-[#fffaf0]/10 dark:bg-[#090807]">
         <Image
           src={boxContentsBg}
           alt=""
           fill
           placeholder="blur"
           sizes="100vw"
-          className="absolute inset-0 -z-20 object-cover object-center brightness-[0.38] saturate-[0.75]"
+          className="absolute inset-0 -z-20 object-cover object-center brightness-[0.96] saturate-[0.66] dark:brightness-[0.38] dark:saturate-[0.75]"
         />
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_50%_42%,rgba(9,8,7,0.55)_0%,rgba(9,8,7,0.92)_68%),linear-gradient(180deg,rgba(9,8,7,0.88)_0%,rgba(9,8,7,0.72)_38%,rgba(9,8,7,0.94)_100%)]" />
-        <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.028)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.028)_1px,transparent_1px)] bg-size-[56px_56px]" />
+        <div className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(244,241,236,0.95)_0%,rgba(237,230,219,0.84)_38%,rgba(244,241,236,0.97)_100%)] dark:bg-[radial-gradient(ellipse_at_50%_42%,rgba(9,8,7,0.55)_0%,rgba(9,8,7,0.92)_68%),linear-gradient(180deg,rgba(9,8,7,0.88)_0%,rgba(9,8,7,0.72)_38%,rgba(9,8,7,0.94)_100%)]" />
+        <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(33,28,24,0.024)_1px,transparent_1px),linear-gradient(rgba(33,28,24,0.024)_1px,transparent_1px)] bg-size-[56px_56px] dark:bg-[linear-gradient(90deg,rgba(255,250,240,0.028)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.028)_1px,transparent_1px)]" />
 
         <div className="relative z-10 mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-20">
           <div className="mx-auto mb-10 max-w-3xl space-y-4 text-center">
             <ScrollReveal>
-              <p className="text-xs font-semibold tracking-[0.24em] text-[#d7b56d] uppercase">
+              <p className="text-xs font-semibold tracking-[0.24em] text-[#8f6126] uppercase dark:text-[#d7b56d]">
                 O que vem na caixa
               </p>
             </ScrollReveal>
             <ScrollReveal delay={0.08}>
-              <h2 className="font-heading text-3xl font-semibold tracking-tight sm:text-4xl">
+              <h2 className="font-heading text-3xl font-semibold tracking-tight text-[#211c18] sm:text-4xl dark:text-[#fffaf0]">
                 O que você vai encontrar dentro da sua box?
               </h2>
             </ScrollReveal>
             <TextGenerateEffect
               words="Cada edição traz uma curadoria surpresa com itens das categorias abaixo — selecionados e combinados para manter exclusividade e fator surpresa a cada entrega."
-              textClassName="mx-auto max-w-2xl text-sm leading-6 text-[#d7c9b5]"
+              textClassName="mx-auto max-w-2xl text-sm leading-6 text-[#5f5147] dark:text-[#d7c9b5]"
               staggerDelay={0.04}
             />
           </div>
@@ -449,14 +451,14 @@ export default function HomePage() {
           <EvidenceInventoryGrid categories={boxCategories} />
 
           <ScrollReveal delay={0.15}>
-            <div className="mx-auto mt-8 max-w-3xl border border-[#d7b56d]/25 bg-[#171211]/88 p-5 backdrop-blur-sm sm:p-6">
-              <p className="text-xs font-semibold tracking-[0.2em] text-[#d7b56d] uppercase">
+            <div className="mx-auto mt-8 max-w-3xl border border-[#9a662a]/28 bg-[#fffaf2]/90 p-5 shadow-[0_8px_16px_rgba(63,46,34,0.06)] backdrop-blur-sm sm:p-6 dark:border-[#d7b56d]/25 dark:bg-[#171211]/88 dark:shadow-none">
+              <p className="text-xs font-semibold tracking-[0.2em] text-[#8f6126] uppercase dark:text-[#d7b56d]">
                 Nota do arquivo
               </p>
-              <p className="mt-3 text-sm/6 text-[#d7c9b5]">
+              <p className="mt-3 text-sm/6 text-[#5f5147] dark:text-[#d7c9b5]">
                 Para garantir exclusividade e fator surpresa, cada edição conta
                 com uma{' '}
-                <strong className="font-medium text-[#e5d8c4]">
+                <strong className="font-medium text-[#211c18] dark:text-[#e5d8c4]">
                   seleção de alguns itens
                 </strong>{' '}
                 das categorias acima, variando a cada mês. Você não receberá
@@ -468,7 +470,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="relative isolate overflow-hidden border-y border-[#fffaf0]/10 bg-[#050403]">
+      <section className="relative isolate overflow-hidden border-y border-[#211c18]/12 bg-[#ebe2d4] dark:border-[#fffaf0]/10 dark:bg-[#050403]">
         <Image
           src={investigationContinuousBg}
           alt=""
@@ -477,23 +479,23 @@ export default function HomePage() {
           sizes="100vw"
           className="absolute inset-0 -z-20 object-cover object-center"
         />
-        <div className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(5,4,3,0.72)_0%,rgba(5,4,3,0.55)_45%,rgba(5,4,3,0.82)_100%),linear-gradient(90deg,rgba(5,4,3,0.88)_0%,rgba(5,4,3,0.35)_42%,rgba(5,4,3,0.2)_100%)]" />
+        <div className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(244,241,236,0.95)_0%,rgba(235,226,212,0.84)_45%,rgba(244,241,236,0.95)_100%),linear-gradient(90deg,rgba(244,241,236,0.98)_0%,rgba(244,241,236,0.86)_42%,rgba(244,241,236,0.74)_100%)] dark:bg-[linear-gradient(180deg,rgba(5,4,3,0.72)_0%,rgba(5,4,3,0.55)_45%,rgba(5,4,3,0.82)_100%),linear-gradient(90deg,rgba(5,4,3,0.88)_0%,rgba(5,4,3,0.35)_42%,rgba(5,4,3,0.2)_100%)]" />
 
         <div className="relative z-10 mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:py-24">
           <div className="flex flex-col items-center space-y-8 text-center">
             <div className="flex flex-col items-center space-y-6">
               <ScrollReveal>
                 <div className="flex items-center justify-center gap-4">
-                  <span className="h-px w-8 bg-[#d7b56d]/55" />
-                  <p className="text-xs font-semibold tracking-[0.3em] text-[#d7b56d] uppercase">
+                  <span className="h-px w-8 bg-[#8f6126]/55 dark:bg-[#d7b56d]/55" />
+                  <p className="text-xs font-semibold tracking-[0.3em] text-[#8f6126] uppercase dark:text-[#d7b56d]">
                     Investigação contínua
                   </p>
-                  <span className="h-px w-8 bg-[#d7b56d]/55" />
+                  <span className="h-px w-8 bg-[#8f6126]/55 dark:bg-[#d7b56d]/55" />
                 </div>
               </ScrollReveal>
 
               <ScrollReveal delay={0.08}>
-                <h2 className="mx-auto max-w-2xl font-heading text-3xl/tight font-black text-[#f0e8dd] sm:text-4xl lg:text-[2.75rem] lg:leading-[1.12]">
+                <h2 className="mx-auto max-w-2xl font-heading text-3xl/tight font-black text-[#211c18] sm:text-4xl lg:text-[2.75rem] lg:leading-[1.12] dark:text-[#f0e8dd]">
                   Uma pista por mês.
                   <br />
                   Um caso inteiro para desvendar.
@@ -501,7 +503,7 @@ export default function HomePage() {
               </ScrollReveal>
 
               <ScrollReveal delay={0.12}>
-                <p className="mx-auto max-w-2xl text-base/7 text-[#c8bdad] sm:text-lg/8">
+                <p className="mx-auto max-w-2xl text-base/7 text-[#5f5147] sm:text-lg/8 dark:text-[#c8bdad]">
                   Receba dicas, evidências, documentos e revelações que se
                   acumulam ao longo do ano — até desvendar o crime juntos, em
                   tempo real, com toda a comunidade do clube.
@@ -510,14 +512,14 @@ export default function HomePage() {
 
               {liveEventDate ? (
                 <ScrollReveal delay={0.16}>
-                  <div className="mx-auto max-w-md border border-[#b98542]/40 bg-[#070604]/75 p-5 backdrop-blur-sm">
-                    <p className="text-xs font-semibold tracking-[0.22em] text-[#d7b56d] uppercase">
+                  <div className="mx-auto max-w-md border border-[#9a662a]/38 bg-[#fffaf2]/86 p-5 shadow-[0_8px_16px_rgba(63,46,34,0.06)] backdrop-blur-sm dark:border-[#b98542]/40 dark:bg-[#070604]/75 dark:shadow-none">
+                    <p className="text-xs font-semibold tracking-[0.22em] text-[#8f6126] uppercase dark:text-[#d7b56d]">
                       Evento ao vivo
                     </p>
-                    <p className="mt-2 font-heading text-lg font-semibold text-[#f0e8dd]">
+                    <p className="mt-2 font-heading text-lg font-semibold text-[#211c18] dark:text-[#f0e8dd]">
                       {liveEventTitle}
                     </p>
-                    <p className="mt-1 text-sm/6 text-[#c8bdad]">
+                    <p className="mt-1 text-sm/6 text-[#5f5147] dark:text-[#c8bdad]">
                       {formatDate(liveEventDate)} — revelação final com a
                       comunidade
                     </p>
@@ -530,7 +532,7 @@ export default function HomePage() {
               <Button
                 asChild
                 size="lg"
-                className="bg-[#d84132] px-8 py-6 text-base text-white shadow-[0_0_26px_rgba(216,65,50,0.35)] hover:bg-[#b93227]"
+                className="bg-[#b5332a] px-8 py-6 text-base text-white shadow-[0_14px_28px_rgba(181,51,42,0.22)] hover:bg-[#982820] dark:bg-[#d84132] dark:shadow-[0_0_26px_rgba(216,65,50,0.35)] dark:hover:bg-[#b93227]"
               >
                 <Link href="/assinatura">
                   Garantir minha vaga no clube
@@ -542,21 +544,21 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="relative isolate overflow-hidden border-b border-[#fffaf0]/10 bg-[#171211]">
-        <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.035)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.035)_1px,transparent_1px)] bg-size-[56px_56px]" />
+      <section className="relative isolate overflow-hidden border-b border-[#211c18]/12 bg-[#e9dfcf] dark:border-[#fffaf0]/10 dark:bg-[#171211]">
+        <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(33,28,24,0.026)_1px,transparent_1px),linear-gradient(rgba(33,28,24,0.026)_1px,transparent_1px)] bg-size-[56px_56px] dark:bg-[linear-gradient(90deg,rgba(255,250,240,0.035)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.035)_1px,transparent_1px)]" />
 
         <div className="relative z-10 mx-auto max-w-6xl px-4 py-14 sm:px-6">
           <div className="mb-10 max-w-2xl">
             <ScrollReveal>
               <div className="flex items-center gap-4">
-                <p className="text-xs font-semibold tracking-[0.22em] text-[#d7b56d] uppercase">
+                <p className="text-xs font-semibold tracking-[0.22em] text-[#8f6126] uppercase dark:text-[#d7b56d]">
                   Como funciona?
                 </p>
-                <span className="hidden h-px flex-1 bg-[#d7b56d]/45 sm:block" />
+                <span className="hidden h-px flex-1 bg-[#8f6126]/45 sm:block dark:bg-[#d7b56d]/45" />
               </div>
             </ScrollReveal>
             <ScrollReveal delay={0.08}>
-              <h2 className="mt-2 font-heading text-3xl font-semibold tracking-tight text-[#fffaf0] sm:text-4xl">
+              <h2 className="mt-2 font-heading text-3xl font-semibold tracking-tight text-[#211c18] sm:text-4xl dark:text-[#fffaf0]">
                 Da assinatura ao dossiê final em três passos.
               </h2>
             </ScrollReveal>
@@ -566,36 +568,36 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="relative isolate overflow-hidden border-b border-[#fffaf0]/10 bg-[#0b0908]">
+      <section className="relative isolate overflow-hidden border-b border-[#211c18]/12 bg-[#eee7dc] dark:border-[#fffaf0]/10 dark:bg-[#0b0908]">
         <Image
           src={plansDossierPlate}
           alt=""
           fill
           placeholder="blur"
           sizes="100vw"
-          className="absolute inset-0 -z-20 object-cover object-center brightness-[0.42] saturate-[0.78]"
+          className="absolute inset-0 -z-20 object-cover object-center brightness-[0.98] saturate-[0.68] dark:brightness-[0.42] dark:saturate-[0.78]"
         />
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_14%_18%,rgba(216,65,50,0.14),transparent_30%),radial-gradient(circle_at_86%_12%,rgba(215,181,109,0.12),transparent_28%),linear-gradient(180deg,rgba(11,9,8,0.88)_0%,rgba(11,9,8,0.62)_42%,rgba(11,9,8,0.9)_100%)]" />
-        <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.032)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.032)_1px,transparent_1px)] bg-size-[56px_56px]" />
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_14%_18%,rgba(181,51,42,0.055),transparent_32%),radial-gradient(circle_at_86%_12%,rgba(151,102,38,0.06),transparent_30%),linear-gradient(180deg,rgba(244,241,236,0.95)_0%,rgba(238,231,220,0.86)_42%,rgba(244,241,236,0.96)_100%)] dark:bg-[radial-gradient(circle_at_14%_18%,rgba(216,65,50,0.14),transparent_30%),radial-gradient(circle_at_86%_12%,rgba(215,181,109,0.12),transparent_28%),linear-gradient(180deg,rgba(11,9,8,0.88)_0%,rgba(11,9,8,0.62)_42%,rgba(11,9,8,0.9)_100%)]" />
+        <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(33,28,24,0.024)_1px,transparent_1px),linear-gradient(rgba(33,28,24,0.024)_1px,transparent_1px)] bg-size-[56px_56px] dark:bg-[linear-gradient(90deg,rgba(255,250,240,0.032)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.032)_1px,transparent_1px)]" />
 
         <div className="relative z-10 mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-20">
           <div className="mb-10 max-w-2xl space-y-4">
             <ScrollReveal>
               <div className="flex items-center gap-4">
-                <p className="text-xs font-semibold tracking-[0.22em] text-[#d7b56d] uppercase">
+                <p className="text-xs font-semibold tracking-[0.22em] text-[#8f6126] uppercase dark:text-[#d7b56d]">
                   Escolha seu plano
                 </p>
-                <span className="hidden h-px flex-1 bg-[#d7b56d]/45 sm:block" />
+                <span className="hidden h-px flex-1 bg-[#8f6126]/45 sm:block dark:bg-[#d7b56d]/45" />
               </div>
             </ScrollReveal>
             <ScrollReveal delay={0.08}>
-              <h2 className="font-heading text-3xl font-semibold tracking-tight text-[#fffaf0] sm:text-4xl">
+              <h2 className="font-heading text-3xl font-semibold tracking-tight text-[#211c18] sm:text-4xl dark:text-[#fffaf0]">
                 Entre no caso pelo ritmo que combina com você.
               </h2>
             </ScrollReveal>
             <TextGenerateEffect
               words="Cada opção abre um dossiê diferente: acompanhamento mensal, arquivo completo anual ou uma edição avulsa para experimentar sem compromisso."
-              textClassName="max-w-2xl text-sm leading-6 text-[#d7c9b5]"
+              textClassName="max-w-2xl text-sm leading-6 text-[#5f5147] dark:text-[#d7c9b5]"
               staggerDelay={0.04}
             />
           </div>
@@ -613,12 +615,12 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="relative isolate overflow-hidden bg-[#171211] text-[#fffaf0]">
-        <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.035)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.035)_1px,transparent_1px)] bg-size-[56px_56px]" />
+      <section className="relative isolate overflow-hidden bg-[#e9dfcf] text-[#211c18] dark:bg-[#171211] dark:text-[#fffaf0]">
+        <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(33,28,24,0.026)_1px,transparent_1px),linear-gradient(rgba(33,28,24,0.026)_1px,transparent_1px)] bg-size-[56px_56px] dark:bg-[linear-gradient(90deg,rgba(255,250,240,0.035)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.035)_1px,transparent_1px)]" />
 
         <div className="relative z-10 mx-auto max-w-6xl px-4 py-16 sm:px-6">
           <ScrollReveal>
-            <div className="relative isolate mb-8 min-h-[360px] overflow-hidden border border-[#fffaf0]/14 bg-[#090807] p-6 shadow-[0_24px_48px_rgba(0,0,0,0.3)] sm:p-8 lg:min-h-[420px]">
+            <div className="relative isolate mb-8 min-h-[360px] overflow-hidden border border-[#211c18]/16 bg-[#fffaf2] p-6 shadow-[0_10px_20px_rgba(63,46,34,0.07)] sm:p-8 lg:min-h-[420px] dark:border-[#fffaf0]/14 dark:bg-[#090807] dark:shadow-[0_24px_48px_rgba(0,0,0,0.3)]">
               <Image
                 src={previousBoxesBanner}
                 alt=""
@@ -627,11 +629,11 @@ export default function HomePage() {
                 sizes="(max-width: 768px) 100vw, 1152px"
                 className="absolute inset-0 -z-20 object-cover object-[68%_center]"
               />
-              <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(9,8,7,0.96)_0%,rgba(9,8,7,0.86)_38%,rgba(9,8,7,0.38)_68%,rgba(9,8,7,0.18)_100%)]" />
-              <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.04)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.04)_1px,transparent_1px)] bg-size-[42px_42px,42px_42px]" />
+              <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,242,0.98)_0%,rgba(255,250,242,0.9)_38%,rgba(255,250,242,0.52)_68%,rgba(255,250,242,0.22)_100%)] dark:bg-[linear-gradient(90deg,rgba(9,8,7,0.96)_0%,rgba(9,8,7,0.86)_38%,rgba(9,8,7,0.38)_68%,rgba(9,8,7,0.18)_100%)]" />
+              <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(33,28,24,0.026)_1px,transparent_1px),linear-gradient(rgba(33,28,24,0.026)_1px,transparent_1px)] bg-size-[42px_42px,42px_42px] dark:bg-[linear-gradient(90deg,rgba(255,250,240,0.04)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.04)_1px,transparent_1px)]" />
 
               <div className="flex min-h-[300px] max-w-xl flex-col justify-center space-y-4 lg:min-h-[356px]">
-                <p className="text-xs font-semibold tracking-[0.22em] text-[#d7b56d] uppercase">
+                <p className="text-xs font-semibold tracking-[0.22em] text-[#8f6126] uppercase dark:text-[#d7b56d]">
                   Loja e edições avulsas
                 </p>
                 <h2 className="font-heading text-3xl font-semibold tracking-tight sm:text-5xl">
@@ -639,13 +641,13 @@ export default function HomePage() {
                 </h2>
                 <TextGenerateEffect
                   words="Boxes anteriores e produtos extras continuam disponíveis enquanto houver estoque. Assinantes veem preços especiais em itens selecionados."
-                  textClassName="max-w-md text-sm leading-6 text-[#d7c9b5]"
+                  textClassName="max-w-md text-sm leading-6 text-[#5f5147] dark:text-[#d7c9b5]"
                   staggerDelay={0.04}
                 />
                 <Button
                   asChild
                   variant="outline"
-                  className="w-fit border-[#fffaf0]/25 bg-transparent text-[#fffaf0] hover:bg-[#fffaf0]/12 hover:text-[#fffaf0]"
+                  className="w-fit border-[#211c18]/24 bg-[#fffaf2]/60 text-[#211c18] hover:bg-[#fffaf2] hover:text-[#211c18] dark:border-[#fffaf0]/25 dark:bg-transparent dark:text-[#fffaf0] dark:hover:bg-[#fffaf0]/12 dark:hover:text-[#fffaf0]"
                 >
                   <Link href="/loja">
                     Ver loja completa
@@ -660,16 +662,16 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="relative isolate overflow-hidden bg-[#d84132] text-white">
+      <section className="relative isolate overflow-hidden bg-[#b5332a] text-white dark:bg-[#d84132]">
         <Image
           src={finalCtaDossierPlate}
           alt=""
           fill
           sizes="100vw"
-          className="absolute inset-0 -z-30 object-cover object-center brightness-[0.42] saturate-[0.9]"
+          className="absolute inset-0 -z-30 object-cover object-center brightness-[0.64] saturate-[0.78] dark:brightness-[0.42] dark:saturate-[0.9]"
         />
-        <div className="absolute inset-0 -z-20 bg-[rgba(216,65,50,0.42)]" />
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_18%_45%,rgba(255,244,220,0.24),transparent_28%),linear-gradient(90deg,rgba(23,18,17,0.38),transparent_58%,rgba(23,18,17,0.2))]" />
+        <div className="absolute inset-0 -z-20 bg-[rgba(181,51,42,0.58)] dark:bg-[rgba(216,65,50,0.42)]" />
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_18%_45%,rgba(255,244,220,0.18),transparent_28%),linear-gradient(90deg,rgba(33,28,24,0.48),transparent_58%,rgba(33,28,24,0.24))] dark:bg-[radial-gradient(circle_at_18%_45%,rgba(255,244,220,0.24),transparent_28%),linear-gradient(90deg,rgba(23,18,17,0.38),transparent_58%,rgba(23,18,17,0.2))]" />
         <div className="mx-auto flex max-w-6xl flex-col gap-5 px-4 py-12 sm:px-6 md:flex-row md:items-center md:justify-between">
           <ScrollReveal>
             <div className="max-w-2xl">

@@ -2,12 +2,15 @@
 
 import {
   IconMenu2,
+  IconMoon,
   IconShoppingCart,
+  IconSun,
   IconUser,
   IconX,
 } from '@tabler/icons-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
 
 import { BrandLogo } from '@/src/components/layout/brand-logo'
@@ -28,13 +31,22 @@ type PublicHeaderContentProps = {
 
 export function PublicHeaderContent({ itemCount }: PublicHeaderContentProps) {
   const pathname = usePathname()
+  const { resolvedTheme, setTheme } = useTheme()
   const [isScrolled, setIsScrolled] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [hasMounted, setHasMounted] = useState(false)
   const shouldOverlayContent = pathname === '/'
   const shouldShowBackdrop = isScrolled || !shouldOverlayContent
+  const isDarkTheme = resolvedTheme === 'dark'
+
+  const toggleTheme = () => {
+    setTheme(isDarkTheme ? 'light' : 'dark')
+  }
 
   useEffect(() => {
+    setHasMounted(true)
+
     const localLoggedIn = localStorage.getItem('isLoggedIn') === 'true'
     setIsLoggedIn(localLoggedIn)
 
@@ -81,7 +93,7 @@ export function PublicHeaderContent({ itemCount }: PublicHeaderContentProps) {
           'fixed inset-x-0 z-50 border-b transition-all duration-300 ease-out',
           pathname === '/' && !isScrolled ? 'top-[38px]' : 'top-0',
           shouldShowBackdrop
-            ? 'border-[#fffaf0]/12 bg-[#090807]/82 shadow-[0_18px_48px_rgba(0,0,0,0.28)] backdrop-blur-xl supports-backdrop-filter:bg-[#090807]/72'
+            ? 'border-[#211c18]/12 bg-[#fffaf2]/84 shadow-[0_14px_36px_rgba(63,46,34,0.14)] backdrop-blur-xl supports-backdrop-filter:bg-[#fffaf2]/74 dark:border-[#fffaf0]/12 dark:bg-[#090807]/82 dark:shadow-[0_18px_48px_rgba(0,0,0,0.28)] dark:supports-backdrop-filter:bg-[#090807]/72'
             : 'border-transparent bg-transparent',
         )}
       >
@@ -98,7 +110,7 @@ export function PublicHeaderContent({ itemCount }: PublicHeaderContentProps) {
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-xs font-semibold tracking-[0.18em] text-[#d7c9b5] uppercase transition-colors hover:text-[#fffaf0]"
+                className="text-xs font-semibold tracking-[0.18em] text-[#4f433b] uppercase transition-colors hover:text-[#211c18] dark:text-[#d7c9b5] dark:hover:text-[#fffaf0]"
               >
                 {link.label}
               </Link>
@@ -116,9 +128,46 @@ export function PublicHeaderContent({ itemCount }: PublicHeaderContentProps) {
 
           <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
             <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              role="switch"
+              aria-checked={hasMounted ? isDarkTheme : undefined}
+              aria-label={
+                hasMounted
+                  ? `Alternar para tema ${isDarkTheme ? 'claro' : 'escuro'}`
+                  : 'Alternar tema'
+              }
+              className="h-8 min-w-17 gap-1 rounded-full border-[#9a662a]/35 bg-[#211c18]/6 px-1.5 text-[#211c18] hover:border-[#9a662a]/60 hover:bg-[#211c18]/10 hover:text-[#211c18] dark:border-[#d7b56d]/35 dark:bg-[#fffaf0]/8 dark:text-[#fffaf0] dark:hover:border-[#d7b56d]/60 dark:hover:bg-[#fffaf0]/14 dark:hover:text-[#fffaf0]"
+              onClick={toggleTheme}
+            >
+              <span
+                className={cn(
+                  'flex size-5 items-center justify-center rounded-full transition-colors',
+                  hasMounted && !isDarkTheme
+                    ? 'bg-[#b5332a] text-white'
+                    : 'text-[#7c5323] dark:text-[#d7c9b5]',
+                )}
+                aria-hidden="true"
+              >
+                <IconSun className="size-3.5" />
+              </span>
+              <span
+                className={cn(
+                  'flex size-5 items-center justify-center rounded-full transition-colors',
+                  hasMounted && isDarkTheme
+                    ? 'bg-[#d7b56d] text-[#171211]'
+                    : 'text-[#7c5323] dark:text-[#d7c9b5]',
+                )}
+                aria-hidden="true"
+              >
+                <IconMoon className="size-3.5" />
+              </span>
+            </Button>
+            <Button
               variant="ghost"
               size="sm"
-              className="text-[#fffaf0] hover:bg-[#fffaf0]/10 hover:text-[#fffaf0]"
+              className="text-[#211c18] hover:bg-[#211c18]/8 hover:text-[#211c18] dark:text-[#fffaf0] dark:hover:bg-[#fffaf0]/10 dark:hover:text-[#fffaf0]"
               asChild
             >
               <Link
@@ -132,7 +181,7 @@ export function PublicHeaderContent({ itemCount }: PublicHeaderContentProps) {
             <Button
               variant="outline"
               size="sm"
-              className="border-[#d7b56d]/35 bg-[#fffaf0]/8 text-[#fffaf0] hover:border-[#d7b56d]/60 hover:bg-[#fffaf0]/14 hover:text-[#fffaf0]"
+              className="border-[#9a662a]/35 bg-[#211c18]/6 text-[#211c18] hover:border-[#9a662a]/60 hover:bg-[#211c18]/10 hover:text-[#211c18] dark:border-[#d7b56d]/35 dark:bg-[#fffaf0]/8 dark:text-[#fffaf0] dark:hover:border-[#d7b56d]/60 dark:hover:bg-[#fffaf0]/14 dark:hover:text-[#fffaf0]"
               asChild
             >
               <Link href="/carrinho" aria-label="Carrinho">
@@ -148,7 +197,7 @@ export function PublicHeaderContent({ itemCount }: PublicHeaderContentProps) {
             <Button
               variant="ghost"
               size="icon"
-              className="text-[#fffaf0] hover:bg-[#fffaf0]/10 hover:text-[#fffaf0] md:hidden"
+              className="text-[#211c18] hover:bg-[#211c18]/8 hover:text-[#211c18] md:hidden dark:text-[#fffaf0] dark:hover:bg-[#fffaf0]/10 dark:hover:text-[#fffaf0]"
               onClick={() => setIsMenuOpen(true)}
               aria-label="Abrir menu"
             >
@@ -169,14 +218,14 @@ export function PublicHeaderContent({ itemCount }: PublicHeaderContentProps) {
       >
         {/* Backdrop overlay */}
         <div
-          className="absolute inset-0 bg-[#090807]/80 backdrop-blur-sm transition-opacity duration-300"
+          className="absolute inset-0 bg-[#211c18]/36 backdrop-blur-sm transition-opacity duration-300 dark:bg-[#090807]/80"
           onClick={() => setIsMenuOpen(false)}
         />
 
         {/* Sidebar container */}
         <div
           className={cn(
-            'absolute inset-y-0 right-0 flex w-72 flex-col justify-between border-l border-[#fffaf0]/12 bg-[#0b0908] p-6 shadow-[0_0_50px_rgba(0,0,0,0.8)] transition-transform duration-300 ease-out',
+            'absolute inset-y-0 right-0 flex w-72 flex-col justify-between border-l border-[#211c18]/12 bg-[#fffaf2] p-6 shadow-[0_0_50px_rgba(63,46,34,0.24)] transition-transform duration-300 ease-out dark:border-[#fffaf0]/12 dark:bg-[#0b0908] dark:shadow-[0_0_50px_rgba(0,0,0,0.8)]',
             isMenuOpen ? 'translate-x-0' : 'translate-x-full',
           )}
         >
@@ -188,7 +237,7 @@ export function PublicHeaderContent({ itemCount }: PublicHeaderContentProps) {
               <Button
                 variant="ghost"
                 size="icon"
-                className="text-[#fffaf0] hover:bg-[#fffaf0]/10"
+                className="text-[#211c18] hover:bg-[#211c18]/8 dark:text-[#fffaf0] dark:hover:bg-[#fffaf0]/10"
                 onClick={() => setIsMenuOpen(false)}
                 aria-label="Fechar menu"
               >
@@ -203,9 +252,9 @@ export function PublicHeaderContent({ itemCount }: PublicHeaderContentProps) {
                   href={link.href}
                   onClick={() => setIsMenuOpen(false)}
                   className={cn(
-                    'border-b border-[#fffaf0]/5 py-2 text-xs font-semibold tracking-[0.18em] text-[#d7c9b5] uppercase transition-colors hover:text-[#fffaf0]',
+                    'border-b border-[#211c18]/8 py-2 text-xs font-semibold tracking-[0.18em] text-[#5f5147] uppercase transition-colors hover:text-[#211c18] dark:border-[#fffaf0]/5 dark:text-[#d7c9b5] dark:hover:text-[#fffaf0]',
                     pathname === link.href &&
-                      'border-l-2 border-[#d7b56d]/50 pl-1 text-[#fffaf0]',
+                      'border-l-2 border-[#9a662a]/50 pl-1 text-[#211c18] dark:border-[#d7b56d]/50 dark:text-[#fffaf0]',
                   )}
                 >
                   {link.label}
@@ -227,21 +276,40 @@ export function PublicHeaderContent({ itemCount }: PublicHeaderContentProps) {
           </div>
 
           {/* Footer of Drawer */}
-          <div className="flex flex-col gap-4 border-t border-[#fffaf0]/10 pt-6">
+          <div className="flex flex-col gap-4 border-t border-[#211c18]/10 pt-6 dark:border-[#fffaf0]/10">
+            <button
+              type="button"
+              role="switch"
+              aria-checked={hasMounted ? isDarkTheme : undefined}
+              onClick={toggleTheme}
+              className="flex items-center justify-between gap-3 text-left text-xs font-semibold tracking-[0.12em] text-[#5f5147] uppercase transition-colors hover:text-[#211c18] dark:text-[#d7c9b5] dark:hover:text-[#fffaf0]"
+            >
+              <span className="flex items-center gap-3">
+                {hasMounted && isDarkTheme ? (
+                  <IconMoon className="size-4 text-[#d7b56d]" />
+                ) : (
+                  <IconSun className="size-4 text-[#8f6126]" />
+                )}
+                <span>Tema</span>
+              </span>
+              <span className="rounded-full border border-[#9a662a]/30 px-2 py-1 text-[10px] text-[#8f6126] dark:border-[#d7b56d]/30 dark:text-[#d7b56d]">
+                {hasMounted && isDarkTheme ? 'Escuro' : 'Claro'}
+              </span>
+            </button>
             <Link
               href={isLoggedIn ? '/cliente/perfil' : '/login'}
               onClick={() => setIsMenuOpen(false)}
-              className="flex items-center gap-3 text-xs font-semibold tracking-[0.12em] text-[#d7c9b5] uppercase transition-colors hover:text-[#fffaf0]"
+              className="flex items-center gap-3 text-xs font-semibold tracking-[0.12em] text-[#5f5147] uppercase transition-colors hover:text-[#211c18] dark:text-[#d7c9b5] dark:hover:text-[#fffaf0]"
             >
-              <IconUser className="size-4 text-[#d7b56d]" />
+              <IconUser className="size-4 text-[#8f6126] dark:text-[#d7b56d]" />
               <span>Minha Conta</span>
             </Link>
             <Link
               href="/carrinho"
               onClick={() => setIsMenuOpen(false)}
-              className="flex items-center gap-3 text-xs font-semibold tracking-[0.12em] text-[#d7c9b5] uppercase transition-colors hover:text-[#fffaf0]"
+              className="flex items-center gap-3 text-xs font-semibold tracking-[0.12em] text-[#5f5147] uppercase transition-colors hover:text-[#211c18] dark:text-[#d7c9b5] dark:hover:text-[#fffaf0]"
             >
-              <IconShoppingCart className="size-4 text-[#d7b56d]" />
+              <IconShoppingCart className="size-4 text-[#8f6126] dark:text-[#d7b56d]" />
               <span>Carrinho ({itemCount})</span>
             </Link>
           </div>
