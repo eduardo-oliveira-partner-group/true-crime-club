@@ -281,7 +281,7 @@ export default function HomePage() {
                     Muito além de uma caixa.
                     <br />
                     <span className="text-[#d7b56d]">
-                      Uma imersão mensal
+                      Uma imersão
                       <br />
                       em true crime.
                     </span>
