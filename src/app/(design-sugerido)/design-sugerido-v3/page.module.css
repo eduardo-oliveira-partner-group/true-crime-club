@@ -2263,8 +2263,8 @@
   z-index: 1;
   width: auto;
   height: auto;
-  max-height: clamp(200px, 22vw, 280px);
-  max-width: 320px;
+  max-height: clamp(140px, 16vw, 200px);
+  max-width: 240px;
   object-fit: contain;
   object-position: left bottom;
   filter: contrast(1.06) saturate(0.9);
@@ -2433,8 +2433,8 @@
   }
 
   .featuredBySilhuetas {
-    max-width: 80%;
-    max-height: clamp(180px, 36vw, 240px);
+    max-width: 70%;
+    max-height: clamp(120px, 28vw, 170px);
     object-position: center bottom;
   }
 
@@ -2466,8 +2466,8 @@
   }
 
   .featuredBySilhuetas {
-    max-width: 92%;
-    max-height: clamp(160px, 44vw, 220px);
+    max-width: 78%;
+    max-height: clamp(110px, 32vw, 150px);
   }
 
   .hero {

@@ -613,14 +613,14 @@ function FeaturedBy() {
             src={featuredSilhuetas}
             alt="Dois investigadores em conversa"
             className={styles.featuredBySilhuetas}
-            sizes="(max-width: 860px) 90vw, 420px"
+            sizes="(max-width: 860px) 70vw, 240px"
             priority={false}
           />
         </div>
       </div>
       <div className={styles.featuredByBar}>
         <div className={styles.featuredByBarInner}>
-          <span className={styles.featuredByHeading}>FEATURED BY</span>
+          <span className={styles.featuredByHeading}>DIVULGADO EM</span>
           <div className={styles.featuredByLogos}>
             {featuredByLogos.map((item) => (
               <Image
