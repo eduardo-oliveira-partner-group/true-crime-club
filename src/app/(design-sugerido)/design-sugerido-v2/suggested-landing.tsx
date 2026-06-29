@@ -517,7 +517,7 @@ function ClubIntro() {
           </p>
           <p>
             A cada caixa, a história avança. Você conecta os pontos no seu
-            tempo, debate as teorias com outros membros e, no fim, decide: o que
+            tempo, debate as teorias com outros membros e, no fim, desvenda: o que
             realmente aconteceu? Curiosidade sobre o comportamento humano — essa
             é a verdadeira investigação.
           </p>
