@@ -437,13 +437,13 @@ function Hero() {
             exclusivos, colecionáveis e novas pistas. Ao longo de 12 caixas você
             junta tudo e decide quem foi.
           </p>
-          <p
+          {/* <p
             className={`${styles.heroSubcopy} ${styles.heroReveal}`}
             style={{ '--hero-delay': '0.44s' } as CSSProperties}
           >
             Menos sangue, mais gente. Aqui a investigação é sobre o que move as
             pessoas.
-          </p>
+          </p> */}
           <div
             className={`${styles.heroCtas} ${styles.heroReveal}`}
             style={{ '--hero-delay': '0.52s' } as CSSProperties}
