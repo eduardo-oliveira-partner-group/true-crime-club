@@ -619,17 +619,19 @@ function FeaturedBy() {
         </div>
       </div>
       <div className={styles.featuredByBar}>
-        <span className={styles.featuredByHeading}>FEATURED BY</span>
-        <div className={styles.featuredByLogos}>
-          {featuredByLogos.map((item) => (
-            <Image
-              key={item.alt}
-              src={item.src}
-              alt={item.alt}
-              className={styles.featuredByLogo}
-              sizes="(max-width: 540px) 45vw, 180px"
-            />
-          ))}
+        <div className={styles.featuredByBarInner}>
+          <span className={styles.featuredByHeading}>FEATURED BY</span>
+          <div className={styles.featuredByLogos}>
+            {featuredByLogos.map((item) => (
+              <Image
+                key={item.alt}
+                src={item.src}
+                alt={item.alt}
+                className={styles.featuredByLogo}
+                sizes="(max-width: 540px) 45vw, 180px"
+              />
+            ))}
+          </div>
         </div>
       </div>
     </section>
