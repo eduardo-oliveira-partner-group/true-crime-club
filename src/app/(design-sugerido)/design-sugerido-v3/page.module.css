@@ -2308,7 +2308,7 @@
 .featuredByLogo {
   width: 100%;
   height: auto;
-  max-height: 46px;
+  max-height: 58px;
   object-fit: contain;
   opacity: 0.92;
   transition: opacity 0.2s ease;
@@ -2438,6 +2438,10 @@
     object-position: center bottom;
   }
 
+  .featuredByLogo {
+    max-height: 50px;
+  }
+
 }
 
 @media (max-width: 540px) {
@@ -2458,7 +2462,7 @@
   }
 
   .featuredByLogo {
-    max-height: 38px;
+    max-height: 44px;
   }
 
   .featuredBySilhuetas {
