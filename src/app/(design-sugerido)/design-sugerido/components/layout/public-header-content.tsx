@@ -31,10 +31,10 @@ type PublicHeaderContentProps = {
 
 export function PublicHeaderContent({ itemCount }: PublicHeaderContentProps) {
   const pathname = usePathname()
-  const isArchive = pathname?.startsWith('/design-sugerido')
-  const prefix = isArchive ? '/design-sugerido' : ''
+  const isArchive = true
+  const prefix = '/design-sugerido'
   const prefixPath = (href: string) => {
-    if (href === '/') return isArchive ? '/design-sugerido' : '/'
+    if (href === '/') return '/design-sugerido'
     return `${prefix}${href}`
   }
   const { resolvedTheme, setTheme } = useTheme()
@@ -42,7 +42,7 @@ export function PublicHeaderContent({ itemCount }: PublicHeaderContentProps) {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [hasMounted, setHasMounted] = useState(false)
-  const shouldOverlayContent = pathname === '/'
+  const shouldOverlayContent = pathname === '/design-sugerido'
   const shouldShowBackdrop = isScrolled || !shouldOverlayContent
   const isDarkTheme = resolvedTheme === 'dark'
 
@@ -97,7 +97,9 @@ export function PublicHeaderContent({ itemCount }: PublicHeaderContentProps) {
       <header
         className={cn(
           'fixed inset-x-0 z-50 border-b transition-all duration-300 ease-out',
-          pathname === '/' && !isScrolled ? 'top-[38px]' : 'top-0',
+          pathname === '/design-sugerido' && !isScrolled
+            ? 'top-[38px]'
+            : 'top-0',
           shouldShowBackdrop
             ? 'border-[#211c18]/12 bg-[#fffaf2]/84 shadow-[0_14px_36px_rgba(63,46,34,0.14)] backdrop-blur-xl supports-backdrop-filter:bg-[#fffaf2]/74 dark:border-[#fffaf0]/12 dark:bg-[#090807]/82 dark:shadow-[0_18px_48px_rgba(0,0,0,0.28)] dark:supports-backdrop-filter:bg-[#090807]/72'
             : 'border-transparent bg-transparent',
@@ -177,7 +179,7 @@ export function PublicHeaderContent({ itemCount }: PublicHeaderContentProps) {
               asChild
             >
               <Link
-                href={isLoggedIn ? '/cliente/perfil' : '/login'}
+                href={prefixPath(isLoggedIn ? '/cliente/perfil' : '/login')}
                 aria-label="Conta"
               >
                 <IconUser className="size-4" />
@@ -259,7 +261,7 @@ export function PublicHeaderContent({ itemCount }: PublicHeaderContentProps) {
                   onClick={() => setIsMenuOpen(false)}
                   className={cn(
                     'border-b border-[#211c18]/8 py-2 text-xs font-semibold tracking-[0.18em] text-[#5f5147] uppercase transition-colors hover:text-[#211c18] dark:border-[#fffaf0]/5 dark:text-[#d7c9b5] dark:hover:text-[#fffaf0]',
-                    pathname === link.href &&
+                    pathname === prefixPath(link.href) &&
                       'border-l-2 border-[#9a662a]/50 pl-1 text-[#211c18] dark:border-[#d7b56d]/50 dark:text-[#fffaf0]',
                   )}
                 >
@@ -303,7 +305,7 @@ export function PublicHeaderContent({ itemCount }: PublicHeaderContentProps) {
               </span>
             </button>
             <Link
-              href={isLoggedIn ? '/cliente/perfil' : '/login'}
+              href={prefixPath(isLoggedIn ? '/cliente/perfil' : '/login')}
               onClick={() => setIsMenuOpen(false)}
               className="flex items-center gap-3 text-xs font-semibold tracking-[0.12em] text-[#5f5147] uppercase transition-colors hover:text-[#211c18] dark:text-[#d7c9b5] dark:hover:text-[#fffaf0]"
             >

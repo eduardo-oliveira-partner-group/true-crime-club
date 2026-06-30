@@ -283,7 +283,7 @@ const featuredByLogos = [
   { src: logoPoltronaNerd, alt: 'Poltrona Nerd' },
 ]
 
-export function SuggestedLanding({ fontClassName }: SuggestedLandingProps) {
+export function Landing({ fontClassName }: SuggestedLandingProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [showFab, setShowFab] = useState(false)
   const [jsReady, setJsReady] = useState(false)

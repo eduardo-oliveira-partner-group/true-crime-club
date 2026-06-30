@@ -1,3 +1,5 @@
+'use client'
+
 import {
   IconBrandInstagram,
   // IconCircleCheck,
@@ -6,6 +8,7 @@ import {
   IconPhone,
 } from '@tabler/icons-react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
 import { BrandLogo } from '@/src/components/layout/brand-logo'
 import { getDynamicContent } from '@/src/lib/domain/repositories'
@@ -38,13 +41,6 @@ const legalLinks = [
   { href: '/politica-de-privacidade', label: 'Política de privacidade' },
 ]
 
-// const trustItems = [
-//   'Primeiro clube do Brasil',
-//   'Pistas mensais',
-//   'Evento ao vivo com a comunidade',
-//   'Cancelamento flexível',
-// ]
-
 function FooterSection({
   title,
   children,
@@ -63,6 +59,14 @@ function FooterSection({
 }
 
 export function PublicFooter() {
+  const pathname = usePathname()
+  const isArchive = true
+  const prefix = '/design-sugerido'
+  const prefixPath = (href: string) => {
+    if (href === '/') return '/design-sugerido'
+    return `${prefix}${href}`
+  }
+
   // const heroBadge = getDynamicContent('home.hero.badge')
   const trustSupport = getDynamicContent('home.trust.support')
 
@@ -71,7 +75,7 @@ export function PublicFooter() {
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:py-14">
         <div className="grid gap-10 lg:grid-cols-[1.35fr_repeat(3,minmax(0,1fr))]">
           <div className="space-y-5">
-            <Link href="/" className="inline-block">
+            <Link href={prefixPath('/')} className="inline-block">
               <BrandLogo className="h-10" />
             </Link>
 
@@ -102,7 +106,7 @@ export function PublicFooter() {
               {clubLinks.map((link) => (
                 <li key={`${link.href}-${link.label}`}>
                   <Link
-                    href={link.href}
+                    href={prefixPath(link.href)}
                     className="text-sm text-[#5f5147] transition-colors hover:text-[#211c18] dark:text-[#d7c9b5] dark:hover:text-[#fffaf0]"
                   >
                     {link.label}
@@ -117,7 +121,7 @@ export function PublicFooter() {
               {exploreLinks.map((link) => (
                 <li key={`${link.href}-${link.label}`}>
                   <Link
-                    href={link.href}
+                    href={prefixPath(link.href)}
                     className="text-sm text-[#5f5147] transition-colors hover:text-[#211c18] dark:text-[#d7c9b5] dark:hover:text-[#fffaf0]"
                   >
                     {link.label}
@@ -227,7 +231,7 @@ export function PublicFooter() {
             {legalLinks.map((link) => (
               <li key={link.href}>
                 <Link
-                  href={link.href}
+                  href={prefixPath(link.href)}
                   className="transition-colors hover:text-[#211c18] dark:hover:text-[#fffaf0]"
                 >
                   {link.label}
