@@ -621,3 +621,36 @@
   will-change: transform;
   animation: mq var(--marquee-duration, 30s) linear infinite;
 }
+
+/* Pause marquee tracks on hover (design-sugerido-v3 promo + ribbon) */
+.marquee-group:hover .animate-marquee {
+  animation-play-state: paused;
+}
+
+/* Entrance animation for hero copy (design-sugerido-v3) */
+@keyframes heroIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.animate-hero-in {
+  opacity: 0;
+  animation-name: heroIn;
+  animation-duration: 0.7s;
+  animation-timing-function: cubic-bezier(0.2, 0.65, 0.3, 1);
+  animation-fill-mode: both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-hero-in {
+    opacity: 1;
+    animation: none;
+  }
+}
