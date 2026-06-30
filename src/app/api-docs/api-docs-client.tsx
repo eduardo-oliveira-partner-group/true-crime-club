@@ -27,6 +27,22 @@ type JsonValue =
   | JsonValue[]
   | { [key: string]: JsonValue }
 
+const MOCK_DATE_TIME = '2026-04-27T14:50:00.000Z'
+
+const escapeJsonForHtml = (json: string) =>
+  json.replace(/[<>&]/g, (char) => {
+    switch (char) {
+      case '<':
+        return '\\u003c'
+      case '>':
+        return '\\u003e'
+      case '&':
+        return '\\u0026'
+      default:
+        return char
+    }
+  })
+
 interface ApiDocsClientProps {
   spec: OpenApiSpec
   initialTag?: string
@@ -127,7 +143,7 @@ export default function ApiDocsClient({
 
     if (schema.type === 'string') {
       if (schema.format === 'email') return 'mariana.silva@email.com'
-      if (schema.format === 'date-time') return new Date().toISOString()
+      if (schema.format === 'date-time') return MOCK_DATE_TIME
       if (schema.enum && schema.enum.length > 0) return schema.enum[0]
       return 'string'
     }
@@ -142,6 +158,9 @@ export default function ApiDocsClient({
 
     return null
   }
+
+  const formatMockJson = (schema: OpenApiSchema | undefined) =>
+    escapeJsonForHtml(JSON.stringify(generateMockJson(schema), null, 2))
 
   // Handle simulate request
   const simulateRequest = async (route: OpenApiRoute) => {
@@ -177,9 +196,7 @@ export default function ApiDocsClient({
       route.responses['201'] ||
       Object.values(route.responses)[0]
     const schema = successResponse?.content?.['application/json']?.schema
-    const mockJson = generateMockJson(schema)
-
-    setSimulatedResponse(JSON.stringify(mockJson, null, 2))
+    setSimulatedResponse(formatMockJson(schema))
     setIsSimulating(false)
   }
 
@@ -640,20 +657,12 @@ export default function ApiDocsClient({
                           </h4>
                           <div className="relative">
                             <pre className="overflow-x-auto rounded-md border border-[#fffaf0]/10 bg-[#0b0908] p-3.5 font-mono text-[11px] leading-relaxed text-[#fffaf0]">
-                              {JSON.stringify(
-                                generateMockJson(reqBody),
-                                null,
-                                2,
-                              )}
+                              {formatMockJson(reqBody)}
                             </pre>
                             <button
                               onClick={() =>
                                 copyToClipboard(
-                                  JSON.stringify(
-                                    generateMockJson(reqBody),
-                                    null,
-                                    2,
-                                  ),
+                                  formatMockJson(reqBody),
                                   `${route.method}-${route.path}-body`,
                                 )
                               }
@@ -725,20 +734,12 @@ export default function ApiDocsClient({
                                             data-lenis-prevent-wheel
                                             className="custom-scrollbar max-h-[180px] overflow-x-auto rounded border border-[#fffaf0]/10 bg-[#0b0908] p-2.5 font-mono text-[10px] leading-relaxed text-[#fffaf0]"
                                           >
-                                            {JSON.stringify(
-                                              generateMockJson(respSchema),
-                                              null,
-                                              2,
-                                            )}
+                                            {formatMockJson(respSchema)}
                                           </pre>
                                           <button
                                             onClick={() =>
                                               copyToClipboard(
-                                                JSON.stringify(
-                                                  generateMockJson(respSchema),
-                                                  null,
-                                                  2,
-                                                ),
+                                                formatMockJson(respSchema),
                                                 `${route.method}-${route.path}-${code}`,
                                               )
                                             }
@@ -796,20 +797,26 @@ export default function ApiDocsClient({
                   <div
                     key={name}
                     id={`model-${name}`}
-                    className="relative overflow-hidden rounded-lg border border-[#fffaf0]/10 bg-[#171211] p-6 shadow-2xl"
+                    className="relative overflow-visible rounded-lg border border-[#fffaf0]/10 bg-[#171211] p-4 shadow-2xl sm:p-6"
                   >
-                    <div className="mb-4 flex items-center justify-between border-b border-[#fffaf0]/10 pb-3">
-                      <div>
-                        <span className="block font-mono text-[10px] font-semibold tracking-widest text-[#d84132] uppercase">
+                    <div className="mb-4 border-b border-[#fffaf0]/10 pb-4">
+                      <div className="mb-3 flex items-center justify-between gap-3">
+                        <span className="min-w-0 truncate font-mono text-[10px] font-semibold tracking-widest text-[#d84132] uppercase">
                           MODELO DE DADOS (SCHEMA)
                         </span>
-                        <h2 className="mt-0.5 font-mono text-lg font-bold text-[#d7b56d]">
+                        <span className="shrink-0 rounded border border-[#fffaf0]/10 bg-[#0b0908] px-2.5 py-1 font-mono text-[10px] text-[#fffaf0]/45 uppercase">
+                          TYPE: {schema.type || 'object'}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3">
+                        <IconFileDescription
+                          size={18}
+                          className="text-[#d7b56d]"
+                        />
+                        <h2 className="min-w-0 font-mono text-lg/tight font-bold break-all text-[#d7b56d]">
                           {name}
                         </h2>
                       </div>
-                      <span className="rounded border border-[#fffaf0]/10 bg-[#0b0908] px-2.5 py-1 font-mono text-[10px] text-[#fffaf0]/30">
-                        TYPE: {schema.type || 'object'}
-                      </span>
                     </div>
 
                     {schema.description && (
@@ -844,16 +851,12 @@ export default function ApiDocsClient({
                             data-lenis-prevent-wheel
                             className="custom-scrollbar max-h-[300px] overflow-x-auto rounded-md border border-[#fffaf0]/10 bg-[#0b0908] p-3.5 font-mono text-[11px] leading-relaxed text-[#fffaf0]"
                           >
-                            {JSON.stringify(generateMockJson(schema), null, 2)}
+                            {formatMockJson(schema)}
                           </pre>
                           <button
                             onClick={() =>
                               copyToClipboard(
-                                JSON.stringify(
-                                  generateMockJson(schema),
-                                  null,
-                                  2,
-                                ),
+                                formatMockJson(schema),
                                 `model-json-${name}`,
                               )
                             }

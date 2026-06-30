@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: True Crime Club API
   description: |
-    Especificação OpenAPI para a API do True Crime Club. Esta API conecta todas as partes dinâmicas da aplicação (login, loja, checkout, área do cliente) e servirá tanto para o mock interno quanto para o backend externo definitivo.
+    Especificação OpenAPI para a API do True Crime Club. Esta API conecta todas as partes dinâmicas da aplicação (entrada, loja, finalização de compra, área do cliente) e servirá tanto para a simulação interna quanto para o serviço externo definitivo.
     
     Convenções gerais:
     * Valores monetários são expressos em centavos (ex: `14990` equivale a `R$ 149,90`).
@@ -10,18 +10,18 @@ info:
   version: 1.0.0
 servers:
   - url: http://localhost:3000/api
-    description: Servidor Local (Mockado)
+    description: Servidor local de simulação
   - url: https://api.truecrimeclub.com.br/v1
-    description: Servidor de Produção (Futuro)
+    description: Servidor de produção futuro
 
 tags:
   - name: Autenticação
-    description: Registro, Login e Sessão do Cliente
+    description: Registro, Entrada e Sessão do Cliente
   - name: Catálogo
     description: Consulta de Produtos, Caixas e Planos de Assinatura
   - name: Carrinho
     description: Manipulação do Carrinho de Compras e Cupons
-  - name: Checkout & Frete
+  - name: Finalização & Frete
     description: Cálculo de Frete e Fechamento de Pedidos
   - name: Cliente & Painel
     description: Informações Pessoais, Endereços e Assinatura do Cliente
@@ -32,11 +32,11 @@ tags:
 
 paths:
   # --- AUTENTICAÇÃO ---
-  /auth/login:
+  /autenticacao/entrar:
     post:
       tags:
         - Autenticação
-      summary: Realizar login do cliente
+      summary: Autenticar cliente
       description: Autentica o cliente e emite um cookie de sessão ou JWT.
       requestBody:
         required: true
@@ -76,7 +76,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Erro'
 
-  /auth/logout:
+  /autenticacao/sair:
     post:
       tags:
         - Autenticação
@@ -84,7 +84,7 @@ paths:
       description: Remove o cookie de sessão do cliente.
       responses:
         '200':
-          description: Logoff bem-sucedido.
+          description: Sessão encerrada com sucesso.
           content:
             application/json:
               schema:
@@ -94,7 +94,7 @@ paths:
                     type: boolean
                     example: true
 
-  /auth/me:
+  /autenticacao/cliente-atual:
     get:
       tags:
         - Autenticação
@@ -156,7 +156,7 @@ paths:
           required: true
           schema:
             type: string
-            example: cust-001
+            example: cliente-001
       requestBody:
         required: true
         content:
@@ -213,7 +213,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EnderecoInput'
+              $ref: '#/components/schemas/EntradaEndereco'
       responses:
         '201':
           description: Endereço criado.
@@ -222,7 +222,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Endereco'
 
-  /clientes/{id}/enderecos/{enderecoId}:
+  /clientes/{id}/enderecos/{idEndereco}:
     delete:
       tags:
         - Cliente & Painel
@@ -233,7 +233,7 @@ paths:
           required: true
           schema:
             type: string
-        - name: enderecoId
+        - name: idEndereco
           in: path
           required: true
           schema:
@@ -268,7 +268,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Filtrar por categoria (ex. 'box', 'avulsa')
+          description: Filtrar por categoria (ex. 'caixa', 'avulsa')
       responses:
         '200':
           description: Lista de produtos obtida com sucesso.
@@ -279,13 +279,13 @@ paths:
                 items:
                   $ref: '#/components/schemas/Produto'
 
-  /produtos/{slug}:
+  /produtos/{identificador}:
     get:
       tags:
         - Catálogo
-      summary: Obter detalhes do produto pelo slug
+      summary: Obter detalhes do produto pelo identificador
       parameters:
-        - name: slug
+        - name: identificador
           in: path
           required: true
           schema:
@@ -342,11 +342,11 @@ paths:
             schema:
               type: object
               required:
-                - produtoId
+                - idProduto
               properties:
-                produtoId:
+                idProduto:
                   type: string
-                  example: prod-005
+                  example: produto-005
                 quantidade:
                   type: integer
                   minimum: 1
@@ -362,13 +362,13 @@ paths:
         '400':
           description: Produto inválido ou esgotado.
 
-  /carrinho/itens/{itemId}:
+  /carrinho/itens/{idItem}:
     put:
       tags:
         - Carrinho
       summary: Atualizar quantidade de um item
       parameters:
-        - name: itemId
+        - name: idItem
           in: path
           required: true
           schema:
@@ -398,7 +398,7 @@ paths:
         - Carrinho
       summary: Remover item do carrinho
       parameters:
-        - name: itemId
+        - name: idItem
           in: path
           required: true
           schema:
@@ -415,7 +415,7 @@ paths:
                     type: boolean
                     example: true
 
-  /carrinho/coupon:
+  /carrinho/cupom:
     post:
       tags:
         - Carrinho
@@ -438,13 +438,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CouponResult'
+                $ref: '#/components/schemas/ResultadoCupom'
 
   # --- CHECKOUT & FRETE ---
-  /checkout/shipping:
+  /finalizacao/frete:
     post:
       tags:
-        - Checkout & Frete
+        - Finalização & Frete
       summary: Calcular frete para um CEP
       requestBody:
         required: true
@@ -453,9 +453,9 @@ paths:
             schema:
               type: object
               required:
-                - zipCode
+                - cep
               properties:
-                zipCode:
+                cep:
                   type: string
                   example: 05435-020
       responses:
@@ -466,11 +466,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/FreteEstimado'
 
-  /checkout/order:
+  /finalizacao/pedido:
     post:
       tags:
-        - Checkout & Frete
-      summary: Finalizar checkout e criar pedido
+        - Finalização & Frete
+      summary: Finalizar compra e criar pedido
       description: Cria um pedido a partir dos itens do carrinho e limpa o carrinho.
       requestBody:
         required: true
@@ -479,19 +479,19 @@ paths:
             schema:
               type: object
               required:
-                - enderecoId
-                - pagamentoMetodoId
+                - idEndereco
+                - idMetodoPagamento
               properties:
-                enderecoId:
+                idEndereco:
                   type: string
-                  example: addr-001
-                pagamentoMetodoId:
+                  example: endereco-001
+                idMetodoPagamento:
                   type: string
-                  example: pm-001
-                planoId:
+                  example: metodo-pagamento-001
+                idPlano:
                   type: string
                   description: Opcional, para fluxos de assinatura.
-                  example: plan-annual
+                  example: plano-anual
       responses:
         '201':
           description: Pedido criado com sucesso.
@@ -501,7 +501,7 @@ paths:
                 $ref: '#/components/schemas/Pedido'
 
   # --- CLIENTE PAINEL (PEDIDOS E ASSINATURA) ---
-  /customer/orders:
+  /cliente/pedidos:
     get:
       tags:
         - Cliente & Painel
@@ -516,7 +516,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/Pedido'
 
-  /customer/orders/{id}:
+  /cliente/pedidos/{id}:
     get:
       tags:
         - Cliente & Painel
@@ -537,7 +537,7 @@ paths:
         '404':
           description: Pedido não encontrado.
 
-  /customer/subscription:
+  /cliente/assinatura:
     get:
       tags:
         - Cliente & Painel
@@ -562,12 +562,12 @@ paths:
             schema:
               type: object
               required:
-                - action
+                - acao
               properties:
-                action:
+                acao:
                   type: string
-                  enum: [cancel, reactivate]
-                  example: cancel
+                  enum: [cancelar, reativar]
+                  example: cancelar
       responses:
         '200':
           description: Assinatura atualizada.
@@ -577,7 +577,7 @@ paths:
                 $ref: '#/components/schemas/Assinatura'
 
   # --- CONTEÚDO & INVESTIGAÇÃO ---
-  /exclusive-content:
+  /conteudos-exclusivos:
     get:
       tags:
         - Conteúdo & Investigação
@@ -592,13 +592,13 @@ paths:
                 items:
                   $ref: '#/components/schemas/ConteudoExclusivo'
 
-  /exclusive-content/{slug}:
+  /conteudos-exclusivos/{identificador}:
     get:
       tags:
         - Conteúdo & Investigação
-      summary: Obter detalhes de um conteúdo exclusivo pelo slug
+      summary: Obter detalhes de um conteúdo exclusivo pelo identificador
       parameters:
-        - name: slug
+        - name: identificador
           in: path
           required: true
           schema:
@@ -614,7 +614,7 @@ paths:
         '403':
           description: Conteúdo bloqueado para o ciclo atual do assinante.
 
-  /cases:
+  /casos:
     get:
       tags:
         - Conteúdo & Investigação
@@ -710,7 +710,7 @@ components:
       properties:
         id:
           type: string
-          example: cust-001
+          example: cliente-001
         nome:
           type: string
           example: Mariana Silva
@@ -727,13 +727,13 @@ components:
     PreferenciasAssinante:
       type: object
       properties:
-        shirtSize:
+        tamanhoCamiseta:
           type: string
           example: M
-        shoeSize:
+        tamanhoCalcado:
           type: string
           example: 38
-        notes:
+        observacoes:
           type: string
           example: Prefere tons escuros nas peças.
 
@@ -742,67 +742,67 @@ components:
       properties:
         id:
           type: string
-          example: addr-001
-        label:
+          example: endereco-001
+        rotulo:
           type: string
           example: Casa
-        street:
+        logradouro:
           type: string
           example: Rua das Acácias
-        number:
+        numero:
           type: string
           example: 142
-        complement:
+        complemento:
           type: string
           example: Apto 82
-        neighborhood:
+        bairro:
           type: string
           example: Vila Madalena
-        city:
+        cidade:
           type: string
           example: São Paulo
-        state:
+        estado:
           type: string
           example: SP
-        zipCode:
+        cep:
           type: string
           example: 05435-020
-        isDefault:
+        padrao:
           type: boolean
           example: true
 
-    EnderecoInput:
+    EntradaEndereco:
       type: object
       required:
-        - label
-        - street
-        - number
-        - neighborhood
-        - city
-        - state
-        - zipCode
+        - rotulo
+        - logradouro
+        - numero
+        - bairro
+        - cidade
+        - estado
+        - cep
       properties:
-        label:
+        rotulo:
           type: string
           example: Trabalho
-        street:
+        logradouro:
           type: string
           example: Av. Paulista
-        number:
+        numero:
           type: string
           example: 1000
-        complement:
+        complemento:
           type: string
-        neighborhood:
+        bairro:
           type: string
           example: Bela Vista
-        city:
+        cidade:
           type: string
           example: São Paulo
-        state:
+        estado:
           type: string
           example: SP
-        zipCode:
+        cep:
           type: string
           example: 01310-100
 
@@ -811,8 +811,8 @@ components:
       properties:
         id:
           type: string
-          example: prod-005
-        slug:
+          example: produto-005
+        identificador:
           type: string
           example: tcc-caixa-03-avulsa
         nome:
@@ -820,8 +820,8 @@ components:
           example: TCC - CAIXA 03 (AVULSA)
         tipo:
           type: string
-          enum: [product, box]
-          example: box
+          enum: [produto, caixa]
+          example: caixa
         preco:
           type: integer
           example: 18990
@@ -832,19 +832,19 @@ components:
           type: array
           items:
             type: string
-          example: ["/images/box-03.jpg"]
+          example: ["/imagens/caixa-03.jpg"]
         categorias:
           type: array
           items:
             type: string
-          example: ["box", "avulsa"]
+          example: ["caixa", "avulsa"]
         emEstoque:
           type: boolean
           example: true
         disponibilidade:
           type: string
-          enum: [available, limited, out_of_stock, coming_soon]
-          example: limited
+          enum: [disponivel, limitado, esgotado, em_breve]
+          example: limitado
 
     ProdutoDetalhado:
       allOf:
@@ -872,15 +872,15 @@ components:
               type: array
               items:
                 type: string
-              example: ["prod-002", "prod-006"]
+              example: ["produto-002", "produto-006"]
 
     PlanoAssinatura:
       type: object
       properties:
         id:
           type: string
-          example: plan-annual
-        slug:
+          example: plano-anual
+        identificador:
           type: string
           example: anual
         nome:
@@ -889,25 +889,25 @@ components:
         descricao:
           type: string
           example: Melhor custo-benefício anual
-        billingInterval:
+        intervaloCobranca:
           type: string
-          enum: [monthly, annual, one_time]
-          example: annual
-        price:
+          enum: [mensal, anual, avulso]
+          example: anual
+        preco:
           type: integer
           example: 143880
-        pricePerMonth:
+        precoPorMes:
           type: integer
           example: 11990
-        isRecommended:
+        recomendado:
           type: boolean
           example: true
-        features:
+        beneficios:
           type: array
           items:
             type: string
-          example: ["Receba 12 boxes", "Acesso aos arquivos online"]
-        commitmentMonths:
+          example: ["Receba 12 caixas", "Acesso aos arquivos on-line"]
+        mesesCompromisso:
           type: integer
           example: 12
 
@@ -916,78 +916,78 @@ components:
       properties:
         id:
           type: string
-          example: ci-001
-        produtoId:
+          example: item-carrinho-001
+        idProduto:
           type: string
-          example: prod-005
-        productSlug:
+          example: produto-005
+        identificadorProduto:
           type: string
           example: tcc-caixa-03-avulsa
-        productName:
+        nomeProduto:
           type: string
           example: TCC - CAIXA 03 (AVULSA)
-        productType:
+        tipoProduto:
           type: string
-          example: box
+          example: caixa
         quantidade:
           type: integer
           example: 1
-        unitPrice:
+        precoUnitario:
           type: integer
           example: 15990
-        image:
+        imagem:
           type: string
-          example: /images/box-03.jpg
+          example: /imagens/caixa-03.jpg
 
     Carrinho:
       type: object
       properties:
         id:
           type: string
-          example: cart-001
-        items:
+          example: carrinho-001
+        itens:
           type: array
           items:
             $ref: '#/components/schemas/CarrinhoItem'
-        couponCode:
+        codigoCupom:
           type: string
           example: DETETIVE10
-        couponDiscount:
+        descontoCupom:
           type: integer
           example: 1000
-        shippingEstimate:
+        freteEstimado:
           type: integer
           example: 1990
-        shippingRegion:
+        regiaoFrete:
           type: string
           example: SP
 
-    CouponResult:
+    ResultadoCupom:
       type: object
       properties:
-        valid:
+        valido:
           type: boolean
           example: true
-        code:
+        codigo:
           type: string
           example: DETETIVE10
-        discount:
+        desconto:
           type: integer
           example: 1000
-        message:
+        mensagem:
           type: string
           example: Cupom aplicado com sucesso.
 
     FreteEstimado:
       type: object
       properties:
-        region:
+        regiao:
           type: string
           example: CEP 05435-020
-        price:
+        preco:
           type: integer
           example: 1990
-        estimatedDays:
+        prazoEstimado:
           type: string
           example: 5–8 dias úteis
 
@@ -996,38 +996,38 @@ components:
       properties:
         id:
           type: string
-          example: ord-003
-        orderNumber:
+          example: pedido-003
+        numeroPedido:
           type: string
           example: TCC-202604-1052
         status:
           type: string
-          enum: [pending_payment, paid, processing, awaiting_shipment, shipped, delivered, cancelled]
-          example: paid
-        paymentStatus:
+          enum: [pagamento_pendente, pago, em_processamento, aguardando_envio, enviado, entregue, cancelado]
+          example: pago
+        statusPagamento:
           type: string
-          enum: [pending, paid, refused, expired, refunded]
-          example: paid
+          enum: [pendente, pago, recusado, expirado, estornado]
+          example: pago
         subtotal:
           type: integer
           example: 14990
-        shipping:
+        frete:
           type: integer
           example: 1990
-        discount:
+        desconto:
           type: integer
           example: 0
         total:
           type: integer
           example: 16980
-        createdAt:
+        criadoEm:
           type: string
           format: date-time
           example: "2026-04-27T14:50:00.000Z"
-        billingCycleNote:
+        observacaoCicloCobranca:
           type: string
           example: Cobrança processada no mês da compra.
-        shippingCycleNote:
+        observacaoCicloEnvio:
           type: string
           example: Envio previsto para o mês seguinte.
 
@@ -1036,7 +1036,7 @@ components:
         - $ref: '#/components/schemas/Pedido'
         - type: object
           properties:
-            items:
+            itens:
               type: array
               items:
                 $ref: '#/components/schemas/CarrinhoItem'
@@ -1046,37 +1046,37 @@ components:
       properties:
         id:
           type: string
-          example: sub-001
-        customerId:
+          example: assinatura-001
+        idCliente:
           type: string
-          example: cust-001
-        planId:
+          example: cliente-001
+        idPlano:
           type: string
-          example: plan-monthly
-        planName:
+          example: plano-mensal
+        nomePlano:
           type: string
           example: Plano Mensal
         status:
           type: string
-          enum: [active, pending_payment, cancelled, paused, past_due]
-          example: active
-        startedAt:
+          enum: [ativa, pagamento_pendente, cancelada, pausada, vencida]
+          example: ativa
+        iniciadaEm:
           type: string
           format: date-time
-        nextBillingDate:
+        proximaCobrancaEm:
           type: string
           format: date-time
-        nextBillingAmount:
+        valorProximaCobranca:
           type: integer
           example: 14990
-        currentCycleBoxId:
+        idCaixaCicloAtual:
           type: string
-        currentCycleBoxName:
+        nomeCaixaCicloAtual:
           type: string
-        canCancel:
+        podeCancelar:
           type: boolean
           example: true
-        canReactivate:
+        podeReativar:
           type: boolean
           example: false
 
@@ -1085,28 +1085,28 @@ components:
       properties:
         id:
           type: string
-          example: clue-003
-        slug:
+          example: pista-003
+        identificador:
           type: string
           example: pista-ciclo-3
-        title:
+        titulo:
           type: string
           example: Registro Bancário Suspeito
-        description:
+        descricao:
           type: string
           example: Extrato parcial das contas...
         status:
           type: string
           enum: [liberado, bloqueado]
           example: liberado
-        cycleNumber:
+        numeroCiclo:
           type: integer
           example: 3
-        type:
+        tipo:
           type: string
-          enum: [clue, video, document, article]
-          example: clue
-        files:
+          enum: [pista, video, documento, artigo]
+          example: pista
+        arquivos:
           type: array
           items:
             $ref: '#/components/schemas/ArquivoCaso'
@@ -1116,18 +1116,18 @@ components:
       properties:
         id:
           type: string
-          example: file-003
-        name:
+          example: arquivo-003
+        nome:
           type: string
           example: extrato-parcial.pdf
-        type:
+        tipo:
           type: string
-          enum: [pdf, image, audio, video]
+          enum: [pdf, imagem, audio, video]
           example: pdf
-        downloadUrl:
+        urlDownload:
           type: string
-          example: /mock/files/extrato.pdf
-        sizeLabel:
+          example: /simulacao/arquivos/extrato.pdf
+        tamanho:
           type: string
           example: 180 KB
 
@@ -1136,25 +1136,25 @@ components:
       properties:
         id:
           type: string
-          example: case-2026
-        slug:
+          example: caso-2026
+        identificador:
           type: string
           example: operacao-meia-noite
-        title:
+        titulo:
           type: string
           example: Operação Meia-Noite
-        description:
+        descricao:
           type: string
-        year:
+        ano:
           type: integer
           example: 2026
-        totalClues:
+        totalPistas:
           type: integer
           example: 12
-        liveEventDate:
+        dataEventoAoVivo:
           type: string
           format: date-time
-        liveEventTitle:
+        tituloEventoAoVivo:
           type: string
 
     Pista:
@@ -1162,19 +1162,19 @@ components:
       properties:
         id:
           type: string
-        slug:
+        identificador:
           type: string
-        caseId:
+        idCaso:
           type: string
-        title:
+        titulo:
           type: string
-        description:
+        descricao:
           type: string
-        cycleNumber:
+        numeroCiclo:
           type: integer
         status:
           type: string
-        files:
+        arquivos:
           type: array
           items:
             $ref: '#/components/schemas/ArquivoCaso'
@@ -1182,57 +1182,57 @@ components:
     ProgressoAssinante:
       type: object
       properties:
-        caseId:
+        idCaso:
           type: string
-          example: case-2026
-        collectedClues:
+          example: caso-2026
+        pistasColetadas:
           type: integer
           example: 3
-        totalClues:
+        totalPistas:
           type: integer
           example: 12
-        currentCycle:
+        cicloAtual:
           type: integer
           example: 3
-        liveEventDate:
+        dataEventoAoVivo:
           type: string
           format: date-time
-        liveEventTitle:
+        tituloEventoAoVivo:
           type: string
-        percentComplete:
+        percentualCompleto:
           type: number
           example: 25
 
     BlocoDinamico:
       type: object
       properties:
-        key:
+        chave:
           type: string
           example: home.hero.title
-        type:
+        tipo:
           type: string
-          enum: [text, banner, image, html]
-          example: text
-        value:
+          enum: [texto, banner, imagem, html]
+          example: texto
+        valor:
           type: string
           example: Investigue. Colete. Desvende.
-        route:
+        rota:
           type: string
           example: /
 
     EntradaSeo:
       type: object
       properties:
-        title:
+        titulo:
           type: string
           example: True Crime Club
-        description:
+        descricao:
           type: string
-        canonical:
+        urlCanonica:
           type: string
-        ogImage:
+        imagemCompartilhamento:
           type: string
-        noindex:
+        naoIndexar:
           type: boolean
           example: false
 
