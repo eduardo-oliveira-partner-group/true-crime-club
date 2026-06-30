@@ -1,6 +1,6 @@
 import fs from 'fs'
-import path from 'path'
 import { load } from 'js-yaml'
+import path from 'path'
 
 export interface OpenApiSchema {
   type?: string
@@ -89,7 +89,7 @@ function resolveRefs(obj: any, root: any, seen = new Set<string>()): any {
     for (const segment of refPath) {
       current = current?.[segment]
     }
-    
+
     // Merge the resolved schema with other properties (like description/examples on the ref caller)
     const resolved = resolveRefs(current, root, newSeen)
     const { $ref, ...rest } = obj
@@ -98,8 +98,13 @@ function resolveRefs(obj: any, root: any, seen = new Set<string>()): any {
 
   // Handle allOf merging to simplify visual display
   if (obj.allOf && Array.isArray(obj.allOf)) {
-    const resolvedAllOf = obj.allOf.map((item: any) => resolveRefs(item, root, seen))
-    const merged = resolvedAllOf.reduce((acc: any, curr: any) => mergeSchemas(acc, curr), {})
+    const resolvedAllOf = obj.allOf.map((item: any) =>
+      resolveRefs(item, root, seen),
+    )
+    const merged = resolvedAllOf.reduce(
+      (acc: any, curr: any) => mergeSchemas(acc, curr),
+      {},
+    )
     const { allOf, ...rest } = obj
     return mergeSchemas(merged, resolveRefs(rest, root, seen))
   }
@@ -114,15 +119,17 @@ function resolveRefs(obj: any, root: any, seen = new Set<string>()): any {
 function mergeSchemas(base: any, override: any): any {
   if (!base) return override
   if (!override) return base
-  
+
   const merged = { ...base, ...override }
-  
+
   if (base.properties && override.properties) {
     merged.properties = { ...base.properties, ...override.properties }
   }
-  
+
   if (base.required && override.required) {
-    merged.required = Array.from(new Set([...base.required, ...override.required]))
+    merged.required = Array.from(
+      new Set([...base.required, ...override.required]),
+    )
   }
 
   return merged
@@ -143,7 +150,17 @@ export function getOpenApiSpec(): OpenApiSpec {
       if (typeof pathObj === 'object' && pathObj !== null) {
         for (const [methodStr, methodObj] of Object.entries(pathObj)) {
           // Only process HTTP methods
-          if (['get', 'post', 'put', 'delete', 'patch', 'options', 'head'].includes(methodStr.toLowerCase())) {
+          if (
+            [
+              'get',
+              'post',
+              'put',
+              'delete',
+              'patch',
+              'options',
+              'head',
+            ].includes(methodStr.toLowerCase())
+          ) {
             routes.push({
               path: pathStr,
               method: methodStr.toUpperCase(),
@@ -158,7 +175,9 @@ export function getOpenApiSpec(): OpenApiSpec {
   // 3. Extract resolved schemas
   const schemas: Record<string, OpenApiSchema> = {}
   if (resolvedSpec.components?.schemas) {
-    for (const [name, schema] of Object.entries(resolvedSpec.components.schemas)) {
+    for (const [name, schema] of Object.entries(
+      resolvedSpec.components.schemas,
+    )) {
       schemas[name] = schema as OpenApiSchema
     }
   }

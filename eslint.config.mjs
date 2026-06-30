@@ -11,6 +11,7 @@ const eslintConfig = defineConfig([
   ...nextTs,
   prettierConfig,
   {
+    ignores: ['./.agents/**'],
     plugins: {
       'better-tailwindcss': eslintPluginBetterTailwindcss,
       'simple-import-sort': simpleImportSort,

@@ -261,14 +261,30 @@ export default function ApiDocsClient({
               {spec.info.version}
             </span>
           </div>
-          {spec.servers && spec.servers.length > 0 && (
+          <a
+            href="/docs/openapi.yaml"
+            download
+            className="flex items-center gap-2 rounded-md border border-[#fffaf0]/10 bg-[#171211] px-3 py-1.5 font-mono text-xs text-[#d7c9b5] transition-colors hover:bg-[#fffaf0]/10"
+            title="Baixar OpenAPI YAML"
+          >
+            <svg width="14" height="14" fill="none" viewBox="0 0 16 16">
+              <path
+                fill="currentColor"
+                d="M8 2.5a.75.75 0 0 1 .75.75v5.69l1.72-1.72a.75.75 0 1 1 1.06 1.06l-3 3a.75.75 0 0 1-1.06 0l-3-3A.75.75 0 1 1 5.53 7.22L7.25 8.94V3.25A.75.75 0 0 1 8 2.5Zm-5.25 9a.75.75 0 1 0 0 1.5h10.5a.75.75 0 0 0 0-1.5H2.75Z"
+              />
+            </svg>
+            <span className="text-[#fffaf0]/60">Baixar:</span>
+            <span className="font-semibold text-[#fffaf0]">openapi.yaml</span>
+          </a>
+
+          {/* {spec.servers && spec.servers.length > 0 && (
             <div className="flex items-center gap-2 rounded-md border border-[#fffaf0]/10 bg-[#171211] px-3 py-1.5 font-mono text-xs text-[#d7c9b5]">
               <span className="text-[#fffaf0]/60">Host:</span>
               <span className="font-semibold text-[#fffaf0]">
                 {spec.servers[0].url}
               </span>
             </div>
-          )}
+          )} */}
         </div>
       </header>
 
