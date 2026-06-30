@@ -10,13 +10,11 @@ import {
   IconMenu2,
   IconQuote,
   IconRefresh,
-  IconShoppingBag,
   IconSparkles,
   IconStack2,
   IconStarFilled,
   IconUser,
   IconUsers,
-  IconX,
   type TablerIcon,
 } from '@tabler/icons-react'
 import { motion } from 'motion/react'
@@ -443,7 +441,11 @@ function SuggestedHeader({
   return (
     <header
       ref={headerRef}
-      className="sticky top-0 z-50 border-b border-dashed border-[rgba(33,28,24,0.22)] bg-[rgba(237,228,221,0.92)] backdrop-blur-sm"
+      className={`z-50 border-b ${
+        isMenuOpen
+          ? 'fixed inset-x-0 top-0 border-[rgba(33,28,24,0.12)] bg-(--paper)'
+          : 'sticky top-0 border-dashed border-[rgba(33,28,24,0.22)] bg-[rgba(237,228,221,0.92)] backdrop-blur-sm'
+      }`}
     >
       <div
         className={`flex items-center justify-between gap-6 ${sectionFrame} py-[14px]`}
@@ -489,7 +491,7 @@ function SuggestedHeader({
             aria-label="Caixas no carrinho — finalizar compra"
             className={`relative inline-flex size-[42px] items-center justify-center rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-(--card) text-(--ink) no-underline ${transitionColors} hover:bg-(--ink) hover:text-[#fbf9f6]`}
           >
-            <IconShoppingBag size={20} stroke={1.75} aria-hidden />
+            <IconBoxSeam size={20} stroke={1.75} aria-hidden />
             <span
               className={`absolute top-[-7px] right-[-7px] flex h-[19px] min-w-[19px] items-center justify-center rounded-[10px] border-[1.5px] border-(--paper) bg-(--red) px-[5px] text-[11px] font-bold text-[#fbf9f6] ${fontMono}`}
             >
@@ -509,11 +511,7 @@ function SuggestedHeader({
             aria-label={isMenuOpen ? 'Fechar menu' : 'Abrir menu'}
             aria-expanded={isMenuOpen}
           >
-            {isMenuOpen ? (
-              <IconX size={19} stroke={2.2} aria-hidden />
-            ) : (
-              <IconMenu2 size={19} stroke={2.2} aria-hidden />
-            )}
+            <IconMenu2 size={19} stroke={2.2} aria-hidden />
           </button>
         </div>
       </div>
@@ -537,7 +535,7 @@ function SuggestedHeader({
             <Link
               href="/login"
               onClick={onCloseMenu}
-              className={`inline-flex flex-1 items-center justify-center gap-[7px] rounded-[9px] border border-[rgba(33,28,24,0.2)] p-[13px] leading-none tracking-[0.04em] text-(--ink) no-underline ${transitionColors} hover:border-(--red) hover:text-(--red)`}
+              className={`inline-flex flex-1 items-center justify-center gap-[7px] rounded-[9px] border border-[rgba(33,28,24,0.2)] p-[13px] leading-none font-bold tracking-[0.04em] text-(--ink) no-underline ${transitionColors} hover:border-(--red) hover:text-(--red)`}
             >
               <IconUser size={16} stroke={2} className="shrink-0" aria-hidden />
               <span className="leading-none">Entrar</span>
@@ -545,7 +543,7 @@ function SuggestedHeader({
             <Link
               href="/assinatura"
               onClick={onCloseMenu}
-              className={`inline-flex flex-1 items-center justify-center rounded-[9px] border border-[rgba(33,28,24,0.15)] bg-(--red) p-[13px] tracking-[0.04em] text-[#fbf9f6] no-underline ${transitionColors} hover:bg-(--red-deep)`}
+              className={`inline-flex flex-1 items-center justify-center rounded-[9px] border border-[rgba(33,28,24,0.15)] bg-(--red) p-[13px] font-bold tracking-[0.04em] text-[#fbf9f6] no-underline ${transitionColors} hover:bg-(--red-deep)`}
             >
               Assinar
             </Link>
