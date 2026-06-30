@@ -2,15 +2,24 @@ import fs from 'fs'
 import { load } from 'js-yaml'
 import path from 'path'
 
+export type JsonObject = { [key: string]: JsonValue }
+export type JsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JsonValue[]
+  | JsonObject
+
 export interface OpenApiSchema {
   type?: string
   format?: string
   description?: string
-  example?: any
+  example?: JsonValue
   properties?: Record<string, OpenApiSchema>
   items?: OpenApiSchema
   required?: string[]
-  enum?: any[]
+  enum?: JsonValue[]
   allOf?: OpenApiSchema[]
   oneOf?: OpenApiSchema[]
   anyOf?: OpenApiSchema[]
@@ -68,15 +77,40 @@ export interface OpenApiSpec {
   schemas: Record<string, OpenApiSchema>
 }
 
+interface ResolvedOpenApiDocument {
+  info?: OpenApiSpec['info']
+  servers?: OpenApiSpec['servers']
+  tags?: OpenApiTag[]
+  paths?: Record<
+    string,
+    Partial<Record<string, Omit<OpenApiRoute, 'path' | 'method'>>>
+  >
+  components?: {
+    schemas?: Record<string, OpenApiSchema>
+  }
+}
+
+function isJsonObject(value: JsonValue): value is JsonObject {
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
+}
+
+function asOpenApiSchema(value: JsonValue): OpenApiSchema {
+  return isJsonObject(value) ? (value as OpenApiSchema) : {}
+}
+
 // Helper to resolve $ref recursively
-function resolveRefs(obj: any, root: any, seen = new Set<string>()): any {
+function resolveRefs(
+  obj: JsonValue,
+  root: JsonObject,
+  seen = new Set<string>(),
+): JsonValue {
   if (!obj || typeof obj !== 'object') return obj
 
   if (Array.isArray(obj)) {
     return obj.map((item) => resolveRefs(item, root, seen))
   }
 
-  if (obj.$ref) {
+  if (typeof obj.$ref === 'string') {
     const ref = obj.$ref
     if (seen.has(ref)) {
       return { type: 'object', description: `[Circular Reference to ${ref}]` }
@@ -85,42 +119,58 @@ function resolveRefs(obj: any, root: any, seen = new Set<string>()): any {
     newSeen.add(ref)
 
     const refPath = ref.replace(/^#\//, '').split('/')
-    let current = root
+    let current: JsonValue | undefined = root
     for (const segment of refPath) {
-      current = current?.[segment]
+      if (isJsonObject(current)) {
+        current = current[segment] ?? null
+      } else {
+        current = undefined
+        break
+      }
     }
 
     // Merge the resolved schema with other properties (like description/examples on the ref caller)
-    const resolved = resolveRefs(current, root, newSeen)
-    const { $ref, ...rest } = obj
-    return mergeSchemas(resolved, resolveRefs(rest, root, newSeen))
+    const resolved = resolveRefs(current ?? null, root, newSeen)
+    const rest: JsonObject = { ...obj }
+    delete rest.$ref
+    return mergeSchemas(
+      asOpenApiSchema(resolved),
+      asOpenApiSchema(resolveRefs(rest, root, newSeen)),
+    ) as JsonObject
   }
 
   // Handle allOf merging to simplify visual display
-  if (obj.allOf && Array.isArray(obj.allOf)) {
-    const resolvedAllOf = obj.allOf.map((item: any) =>
-      resolveRefs(item, root, seen),
-    )
-    const merged = resolvedAllOf.reduce(
-      (acc: any, curr: any) => mergeSchemas(acc, curr),
+  if (Array.isArray(obj.allOf)) {
+    const resolvedAllOf = obj.allOf.map((item) => resolveRefs(item, root, seen))
+    const merged = resolvedAllOf.reduce<OpenApiSchema>(
+      (acc, curr) => mergeSchemas(acc, asOpenApiSchema(curr)),
       {},
     )
-    const { allOf, ...rest } = obj
-    return mergeSchemas(merged, resolveRefs(rest, root, seen))
+    const rest: JsonObject = { ...obj }
+    delete rest.allOf
+    return mergeSchemas(
+      merged,
+      asOpenApiSchema(resolveRefs(rest, root, seen)),
+    ) as JsonObject
   }
 
-  const result: any = {}
+  const result: JsonObject = {}
   for (const [key, value] of Object.entries(obj)) {
-    result[key] = resolveRefs(value, root, seen)
+    if (value !== undefined) {
+      result[key] = resolveRefs(value, root, seen)
+    }
   }
   return result
 }
 
-function mergeSchemas(base: any, override: any): any {
-  if (!base) return override
+function mergeSchemas(
+  base: OpenApiSchema | undefined | null,
+  override: OpenApiSchema | undefined | null,
+): OpenApiSchema {
+  if (!base) return override ?? {}
   if (!override) return base
 
-  const merged = { ...base, ...override }
+  const merged: OpenApiSchema = { ...base, ...override }
 
   if (base.properties && override.properties) {
     merged.properties = { ...base.properties, ...override.properties }
@@ -138,10 +188,10 @@ function mergeSchemas(base: any, override: any): any {
 export function getOpenApiSpec(): OpenApiSpec {
   const filePath = path.join(process.cwd(), 'docs/openapi.yaml')
   const fileContent = fs.readFileSync(filePath, 'utf8')
-  const rawSpec = load(fileContent) as any
+  const rawSpec = load(fileContent) as JsonObject
 
   // 1. Resolve references internally
-  const resolvedSpec = resolveRefs(rawSpec, rawSpec)
+  const resolvedSpec = resolveRefs(rawSpec, rawSpec) as ResolvedOpenApiDocument
 
   // 2. Extract paths into a flat array of routes
   const routes: OpenApiRoute[] = []
@@ -164,7 +214,7 @@ export function getOpenApiSpec(): OpenApiSpec {
             routes.push({
               path: pathStr,
               method: methodStr.toUpperCase(),
-              ...(methodObj as any),
+              ...(methodObj as Omit<OpenApiRoute, 'path' | 'method'>),
             })
           }
         }
@@ -178,7 +228,7 @@ export function getOpenApiSpec(): OpenApiSpec {
     for (const [name, schema] of Object.entries(
       resolvedSpec.components.schemas,
     )) {
-      schemas[name] = schema as OpenApiSchema
+      schemas[name] = schema
     }
   }
 
