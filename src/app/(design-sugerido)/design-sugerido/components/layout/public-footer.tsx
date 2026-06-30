@@ -8,7 +8,6 @@ import {
   IconPhone,
 } from '@tabler/icons-react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 
 import { BrandLogo } from '@/src/components/layout/brand-logo'
 import { getDynamicContent } from '@/src/lib/domain/repositories'
@@ -27,12 +26,16 @@ const exploreLinks = [
   { href: '/login', label: 'Entrar na conta' },
 ]
 
-const designPreviewLinks = [
+const designPreviewLinks: {
+  href: string
+  version?: string
+  label: string
+  description: string
+}[] = [
   {
-    href: '/design-sugerido',
-    version: 'v1',
-    label: 'Design Anterior (v1)',
-    description: 'Tema clássico com escrivaninha e quadro de cortiça',
+    href: '/',
+    label: 'Página Inicial Padrão',
+    description: 'Retornar para a versão oficial e ativa do site',
   },
 ]
 
@@ -59,8 +62,6 @@ function FooterSection({
 }
 
 export function PublicFooter() {
-  const pathname = usePathname()
-  const isArchive = true
   const prefix = '/design-sugerido'
   const prefixPath = (href: string) => {
     if (href === '/') return '/design-sugerido'
@@ -189,7 +190,7 @@ export function PublicFooter() {
                 Versão de Design
               </p>
               <p className="mt-1 max-w-xl text-xs/5 text-[#6e6055] dark:text-[#a89882]">
-                Proposta de homepage para revisão.
+                Retorne para a versão oficial ativa do site.
               </p>
             </div>
             <p className="text-[10px] font-semibold tracking-[0.18em] text-[#76675b] uppercase dark:text-[#6f6458]">
@@ -204,9 +205,11 @@ export function PublicFooter() {
                   className="group flex h-full flex-col gap-1 rounded-sm border border-[#211c18]/10 bg-[#f4f1ec]/80 px-4 py-3 transition-colors hover:border-[#9a662a]/35 hover:bg-[#fffaf2] dark:border-[#fffaf0]/10 dark:bg-[#090807]/70 dark:hover:border-[#d7b56d]/35 dark:hover:bg-[#090807]"
                 >
                   <span className="flex items-center gap-2">
-                    <span className="inline-flex min-w-7 items-center justify-center rounded-sm border border-[#9a662a]/30 bg-[#9a662a]/10 px-1.5 py-0.5 text-[10px] font-semibold tracking-[0.12em] text-[#8f6126] uppercase dark:border-[#d7b56d]/30 dark:bg-[#d7b56d]/10 dark:text-[#d7b56d]">
-                      {link.version}
-                    </span>
+                    {link.version && (
+                      <span className="inline-flex min-w-7 items-center justify-center rounded-sm border border-[#9a662a]/30 bg-[#9a662a]/10 px-1.5 py-0.5 text-[10px] font-semibold tracking-[0.12em] text-[#8f6126] uppercase dark:border-[#d7b56d]/30 dark:bg-[#d7b56d]/10 dark:text-[#d7b56d]">
+                        {link.version}
+                      </span>
+                    )}
                     <span className="text-sm font-medium text-[#211c18] transition-colors group-hover:text-[#8f6126] dark:text-[#fffaf0] dark:group-hover:text-[#d7b56d]">
                       {link.label}
                     </span>

@@ -31,7 +31,6 @@ type PublicHeaderContentProps = {
 
 export function PublicHeaderContent({ itemCount }: PublicHeaderContentProps) {
   const pathname = usePathname()
-  const isArchive = true
   const prefix = '/design-sugerido'
   const prefixPath = (href: string) => {
     if (href === '/') return '/design-sugerido'
