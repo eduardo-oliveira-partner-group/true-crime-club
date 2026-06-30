@@ -26,18 +26,6 @@ const exploreLinks = [
 
 const designPreviewLinks = [
   {
-    href: '/design-sugerido',
-    version: 'v1',
-    label: 'Proposta original',
-    description: 'Layout base da landing page',
-  },
-  {
-    href: '/design-sugerido-v2',
-    version: 'v2',
-    label: 'Proposta refinada',
-    description: 'Hero animado e microinterações',
-  },
-  {
     href: '/design-sugerido-v3',
     version: 'v3',
     label: 'Dossiê de investigação',
@@ -194,17 +182,17 @@ export function PublicFooter() {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-xs font-semibold tracking-[0.2em] text-[#8f6126] uppercase dark:text-[#d7b56d]">
-                Versões de Design
+                Versão de Design
               </p>
               <p className="mt-1 max-w-xl text-xs/5 text-[#6e6055] dark:text-[#a89882]">
-                Propostas de homepage para revisão e comparação.
+                Proposta de homepage para revisão.
               </p>
             </div>
             <p className="text-[10px] font-semibold tracking-[0.18em] text-[#76675b] uppercase dark:text-[#6f6458]">
               Pré-visualização interna
             </p>
           </div>
-          <ul className="mt-4 grid gap-3 sm:grid-cols-3">
+          <ul className="mt-4 grid max-w-md gap-3 sm:grid-cols-1">
             {designPreviewLinks.map((link) => (
               <li key={link.href}>
                 <Link
