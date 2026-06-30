@@ -43,6 +43,15 @@ const escapeJsonForHtml = (json: string) =>
     }
   })
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
+interface InternalApiRequest {
+  method: string
+  url: string
+  body?: JsonValue
+  note?: string
+}
+
 interface ApiDocsClientProps {
   spec: OpenApiSpec
   initialTag?: string
@@ -125,6 +134,9 @@ export default function ApiDocsClient({
   const generateMockJson = (schema: OpenApiSchema | undefined): JsonValue => {
     if (!schema) return null
     if (schema.example !== undefined) return schema.example
+    if ((schema as { default?: JsonValue }).default !== undefined) {
+      return (schema as { default?: JsonValue }).default as JsonValue
+    }
 
     // Resolve type
     if (schema.type === 'object') {
@@ -162,41 +174,179 @@ export default function ApiDocsClient({
   const formatMockJson = (schema: OpenApiSchema | undefined) =>
     escapeJsonForHtml(JSON.stringify(generateMockJson(schema), null, 2))
 
-  // Handle simulate request
+  const buildDocumentedPath = (route: OpenApiRoute) => {
+    let path = route.path
+
+    route.parameters
+      ?.filter((param) => param.in === 'path')
+      .forEach((param) => {
+        const example =
+          param.schema.example ??
+          (route.path === '/cliente/pedidos/{id}' && param.name === 'id'
+            ? 'pedido-001'
+            : undefined) ??
+          {
+            id: 'cliente-001',
+            idEndereco: 'endereco-001',
+            idItem: 'ci-exemplo',
+            identificador: 'pista-ciclo-3',
+            chave: 'home.hero.title',
+          }[param.name] ??
+          'exemplo'
+
+        path = path.replace(
+          `{${param.name}}`,
+          encodeURIComponent(String(example)),
+        )
+      })
+
+    const query = new URLSearchParams()
+    route.parameters
+      ?.filter((param) => param.in === 'query')
+      .forEach((param) => {
+        const example = param.schema.example
+        if (param.required && example !== undefined) {
+          query.set(param.name, String(example))
+        }
+      })
+
+    const queryString = query.toString()
+    return queryString ? `${path}?${queryString}` : path
+  }
+
+  const requestBodyFor = (route: OpenApiRoute): JsonValue | undefined => {
+    const key = `${route.method} ${route.path}`
+    const generated = generateMockJson(
+      route.requestBody?.content?.['application/json']?.schema,
+    )
+
+    switch (key) {
+      case 'POST /carrinho/itens':
+        return { idProduto: 'produto-005', quantidade: 1 }
+      case 'PUT /carrinho/itens/{idItem}':
+        return { quantidade: 2 }
+      case 'POST /carrinho/cupom':
+        return { codigo: 'BEMVINDO10' }
+      case 'POST /finalizacao/frete':
+        return { cep: '05435-020' }
+      case 'PATCH /clientes/{id}':
+        return {
+          nome: 'Mariana Silva',
+          telefone: '(11) 99999-0000',
+          preferencias: {
+            tamanhoCamiseta: 'M',
+            tamanhoCalcado: '38',
+            observacoes: 'Prefere tons escuros nas peças.',
+          },
+        }
+      case 'POST /cliente/assinatura':
+        return { acao: 'cancelar' }
+      default:
+        return generated === null ? undefined : generated
+    }
+  }
+
+  const resolveInternalRequest = (route: OpenApiRoute): InternalApiRequest => {
+    const body = requestBodyFor(route)
+    const note =
+      route.path === '/autenticacao/cliente-atual'
+        ? 'Esta rota usa o cookie de sessão atual; sem login ativo, o retorno real esperado é 401.'
+        : route.path === '/carrinho/itens/{idItem}'
+          ? 'Depende de um item real no carrinho; se o id de exemplo não existir, o servidor deve responder com erro real.'
+          : route.path === '/finalizacao/pedido'
+            ? 'Cria o pedido a partir do carrinho em memória; carrinho vazio retorna o erro real do domínio.'
+            : undefined
+
+    return {
+      method: route.method,
+      url: `/api${buildDocumentedPath(route)}`,
+      body,
+      note,
+    }
+  }
+
+  // Handle real request against internal API routes
   const simulateRequest = async (route: OpenApiRoute) => {
     if (isSimulating) return
     setIsSimulating(true)
     setSimulatedResponse(null)
+    const internalRequest = resolveInternalRequest(route)
+    const documentedPath = buildDocumentedPath(route)
 
     const logs = [
       `> INITIATING SECURE LINK TO EVIDENCES SYSTEM...`,
-      `> ACCESSING DATABASE WITH KEY: TCC-SYS-SECURE`,
-      `> DISPATCHING SIMULATED REQUEST...`,
+      `> ACCESSING INTERNAL NEXT ROUTE HANDLER...`,
+      `> DISPATCHING REAL REQUEST...`,
       `> METHOD: ${route.method}`,
-      `> URL: http://localhost:3000/api${route.path}`,
+      `> DOCUMENTED URL: ${documentedPath}`,
     ]
+
+    logs.push(`> API URL: ${internalRequest.method} ${internalRequest.url}`)
+    if (internalRequest.note) logs.push(`> NOTE: ${internalRequest.note}`)
 
     setSimulatedLogs([logs[0]])
 
     // Animate logs printout
     for (let i = 1; i < logs.length; i++) {
-      await new Promise((r) => setTimeout(r, 200))
+      await sleep(200)
       setSimulatedLogs((prev) => [...prev, logs[i]])
     }
 
-    await new Promise((r) => setTimeout(r, 600))
-    setSimulatedLogs((prev) => [
-      ...prev,
-      `> ESTABLISHING SECURE HANDSHAKE... STATUS: 200 OK`,
-    ])
+    if (internalRequest.body !== undefined) {
+      setSimulatedLogs((prev) => [
+        ...prev,
+        `> REQUEST BODY: ${JSON.stringify(internalRequest.body)}`,
+      ])
+    }
 
-    // Find the first successful response
-    const successResponse =
-      route.responses['200'] ||
-      route.responses['201'] ||
-      Object.values(route.responses)[0]
-    const schema = successResponse?.content?.['application/json']?.schema
-    setSimulatedResponse(formatMockJson(schema))
+    try {
+      const response = await fetch(internalRequest.url, {
+        method: internalRequest.method,
+        credentials: 'same-origin',
+        headers:
+          internalRequest.body === undefined
+            ? undefined
+            : { 'Content-Type': 'application/json' },
+        body:
+          internalRequest.body === undefined
+            ? undefined
+            : JSON.stringify(internalRequest.body),
+      })
+      const rawBody = await response.text()
+      let parsedBody: JsonValue | string = rawBody
+
+      try {
+        parsedBody = rawBody ? (JSON.parse(rawBody) as JsonValue) : null
+      } catch {
+        parsedBody = rawBody
+      }
+
+      setSimulatedLogs((prev) => [
+        ...prev,
+        `> RESPONSE STATUS: ${response.status} ${response.statusText || ''}`.trim(),
+        response.ok
+          ? `> SERVER RETURNED LIVE DATA FROM INTERNAL ROUTE.`
+          : `> SERVER RETURNED REAL ERROR FROM INTERNAL ROUTE.`,
+      ])
+      setSimulatedResponse(
+        escapeJsonForHtml(JSON.stringify(parsedBody, null, 2)),
+      )
+    } catch (error) {
+      const err = error as Error
+      setSimulatedLogs((prev) => [...prev, `> NETWORK ERROR: ${err.message}`])
+      setSimulatedResponse(
+        escapeJsonForHtml(
+          JSON.stringify(
+            {
+              erro: 'falha_na_chamada_interna',
+              mensagem: err.message,
+            },
+            null,
+            2,
+          ),
+        ),
+      )
+    }
     setIsSimulating(false)
   }
 
@@ -206,7 +356,7 @@ export default function ApiDocsClient({
       setSimulatedLogs([
         `> TERMINAL READY.`,
         `> TARGET: ${selectedRoute.method} ${selectedRoute.path}`,
-        `> PRESS 'SIMULATE EVIDENCE FETCH' TO TRIGGER CONNECTION.`,
+        `> PRESS 'EXECUTAR REQUISIÇÃO' TO TRIGGER INTERNAL API CALL.`,
       ])
       setSimulatedResponse(null)
     }
@@ -568,7 +718,7 @@ export default function ApiDocsClient({
                             className="flex shrink-0 items-center gap-1 rounded bg-[#d84132] px-2.5 py-1 font-mono text-[10px] font-semibold tracking-widest text-[#fffaf0] uppercase transition-colors hover:bg-[#c8382b]"
                           >
                             <IconPlayerPlay size={10} />
-                            Simular
+                            Executar
                           </button>
                         </div>
                         <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3">
@@ -878,7 +1028,7 @@ export default function ApiDocsClient({
           )}
         </main>
 
-        {/* COLUMN 3: RIGHT - MOCK CONSOLE TERMINAL (CRT STYLED) */}
+        {/* COLUMN 3: RIGHT - LIVE CONSOLE TERMINAL (CRT STYLED) */}
         <aside className="z-10 flex min-h-0 w-full shrink-0 flex-col border-t border-[#fffaf0]/10 bg-[#070605] lg:hidden xl:flex xl:w-[420px] xl:border-t-0 xl:border-l">
           <div className="flex shrink-0 items-center justify-between border-b border-[#fffaf0]/10 bg-[#0b0908] p-4">
             <span className="flex items-center gap-1.5 font-mono text-xs font-semibold tracking-wider text-[#d7b56d] uppercase">
@@ -917,7 +1067,7 @@ export default function ApiDocsClient({
               {simulatedResponse && (
                 <div className="mt-2 flex min-h-[200px] flex-1 flex-col border-t border-[#386b46]/20 pt-3 text-[#62d84e]">
                   <span className="mb-1 block text-[9px] font-bold text-[#4ea23e]/70 uppercase">
-                    [EVIDENCES_RETRIEVED_JSON]
+                    [INTERNAL_API_RESPONSE_JSON]
                   </span>
                   <pre
                     data-lenis-prevent-wheel
@@ -932,7 +1082,7 @@ export default function ApiDocsClient({
               {isSimulating && (
                 <div className="mt-2 flex animate-pulse items-center gap-2 font-bold text-[#62d84e]">
                   <span className="inline-block size-2.5 animate-spin rounded-full border-2 border-[#62d84e] border-t-transparent" />
-                  AGUARDANDO RETORNO DOS MOCKS DO SERVIDOR...
+                  AGUARDANDO RETORNO DA ROTA INTERNA...
                 </div>
               )}
             </div>
@@ -946,10 +1096,10 @@ export default function ApiDocsClient({
                   className="flex w-full items-center justify-center gap-2 rounded-md border border-[#fffaf0]/15 bg-[#d84132]/90 px-4 py-3 font-mono text-xs font-bold tracking-widest text-[#fffaf0] uppercase shadow-lg transition-all hover:bg-[#d84132] active:scale-[0.98] disabled:opacity-50"
                 >
                   <IconPlayerPlay size={14} />
-                  Simular Requisição
+                  Executar Requisição
                 </button>
                 <div className="text-center font-mono text-[10px] text-[#d7c9b5]/40">
-                  Isso executa uma chamada simulada com base na especificação.
+                  Isso executa uma chamada real contra as rotas internas /api.
                 </div>
               </div>
             )}

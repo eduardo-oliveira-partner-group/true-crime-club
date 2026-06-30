@@ -1,3 +1,48 @@
+import type {
+  Address,
+  Cart,
+  CartItem,
+  Customer,
+  PaymentMethod,
+  SubscriberPreferences,
+} from '@/src/lib/domain/types'
+
+type JsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JsonValue[]
+  | { [key: string]: JsonValue }
+
+type JsonObject = Record<string, JsonValue | undefined>
+
+function asObject(value: JsonValue | undefined): JsonObject {
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? (value as JsonObject)
+    : {}
+}
+
+function asArray(value: JsonValue | undefined): JsonObject[] {
+  return Array.isArray(value) ? value.map(asObject) : []
+}
+
+function asString(value: JsonValue | undefined, fallback = ''): string {
+  return typeof value === 'string' ? value : fallback
+}
+
+function asOptionalString(value: JsonValue | undefined): string | undefined {
+  return typeof value === 'string' ? value : undefined
+}
+
+function asNumber(value: JsonValue | undefined, fallback = 0): number {
+  return typeof value === 'number' ? value : fallback
+}
+
+function asOptionalNumber(value: JsonValue | undefined): number | undefined {
+  return typeof value === 'number' ? value : undefined
+}
+
 async function fetcher(endpoint: string, options: RequestInit = {}) {
   const url = `/api${endpoint}`
   const headers = new Headers(options.headers || {})
@@ -22,74 +67,209 @@ async function fetcher(endpoint: string, options: RequestInit = {}) {
   return response.json()
 }
 
+function toCustomer(data: JsonObject): Customer {
+  const preferencias = asObject(data.preferencias)
+
+  return {
+    id: asString(data.id),
+    name: asString(data.nome),
+    email: asString(data.email),
+    phone: asOptionalString(data.telefone),
+    preferences: Object.keys(preferencias).length
+      ? {
+          shirtSize: asOptionalString(preferencias.tamanhoCamiseta),
+          shoeSize: asOptionalString(preferencias.tamanhoCalcado),
+          notes: asOptionalString(preferencias.observacoes),
+        }
+      : undefined,
+  }
+}
+
+function toAddress(data: JsonObject): Address {
+  return {
+    id: asString(data.id),
+    label: asString(data.rotulo),
+    street: asString(data.logradouro),
+    number: asString(data.numero),
+    complement: asOptionalString(data.complemento),
+    neighborhood: asString(data.bairro),
+    city: asString(data.cidade),
+    state: asString(data.estado),
+    zipCode: asString(data.cep),
+    isDefault: data.padrao === true,
+  }
+}
+
+function toPaymentMethod(data: JsonObject): PaymentMethod {
+  return {
+    id: asString(data.id),
+    type: data.tipo === 'pix' ? 'pix' : 'credit_card',
+    label: asString(data.rotulo),
+    lastFour: asOptionalString(data.ultimosQuatro),
+    brand: asOptionalString(data.bandeira),
+    isDefault: data.padrao === true,
+  }
+}
+
+function toCartItem(data: JsonObject): CartItem {
+  return {
+    id: asString(data.id),
+    productId: asString(data.idProduto),
+    productSlug: asString(data.identificadorProduto),
+    productName: asString(data.nomeProduto),
+    productType: data.tipoProduto === 'caixa' ? 'box' : 'product',
+    quantity: asNumber(data.quantidade),
+    unitPrice: asNumber(data.precoUnitario),
+    image: asOptionalString(data.imagem),
+  }
+}
+
+function toCart(data: JsonObject): Cart & {
+  subtotal?: number
+  discount?: number
+  shipping?: number
+  total?: number
+} {
+  return {
+    id: asString(data.id),
+    items: asArray(data.itens).map(toCartItem),
+    couponCode: asOptionalString(data.codigoCupom),
+    couponDiscount: asOptionalNumber(data.descontoCupom),
+    shippingEstimate: asOptionalNumber(data.freteEstimado),
+    shippingRegion: asOptionalString(data.regiaoFrete),
+    subtotal: asOptionalNumber(data.subtotal),
+    discount: asOptionalNumber(data.desconto),
+    shipping: asOptionalNumber(data.freteEstimado),
+    total: asOptionalNumber(data.total),
+  }
+}
+
+function fromPreferences(preferences?: Partial<SubscriberPreferences>) {
+  if (!preferences) return undefined
+  return {
+    tamanhoCamiseta: preferences.shirtSize,
+    tamanhoCalcado: preferences.shoeSize,
+    observacoes: preferences.notes,
+  }
+}
+
+function fromAddress(address: {
+  label: string
+  street: string
+  number: string
+  complement?: string
+  neighborhood: string
+  city: string
+  state: string
+  zipCode: string
+}) {
+  return {
+    rotulo: address.label,
+    logradouro: address.street,
+    numero: address.number,
+    complemento: address.complement,
+    bairro: address.neighborhood,
+    cidade: address.city,
+    estado: address.state,
+    cep: address.zipCode,
+  }
+}
+
 export const apiClient = {
   auth: {
-    login: (body: { email: string }) =>
-      fetcher('/auth/login', { method: 'POST', body: JSON.stringify(body) }),
-    logout: () => fetcher('/auth/logout', { method: 'POST' }),
-    me: () => fetcher('/auth/me'),
+    login: async (body: { email: string }) =>
+      fetcher('/autenticacao/entrar', {
+        method: 'POST',
+        body: JSON.stringify(body),
+      }).then((data) => ({
+        ...data,
+        cliente: data.cliente ? toCustomer(data.cliente) : undefined,
+      })),
+    logout: () => fetcher('/autenticacao/sair', { method: 'POST' }),
+    me: () => fetcher('/autenticacao/cliente-atual').then(toCustomer),
   },
   products: {
     list: (params?: { featured?: boolean; category?: string }) => {
       const q = new URLSearchParams()
-      if (params?.featured !== undefined)
-        q.append('featured', String(params.featured))
-      if (params?.category) q.append('category', params.category)
+      if (params?.featured !== undefined) {
+        q.append('destaque', String(params.featured))
+      }
+      if (params?.category) q.append('categoria', params.category)
       const queryStr = q.toString()
-      return fetcher(`/products${queryStr ? `?${queryStr}` : ''}`)
+      return fetcher(`/produtos${queryStr ? `?${queryStr}` : ''}`)
     },
-    getBySlug: (slug: string) => fetcher(`/products/${slug}`),
+    getBySlug: (slug: string) => fetcher(`/produtos/${slug}`),
   },
   plans: {
-    list: () => fetcher('/plans'),
-    getBySlug: (slug: string) => fetcher(`/plans/${slug}`),
+    list: () => fetcher('/planos'),
+    getBySlug: (slug: string) => fetcher(`/planos/${slug}`),
   },
   cart: {
-    get: () => fetcher('/cart'),
+    get: () => fetcher('/carrinho').then(toCart),
     addItem: (productId: string, quantity: number = 1) =>
-      fetcher('/cart', {
+      fetcher('/carrinho/itens', {
         method: 'POST',
-        body: JSON.stringify({ productId, quantity }),
-      }),
+        body: JSON.stringify({ idProduto: productId, quantidade: quantity }),
+      }).then(toCart),
     updateQuantity: (itemId: string, quantity: number) =>
-      fetcher(`/cart/${itemId}`, {
+      fetcher(`/carrinho/itens/${itemId}`, {
         method: 'PUT',
-        body: JSON.stringify({ quantity }),
-      }),
+        body: JSON.stringify({ quantidade: quantity }),
+      }).then(toCart),
     removeItem: (itemId: string) =>
-      fetcher(`/cart/${itemId}`, {
+      fetcher(`/carrinho/itens/${itemId}`, {
         method: 'DELETE',
-      }),
+      }).then(toCart),
     applyCoupon: (code: string) =>
-      fetcher('/cart/coupon', {
+      fetcher('/carrinho/cupom', {
         method: 'POST',
-        body: JSON.stringify({ code }),
+        body: JSON.stringify({ codigo: code }),
       }),
   },
   checkout: {
     calculateShipping: (zipCode: string) =>
-      fetcher('/checkout/shipping', {
+      fetcher('/finalizacao/frete', {
         method: 'POST',
-        body: JSON.stringify({ zipCode }),
+        body: JSON.stringify({ cep: zipCode }),
       }),
     createOrder: (body?: { enderecoId?: string; pagamentoMetodoId?: string }) =>
-      fetcher('/checkout/order', {
+      fetcher('/finalizacao/pedido', {
         method: 'POST',
-        body: JSON.stringify(body || {}),
+        body: JSON.stringify({
+          idEndereco: body?.enderecoId,
+          idMetodoPagamento: body?.pagamentoMetodoId,
+        }),
       }),
   },
   customer: {
-    getProfile: () => fetcher('/customer/profile'),
+    getProfile: async (): Promise<{
+      customer: Customer
+      addresses: Address[]
+      paymentMethods: PaymentMethod[]
+    }> => {
+      const data = await fetcher('/cliente/perfil')
+
+      return {
+        customer: toCustomer(asObject(data.cliente)),
+        addresses: asArray(data.enderecos).map(toAddress),
+        paymentMethods: asArray(data.metodosPagamento).map(toPaymentMethod),
+      }
+    },
     updateProfile: (body: {
       name?: string
       email?: string
       phone?: string
-      preferences?: { shirtSize?: string; shoeSize?: string; notes?: string }
+      preferences?: Partial<SubscriberPreferences>
     }) =>
-      fetcher('/customer/profile', {
-        method: 'PUT',
-        body: JSON.stringify(body),
-      }),
+      fetcher('/clientes/cliente-001', {
+        method: 'PATCH',
+        body: JSON.stringify({
+          nome: body.name,
+          email: body.email,
+          telefone: body.phone,
+          preferencias: fromPreferences(body.preferences),
+        }),
+      }).then(toCustomer),
     addAddress: (body: {
       label: string
       street: string
@@ -100,33 +280,37 @@ export const apiClient = {
       state: string
       zipCode: string
     }) =>
-      fetcher('/customer/addresses', {
+      fetcher('/clientes/cliente-001/enderecos', {
         method: 'POST',
-        body: JSON.stringify(body),
-      }),
+        body: JSON.stringify(fromAddress(body)),
+      }).then((items) => items.map(toAddress)),
     deleteAddress: (id: string) =>
-      fetcher(`/customer/addresses/${id}`, {
+      fetcher(`/clientes/cliente-001/enderecos/${id}`, {
         method: 'DELETE',
-      }),
-    listOrders: () => fetcher('/customer/orders'),
-    getOrder: (id: string) => fetcher(`/customer/orders/${id}`),
-    getSubscription: () => fetcher('/customer/subscription'),
+      }).then(() =>
+        fetcher('/clientes/cliente-001/enderecos').then((items) =>
+          items.map(toAddress),
+        ),
+      ),
+    listOrders: () => fetcher('/cliente/pedidos'),
+    getOrder: (id: string) => fetcher(`/cliente/pedidos/${id}`),
+    getSubscription: () => fetcher('/cliente/assinatura'),
     cancelSubscription: () =>
-      fetcher('/customer/subscription', {
+      fetcher('/cliente/assinatura', {
         method: 'POST',
-        body: JSON.stringify({ action: 'cancel' }),
+        body: JSON.stringify({ acao: 'cancelar' }),
       }),
     reactivateSubscription: () =>
-      fetcher('/customer/subscription', {
+      fetcher('/cliente/assinatura', {
         method: 'POST',
-        body: JSON.stringify({ action: 'reactivate' }),
+        body: JSON.stringify({ acao: 'reativar' }),
       }),
   },
   exclusiveContent: {
-    list: () => fetcher('/exclusive-content'),
-    getBySlug: (slug: string) => fetcher(`/exclusive-content/${slug}`),
+    list: () => fetcher('/conteudos-exclusivos'),
+    getBySlug: (slug: string) => fetcher(`/conteudos-exclusivos/${slug}`),
   },
   cases: {
-    getData: () => fetcher('/cases'),
+    getData: () => fetcher('/casos'),
   },
 }
