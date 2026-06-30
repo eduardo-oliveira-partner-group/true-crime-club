@@ -1553,6 +1553,8 @@ function SuggestedFooter() {
               { href: '#funciona', label: 'Como funciona' },
               { href: '#planos', label: 'Planos' },
               { href: '#arquivos', label: 'Arquivos' },
+              { href: '/design-sugerido', label: 'Design Sugerido' },
+              { href: '/api-docs', label: 'Dossiê de API' },
             ]}
           />
           <FooterColumn
