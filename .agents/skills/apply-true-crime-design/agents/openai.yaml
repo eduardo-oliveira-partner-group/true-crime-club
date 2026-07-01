@@ -1,0 +1,4 @@
+interface:
+  display_name: "Apply True Crime Design"
+  short_description: "Aplica o design premium TrueCrime.Club"
+  default_prompt: "Use $apply-true-crime-design to redesign this page using the TrueCrime.Club landing system."
