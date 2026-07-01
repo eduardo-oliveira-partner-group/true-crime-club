@@ -10,6 +10,7 @@ import {
   IconMenu2,
   IconQuote,
   IconRefresh,
+  IconShoppingBag,
   IconSparkles,
   IconStack2,
   IconStarFilled,
@@ -481,7 +482,7 @@ function SuggestedHeader({
         <div className="flex items-center gap-4">
           <Link
             href="/login"
-            className={`inline-flex items-center gap-[7px] text-[13px] leading-none tracking-[0.04em] text-(--ink) uppercase no-underline ${transitionColors} hover:text-(--red) max-[860px]:hidden ${fontType}`}
+            className={`inline-flex items-end gap-[7px] text-[13px] leading-none tracking-[0.04em] text-(--ink) uppercase no-underline ${transitionColors} hover:text-(--red) max-[860px]:hidden ${fontType}`}
           >
             <IconUser size={16} stroke={2} className="shrink-0" aria-hidden />
             <span className="leading-none">Entrar</span>
@@ -491,7 +492,7 @@ function SuggestedHeader({
             aria-label="Caixas no carrinho — finalizar compra"
             className={`relative inline-flex size-[42px] items-center justify-center rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-(--card) text-(--ink) no-underline ${transitionColors} hover:bg-(--ink) hover:text-[#fbf9f6]`}
           >
-            <IconBoxSeam size={20} stroke={1.75} aria-hidden />
+            <IconShoppingBag size={20} stroke={1.75} aria-hidden />
             <span
               className={`absolute top-[-7px] right-[-7px] flex h-[19px] min-w-[19px] items-center justify-center rounded-[10px] border-[1.5px] border-(--paper) bg-(--red) px-[5px] text-[11px] font-bold text-[#fbf9f6] ${fontMono}`}
             >
