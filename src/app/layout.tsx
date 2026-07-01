@@ -1,5 +1,6 @@
 import './globals.css'
 
+import { SpeedInsights } from '@vercel/speed-insights/next'
 import type { Metadata } from 'next'
 import { Geist_Mono, Handjet, Inter, Libre_Baskerville } from 'next/font/google'
 
@@ -54,6 +55,7 @@ export default function RootLayout({
         <ThemeProvider>
           <SmoothScrollProvider>{children}</SmoothScrollProvider>
         </ThemeProvider>
+        <SpeedInsights />
       </body>
     </html>
   )
