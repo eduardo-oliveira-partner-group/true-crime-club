@@ -1,3 +1,5 @@
+'use client'
+
 import {
   IconBrandInstagram,
   // IconCircleCheck,
@@ -24,12 +26,16 @@ const exploreLinks = [
   { href: '/login', label: 'Entrar na conta' },
 ]
 
-const designPreviewLinks = [
+const designPreviewLinks: {
+  href: string
+  version?: string
+  label: string
+  description: string
+}[] = [
   {
-    href: '/design-sugerido',
-    version: 'v1',
-    label: 'Design Anterior (v1)',
-    description: 'Tema clássico com escrivaninha e quadro de cortiça',
+    href: '/',
+    label: 'Página Inicial Padrão',
+    description: 'Retornar para a versão oficial e ativa do site',
   },
 ]
 
@@ -37,13 +43,6 @@ const legalLinks = [
   { href: '/termos', label: 'Termos e condições' },
   { href: '/politica-de-privacidade', label: 'Política de privacidade' },
 ]
-
-// const trustItems = [
-//   'Primeiro clube do Brasil',
-//   'Pistas mensais',
-//   'Evento ao vivo com a comunidade',
-//   'Cancelamento flexível',
-// ]
 
 function FooterSection({
   title,
@@ -63,6 +62,12 @@ function FooterSection({
 }
 
 export function PublicFooter() {
+  const prefix = '/design-sugerido'
+  const prefixPath = (href: string) => {
+    if (href === '/') return '/design-sugerido'
+    return `${prefix}${href}`
+  }
+
   // const heroBadge = getDynamicContent('home.hero.badge')
   const trustSupport = getDynamicContent('home.trust.support')
 
@@ -71,7 +76,7 @@ export function PublicFooter() {
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:py-14">
         <div className="grid gap-10 lg:grid-cols-[1.35fr_repeat(3,minmax(0,1fr))]">
           <div className="space-y-5">
-            <Link href="/" className="inline-block">
+            <Link href={prefixPath('/')} className="inline-block">
               <BrandLogo className="h-10" />
             </Link>
 
@@ -102,7 +107,7 @@ export function PublicFooter() {
               {clubLinks.map((link) => (
                 <li key={`${link.href}-${link.label}`}>
                   <Link
-                    href={link.href}
+                    href={prefixPath(link.href)}
                     className="text-sm text-[#5f5147] transition-colors hover:text-[#211c18] dark:text-[#d7c9b5] dark:hover:text-[#fffaf0]"
                   >
                     {link.label}
@@ -117,7 +122,7 @@ export function PublicFooter() {
               {exploreLinks.map((link) => (
                 <li key={`${link.href}-${link.label}`}>
                   <Link
-                    href={link.href}
+                    href={prefixPath(link.href)}
                     className="text-sm text-[#5f5147] transition-colors hover:text-[#211c18] dark:text-[#d7c9b5] dark:hover:text-[#fffaf0]"
                   >
                     {link.label}
@@ -185,7 +190,7 @@ export function PublicFooter() {
                 Versão de Design
               </p>
               <p className="mt-1 max-w-xl text-xs/5 text-[#6e6055] dark:text-[#a89882]">
-                Proposta de homepage para revisão.
+                Retorne para a versão oficial ativa do site.
               </p>
             </div>
             <p className="text-[10px] font-semibold tracking-[0.18em] text-[#76675b] uppercase dark:text-[#6f6458]">
@@ -200,9 +205,11 @@ export function PublicFooter() {
                   className="group flex h-full flex-col gap-1 rounded-sm border border-[#211c18]/10 bg-[#f4f1ec]/80 px-4 py-3 transition-colors hover:border-[#9a662a]/35 hover:bg-[#fffaf2] dark:border-[#fffaf0]/10 dark:bg-[#090807]/70 dark:hover:border-[#d7b56d]/35 dark:hover:bg-[#090807]"
                 >
                   <span className="flex items-center gap-2">
-                    <span className="inline-flex min-w-7 items-center justify-center rounded-sm border border-[#9a662a]/30 bg-[#9a662a]/10 px-1.5 py-0.5 text-[10px] font-semibold tracking-[0.12em] text-[#8f6126] uppercase dark:border-[#d7b56d]/30 dark:bg-[#d7b56d]/10 dark:text-[#d7b56d]">
-                      {link.version}
-                    </span>
+                    {link.version && (
+                      <span className="inline-flex min-w-7 items-center justify-center rounded-sm border border-[#9a662a]/30 bg-[#9a662a]/10 px-1.5 py-0.5 text-[10px] font-semibold tracking-[0.12em] text-[#8f6126] uppercase dark:border-[#d7b56d]/30 dark:bg-[#d7b56d]/10 dark:text-[#d7b56d]">
+                        {link.version}
+                      </span>
+                    )}
                     <span className="text-sm font-medium text-[#211c18] transition-colors group-hover:text-[#8f6126] dark:text-[#fffaf0] dark:group-hover:text-[#d7b56d]">
                       {link.label}
                     </span>
@@ -227,7 +234,7 @@ export function PublicFooter() {
             {legalLinks.map((link) => (
               <li key={link.href}>
                 <Link
-                  href={link.href}
+                  href={prefixPath(link.href)}
                   className="transition-colors hover:text-[#211c18] dark:hover:text-[#fffaf0]"
                 >
                   {link.label}

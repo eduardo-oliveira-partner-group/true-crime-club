@@ -124,7 +124,12 @@ export function CheckoutStepper({
         await onSavePreferences(preferences)
       }
       await onCreateOrder()
-      router.push('/checkout/confirmacao')
+      const prefix =
+        typeof window !== 'undefined' &&
+        window.location.pathname.startsWith('/design-sugerido')
+          ? '/design-sugerido'
+          : ''
+      router.push(`${prefix}/checkout/confirmacao`)
     } catch (err) {
       setError(
         err instanceof Error

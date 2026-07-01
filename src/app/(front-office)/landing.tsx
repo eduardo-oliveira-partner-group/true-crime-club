@@ -16,7 +16,6 @@ import {
   IconStarFilled,
   IconUser,
   IconUsers,
-  IconX,
   type TablerIcon,
 } from '@tabler/icons-react'
 import { motion } from 'motion/react'
@@ -283,7 +282,7 @@ const featuredByLogos = [
   { src: logoPoltronaNerd, alt: 'Poltrona Nerd' },
 ]
 
-export function SuggestedLanding({ fontClassName }: SuggestedLandingProps) {
+export function Landing({ fontClassName }: SuggestedLandingProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [showFab, setShowFab] = useState(false)
   const [jsReady, setJsReady] = useState(false)
@@ -443,7 +442,11 @@ function SuggestedHeader({
   return (
     <header
       ref={headerRef}
-      className="sticky top-0 z-50 border-b border-dashed border-[rgba(33,28,24,0.22)] bg-[rgba(237,228,221,0.92)] backdrop-blur-sm"
+      className={`z-50 border-b ${
+        isMenuOpen
+          ? 'fixed inset-x-0 top-0 border-[rgba(33,28,24,0.12)] bg-(--paper)'
+          : 'sticky top-0 border-dashed border-[rgba(33,28,24,0.22)] bg-[rgba(237,228,221,0.92)] backdrop-blur-sm'
+      }`}
     >
       <div
         className={`flex items-center justify-between gap-6 ${sectionFrame} py-[14px]`}
@@ -479,7 +482,7 @@ function SuggestedHeader({
         <div className="flex items-center gap-4">
           <Link
             href="/login"
-            className={`inline-flex items-center gap-[7px] text-[13px] leading-none tracking-[0.04em] text-(--ink) uppercase no-underline ${transitionColors} hover:text-(--red) max-[860px]:hidden ${fontType}`}
+            className={`inline-flex items-end gap-[7px] text-[13px] leading-none tracking-[0.04em] text-(--ink) uppercase no-underline ${transitionColors} hover:text-(--red) max-[860px]:hidden ${fontType}`}
           >
             <IconUser size={16} stroke={2} className="shrink-0" aria-hidden />
             <span className="leading-none">Entrar</span>
@@ -509,11 +512,7 @@ function SuggestedHeader({
             aria-label={isMenuOpen ? 'Fechar menu' : 'Abrir menu'}
             aria-expanded={isMenuOpen}
           >
-            {isMenuOpen ? (
-              <IconX size={19} stroke={2.2} aria-hidden />
-            ) : (
-              <IconMenu2 size={19} stroke={2.2} aria-hidden />
-            )}
+            <IconMenu2 size={19} stroke={2.2} aria-hidden />
           </button>
         </div>
       </div>
@@ -537,7 +536,7 @@ function SuggestedHeader({
             <Link
               href="/login"
               onClick={onCloseMenu}
-              className={`inline-flex flex-1 items-center justify-center gap-[7px] rounded-[9px] border border-[rgba(33,28,24,0.2)] p-[13px] leading-none tracking-[0.04em] text-(--ink) no-underline ${transitionColors} hover:border-(--red) hover:text-(--red)`}
+              className={`inline-flex flex-1 items-center justify-center gap-[7px] rounded-[9px] border border-[rgba(33,28,24,0.2)] p-[13px] leading-none font-bold tracking-[0.04em] text-(--ink) no-underline ${transitionColors} hover:border-(--red) hover:text-(--red)`}
             >
               <IconUser size={16} stroke={2} className="shrink-0" aria-hidden />
               <span className="leading-none">Entrar</span>
@@ -545,7 +544,7 @@ function SuggestedHeader({
             <Link
               href="/assinatura"
               onClick={onCloseMenu}
-              className={`inline-flex flex-1 items-center justify-center rounded-[9px] border border-[rgba(33,28,24,0.15)] bg-(--red) p-[13px] tracking-[0.04em] text-[#fbf9f6] no-underline ${transitionColors} hover:bg-(--red-deep)`}
+              className={`inline-flex flex-1 items-center justify-center rounded-[9px] border border-[rgba(33,28,24,0.15)] bg-(--red) p-[13px] font-bold tracking-[0.04em] text-[#fbf9f6] no-underline ${transitionColors} hover:bg-(--red-deep)`}
             >
               Assinar
             </Link>
@@ -1553,6 +1552,8 @@ function SuggestedFooter() {
               { href: '#funciona', label: 'Como funciona' },
               { href: '#planos', label: 'Planos' },
               { href: '#arquivos', label: 'Arquivos' },
+              { href: '/design-sugerido', label: 'Design Sugerido' },
+              { href: '/api-docs', label: 'Dossiê de API' },
             ]}
           />
           <FooterColumn

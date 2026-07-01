@@ -314,7 +314,7 @@ export function ProductQuickView({
                       className="rounded-none border-[#211c18]/22 bg-[#211c18]/6 text-[#211c18] hover:bg-[#211c18]/10 hover:text-[#211c18] dark:border-[#fffaf0]/22 dark:bg-[#fffaf0]/6 dark:text-[#fffaf0] dark:hover:bg-[#fffaf0]/12 dark:hover:text-[#fffaf0]"
                     >
                       <Link
-                        href={`/loja/${product.slug}`}
+                        href={`${typeof window !== 'undefined' && window.location.pathname.startsWith('/design-sugerido') ? '/design-sugerido' : ''}/loja/${product.slug}`}
                         aria-label="Ver página completa"
                       >
                         <IconExternalLink />
@@ -357,7 +357,7 @@ export function ProductQuickView({
                       className="rounded-none border-[#211c18]/22 bg-[#211c18]/6 text-[#211c18] hover:bg-[#211c18]/10 hover:text-[#211c18] dark:border-[#fffaf0]/22 dark:bg-[#fffaf0]/6 dark:text-[#fffaf0] dark:hover:bg-[#fffaf0]/12 dark:hover:text-[#fffaf0]"
                     >
                       <Link
-                        href={`/loja/${product.slug}`}
+                        href={`${typeof window !== 'undefined' && window.location.pathname.startsWith('/design-sugerido') ? '/design-sugerido' : ''}/loja/${product.slug}`}
                         aria-label="Ver página completa"
                       >
                         <IconExternalLink />

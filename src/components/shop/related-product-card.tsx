@@ -18,7 +18,7 @@ export function RelatedProductCard({ product }: RelatedProductCardProps) {
 
   return (
     <Link
-      href={`/loja/${product.slug}`}
+      href={`${typeof window !== 'undefined' && window.location.pathname.startsWith('/design-sugerido') ? '/design-sugerido' : ''}/loja/${product.slug}`}
       className="group block border border-[#fffaf0]/14 bg-[#090807] p-0 shadow-[0_20px_48px_rgba(0,0,0,0.24)] transition hover:-translate-y-1 hover:border-[#d7b56d]/35 focus-visible:ring-2 focus-visible:ring-[#d7b56d] focus-visible:outline-none"
     >
       <div className="relative aspect-4/3 overflow-hidden border-b border-[#fffaf0]/14 bg-[#171211]">
