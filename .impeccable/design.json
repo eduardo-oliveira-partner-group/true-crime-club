@@ -1,0 +1,324 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-01T01:10:00Z",
+  "title": "Design System: TrueCrime.Club",
+  "extensions": {
+    "colorMeta": {
+      "paper": {
+        "role": "neutral",
+        "displayName": "paper",
+        "canonical": "#ede4dd",
+        "tonalRamp": ["#2e2821", "#4a4138", "#6b5f52", "#8d7f70", "#b09f8e", "#cdbfaf", "#ede4dd", "#f8f3ee"]
+      },
+      "paper-soft": {
+        "role": "neutral",
+        "displayName": "paper-soft",
+        "canonical": "#f5eee4",
+        "tonalRamp": ["#332c23", "#504738", "#70634f", "#928168", "#b5a183", "#d5c5a6", "#f5eee4", "#fbf8f3"]
+      },
+      "card": {
+        "role": "neutral",
+        "displayName": "card",
+        "canonical": "#fbf9f6",
+        "tonalRamp": ["#33322f", "#504e4a", "#706d68", "#928e87", "#b5b0a8", "#d5d2cc", "#fbf9f6", "#fdfcfb"]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "ink",
+        "canonical": "#211c18",
+        "tonalRamp": ["#0e0c0a", "#211c18", "#3d362f", "#5a5148", "#796e63", "#998d80", "#bbb0a3", "#ddd5ca"]
+      },
+      "ink-soft": {
+        "role": "neutral",
+        "displayName": "ink-soft",
+        "canonical": "#3d362f",
+        "tonalRamp": ["#141210", "#292420", "#3d362f", "#554c43", "#6e645a", "#8a7e72", "#a89b8e", "#c8bbaf"]
+      },
+      "ink-mute": {
+        "role": "neutral",
+        "displayName": "ink-mute",
+        "canonical": "#6e645a",
+        "tonalRamp": ["#1c1915", "#38332c", "#554c43", "#6e645a", "#8a7e72", "#a89b8e", "#c8bbaf", "#e5ddd5"]
+      },
+      "red": {
+        "role": "primary",
+        "displayName": "red",
+        "canonical": "#c5271f",
+        "tonalRamp": ["#3a0b08", "#5e1410", "#821d18", "#a91d16", "#c5271f", "#d94d3e", "#e87a6e", "#f5aba3"]
+      },
+      "red-deep": {
+        "role": "primary",
+        "displayName": "red-deep",
+        "canonical": "#a91d16",
+        "tonalRamp": ["#2f0907", "#52110d", "#761914", "#a91d16", "#c5271f", "#d94d3e", "#e87a6e", "#f5aba3"]
+      },
+      "yellow": {
+        "role": "secondary",
+        "displayName": "yellow",
+        "canonical": "#efbc18",
+        "tonalRamp": ["#3d3006", "#64500b", "#8b7010", "#b29115", "#d9b118", "#efbc18", "#f4d05a", "#f9e49e"]
+      },
+      "amber": {
+        "role": "secondary",
+        "displayName": "amber",
+        "canonical": "#e0a50a",
+        "tonalRamp": ["#382903", "#5c4406", "#806008", "#a4800a", "#c8a00c", "#e0a50a", "#ebc04a", "#f5dc90"]
+      },
+      "teal": {
+        "role": "secondary",
+        "displayName": "teal",
+        "canonical": "#1aa587",
+        "tonalRamp": ["#062a22", "#0c4538", "#12604e", "#15735d", "#189070", "#1aa587", "#40c0a0", "#7ddbc0"]
+      },
+      "teal-deep": {
+        "role": "secondary",
+        "displayName": "teal-deep",
+        "canonical": "#15735d",
+        "tonalRamp": ["#041d17", "#08382d", "#0c5343", "#15735d", "#189070", "#1aa587", "#40c0a0", "#7ddbc0"]
+      },
+      "purple": {
+        "role": "secondary",
+        "displayName": "purple",
+        "canonical": "#5e5ea2",
+        "tonalRamp": ["#1a1a30", "#2d2d50", "#404070", "#4a4580", "#5e5ea2", "#7a7ab8", "#9e9ed0", "#c4c4e5"]
+      },
+      "purple-deep": {
+        "role": "secondary",
+        "displayName": "purple-deep",
+        "canonical": "#4a4580",
+        "tonalRamp": ["#141328", "#252348", "#363468", "#4a4580", "#5e5ea2", "#7a7ab8", "#9e9ed0", "#c4c4e5"]
+      },
+      "night": {
+        "role": "neutral",
+        "displayName": "night",
+        "canonical": "#0e1014",
+        "tonalRamp": ["#050608", "#0e1014", "#1c1e24", "#2c2f38", "#40444f", "#585c68", "#727884", "#9098a4"]
+      },
+      "cream": {
+        "role": "neutral",
+        "displayName": "cream",
+        "canonical": "#f4ecdc",
+        "tonalRamp": ["#332c1e", "#544834", "#76654b", "#988464", "#baa480", "#d9c8a0", "#f4ecdc", "#faf6ee"]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Hero headline. Uma frase por linha, peso forte, caixa normal. Exclusivo para o hero da página."
+      },
+      "heading": {
+        "displayName": "Heading",
+        "purpose": "Títulos de seção. Frases curtas que funcionam como pistas de investigação. Semibold, tracking levemente negativo."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Parágrafos editoriais. Hanken Grotesk regular em ink-soft para leitura confortável. Drop-cap na primeira letra do bloco principal."
+      },
+      "label": {
+        "displayName": "Label/Typewriter",
+        "purpose": "Metadados de arquivo: eyebrows, tags, badges, códigos de referência. Special Elite uppercase com tracking amplo."
+      },
+      "mono": {
+        "displayName": "Mono/Button",
+        "purpose": "Texto de botões e labels numéricos. Space Mono bold, uppercase, tracking 0.04em."
+      }
+    },
+    "shadows": [
+      {
+        "name": "card-base",
+        "value": "0 18px 40px -18px rgba(33,28,24,0.22), inset 0 0 0 1px rgba(255,255,255,0.5)",
+        "purpose": "Sombra quente padrão para cards de dossiê."
+      },
+      {
+        "name": "card-hover",
+        "value": "0 24px 44px -18px rgba(33,28,24,0.3), inset 0 0 0 1px rgba(255,255,255,0.6)",
+        "purpose": "Elevação aumentada no hover de cards."
+      },
+      {
+        "name": "polaroid",
+        "value": "0 12px 26px -12px rgba(33,28,24,0.28), inset 0 0 0 1px rgba(255,255,255,0.6)",
+        "purpose": "Cards com rotação (testimonials)."
+      },
+      {
+        "name": "plan-featured",
+        "value": "0 20px 40px -14px rgba(74,69,128,0.55)",
+        "purpose": "Sombra colorida purple no plano anual."
+      },
+      {
+        "name": "board-pin",
+        "value": "0 3px 5px rgba(33,28,24,0.45), inset 0 -2px 3px rgba(0,0,0,0.3)",
+        "purpose": "Alfinete de quadro de evidências — pin 3D."
+      },
+      {
+        "name": "button-base",
+        "value": "0 9px 22px -8px rgba(33,28,24,0.13)",
+        "purpose": "Sombra sutil para CTAs primários em repouso."
+      },
+      {
+        "name": "button-hover",
+        "value": "0 14px 30px -10px rgba(33,28,24,0.22)",
+        "purpose": "Sombra expandida para CTAs primários no hover."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-expo-out",
+        "value": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "Easing padrão para translate, scale e transform. Saída rápida com desaceleração suave."
+      },
+      {
+        "name": "ease-standard",
+        "value": "ease",
+        "purpose": "Easing para background-color, border-color e color (0.2s)."
+      },
+      {
+        "name": "spring-card",
+        "value": "spring(stiffness: 85, damping: 13, mass: 0.7)",
+        "purpose": "Motion spring para elevação e rotação de feature cards via framer-motion."
+      },
+      {
+        "name": "duration-fast",
+        "value": "0.2s",
+        "purpose": "Transições de cor (bg, border, text)."
+      },
+      {
+        "name": "duration-medium",
+        "value": "0.3s",
+        "purpose": "Transições de polaroid/testimonial cards."
+      },
+      {
+        "name": "duration-reveal",
+        "value": "0.6s",
+        "purpose": "Animação de reveal ao entrar na viewport (opacity + translateY)."
+      },
+      {
+        "name": "hero-entrance",
+        "value": "0.7s cubic-bezier(0.2, 0.65, 0.3, 1)",
+        "purpose": "Animação de entrada escalonada do hero (heroIn keyframe)."
+      }
+    ],
+    "breakpoints": [
+      { "name": "mobile", "value": "540px" },
+      { "name": "tablet", "value": "860px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "CTA principal de ação comercial (assinar, comprar). Fundo red, texto claro, uppercase, seta animada.",
+      "html": "<button class=\"ds-btn-primary\">Quero assinar <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"ds-btn-arrow\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 20px; background: #c5271f; color: #fbf9f6; border: 1px solid rgba(33,28,24,0.15); border-radius: 9px; font-family: 'Space Mono', monospace; font-size: 14px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; line-height: 1; white-space: nowrap; text-decoration: none; cursor: pointer; box-shadow: 0 9px 22px -8px rgba(33,28,24,0.13); transition: translate 0.24s cubic-bezier(0.22,1,0.36,1), background-color 0.2s ease, box-shadow 0.24s cubic-bezier(0.22,1,0.36,1); } .ds-btn-primary:hover { background: #a91d16; translate: 0 -2px; box-shadow: 0 14px 30px -10px rgba(33,28,24,0.22); } .ds-btn-primary:focus-visible { outline: 2px solid #c5271f; outline-offset: 2px; } .ds-btn-arrow { transition: translate 0.25s cubic-bezier(0.22,1,0.36,1); } .ds-btn-primary:hover .ds-btn-arrow { translate: 4px 0; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "CTA secundário (assinar mensal, ações utilitárias). Outline ink, inverte no hover.",
+      "html": "<button class=\"ds-btn-secondary\">Assinar mensal</button>",
+      "css": ".ds-btn-secondary { display: flex; width: 100%; align-items: center; justify-content: center; padding: 15px 16px; background: transparent; color: #211c18; border: 1px solid rgba(33,28,24,0.15); border-radius: 10px; font-family: 'Space Mono', monospace; font-size: 14px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; line-height: 1; text-decoration: none; cursor: pointer; transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease; } .ds-btn-secondary:hover { background: #211c18; color: #fbf9f6; } .ds-btn-secondary:focus-visible { outline: 2px solid #c5271f; outline-offset: 2px; }"
+    },
+    {
+      "name": "Chip / Tag",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Tag de metadado investigativo. Fundo paper-soft, hover inverte para red.",
+      "html": "<span class=\"ds-chip\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 14a1 1 0 0 1 -.3 -.7l8 -8a1 1 0 0 1 .7 -.3h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -.3 .7l-8 8a1 1 0 0 1 -1.4 0l-4 -4a1 1 0 0 1 0 -1.4z\"/><circle cx=\"16\" cy=\"8\" r=\"1\"/></svg> HISTÓRIA CONTÍNUA</span>",
+      "css": ".ds-chip { display: inline-flex; align-items: center; gap: 7px; padding: 8px 14px; background: #f5eee4; color: #211c18; border: 1px solid rgba(33,28,24,0.15); border-radius: 2px; font-family: 'Special Elite', monospace; font-size: 11.5px; letter-spacing: 0.06em; text-transform: uppercase; cursor: default; transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease; } .ds-chip:hover { background: #c5271f; color: #fbf9f6; border-color: #c5271f; }"
+    },
+    {
+      "name": "Dossier Card",
+      "kind": "card",
+      "refersTo": "card-dossier",
+      "description": "Card principal de dossiê com aba de referência, pin decorativo e gradient interno.",
+      "html": "<article class=\"ds-card-dossier\"><div class=\"ds-card-tab\"><span class=\"ds-card-tab-code\">DOSSIÊ</span> O CLUBE</div><span class=\"ds-card-pin\" aria-hidden=\"true\"></span><h3 class=\"ds-card-title\">Não é sobre o crime. É sobre as pessoas por trás dele.</h3><p class=\"ds-card-body\">O TrueCrime Club é um clube de assinatura que transforma o melhor do gênero numa experiência física.</p></article>",
+      "css": ".ds-card-dossier { position: relative; overflow: hidden; border-radius: 14px 14px 18px 18px; border: 1px solid rgba(33,28,24,0.18); background: #fbf9f6; background-image: linear-gradient(180deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0) 120px); padding: 60px 48px 52px; box-shadow: 0 18px 40px -18px rgba(33,28,24,0.22), inset 0 0 0 1px rgba(255,255,255,0.5); } .ds-card-tab { position: absolute; top: -1px; left: 44px; transform: translateY(-100%); display: inline-flex; align-items: center; gap: 10px; border-radius: 10px 10px 0 0; border: 1px solid rgba(33,28,24,0.18); border-bottom: 0; background: #f5eee4; padding: 9px 18px 11px; font-family: 'Special Elite', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #211c18; } .ds-card-tab-code { font-weight: 700; color: #c5271f; } .ds-card-pin { position: absolute; top: 18px; right: 40px; width: 16px; height: 16px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #f47878 0%, #c5271f 55%, #a91d16 100%); box-shadow: 0 3px 5px rgba(33,28,24,0.4), inset 0 -2px 3px rgba(0,0,0,0.3); } .ds-card-title { margin: 0 0 8px; font-family: 'Archivo', system-ui, sans-serif; font-size: clamp(30px, 3.6vw, 46px); font-weight: 600; line-height: 1.02; letter-spacing: -0.015em; color: #211c18; } .ds-card-body { margin: 0; font-family: 'Hanken Grotesk', system-ui, sans-serif; font-size: 18.5px; line-height: 1.6; color: #3d362f; }"
+    },
+    {
+      "name": "Section Eyebrow",
+      "kind": "custom",
+      "refersTo": null,
+      "description": "Label de seção com traço horizontal e código sequencial. Special Elite, uppercase, red.",
+      "html": "<div class=\"ds-eyebrow\">01 — O que é o Club</div>",
+      "css": ".ds-eyebrow { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 16px; font-family: 'Special Elite', monospace; font-size: 13px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1; color: #c5271f; } .ds-eyebrow::before { content: ''; display: inline-block; width: 22px; height: 1px; background: currentColor; flex-shrink: 0; }"
+    },
+    {
+      "name": "Board Pin",
+      "kind": "custom",
+      "refersTo": null,
+      "description": "Alfinete decorativo de quadro de evidências. Pin 3D com radial-gradient e sombra.",
+      "html": "<span class=\"ds-board-pin\" aria-hidden=\"true\"></span>",
+      "css": ".ds-board-pin { display: inline-block; width: 14px; height: 14px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.7) 0%, var(--pin-color, #c5271f) 55%, rgba(0,0,0,0.4) 100%); box-shadow: 0 3px 5px rgba(33,28,24,0.45), inset 0 -2px 3px rgba(0,0,0,0.3); }"
+    },
+    {
+      "name": "Archive Card",
+      "kind": "card",
+      "refersTo": null,
+      "description": "Card de box arquivada com aba amarela rotacionada, badge 'ARQUIVADO' e imagem do produto.",
+      "html": "<article class=\"ds-archive-card\"><div class=\"ds-archive-bg\"></div><div class=\"ds-archive-tab\"><span class=\"ds-archive-tab-code\">BOX 01</span>Caso Victória Monteiro</div><div class=\"ds-archive-inner\"><div class=\"ds-archive-badge\">ARQUIVADO</div><div class=\"ds-archive-img\"></div><div class=\"ds-archive-content\"><div class=\"ds-archive-label\">BOX 01</div><h3 class=\"ds-archive-title\">Primeira Página</h3><div class=\"ds-archive-footer\"><strong class=\"ds-archive-price\">R$ 149,90</strong><button class=\"ds-archive-buy\">Comprar</button></div></div></div></article>",
+      "css": ".ds-archive-card { position: relative; } .ds-archive-bg { position: absolute; inset: 0; z-index: 0; translate: 0 -3px; rotate: 2.5deg; border-radius: 10px; background: #efbc18; box-shadow: 0 14px 26px -14px rgba(0,0,0,0.4); } .ds-archive-tab { position: absolute; top: -25px; right: 16px; z-index: 0; display: inline-flex; align-items: center; gap: 8px; transform-origin: bottom right; rotate: 2.5deg; border-radius: 8px 8px 0 0; background: #efbc18; padding: 6px 15px 24px; font-family: 'Special Elite', monospace; font-size: 9.5px; letter-spacing: 0.06em; text-transform: uppercase; color: #211c18; box-shadow: 0 6px 14px -8px rgba(0,0,0,0.4); } .ds-archive-tab-code { font-weight: 700; color: #c5271f; } .ds-archive-inner { position: relative; z-index: 1; overflow: hidden; border-radius: 10px; border: 1px solid rgba(33,28,24,0.15); background: #fbf9f6; color: #211c18; box-shadow: 0 9px 22px -8px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.5); transition: translate 0.32s cubic-bezier(0.22,1,0.36,1), box-shadow 0.32s cubic-bezier(0.22,1,0.36,1); } .ds-archive-card:hover .ds-archive-inner { translate: 0 -5px; box-shadow: 0 20px 36px -14px rgba(0,0,0,0.45), inset 0 0 0 1px rgba(255,255,255,0.6); } .ds-archive-badge { position: absolute; top: 10px; right: 10px; z-index: 2; rotate: -9deg; border: 2px solid rgba(94,94,162,0.85); background: rgba(251,249,246,0.65); padding: 5px 9px 6px; font-family: 'Special Elite', monospace; font-size: 9.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(94,94,162,0.95); box-shadow: inset 0 0 0 1px rgba(94,94,162,0.4); backdrop-filter: blur(2px); } .ds-archive-img { aspect-ratio: 1; border-bottom: 1px solid rgba(33,28,24,0.15); background: #ede4dd; } .ds-archive-content { padding: 16px 16px 18px; } .ds-archive-label { font-family: 'Special Elite', monospace; font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; color: #6e645a; margin-bottom: 5px; } .ds-archive-title { margin: 0 0 16px; font-family: 'Archivo', system-ui, sans-serif; font-size: 16.5px; font-weight: 600; line-height: 1.12; } .ds-archive-footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; } .ds-archive-price { font-family: 'Archivo', system-ui, sans-serif; font-size: 17px; font-weight: 600; } .ds-archive-buy { display: inline-flex; align-items: center; justify-content: center; padding: 9px 13px; background: #211c18; color: #fbf9f6; border: none; border-radius: 8px; font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; cursor: pointer; transition: background-color 0.2s ease; } .ds-archive-buy:hover { background: #c5271f; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "O Quadro de Evidências",
+    "overview": "O design system do TrueCrime.Club é construído em torno da metáfora do quadro de evidências: um painel de investigação onde fotos, pistas, fios coloridos e alfinetes conectam fragmentos de um caso aberto. A superfície é papel envelhecido sob luz do dia, não escuridão cinematográfica. Cada seção é uma peça de evidência pinada ao quadro — cards com alfinetes físicos, etiquetas de arquivo, selos de dossiê, fitas adesivas simuladas, linhas tracejadas conectando passos.\n\nO sistema visual rejeita explicitamente terror apelativo, decoração policial caricata, superfícies brancas sem tratamento, glassmorphism como default, gradient text e a estética escura saturada de plataformas de crime genéricas. A investigação aqui é sofisticada e colecionável, não mórbida ou amadora. O acabamento é editorial e premium — cada elemento deve parecer produzido com a qualidade de um material de arquivo real.",
+    "keyCharacteristics": [
+      "Modo claro com textura documental (grão fotográfico, micro-pontos, linhas de grade sutis em modo mix-blend-multiply)",
+      "Paleta quente com acentos cirúrgicos em quatro cores de função (vermelho, amarelo, teal, roxo)",
+      "Tipografia editorial com hierarquia forte: Archivo para títulos pesados, Hanken Grotesk para corpo limpo, Special Elite para metadados de arquivo",
+      "Alfinetes de quadro de evidências (radial-gradients simulando pins 3D) como elemento visual de assinatura",
+      "Micro-rotações em cards e fitas adesivas para simular materiais fixados ao quadro",
+      "Separadores tracejados e bordas finas com baixa opacidade para ritmo documental"
+    ],
+    "rules": [
+      {
+        "name": "The Four-Wire Rule",
+        "body": "As quatro cores de acento (red, yellow, teal, purple) funcionam como fios coloridos do quadro de evidências. Cada uma marca uma função específica e não deve ser usada fora do seu papel. Red = ação e evidência. Yellow = alerta e destaque. Teal = catalogação e status. Purple = comunidade e exclusividade. Misturar funções dilui o sistema.",
+        "section": "colors"
+      },
+      {
+        "name": "The Paper-First Rule",
+        "body": "A superfície padrão é sempre paper (#ede4dd), nunca branco puro (#fff) ou cinza frio. Cards usam card (#fbf9f6), um branco-quente que flutua sobre o paper sem criar contraste frio. Superfícies brancas sem tratamento são proibidas.",
+        "section": "colors"
+      },
+      {
+        "name": "The Typewriter Rule",
+        "body": "Special Elite é reservada para metadados de arquivo: eyebrows, tags, labels, badges e códigos de referência. Nunca em títulos, nunca em body, nunca em botões. Se o texto não parecer uma etiqueta de catalogação, não usa typewriter.",
+        "section": "typography"
+      },
+      {
+        "name": "The Drop-Cap Rule",
+        "body": "O primeiro bloco de prosa de cada seção editorial usa drop-cap: primeira letra em Archivo bold, cor red, float left. Nunca em cards, nunca em listas. Um drop-cap por seção, máximo.",
+        "section": "typography"
+      },
+      {
+        "name": "The Warm-Shadow Rule",
+        "body": "Todas as sombras usam rgba(33,28,24,...) — a cor ink em transparência. Nunca rgba(0,0,0,...) puro (exceto no inset de pins). Sombras frias ou cinzas são proibidas. A sombra deve parecer a projeção de um objeto sob luz incandescente.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do usar paper (#ede4dd) como fundo principal e card (#fbf9f6) para superfícies elevadas. Nunca branco puro.",
+      "Do aplicar grão fotográfico (feTurbulence SVG inline) e linhas de grade (linear-gradient 34px) como overlays fixos em mix-blend-multiply com opacidade baixa.",
+      "Do usar alfinetes de quadro (radial-gradient pins com sombra 3D) como elemento de conexão visual entre cards e seções.",
+      "Do alternar micro-rotações em cards adjacentes (±1.4deg feature cards, ±1.8deg testimonials). Hover remove a rotação e eleva o card.",
+      "Do usar separadores tracejados (repeating-linear-gradient com dash 5px gap 4px) em vez de borders sólidos dentro de cards.",
+      "Do respeitar prefers-reduced-motion: reduce em toda animação.",
+      "Do usar Special Elite apenas para metadados de arquivo.",
+      "Do manter o Four-Wire Rule: red = ação, yellow = alerta/destaque, teal = catalogação/status, purple = comunidade/exclusividade."
+    ],
+    "donts": [
+      "Don't usar fundo escuro como padrão. Night (#0e1014) é reservado para hero, footer e seções invertidas pontuais.",
+      "Don't usar border-left ou border-right maiores que 1px como accent colorido em cards.",
+      "Don't usar gradient text (background-clip: text com gradient).",
+      "Don't usar glassmorphism como default.",
+      "Don't usar border-radius maior que 16px em cards.",
+      "Don't usar sombras frias (rgba(0,0,0,...)) em cards ou botões.",
+      "Don't criar seções sem eyebrow.",
+      "Don't usar superfícies brancas puras (#fff) ou cinzas frios.",
+      "Don't usar cards idênticos em grid sem variação.",
+      "Don't usar terror apelativo, sangue, choque visual, decoração policial caricata ou linguagem mórbida."
+    ]
+  }
+}
