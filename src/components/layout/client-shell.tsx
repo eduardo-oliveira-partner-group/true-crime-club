@@ -10,12 +10,11 @@ import {
   IconUsers,
   IconX,
 } from '@tabler/icons-react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
-import logo from '@/src/assets/images/brand/logo.png'
+import { BrandLogo } from '@/src/components/layout/brand-logo'
 import { apiClient } from '@/src/lib/api-client'
 import type { Customer } from '@/src/lib/domain/types'
 import { cn } from '@/src/lib/utils'
@@ -58,7 +57,7 @@ export function ClientShell({ children }: { children: React.ReactNode }) {
       <header className="border-b border-[#fffaf0]/12 bg-[#0b0908]/80 backdrop-blur-sm">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
           <Link href="/" className="inline-flex items-center">
-            <Image src={logo} alt="True Crime Club" className="h-7 w-auto" />
+            <BrandLogo className="h-7 w-auto" />
           </Link>
           <div className="flex items-center gap-4">
             <div className="text-right">

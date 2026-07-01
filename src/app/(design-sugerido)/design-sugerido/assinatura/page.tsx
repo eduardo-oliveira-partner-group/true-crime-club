@@ -1,9 +1,10 @@
 import Image from 'next/image'
 
 import plansDossierPlate from '@/src/assets/images/home/plans-dossier-plate.png'
-import { PlanDossierCard } from '../components/home/plan-dossier-card'
 import { getDynamicContent, listPlans } from '@/src/lib/domain/repositories'
 import { buildMetadata } from '@/src/lib/seo'
+
+import { PlanDossierCard } from '../components/home/plan-dossier-card'
 
 export const metadata = buildMetadata({
   path: '/design-sugerido/assinatura',

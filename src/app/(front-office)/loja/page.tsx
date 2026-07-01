@@ -139,7 +139,7 @@ function FeaturedProductCase({ product }: { product: Product }) {
       </div>
       <div className="grid gap-5 pt-5 sm:grid-cols-[1fr_auto] sm:items-end">
         <div>
-          <p className="border-l-2 border-[#d84132] pl-3 text-xs font-semibold tracking-[0.2em] text-(--red) uppercase">
+          <p className="border-l-2 border-(--red) pl-3 text-xs font-semibold tracking-[0.2em] text-(--red) uppercase">
             Arquivo em destaque
           </p>
           <h2 className="mt-3 font-heading text-2xl/tight font-semibold tracking-wide text-(--ink) uppercase">
@@ -157,9 +157,9 @@ function FeaturedProductCase({ product }: { product: Product }) {
 
 function EvidencePlaceholder({ product }: { product: Product }) {
   return (
-    <div className="absolute inset-0 flex items-center justify-center bg-[#120f0d]">
-      <div className="absolute inset-6 border border-[#d7b56d]/20" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_38%,rgba(216,65,50,0.16),transparent_28%),radial-gradient(circle_at_48%_58%,rgba(215,181,109,0.12),transparent_32%)]" />
+    <div className="absolute inset-0 flex items-center justify-center bg-(--card)">
+      <div className="absolute inset-6 border border-[rgba(33,28,24,0.15)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_38%,rgba(197,39,31,0.08),transparent_28%),radial-gradient(circle_at_48%_58%,rgba(239,188,24,0.06),transparent_32%)]" />
       <div className="relative z-10 flex flex-col items-center text-center">
         <IconSparkles className="size-9 text-(--red)" />
         <p className="mt-3 max-w-44 text-xs font-semibold tracking-[0.18em] text-(--ink) uppercase">

@@ -238,7 +238,7 @@ export default async function ProductDetailPage({
                       key={item}
                       className="flex gap-3 border border-[rgba(33,28,24,0.15)] bg-(--paper)/72 px-4 py-3 text-sm/6 text-(--ink-soft)"
                     >
-                      <span className="mt-2 size-1.5 shrink-0 bg-[#d84132]" />
+                      <span className="mt-2 size-1.5 shrink-0 bg-(--red)" />
                       <span>{item}</span>
                     </li>
                   ))}
@@ -263,27 +263,27 @@ export default async function ProductDetailPage({
               </h2>
               <ul className="mt-5 grid gap-3 text-sm/6 text-(--ink-soft) sm:grid-cols-2">
                 <li className="flex gap-3">
-                  <span className="mt-2 size-1.5 shrink-0 bg-[#d7b56d]" />
+                  <span className="mt-2 size-1.5 shrink-0 bg-(--amber)" />
                   <span>
                     Boxes avulsas são enviadas conforme disponibilidade de
                     estoque e prazo informado no checkout.
                   </span>
                 </li>
                 <li className="flex gap-3">
-                  <span className="mt-2 size-1.5 shrink-0 bg-[#d7b56d]" />
+                  <span className="mt-2 size-1.5 shrink-0 bg-(--amber)" />
                   <span>
                     Preços de assinante exigem plano ativo no True Crime Club.
                   </span>
                 </li>
                 <li className="flex gap-3">
-                  <span className="mt-2 size-1.5 shrink-0 bg-[#d7b56d]" />
+                  <span className="mt-2 size-1.5 shrink-0 bg-(--amber)" />
                   <span>
                     Itens esgotados ou indisponíveis não podem ser adicionados
                     ao carrinho.
                   </span>
                 </li>
                 <li className="flex gap-3">
-                  <span className="mt-2 size-1.5 shrink-0 bg-[#d7b56d]" />
+                  <span className="mt-2 size-1.5 shrink-0 bg-(--amber)" />
                   <span>
                     Frete e formas de pagamento são confirmados na etapa final
                     da compra.

@@ -57,3 +57,13 @@ export const buttonLiftShadow =
 /** Standard dossier card surface classes. */
 export const dossierCardSurface =
   'rounded-[14px_14px_16px_16px] border border-[rgba(33,28,24,0.15)] bg-(--card) bg-[linear-gradient(180deg,rgba(255,255,255,0.5)_0%,rgba(255,255,255,0)_120px)]'
+
+/** Form label on paper/card surfaces — body font, not typewriter. */
+export const formLabelClass =
+  'text-sm font-semibold text-(--ink) [font-family:var(--design-font-body),system-ui,sans-serif]'
+
+/** Form input aligned with DESIGN.md Inputs / Fields. */
+export const formInputClass = `mt-2 w-full rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-transparent px-4 py-3 text-sm text-(--ink) outline-none placeholder:text-(--ink-mute) ${transitionBgColor} focus:border-(--red) focus:bg-(--card) focus:shadow-[0_0_0_2px_rgba(197,39,31,0.15)]`
+
+/** Inline action links on auth and utility forms. */
+export const formLinkClass = `font-medium text-(--red) no-underline ${transitionBgColor} hover:text-(--red-deep)`

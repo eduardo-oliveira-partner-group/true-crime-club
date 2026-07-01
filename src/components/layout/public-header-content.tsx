@@ -7,7 +7,7 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 
 import { landingNavLinks } from '@/src/app/(front-office)/_landing/content'
-import logo from '@/src/assets/images/design-sugerido/logo.png'
+import logo from '@/src/assets/images/brand/logo.png'
 import { apiClient } from '@/src/lib/api-client'
 import {
   fontMono,
