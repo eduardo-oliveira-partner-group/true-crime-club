@@ -1,31 +1,9 @@
 import type { Metadata } from 'next'
-import { Archivo, Hanken_Grotesk, Space_Mono } from 'next/font/google'
 
 import { getSeoEntry } from '@/src/lib/domain/repositories'
 import { buildMetadata } from '@/src/lib/seo'
 
 import { Landing } from './landing'
-
-const hankenGrotesk = Hanken_Grotesk({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  variable: '--design-font-body',
-  display: 'swap',
-})
-
-const spaceMono = Space_Mono({
-  subsets: ['latin'],
-  weight: ['400', '700'],
-  variable: '--design-font-mono',
-  display: 'swap',
-})
-
-const archivo = Archivo({
-  subsets: ['latin'],
-  weight: ['700', '800', '900'],
-  variable: '--design-font-heading',
-  display: 'swap',
-})
 
 export const metadata: Metadata = buildMetadata({
   path: '/',
@@ -33,9 +11,5 @@ export const metadata: Metadata = buildMetadata({
 })
 
 export default function HomePage() {
-  return (
-    <Landing
-      fontClassName={`${hankenGrotesk.variable} ${spaceMono.variable} ${archivo.variable}`}
-    />
-  )
+  return <Landing />
 }

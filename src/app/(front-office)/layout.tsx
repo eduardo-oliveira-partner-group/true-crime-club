@@ -5,6 +5,7 @@ import { PublicHeader } from '@/src/components/layout/public-header'
 import { DesignOverlays } from '@/src/components/public-design/design-overlays'
 import { PublicPromoMarquee } from '@/src/components/public-design/promo-marquee'
 import { paperPageClass } from '@/src/lib/design/classes'
+import { designFontClassName } from '@/src/lib/design/fonts'
 import { designTokens } from '@/src/lib/design/tokens'
 
 export default function FrontOfficeLayout({
@@ -14,7 +15,7 @@ export default function FrontOfficeLayout({
 }>) {
   return (
     <div
-      className={`flex min-h-svh flex-col ${paperPageClass}`}
+      className={`front-office-shell flex min-h-svh flex-col ${paperPageClass} ${designFontClassName}`}
       style={designTokens}
     >
       <DesignOverlays />

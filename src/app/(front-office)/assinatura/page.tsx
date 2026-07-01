@@ -1,5 +1,3 @@
-import { Archivo, Hanken_Grotesk, Space_Mono } from 'next/font/google'
-
 import { PlanDossierCard } from '@/src/components/home/plan-dossier-card'
 import { DesignPageShell } from '@/src/components/public-design/design-page-shell'
 import { DossierCard } from '@/src/components/public-design/dossier-card'
@@ -12,27 +10,6 @@ import {
 } from '@/src/lib/domain/repositories'
 import { buildMetadata } from '@/src/lib/seo'
 
-const hankenGrotesk = Hanken_Grotesk({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  variable: '--design-font-body',
-  display: 'swap',
-})
-
-const spaceMono = Space_Mono({
-  subsets: ['latin'],
-  weight: ['400', '700'],
-  variable: '--design-font-mono',
-  display: 'swap',
-})
-
-const archivo = Archivo({
-  subsets: ['latin'],
-  weight: ['700', '800', '900'],
-  variable: '--design-font-heading',
-  display: 'swap',
-})
-
 export const metadata = buildMetadata({
   path: '/assinatura',
   entry: getSeoEntry('/assinatura'),
@@ -41,10 +18,9 @@ export const metadata = buildMetadata({
 export default function AssinaturaPage() {
   const plans = listPlans()
   const howItWorks = getDynamicContent('assinatura.how_it_works')
-  const fontClassName = `${hankenGrotesk.variable} ${spaceMono.variable} ${archivo.variable}`
 
   return (
-    <DesignPageShell fontClassName={fontClassName} showOverlays={false}>
+    <DesignPageShell showOverlays={false}>
       <section className="relative z-10 mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-20">
         <div className="mb-10 max-w-2xl space-y-4 text-center md:text-left">
           <SectionEyebrow>Clube de Investigação</SectionEyebrow>

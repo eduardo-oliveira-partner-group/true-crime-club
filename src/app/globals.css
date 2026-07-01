@@ -24,9 +24,9 @@
   --night: #0e1014;
   --night-soft: #16110e;
   --cream: #f4ecdc;
-  --design-font-body: var(--font-sans);
-  --design-font-heading: var(--font-heading);
-  --design-font-mono: var(--font-mono);
+  --design-font-body: 'Hanken Grotesk', system-ui, sans-serif;
+  --design-font-heading: 'Archivo', system-ui, sans-serif;
+  --design-font-mono: 'Space Mono', monospace;
 
   --brand-accent: oklch(0.55 0.18 25);
   --brand-accent-foreground: oklch(0.98 0.01 25);
@@ -150,6 +150,13 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* Front Office: map Tailwind font utilities to the dossier design system. */
+.front-office-shell {
+  --font-sans: var(--design-font-body);
+  --font-heading: var(--design-font-heading);
+  --font-mono: var(--design-font-mono);
 }
 
 @layer base {

@@ -15,14 +15,10 @@ import { StandaloneEdition } from '@/src/app/(front-office)/_landing/sections/st
 import { Testimonials } from '@/src/app/(front-office)/_landing/sections/testimonials'
 import { DesignPageShell } from '@/src/components/public-design/design-page-shell'
 
-type LandingProps = {
-  fontClassName: string
-}
-
-export function Landing({ fontClassName }: LandingProps) {
+export function Landing() {
   return (
     <LandingClientChrome>
-      <DesignPageShell fontClassName={fontClassName} showOverlays={false}>
+      <DesignPageShell showOverlays={false}>
         <main>
           <Hero />
           <RibbonMarquee />
