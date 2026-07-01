@@ -6,6 +6,28 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
+  /* TrueCrime.Club design system (DESIGN.md) */
+  --paper: #ede4dd;
+  --paper-soft: #f5eee4;
+  --card: #fbf9f6;
+  --ink: #211c18;
+  --ink-soft: #3d362f;
+  --ink-mute: #6e645a;
+  --red: #c5271f;
+  --red-deep: #a91d16;
+  --yellow: #efbc18;
+  --amber: #e0a50a;
+  --teal: #1aa587;
+  --teal-deep: #15735d;
+  --purple: #5e5ea2;
+  --purple-deep: #4a4580;
+  --night: #0e1014;
+  --night-soft: #16110e;
+  --cream: #f4ecdc;
+  --design-font-body: var(--font-sans);
+  --design-font-heading: var(--font-heading);
+  --design-font-mono: var(--font-mono);
+
   --brand-accent: oklch(0.55 0.18 25);
   --brand-accent-foreground: oklch(0.98 0.01 25);
   --brand-muted: oklch(0.94 0.02 285);

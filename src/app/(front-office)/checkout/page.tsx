@@ -70,40 +70,40 @@ export default async function CheckoutPage({
     (isSubscriptionFlow && plan ? plan.price : totals.total) + shipping.price
 
   return (
-    <div className="relative isolate min-h-svh overflow-hidden bg-[#090807] text-[#fffaf0]">
+    <div className="relative isolate min-h-svh overflow-hidden bg-(--paper) text-(--ink)">
       <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.03)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.03)_1px,transparent_1px)] bg-size-[42px_42px]" />
       <div className="absolute inset-x-0 top-0 -z-10 h-72 bg-[radial-gradient(ellipse_at_50%_-10%,rgba(216,65,50,0.1),transparent_60%)]" />
 
       <div className="relative z-10 mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:py-16">
-        <header className="flex flex-col gap-5 border-b border-[#fffaf0]/12 pb-8">
+        <header className="flex flex-col gap-5 border-b border-[rgba(33,28,24,0.15)] pb-8">
           <div className="flex items-center gap-4">
-            <p className="text-xs font-semibold tracking-[0.28em] text-[#d7b56d] uppercase">
+            <p className="text-xs font-semibold tracking-[0.28em] text-(--red) uppercase">
               Checkout
             </p>
             <span className="h-px flex-1 bg-[#d7b56d]/40" />
-            <p className="font-mono text-[0.65rem] tracking-[0.18em] text-[#fffaf0]/45 uppercase">
+            <p className="font-mono text-[0.65rem] tracking-[0.18em] text-(--ink)/45 uppercase">
               PROC-07 · sessão segura
             </p>
           </div>
 
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div className="space-y-3">
-              <h1 className="font-heading text-3xl font-black tracking-tight text-[#fffaf0] uppercase sm:text-4xl">
+              <h1 className="font-heading text-3xl font-black tracking-tight text-(--ink) uppercase sm:text-4xl">
                 Finalize seu ingresso no clube
               </h1>
-              <p className="max-w-xl text-sm/6 text-[#c8bdad]">
+              <p className="max-w-xl text-sm/6 text-(--ink-soft)">
                 Fluxo de validação — nenhum pagamento real será processado.
                 Confira dados, frete e pagamento antes de confirmar.
               </p>
             </div>
             {plan ? (
-              <div className="border border-[#d7b56d]/40 bg-[#171211]/80 px-4 py-3 backdrop-blur-sm">
-                <p className="text-[0.65rem] font-semibold tracking-[0.18em] text-[#d7b56d] uppercase">
+              <div className="border border-[#d7b56d]/40 bg-(--card)/80 px-4 py-3 backdrop-blur-sm">
+                <p className="text-[0.65rem] font-semibold tracking-[0.18em] text-(--red) uppercase">
                   Assinatura selecionada
                 </p>
-                <p className="mt-1.5 flex items-baseline gap-2 font-heading text-sm font-semibold text-[#fffaf0]">
+                <p className="mt-1.5 flex items-baseline gap-2 font-heading text-sm font-semibold text-(--ink)">
                   {plan.name}
-                  <span className="text-[#d7b56d]">
+                  <span className="text-(--red)">
                     {formatCurrency(plan.price)}
                   </span>
                 </p>
@@ -113,17 +113,17 @@ export default async function CheckoutPage({
         </header>
 
         {!isSubscriptionFlow && cart.items.length === 0 ? (
-          <div className="mt-10 border border-dashed border-[#fffaf0]/18 bg-[#0b0908] p-10 text-center">
-            <p className="text-xs font-semibold tracking-[0.2em] text-[#d7b56d] uppercase">
+          <div className="mt-10 border border-dashed border-[rgba(33,28,24,0.15)] bg-(--paper-soft) p-10 text-center">
+            <p className="text-xs font-semibold tracking-[0.2em] text-(--red) uppercase">
               Arquivo vazio
             </p>
-            <p className="mt-3 text-sm text-[#c8bdad]">
+            <p className="mt-3 text-sm text-(--ink-soft)">
               Seu carrinho está vazio. Explore a loja e adicione uma box para
               iniciar o checkout.
             </p>
             <Button
               asChild
-              className="mt-6 h-11 border border-[#d7b56d]/50 bg-transparent px-5 text-[#d7b56d] hover:bg-[#d7b56d]/12 hover:text-[#f0e8dd]"
+              className="mt-6 h-11 border border-[#d7b56d]/50 bg-transparent px-5 text-(--red) hover:bg-[#d7b56d]/12 hover:text-[#f0e8dd]"
             >
               <Link href="/loja">Ir para a loja</Link>
             </Button>
@@ -207,18 +207,18 @@ function OrderSummary({
   const hasItems = (isSubscriptionFlow && planName != null) || items.length > 0
 
   return (
-    <section className="border border-[#fffaf0]/12 bg-[#171211] p-5 shadow-[0_20px_48px_rgba(0,0,0,0.38)] sm:p-6">
-      <div className="flex items-center justify-between border-b border-[#fffaf0]/12 pb-4">
-        <p className="text-xs font-semibold tracking-[0.2em] text-[#d7b56d] uppercase">
+    <section className="border border-[rgba(33,28,24,0.15)] bg-(--card) p-5 shadow-[0_18px_40px_rgba(33,28,24,0.38)] sm:p-6">
+      <div className="flex items-center justify-between border-b border-[rgba(33,28,24,0.15)] pb-4">
+        <p className="text-xs font-semibold tracking-[0.2em] text-(--red) uppercase">
           Resumo do pedido
         </p>
-        <p className="font-mono text-[0.6rem] tracking-[0.16em] text-[#fffaf0]/40 uppercase">
+        <p className="font-mono text-[0.6rem] tracking-[0.16em] text-(--ink)/40 uppercase">
           DOSS-07
         </p>
       </div>
 
       {hasItems ? (
-        <ul className="mt-4 space-y-2.5 text-sm text-[#d7c9b5]">
+        <ul className="mt-4 space-y-2.5 text-sm text-(--ink-soft)">
           {isSubscriptionFlow && planName ? (
             <li className="flex justify-between gap-4">
               <span>{planName} (assinatura)</span>
@@ -235,10 +235,12 @@ function OrderSummary({
           ))}
         </ul>
       ) : (
-        <p className="mt-4 text-sm text-[#c8bdad]">Nenhum item selecionado.</p>
+        <p className="mt-4 text-sm text-(--ink-soft)">
+          Nenhum item selecionado.
+        </p>
       )}
 
-      <div className="mt-5 space-y-2 border-t border-[#fffaf0]/12 pt-4 text-sm text-[#d7c9b5]">
+      <div className="mt-5 space-y-2 border-t border-[rgba(33,28,24,0.15)] pt-4 text-sm text-(--ink-soft)">
         <div className="flex justify-between gap-4">
           <span>Subtotal</span>
           <span className="text-[#f0e8dd]">{subtotal}</span>
@@ -250,15 +252,15 @@ function OrderSummary({
       </div>
 
       <div className="mt-4 flex items-end justify-between gap-4 border-t border-[#d7b56d]/30 pt-4">
-        <span className="text-xs font-semibold tracking-[0.18em] text-[#d7b56d] uppercase">
+        <span className="text-xs font-semibold tracking-[0.18em] text-(--red) uppercase">
           Total
         </span>
-        <span className="font-heading text-2xl font-black text-[#fffaf0]">
+        <span className="font-heading text-2xl font-black text-(--ink)">
           {total}
         </span>
       </div>
 
-      <p className="mt-4 text-[0.7rem]/5 text-[#bfb4a3]">
+      <p className="mt-4 text-[0.7rem]/5 text-(--ink-mute)">
         Ambiente de validação — nenhum pagamento real será processado. O dossiê
         do pedido é gerado ao finalizar.
       </p>

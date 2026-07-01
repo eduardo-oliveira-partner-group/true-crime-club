@@ -1,8 +1,11 @@
-import { ConditionalLayoutWrapper } from '@/src/components/layout/conditional-layout-wrapper'
 import { CookieConsentBanner } from '@/src/components/layout/cookie-consent-banner'
 import { FloatingActionButton } from '@/src/components/layout/floating-action-button'
 import { PublicFooter } from '@/src/components/layout/public-footer'
 import { PublicHeader } from '@/src/components/layout/public-header'
+import { DesignOverlays } from '@/src/components/public-design/design-overlays'
+import { PublicPromoMarquee } from '@/src/components/public-design/promo-marquee'
+import { paperPageClass } from '@/src/lib/design/classes'
+import { designTokens } from '@/src/lib/design/tokens'
 
 export default function FrontOfficeLayout({
   children,
@@ -10,15 +13,16 @@ export default function FrontOfficeLayout({
   children: React.ReactNode
 }>) {
   return (
-    <div className="flex min-h-svh flex-col bg-[#f4f1ec] text-[#211c18] dark:bg-[#090807] dark:text-[#fffaf0]">
-      <ConditionalLayoutWrapper>
-        <PublicHeader />
-      </ConditionalLayoutWrapper>
-      <main className="flex-1">{children}</main>
-      <ConditionalLayoutWrapper>
-        <PublicFooter />
-        <FloatingActionButton />
-      </ConditionalLayoutWrapper>
+    <div
+      className={`flex min-h-svh flex-col ${paperPageClass}`}
+      style={designTokens}
+    >
+      <DesignOverlays />
+      <PublicPromoMarquee />
+      <PublicHeader />
+      <main className="relative z-10 flex-1">{children}</main>
+      <PublicFooter />
+      <FloatingActionButton />
       <CookieConsentBanner />
     </div>
   )

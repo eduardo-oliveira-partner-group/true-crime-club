@@ -67,9 +67,9 @@ export default function FaqPage() {
   }
 
   return (
-    <div className="bg-[#090807] text-[#fffaf0]">
+    <div className="bg-(--paper) text-(--ink)">
       <JsonLd data={faqJsonLd} />
-      <section className="relative isolate overflow-hidden border-b border-[#fffaf0]/10 bg-[#090807]">
+      <section className="relative isolate overflow-hidden border-b border-[rgba(33,28,24,0.15)] bg-(--paper)">
         <Image
           src={previousBoxesBanner}
           alt=""
@@ -85,7 +85,7 @@ export default function FaqPage() {
         <div className="relative z-10 mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-24">
           <ScrollReveal>
             <div className="flex items-center gap-4">
-              <p className="text-xs font-semibold tracking-[0.24em] text-[#d7b56d] uppercase">
+              <p className="text-xs font-semibold tracking-[0.24em] text-(--red) uppercase">
                 Dossiê de dúvidas
               </p>
               <span className="h-px flex-1 bg-[#d7b56d]/45" />
@@ -93,13 +93,13 @@ export default function FaqPage() {
           </ScrollReveal>
 
           <ScrollReveal delay={0.08}>
-            <h1 className="mt-4 max-w-3xl font-heading text-3xl leading-[1.08] font-black tracking-tight text-[#fffaf0] uppercase sm:text-5xl">
+            <h1 className="mt-4 max-w-3xl font-heading text-3xl leading-[1.08] font-black tracking-tight text-(--ink) uppercase sm:text-5xl">
               Perguntas frequentes
             </h1>
           </ScrollReveal>
 
           <ScrollReveal delay={0.14}>
-            <p className="mt-4 max-w-2xl text-base/7 text-[#d7c9b5] sm:text-lg/8">
+            <p className="mt-4 max-w-2xl text-base/7 text-(--ink-soft) sm:text-lg/8">
               {intro?.value ??
                 'Respostas para as dúvidas mais comuns sobre o clube.'}
             </p>
@@ -107,26 +107,26 @@ export default function FaqPage() {
         </div>
       </section>
 
-      <section className="relative isolate overflow-hidden border-b border-[#fffaf0]/10 bg-[#0b0908]">
+      <section className="relative isolate overflow-hidden border-b border-[rgba(33,28,24,0.15)] bg-(--paper-soft)">
         <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.03)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.03)_1px,transparent_1px)] bg-size-[56px_56px]" />
 
         <div className="relative z-10 mx-auto max-w-4xl px-4 py-14 sm:px-6 lg:py-20">
           <ScrollRevealGroup className="space-y-3" staggerChildren={0.07}>
             {faqItems.map((item) => (
               <ScrollRevealItem key={item.code}>
-                <details className="group border border-[#fffaf0]/12 bg-[#171211] p-5 transition-colors hover:border-[#b98542]/45 sm:p-6">
+                <details className="group border border-[rgba(33,28,24,0.15)] bg-(--card) p-5 transition-colors hover:border-[#b98542]/45 sm:p-6">
                   <summary className="flex cursor-pointer list-none items-start justify-between gap-4">
                     <div className="flex items-start gap-4">
-                      <span className="mt-1 font-mono text-[10px] tracking-[0.16em] text-[#bfb4a3] uppercase">
+                      <span className="mt-1 font-mono text-[10px] tracking-[0.16em] text-(--ink-mute) uppercase">
                         {item.code}
                       </span>
-                      <span className="font-heading text-base font-semibold tracking-wide text-[#fffaf0] sm:text-lg">
+                      <span className="font-heading text-base font-semibold tracking-wide text-(--ink) sm:text-lg">
                         {item.question}
                       </span>
                     </div>
-                    <IconChevronDown className="mt-0.5 size-5 shrink-0 text-[#d7b56d] transition-transform duration-300 group-open:rotate-180" />
+                    <IconChevronDown className="mt-0.5 size-5 shrink-0 text-(--red) transition-transform duration-300 group-open:rotate-180" />
                   </summary>
-                  <div className="mt-4 border-t border-[#fffaf0]/10 pt-4 pl-[4.6rem] text-sm/6 text-[#d7c9b5]">
+                  <div className="mt-4 border-t border-[rgba(33,28,24,0.15)] pt-4 pl-[4.6rem] text-sm/6 text-(--ink-soft)">
                     {item.answer}
                   </div>
                 </details>
@@ -136,20 +136,20 @@ export default function FaqPage() {
         </div>
       </section>
 
-      <section className="relative isolate overflow-hidden bg-[#171211] text-[#fffaf0]">
+      <section className="relative isolate overflow-hidden bg-(--card) text-(--ink)">
         <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.035)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.035)_1px,transparent_1px)] bg-size-[56px_56px]" />
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_82%_40%,rgba(216,65,50,0.12),transparent_34%)]" />
 
         <div className="relative z-10 mx-auto flex max-w-6xl flex-col items-start gap-6 px-4 py-14 sm:px-6 md:flex-row md:items-center md:justify-between">
           <ScrollReveal>
             <div className="max-w-2xl space-y-3">
-              <p className="text-xs font-semibold tracking-[0.22em] text-[#d7b56d] uppercase">
+              <p className="text-xs font-semibold tracking-[0.22em] text-(--red) uppercase">
                 Ainda em dúvida?
               </p>
               <h2 className="font-heading text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
                 Entre no caso. O arquivo está aberto.
               </h2>
-              <p className="max-w-xl text-sm/6 text-[#d7c9b5]">
+              <p className="max-w-xl text-sm/6 text-(--ink-soft)">
                 Garanta sua vaga no clube e comece a receber pistas, evidências
                 e edições exclusivas todo mês.
               </p>

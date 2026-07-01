@@ -19,9 +19,9 @@ export function RelatedProductCard({ product }: RelatedProductCardProps) {
   return (
     <Link
       href={`${typeof window !== 'undefined' && window.location.pathname.startsWith('/design-sugerido') ? '/design-sugerido' : ''}/loja/${product.slug}`}
-      className="group block border border-[#fffaf0]/14 bg-[#090807] p-0 shadow-[0_20px_48px_rgba(0,0,0,0.24)] transition hover:-translate-y-1 hover:border-[#d7b56d]/35 focus-visible:ring-2 focus-visible:ring-[#d7b56d] focus-visible:outline-none"
+      className="group block border border-[rgba(33,28,24,0.15)] bg-(--paper) p-0 shadow-[0_18px_40px_rgba(33,28,24,0.24)] transition hover:-translate-y-1 hover:border-[#d7b56d]/35 focus-visible:ring-2 focus-visible:ring-[#d7b56d] focus-visible:outline-none"
     >
-      <div className="relative aspect-4/3 overflow-hidden border-b border-[#fffaf0]/14 bg-[#171211]">
+      <div className="relative aspect-4/3 overflow-hidden border-b border-[rgba(33,28,24,0.15)] bg-(--card)">
         {productImage ? (
           <Image
             src={productImage}
@@ -41,15 +41,15 @@ export function RelatedProductCard({ product }: RelatedProductCardProps) {
         />
       </div>
       <div className="p-5">
-        <p className="text-[0.65rem] font-semibold tracking-[0.18em] text-[#d7b56d] uppercase">
+        <p className="text-[0.65rem] font-semibold tracking-[0.18em] text-(--red) uppercase">
           {product.type === 'box' ? 'Box avulsa' : 'Item complementar'}
         </p>
-        <h3 className="mt-2 line-clamp-2 font-heading text-xl/tight font-semibold tracking-wide text-[#fffaf0] uppercase">
+        <h3 className="mt-2 line-clamp-2 font-heading text-xl/tight font-semibold tracking-wide text-(--ink) uppercase">
           {product.name}
         </h3>
-        <div className="mt-5 flex items-end justify-between gap-4 border-t border-[#fffaf0]/10 pt-4">
+        <div className="mt-5 flex items-end justify-between gap-4 border-t border-[rgba(33,28,24,0.15)] pt-4">
           <PriceBlock product={product} compact />
-          <span className="inline-flex size-10 items-center justify-center border border-[#fffaf0]/22 bg-[#fffaf0]/6 text-[#fffaf0] transition group-hover:bg-[#fffaf0]/12">
+          <span className="inline-flex size-10 items-center justify-center border border-[rgba(33,28,24,0.15)] bg-(--card)/6 text-(--ink) transition group-hover:bg-(--card)/12">
             <IconArrowRight className="size-4" />
           </span>
         </div>

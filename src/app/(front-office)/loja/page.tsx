@@ -37,8 +37,8 @@ export default async function LojaPage() {
     boxProducts[0]
 
   return (
-    <div className="bg-[#090807] text-[#fffaf0]">
-      <section className="relative isolate overflow-hidden border-b border-[#fffaf0]/10 bg-[#090807]">
+    <div className="bg-(--paper) text-(--ink)">
+      <section className="relative isolate overflow-hidden border-b border-[rgba(33,28,24,0.15)] bg-(--paper)">
         <Image
           src={previousBoxesBanner}
           alt=""
@@ -55,7 +55,7 @@ export default async function LojaPage() {
           <div className="max-w-2xl space-y-6">
             <ScrollReveal>
               <div className="flex items-center gap-4">
-                <p className="text-xs font-semibold tracking-[0.24em] text-[#d7b56d] uppercase">
+                <p className="text-xs font-semibold tracking-[0.24em] text-(--red) uppercase">
                   Loja oficial
                 </p>
                 <span className="h-px flex-1 bg-[#d7b56d]/45" />
@@ -63,32 +63,32 @@ export default async function LojaPage() {
             </ScrollReveal>
 
             <ScrollReveal delay={0.08}>
-              <h1 className="max-w-[20rem] font-heading text-3xl leading-[1.06] font-black text-[#fffaf0] uppercase sm:max-w-2xl sm:text-5xl lg:text-6xl">
+              <h1 className="max-w-[20rem] font-heading text-3xl leading-[1.06] font-black text-(--ink) uppercase sm:max-w-2xl sm:text-5xl lg:text-6xl">
                 Arquivos abertos para colecionadores.
               </h1>
             </ScrollReveal>
 
             <ScrollReveal delay={0.14}>
-              <p className="max-w-xl text-base/7 text-[#d7c9b5] sm:text-lg/8">
+              <p className="max-w-xl text-base/7 text-(--ink-soft) sm:text-lg/8">
                 Boxes anteriores, edições avulsas e itens complementares do True
                 Crime Club continuam disponíveis enquanto houver estoque.
               </p>
             </ScrollReveal>
 
             <ScrollReveal delay={0.2}>
-              <div className="grid max-w-xl grid-cols-3 border border-[#fffaf0]/14 bg-[#090807]/72 backdrop-blur-sm">
+              <div className="grid max-w-xl grid-cols-3 border border-[rgba(33,28,24,0.15)] bg-(--paper)/72 backdrop-blur-sm">
                 {stats.map((stat, index) => (
                   <div
                     key={stat.label}
                     className={cn(
                       'min-w-0 p-3 sm:p-5',
-                      index > 0 ? 'border-l border-[#fffaf0]/14' : '',
+                      index > 0 ? 'border-l border-[rgba(33,28,24,0.15)]' : '',
                     )}
                   >
-                    <p className="font-heading text-xl leading-none font-black text-[#fffaf0] sm:text-3xl">
+                    <p className="font-heading text-xl leading-none font-black text-(--ink) sm:text-3xl">
                       {stat.value}
                     </p>
-                    <p className="mt-2 text-[0.58rem]/4 font-semibold tracking-[0.12em] text-[#d7b56d] uppercase sm:text-[0.65rem] sm:tracking-[0.16em]">
+                    <p className="mt-2 text-[0.58rem]/4 font-semibold tracking-[0.12em] text-(--red) uppercase sm:text-[0.65rem] sm:tracking-[0.16em]">
                       {stat.label}
                     </p>
                   </div>
@@ -116,9 +116,9 @@ function FeaturedProductCase({ product }: { product: Product }) {
   return (
     <Link
       href={`/loja/${product.slug}`}
-      className="group block border border-[#d7b56d]/28 bg-[#090807]/82 p-4 shadow-[0_24px_64px_rgba(0,0,0,0.42)] backdrop-blur-sm transition hover:border-[#d7b56d]/48 focus-visible:ring-2 focus-visible:ring-[#d7b56d] focus-visible:outline-none sm:p-5"
+      className="group block border border-[#d7b56d]/28 bg-(--paper)/82 p-4 shadow-[0_18px_40px_rgba(33,28,24,0.42)] backdrop-blur-sm transition hover:border-[#d7b56d]/48 focus-visible:ring-2 focus-visible:ring-[#d7b56d] focus-visible:outline-none sm:p-5"
     >
-      <div className="relative aspect-4/3 overflow-hidden border border-[#fffaf0]/12 bg-[#171211]">
+      <div className="relative aspect-4/3 overflow-hidden border border-[rgba(33,28,24,0.15)] bg-(--card)">
         {productImage ? (
           <Image
             src={productImage}
@@ -139,13 +139,13 @@ function FeaturedProductCase({ product }: { product: Product }) {
       </div>
       <div className="grid gap-5 pt-5 sm:grid-cols-[1fr_auto] sm:items-end">
         <div>
-          <p className="border-l-2 border-[#d84132] pl-3 text-xs font-semibold tracking-[0.2em] text-[#ffb0a5] uppercase">
+          <p className="border-l-2 border-[#d84132] pl-3 text-xs font-semibold tracking-[0.2em] text-(--red) uppercase">
             Arquivo em destaque
           </p>
-          <h2 className="mt-3 font-heading text-2xl/tight font-semibold tracking-wide text-[#fffaf0] uppercase">
+          <h2 className="mt-3 font-heading text-2xl/tight font-semibold tracking-wide text-(--ink) uppercase">
             {product.name}
           </h2>
-          <p className="mt-2 line-clamp-2 text-sm/6 text-[#d7c9b5]">
+          <p className="mt-2 line-clamp-2 text-sm/6 text-(--ink-soft)">
             {product.shortDescription}
           </p>
         </div>
@@ -161,8 +161,8 @@ function EvidencePlaceholder({ product }: { product: Product }) {
       <div className="absolute inset-6 border border-[#d7b56d]/20" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_38%,rgba(216,65,50,0.16),transparent_28%),radial-gradient(circle_at_48%_58%,rgba(215,181,109,0.12),transparent_32%)]" />
       <div className="relative z-10 flex flex-col items-center text-center">
-        <IconSparkles className="size-9 text-[#d7b56d]" />
-        <p className="mt-3 max-w-44 text-xs font-semibold tracking-[0.18em] text-[#fffaf0] uppercase">
+        <IconSparkles className="size-9 text-(--red)" />
+        <p className="mt-3 max-w-44 text-xs font-semibold tracking-[0.18em] text-(--ink) uppercase">
           {product.categories[0] ?? 'item'} do arquivo
         </p>
       </div>

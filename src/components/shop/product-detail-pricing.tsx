@@ -19,23 +19,23 @@ export function ProductDetailPricing({
     <div
       className={cn(
         variant === 'panel' &&
-          'border border-[#fffaf0]/14 bg-[#0b0908]/92 p-5 shadow-[0_20px_48px_rgba(0,0,0,0.32)] sm:p-6',
-        variant === 'inline' && 'border-t border-[#fffaf0]/10 pt-6',
+          'border border-[rgba(33,28,24,0.15)] bg-(--paper-soft)/92 p-5 shadow-[0_18px_40px_rgba(33,28,24,0.32)] sm:p-6',
+        variant === 'inline' && 'border-t border-[rgba(33,28,24,0.15)] pt-6',
         className,
       )}
     >
       {variant === 'panel' ? (
-        <p className="mb-4 text-xs font-semibold tracking-[0.2em] text-[#d7b56d] uppercase">
+        <p className="mb-4 text-xs font-semibold tracking-[0.2em] text-(--red) uppercase">
           Valor do arquivo
         </p>
       ) : null}
       <PriceBlock product={product} />
       {product.subscriberPrice ? (
-        <p className="mt-4 text-sm/6 text-[#d7c9b5]">
+        <p className="mt-4 text-sm/6 text-(--ink-soft)">
           Assinantes do clube têm preço reduzido.{' '}
           <Link
             href="/assinatura"
-            className="font-medium text-[#d7b56d] underline-offset-4 transition hover:text-[#f4d891] hover:underline"
+            className="font-medium text-(--red) underline-offset-4 transition hover:text-[#f4d891] hover:underline"
           >
             Conheça os planos
           </Link>
