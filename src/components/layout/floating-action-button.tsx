@@ -1,30 +1,62 @@
 'use client'
 
+import { IconArrowRight, IconBoxSeam } from '@tabler/icons-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
+
+import {
+  fontMono,
+  transitionColors,
+  transitionFab,
+} from '@/src/lib/design/classes'
 
 export function FloatingActionButton() {
   const [isVisible, setIsVisible] = useState(false)
   const pathname = usePathname()
 
   useEffect(() => {
-    const handleScroll = () => {
+    const hero = document.getElementById('topo')
+    const cta = document.getElementById('cta-final')
+
+    let frame = 0
+    const updateFab = () => {
+      frame = 0
+      if (pathname === '/') {
+        if (!hero || !cta) {
+          setIsVisible(false)
+          return
+        }
+        const heroOut = hero.getBoundingClientRect().bottom <= 0
+        const beforeFinalCta =
+          cta.getBoundingClientRect().top > window.innerHeight
+        setIsVisible(heroOut && beforeFinalCta)
+        return
+      }
+
       const scrolledPastHero = window.scrollY > 300
       const isNearBottom =
         window.innerHeight + window.scrollY >=
         document.documentElement.scrollHeight - 600
-
       setIsVisible(scrolledPastHero && !isNearBottom)
     }
 
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    handleScroll()
+    const scheduleUpdate = () => {
+      if (frame) return
+      frame = window.requestAnimationFrame(updateFab)
+    }
 
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+    updateFab()
+    window.addEventListener('scroll', scheduleUpdate, { passive: true })
+    window.addEventListener('resize', scheduleUpdate)
 
-  // Hide the FAB on pages where it is not appropriate (signature itself, checkout, auth)
+    return () => {
+      if (frame) window.cancelAnimationFrame(frame)
+      window.removeEventListener('scroll', scheduleUpdate)
+      window.removeEventListener('resize', scheduleUpdate)
+    }
+  }, [pathname])
+
   if (
     pathname?.startsWith('/checkout') ||
     pathname?.startsWith('/login') ||
@@ -36,33 +68,24 @@ export function FloatingActionButton() {
 
   return (
     <div
-      className={`fixed right-5 bottom-5 z-50 transition-all duration-300 max-sm:inset-x-3.5 max-sm:bottom-3.5 ${
+      className={`fixed right-5 bottom-5 z-60 ${transitionFab} motion-reduce:transition-none max-[540px]:inset-x-[14px] max-[540px]:bottom-[14px] ${
         isVisible
-          ? 'translate-y-0 scale-100 opacity-100'
-          : 'pointer-events-none translate-y-6 scale-95 opacity-0'
+          ? ''
+          : 'pointer-events-none translate-y-6 scale-[0.96] opacity-0'
       }`}
     >
       <Link
         href="/assinatura"
-        className="inline-flex w-full items-center justify-center gap-[11px] rounded-[13px] border border-[#211c18]/25 bg-[#c5271f] px-6 py-4 font-mono text-sm font-bold tracking-[0.04em] text-[#fbf9f6] uppercase shadow-[0_16px_38px_-10px_rgba(33,28,24,0.55)] transition-all hover:bg-[#a91d16] max-sm:py-3.5"
+        className={`flex items-center gap-[11px] rounded-[13px] border border-[rgba(33,28,24,0.25)] bg-(--red) px-6 py-4 text-[14px] leading-none font-bold tracking-[0.04em] text-[#fbf9f6] uppercase no-underline shadow-[0_16px_38px_-10px_rgba(33,28,24,0.55)] ${transitionColors} hover:bg-(--red-deep) max-[540px]:w-full max-[540px]:justify-center ${fontMono}`}
       >
-        <svg
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="size-5"
-        >
-          <path d="M21 8 12 3 3 8v8l9 5 9-5V8Z" />
-          <path d="M3 8l9 5 9-5" />
-          <path d="M12 13v8" />
-        </svg>
+        <IconBoxSeam size={20} stroke={1.75} aria-hidden />
         Entrar no clube
-        <span className="text-base leading-none">→</span>
+        <IconArrowRight
+          size={16}
+          stroke={2}
+          className="inline-flex items-center leading-none"
+          aria-hidden
+        />
       </Link>
     </div>
   )

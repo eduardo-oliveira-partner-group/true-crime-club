@@ -48,27 +48,27 @@ export default async function CarrinhoPage() {
   const dossierCode = `CART-${String(cart.items.length).padStart(2, '0')}`
 
   return (
-    <div className="relative isolate min-h-svh overflow-hidden bg-[#090807] text-[#fffaf0]">
+    <div className="relative isolate min-h-svh overflow-hidden bg-(--paper) text-(--ink)">
       <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.025)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.025)_1px,transparent_1px)] bg-size-[56px_56px]" />
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_18%_12%,rgba(216,65,50,0.08),transparent_32%),radial-gradient(circle_at_82%_8%,rgba(215,181,109,0.08),transparent_30%)]" />
 
       <div className="relative z-10 mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-20">
-        <header className="flex flex-col gap-5 border-b border-[#fffaf0]/10 pb-8">
+        <header className="flex flex-col gap-5 border-b border-[rgba(33,28,24,0.15)] pb-8">
           <div className="flex flex-wrap items-center gap-4">
-            <p className="text-xs font-semibold tracking-[0.24em] text-[#d7b56d] uppercase">
+            <p className="text-xs font-semibold tracking-[0.24em] text-(--red) uppercase">
               Dossiê de compra
             </p>
             <span className="hidden h-px flex-1 bg-[#d7b56d]/35 sm:block" />
-            <p className="font-mono text-xs tracking-[0.16em] text-[#d7c9b5]/55 uppercase">
+            <p className="font-mono text-xs tracking-[0.16em] text-(--ink-soft)/55 uppercase">
               {dossierCode}
             </p>
           </div>
           <div className="flex flex-wrap items-end justify-between gap-4">
-            <h1 className="font-heading text-3xl/tight font-black tracking-wide text-[#fffaf0] uppercase sm:text-4xl lg:text-5xl">
+            <h1 className="font-heading text-3xl/tight font-black tracking-wide text-(--ink) uppercase sm:text-4xl lg:text-5xl">
               Seu carrinho
             </h1>
             {cart.items.length > 0 ? (
-              <p className="text-sm text-[#d7c9b5]">
+              <p className="text-sm text-(--ink-soft)">
                 {itemCount}{' '}
                 {itemCount === 1 ? 'peça em análise' : 'peças em análise'}
               </p>
@@ -87,7 +87,7 @@ export default async function CarrinhoPage() {
 
               <Link
                 href="/loja"
-                className="group inline-flex items-center gap-2 pt-2 text-sm font-medium text-[#d7b56d] transition hover:text-[#f4d891] focus-visible:ring-2 focus-visible:ring-[#d7b56d] focus-visible:outline-none"
+                className="group inline-flex items-center gap-2 pt-2 text-sm font-medium text-(--red) transition hover:text-[#f4d891] focus-visible:ring-2 focus-visible:ring-[#d7b56d] focus-visible:outline-none"
               >
                 <IconArrowRight className="size-4 rotate-180 transition group-hover:-translate-x-1" />
                 Continuar investigando a loja
@@ -117,17 +117,17 @@ export default async function CarrinhoPage() {
 
 function EmptyCart() {
   return (
-    <div className="mt-12 border border-dashed border-[#fffaf0]/18 bg-[#171211]/60 p-10 text-center">
-      <div className="mx-auto flex size-14 items-center justify-center border border-[#fffaf0]/14 bg-[#090807] text-[#d7b56d]">
+    <div className="mt-12 border border-dashed border-[rgba(33,28,24,0.15)] bg-(--card)/60 p-10 text-center">
+      <div className="mx-auto flex size-14 items-center justify-center border border-[rgba(33,28,24,0.15)] bg-(--paper) text-(--red)">
         <IconShoppingBag className="size-6" />
       </div>
-      <p className="mt-5 text-xs font-semibold tracking-[0.2em] text-[#d7b56d] uppercase">
+      <p className="mt-5 text-xs font-semibold tracking-[0.2em] text-(--red) uppercase">
         Arquivo vazio
       </p>
-      <h2 className="mt-3 font-heading text-2xl font-semibold tracking-tight text-[#fffaf0] sm:text-3xl">
+      <h2 className="mt-3 font-heading text-2xl font-semibold tracking-tight text-(--ink) sm:text-3xl">
         Nenhuma evidência selecionada ainda.
       </h2>
-      <p className="mx-auto mt-3 max-w-md text-sm/6 text-[#d7c9b5]">
+      <p className="mx-auto mt-3 max-w-md text-sm/6 text-(--ink-soft)">
         Abra o arquivo da loja e adicione boxes avulsas e itens colecionáveis
         para montar seu dossiê de compra.
       </p>
@@ -162,13 +162,13 @@ function CartLineItem({
   const itemCode = `EVID-${String(item.quantity).padStart(2, '0')}`
 
   return (
-    <article className="relative isolate overflow-hidden border border-[#fffaf0]/12 bg-[#171211]/70 shadow-[0_18px_44px_rgba(0,0,0,0.32)] transition hover:border-[#fffaf0]/20">
+    <article className="relative isolate overflow-hidden border border-[rgba(33,28,24,0.15)] bg-(--card)/70 shadow-[0_18px_40px_rgba(33,28,24,0.32)] transition hover:border-[rgba(33,28,24,0.15)]">
       <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.022)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.022)_1px,transparent_1px)] bg-size-[34px_34px]" />
 
       <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-stretch sm:gap-5 sm:p-5">
         <Link
           href={`/loja/${item.productSlug}`}
-          className="group relative aspect-square w-full shrink-0 overflow-hidden border border-[#fffaf0]/12 bg-[#0b0908] sm:size-28"
+          className="group relative aspect-square w-full shrink-0 overflow-hidden border border-[rgba(33,28,24,0.15)] bg-(--paper-soft) sm:size-28"
         >
           {productImage ? (
             <Image
@@ -179,7 +179,7 @@ function CartLineItem({
               className="object-cover object-center transition duration-500 group-hover:scale-[1.04]"
             />
           ) : (
-            <div className="flex size-full items-center justify-center text-[#d7b56d]/50">
+            <div className="flex size-full items-center justify-center text-(--red)/50">
               <IconShoppingBag className="size-7" />
             </div>
           )}
@@ -189,28 +189,28 @@ function CartLineItem({
         <div className="flex min-w-0 flex-1 flex-col gap-4">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="min-w-0 space-y-1.5">
-              <p className="font-mono text-[0.68rem] tracking-[0.18em] text-[#d7c9b5]/55 uppercase">
+              <p className="font-mono text-[0.68rem] tracking-[0.18em] text-(--ink-soft)/55 uppercase">
                 {itemCode} · {item.productType === 'box' ? 'Box' : 'Item'}
               </p>
-              <h3 className="font-heading text-lg/tight font-semibold tracking-wide text-[#fffaf0] uppercase">
+              <h3 className="font-heading text-lg/tight font-semibold tracking-wide text-(--ink) uppercase">
                 <Link
                   href={`/loja/${item.productSlug}`}
-                  className="transition hover:text-[#d7b56d]"
+                  className="transition hover:text-(--red)"
                 >
                   {item.productName}
                 </Link>
               </h3>
-              <p className="text-sm text-[#c8bdad]">
+              <p className="text-sm text-(--ink-soft)">
                 {formatCurrency(item.unitPrice)}{' '}
-                <span className="text-[#c8bdad]/60">/ unidade</span>
+                <span className="text-(--ink-soft)/60">/ unidade</span>
               </p>
             </div>
-            <p className="font-heading text-lg leading-none font-semibold text-[#fffaf0]">
+            <p className="font-heading text-lg leading-none font-semibold text-(--ink)">
               {formatCurrency(lineTotal)}
             </p>
           </div>
 
-          <div className="mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-[#fffaf0]/10 pt-4">
+          <div className="mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-[rgba(33,28,24,0.15)] pt-4">
             <QuantityControls itemId={item.id} quantity={item.quantity} />
             <form
               action={async () => {
@@ -223,7 +223,7 @@ function CartLineItem({
                 type="submit"
                 variant="ghost"
                 size="sm"
-                className="h-8 gap-1.5 rounded-none px-3 text-xs font-medium text-[#ffb0a5] hover:bg-[#d84132]/12 hover:text-[#ffb0a5]"
+                className="h-8 gap-1.5 rounded-none px-3 text-xs font-medium text-(--red) hover:bg-[#d84132]/12 hover:text-(--red)"
               >
                 <IconTrash className="size-4" />
                 Remover
@@ -244,14 +244,14 @@ function QuantityControls({
   quantity: number
 }) {
   const baseButton =
-    'flex size-8 items-center justify-center border border-[#fffaf0]/22 bg-[#fffaf0]/6 text-[#fffaf0] transition hover:bg-[#fffaf0]/12 disabled:opacity-40'
+    'flex size-8 items-center justify-center border border-[rgba(33,28,24,0.15)] bg-(--card)/6 text-(--ink) transition hover:bg-(--card)/12 disabled:opacity-40'
 
   return (
     <div className="inline-flex items-center gap-2">
-      <span className="text-[0.68rem] font-semibold tracking-[0.18em] text-[#d7b56d] uppercase">
+      <span className="text-[0.68rem] font-semibold tracking-[0.18em] text-(--red) uppercase">
         Qtde
       </span>
-      <div className="inline-flex items-center gap-2 border border-[#fffaf0]/14 bg-[#090807]/70 px-2 py-1.5">
+      <div className="inline-flex items-center gap-2 border border-[rgba(33,28,24,0.15)] bg-(--paper)/70 px-2 py-1.5">
         <form
           action={async () => {
             'use server'
@@ -270,7 +270,7 @@ function QuantityControls({
         </form>
         <span
           key={quantity}
-          className="min-w-6 text-center font-heading text-sm font-semibold text-[#fffaf0]"
+          className="min-w-6 text-center font-heading text-sm font-semibold text-(--ink)"
         >
           {quantity}
         </span>
@@ -312,11 +312,11 @@ function OrderSummary({
   couponCode?: string
 }) {
   return (
-    <div className="border border-[#b98542]/40 bg-[#0b0908]/85 shadow-[0_24px_64px_rgba(0,0,0,0.42)] backdrop-blur-sm">
-      <div className="border-b border-[#fffaf0]/10 p-5 sm:p-6">
+    <div className="border border-[#b98542]/40 bg-(--paper-soft)/85 shadow-[0_18px_40px_rgba(33,28,24,0.42)] backdrop-blur-sm">
+      <div className="border-b border-[rgba(33,28,24,0.15)] p-5 sm:p-6">
         <div className="flex items-center gap-3">
-          <IconClipboardText className="size-5 text-[#d7b56d]" />
-          <p className="text-xs font-semibold tracking-[0.22em] text-[#d7b56d] uppercase">
+          <IconClipboardText className="size-5 text-(--red)" />
+          <p className="text-xs font-semibold tracking-[0.22em] text-(--red) uppercase">
             Resumo do pedido
           </p>
         </div>
@@ -333,15 +333,15 @@ function OrderSummary({
         ) : null}
         <div className="space-y-1.5">
           <div className="flex items-center justify-between gap-3">
-            <span className="inline-flex items-center gap-2 text-[#c8bdad]">
-              <IconTruck className="size-4 text-[#d7b56d]" />
+            <span className="inline-flex items-center gap-2 text-(--ink-soft)">
+              <IconTruck className="size-4 text-(--red)" />
               Frete estimado
             </span>
-            <span className="font-medium text-[#fffaf0]">
+            <span className="font-medium text-(--ink)">
               {formatCurrency(shipping)}
             </span>
           </div>
-          <p className="pl-6 text-xs text-[#c8bdad]/70">
+          <p className="pl-6 text-xs text-(--ink-soft)/70">
             {shippingRegion} · {shippingDays}
           </p>
         </div>
@@ -349,10 +349,10 @@ function OrderSummary({
         <div className="h-px bg-[#a78a5a]/30" />
 
         <div className="flex items-end justify-between gap-3">
-          <span className="text-xs font-semibold tracking-[0.2em] text-[#d7b56d] uppercase">
+          <span className="text-xs font-semibold tracking-[0.2em] text-(--red) uppercase">
             Total
           </span>
-          <span className="font-heading text-2xl leading-none font-black text-[#fffaf0]">
+          <span className="font-heading text-2xl leading-none font-black text-(--ink)">
             {formatCurrency(total)}
           </span>
         </div>
@@ -360,7 +360,7 @@ function OrderSummary({
         <CouponForm />
       </div>
 
-      <div className="border-t border-[#fffaf0]/10 p-5 sm:p-6">
+      <div className="border-t border-[rgba(33,28,24,0.15)] p-5 sm:p-6">
         <Button
           asChild
           size="lg"
@@ -372,13 +372,13 @@ function OrderSummary({
           </Link>
         </Button>
 
-        <ul className="mt-5 space-y-2 text-xs text-[#c8bdad]">
+        <ul className="mt-5 space-y-2 text-xs text-(--ink-soft)">
           <li className="inline-flex items-center gap-2">
-            <IconShieldCheck className="size-4 text-[#d7b56d]" />
+            <IconShieldCheck className="size-4 text-(--red)" />
             Pagamento seguro e ambiente criptografado.
           </li>
           <li className="inline-flex items-center gap-2">
-            <IconTruck className="size-4 text-[#d7b56d]" />
+            <IconTruck className="size-4 text-(--red)" />
             Envio previsto para o ciclo seguinte à compra.
           </li>
         </ul>
@@ -398,11 +398,11 @@ function SummaryRow({
 }) {
   return (
     <div className="flex items-center justify-between gap-3">
-      <span className="text-[#c8bdad]">{label}</span>
+      <span className="text-(--ink-soft)">{label}</span>
       <span
         className={cn(
           'font-medium',
-          tone === 'gold' ? 'text-[#d7b56d]' : 'text-[#fffaf0]',
+          tone === 'gold' ? 'text-(--red)' : 'text-(--ink)',
         )}
       >
         {value}
@@ -423,24 +423,24 @@ function CouponForm() {
     >
       <label
         htmlFor="coupon"
-        className="text-[0.68rem] font-semibold tracking-[0.18em] text-[#d7b56d] uppercase"
+        className="text-[0.68rem] font-semibold tracking-[0.18em] text-(--red) uppercase"
       >
         Cupom de desconto
       </label>
       <div className="flex gap-2">
         <div className="relative flex-1">
-          <IconTag className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#c8bdad]/60" />
+          <IconTag className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-(--ink-soft)/60" />
           <input
             id="coupon"
             name="coupon"
             placeholder="Informe o código"
-            className="h-10 w-full rounded-none border border-[#fffaf0]/18 bg-[#090807] pr-3 pl-9 text-sm text-[#fffaf0] placeholder:text-[#c8bdad]/50 focus:border-[#d7b56d]/60 focus-visible:ring-2 focus-visible:ring-[#d7b56d]/40 focus-visible:outline-none"
+            className="h-10 w-full rounded-none border border-[rgba(33,28,24,0.15)] bg-(--paper) pr-3 pl-9 text-sm text-(--ink) placeholder:text-(--ink-soft)/50 focus:border-[#d7b56d]/60 focus-visible:ring-2 focus-visible:ring-[#d7b56d]/40 focus-visible:outline-none"
           />
         </div>
         <Button
           type="submit"
           variant="outline"
-          className="h-10 shrink-0 rounded-none border-[#fffaf0]/22 bg-[#fffaf0]/6 px-4 text-[#fffaf0] hover:bg-[#fffaf0]/12 hover:text-[#fffaf0]"
+          className="h-10 shrink-0 rounded-none border-[rgba(33,28,24,0.15)] bg-(--card)/6 px-4 text-(--ink) hover:bg-(--card)/12 hover:text-(--ink)"
         >
           Aplicar
         </Button>

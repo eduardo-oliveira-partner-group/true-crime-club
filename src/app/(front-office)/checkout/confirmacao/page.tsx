@@ -41,7 +41,7 @@ export default function ConfirmacaoPage() {
   const itemCount = order.items.reduce((sum, item) => sum + item.quantity, 0)
 
   return (
-    <div className="relative isolate min-h-svh overflow-hidden bg-[#090807] text-[#fffaf0]">
+    <div className="relative isolate min-h-svh overflow-hidden bg-(--paper) text-(--ink)">
       <Image
         src={evidenceWorkbenchPlate}
         alt=""
@@ -54,41 +54,41 @@ export default function ConfirmacaoPage() {
       <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.028)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.028)_1px,transparent_1px)] bg-size-[42px_42px]" />
 
       <div className="relative z-10 mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:py-16">
-        <header className="border-b border-[#fffaf0]/12 pb-8">
+        <header className="border-b border-[rgba(33,28,24,0.15)] pb-8">
           <div className="flex flex-wrap items-center gap-4">
-            <p className="text-xs font-semibold tracking-[0.26em] text-[#d7b56d] uppercase">
+            <p className="text-xs font-semibold tracking-[0.26em] text-(--red) uppercase">
               Pedido confirmado
             </p>
             <span className="hidden h-px flex-1 bg-[#d7b56d]/38 sm:block" />
-            <p className="font-mono text-[0.68rem] tracking-[0.18em] text-[#fffaf0]/50 uppercase">
+            <p className="font-mono text-[0.68rem] tracking-[0.18em] text-(--ink)/50 uppercase">
               PROC-08 · dossiê aberto
             </p>
           </div>
 
           <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_0.38fr] lg:items-end">
             <div className="flex flex-col gap-4">
-              <div className="inline-flex w-fit items-center gap-2 border border-[#d7b56d]/35 bg-[#171211]/80 px-3 py-2 text-xs font-semibold tracking-[0.18em] text-[#d7b56d] uppercase backdrop-blur-sm">
+              <div className="inline-flex w-fit items-center gap-2 border border-[#d7b56d]/35 bg-(--card)/80 px-3 py-2 text-xs font-semibold tracking-[0.18em] text-(--red) uppercase backdrop-blur-sm">
                 <IconShieldCheck className="size-4" />
                 Sessão registrada
               </div>
-              <h1 className="max-w-3xl font-heading text-3xl/tight font-black tracking-wide text-[#fffaf0] uppercase sm:text-4xl lg:text-5xl">
+              <h1 className="max-w-3xl font-heading text-3xl/tight font-black tracking-wide text-(--ink) uppercase sm:text-4xl lg:text-5xl">
                 O dossiê do seu pedido foi lacrado.
               </h1>
-              <p className="max-w-2xl text-sm/6 text-[#d7c9b5] sm:text-base/7">
+              <p className="max-w-2xl text-sm/6 text-(--ink-soft) sm:text-base/7">
                 Recebemos o pedido {order.orderNumber}. A confirmação foi
                 registrada e os próximos passos ficam disponíveis na área do
                 cliente.
               </p>
             </div>
 
-            <div className="border border-[#d7b56d]/35 bg-[#171211]/85 p-5 shadow-[0_20px_48px_rgba(0,0,0,0.38)] backdrop-blur-sm">
-              <p className="text-[0.66rem] font-semibold tracking-[0.2em] text-[#d7b56d] uppercase">
+            <div className="border border-[#d7b56d]/35 bg-(--card)/85 p-5 shadow-[0_18px_40px_rgba(33,28,24,0.38)] backdrop-blur-sm">
+              <p className="text-[0.66rem] font-semibold tracking-[0.2em] text-(--red) uppercase">
                 Total confirmado
               </p>
-              <p className="mt-2 font-heading text-3xl font-black text-[#fffaf0]">
+              <p className="mt-2 font-heading text-3xl font-black text-(--ink)">
                 {formatCurrency(order.total)}
               </p>
-              <p className="mt-2 text-xs/5 text-[#c8bdad]">
+              <p className="mt-2 text-xs/5 text-(--ink-soft)">
                 {itemCount}{' '}
                 {itemCount === 1
                   ? 'peça catalogada no pedido'
@@ -107,22 +107,22 @@ export default function ConfirmacaoPage() {
               createdAt={formatDateTime(order.createdAt)}
             />
 
-            <section className="border border-[#fffaf0]/12 bg-[#171211]/78 p-5 shadow-[0_20px_48px_rgba(0,0,0,0.32)] sm:p-6">
-              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#fffaf0]/12 pb-4">
+            <section className="border border-[rgba(33,28,24,0.15)] bg-(--card)/78 p-5 shadow-[0_18px_40px_rgba(33,28,24,0.32)] sm:p-6">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[rgba(33,28,24,0.15)] pb-4">
                 <div className="flex items-center gap-3">
-                  <span className="flex size-10 items-center justify-center bg-[#d84132]/18 text-[#ffb0a5]">
+                  <span className="flex size-10 items-center justify-center bg-[#d84132]/18 text-(--red)">
                     <IconPackage className="size-5" />
                   </span>
                   <div>
-                    <p className="text-xs font-semibold tracking-[0.2em] text-[#d7b56d] uppercase">
+                    <p className="text-xs font-semibold tracking-[0.2em] text-(--red) uppercase">
                       Evidências do pedido
                     </p>
-                    <h2 className="font-heading text-xl font-semibold tracking-wide text-[#fffaf0] uppercase">
+                    <h2 className="font-heading text-xl font-semibold tracking-wide text-(--ink) uppercase">
                       Itens catalogados
                     </h2>
                   </div>
                 </div>
-                <p className="font-mono text-[0.65rem] tracking-[0.16em] text-[#fffaf0]/42 uppercase">
+                <p className="font-mono text-[0.65rem] tracking-[0.16em] text-(--ink)/42 uppercase">
                   {String(order.items.length).padStart(2, '0')} registros
                 </p>
               </div>
@@ -163,17 +163,17 @@ export default function ConfirmacaoPage() {
           </main>
 
           <aside className="lg:sticky lg:top-24 lg:self-start">
-            <div className="border border-[#fffaf0]/12 bg-[#0c0a09]/90 p-5 shadow-[0_20px_48px_rgba(0,0,0,0.38)] backdrop-blur-sm sm:p-6">
-              <div className="flex items-center justify-between border-b border-[#fffaf0]/12 pb-4">
-                <p className="text-xs font-semibold tracking-[0.2em] text-[#d7b56d] uppercase">
+            <div className="border border-[rgba(33,28,24,0.15)] bg-(--card) p-5 shadow-[0_18px_40px_rgba(33,28,24,0.38)] backdrop-blur-sm sm:p-6">
+              <div className="flex items-center justify-between border-b border-[rgba(33,28,24,0.15)] pb-4">
+                <p className="text-xs font-semibold tracking-[0.2em] text-(--red) uppercase">
                   Resumo financeiro
                 </p>
-                <p className="font-mono text-[0.62rem] tracking-[0.16em] text-[#fffaf0]/40 uppercase">
+                <p className="font-mono text-[0.62rem] tracking-[0.16em] text-(--ink)/40 uppercase">
                   {order.orderNumber}
                 </p>
               </div>
 
-              <div className="mt-5 flex flex-col gap-3 text-sm text-[#d7c9b5]">
+              <div className="mt-5 flex flex-col gap-3 text-sm text-(--ink-soft)">
                 <SummaryRow
                   label="Subtotal"
                   value={formatCurrency(order.subtotal)}
@@ -189,10 +189,10 @@ export default function ConfirmacaoPage() {
               </div>
 
               <div className="mt-5 flex items-end justify-between gap-4 border-t border-[#d7b56d]/30 pt-5">
-                <span className="text-xs font-semibold tracking-[0.18em] text-[#d7b56d] uppercase">
+                <span className="text-xs font-semibold tracking-[0.18em] text-(--red) uppercase">
                   Total
                 </span>
-                <span className="font-heading text-2xl font-black text-[#fffaf0]">
+                <span className="font-heading text-2xl font-black text-(--ink)">
                   {formatCurrency(order.total)}
                 </span>
               </div>
@@ -210,13 +210,13 @@ export default function ConfirmacaoPage() {
                 <Button
                   asChild
                   variant="outline"
-                  className="h-11 rounded-none border-[#d7b56d]/45 bg-transparent px-5 text-[#d7b56d] hover:bg-[#d7b56d]/12 hover:text-[#f0e8dd]"
+                  className="h-11 rounded-none border-[#d7b56d]/45 bg-transparent px-5 text-(--red) hover:bg-[#d7b56d]/12 hover:text-[#f0e8dd]"
                 >
                   <Link href="/">Voltar à home</Link>
                 </Button>
               </div>
 
-              <p className="mt-5 text-[0.72rem]/5 text-[#bfb4a3]">
+              <p className="mt-5 text-[0.72rem]/5 text-(--ink-mute)">
                 O rastreio será enviado por e-mail após o despacho.
                 {order.trackingCode
                   ? ` Código registrado: ${order.trackingCode}.`
@@ -232,21 +232,21 @@ export default function ConfirmacaoPage() {
 
 function EmptyConfirmation() {
   return (
-    <div className="relative isolate min-h-svh overflow-hidden bg-[#090807] text-[#fffaf0]">
+    <div className="relative isolate min-h-svh overflow-hidden bg-(--paper) text-(--ink)">
       <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.028)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.028)_1px,transparent_1px)] bg-size-[42px_42px]" />
       <div className="absolute inset-x-0 top-0 -z-10 h-72 bg-[radial-gradient(ellipse_at_50%_-10%,rgba(216,65,50,0.12),transparent_62%)]" />
 
       <div className="mx-auto flex min-h-[70svh] max-w-2xl flex-col items-center justify-center px-4 py-14 text-center sm:px-6">
-        <div className="flex size-14 items-center justify-center border border-[#fffaf0]/14 bg-[#171211] text-[#d7b56d]">
+        <div className="flex size-14 items-center justify-center border border-[rgba(33,28,24,0.15)] bg-(--card) text-(--red)">
           <IconClipboardText className="size-6" />
         </div>
-        <p className="mt-6 text-xs font-semibold tracking-[0.22em] text-[#d7b56d] uppercase">
+        <p className="mt-6 text-xs font-semibold tracking-[0.22em] text-(--red) uppercase">
           Arquivo não localizado
         </p>
-        <h1 className="mt-3 font-heading text-3xl font-black tracking-wide text-[#fffaf0] uppercase">
+        <h1 className="mt-3 font-heading text-3xl font-black tracking-wide text-(--ink) uppercase">
           Nenhum pedido encontrado.
         </h1>
-        <p className="mt-3 max-w-md text-sm/6 text-[#d7c9b5]">
+        <p className="mt-3 max-w-md text-sm/6 text-(--ink-soft)">
           Ainda não existe um dossiê de compra para confirmar. Volte à loja e
           selecione uma box para iniciar o checkout.
         </p>
@@ -283,7 +283,7 @@ function StatusPanel({
   ]
 
   return (
-    <section className="relative isolate overflow-hidden border border-[#d7b56d]/32 bg-[#171211]/82 p-5 shadow-[0_20px_48px_rgba(0,0,0,0.36)] sm:p-6">
+    <section className="relative isolate overflow-hidden border border-[#d7b56d]/32 bg-(--card)/82 p-5 shadow-[0_18px_40px_rgba(33,28,24,0.36)] sm:p-6">
       <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.024)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.024)_1px,transparent_1px)] bg-size-[34px_34px]" />
       <div className="flex flex-wrap items-start justify-between gap-5">
         <div className="flex gap-4">
@@ -291,13 +291,13 @@ function StatusPanel({
             <IconCheck className="size-6" />
           </span>
           <div>
-            <p className="text-xs font-semibold tracking-[0.2em] text-[#d7b56d] uppercase">
+            <p className="text-xs font-semibold tracking-[0.2em] text-(--red) uppercase">
               Confirmação emitida
             </p>
-            <h2 className="mt-2 font-heading text-2xl font-black tracking-wide text-[#fffaf0] uppercase">
+            <h2 className="mt-2 font-heading text-2xl font-black tracking-wide text-(--ink) uppercase">
               Pagamento validado
             </h2>
-            <p className="mt-2 max-w-xl text-sm/6 text-[#c8bdad]">
+            <p className="mt-2 max-w-xl text-sm/6 text-(--ink-soft)">
               Seu pedido entrou na fila de preparação. A equipe do clube vai
               acompanhar cobrança, separação e envio pelo mesmo registro.
             </p>
@@ -309,12 +309,12 @@ function StatusPanel({
         {statuses.map(([label, value]) => (
           <div
             key={label}
-            className="border border-[#fffaf0]/10 bg-[#090807]/54 p-4"
+            className="border border-[rgba(33,28,24,0.15)] bg-(--paper)/54 p-4"
           >
-            <dt className="text-[0.66rem] font-semibold tracking-[0.18em] text-[#d7b56d] uppercase">
+            <dt className="text-[0.66rem] font-semibold tracking-[0.18em] text-(--red) uppercase">
               {label}
             </dt>
-            <dd className="mt-2 text-sm font-medium text-[#fffaf0]">{value}</dd>
+            <dd className="mt-2 text-sm font-medium text-(--ink)">{value}</dd>
           </div>
         ))}
       </dl>
@@ -327,10 +327,10 @@ function OrderItemCard({ item }: { item: CartItem }) {
   const lineTotal = item.unitPrice * item.quantity
 
   return (
-    <article className="flex flex-col gap-4 border border-[#fffaf0]/10 bg-[#090807]/54 p-4 sm:flex-row sm:items-center">
+    <article className="flex flex-col gap-4 border border-[rgba(33,28,24,0.15)] bg-(--paper)/54 p-4 sm:flex-row sm:items-center">
       <Link
         href={`/loja/${item.productSlug}`}
-        className="relative aspect-4/3 w-full shrink-0 overflow-hidden border border-[#fffaf0]/12 bg-[#0b0908] sm:size-24"
+        className="relative aspect-4/3 w-full shrink-0 overflow-hidden border border-[rgba(33,28,24,0.15)] bg-(--paper-soft) sm:size-24"
       >
         {productImage ? (
           <Image
@@ -341,31 +341,31 @@ function OrderItemCard({ item }: { item: CartItem }) {
             className="object-cover object-center"
           />
         ) : (
-          <div className="flex size-full items-center justify-center text-[#d7b56d]/50">
+          <div className="flex size-full items-center justify-center text-(--red)/50">
             <IconPackage className="size-6" />
           </div>
         )}
       </Link>
 
       <div className="min-w-0 flex-1">
-        <p className="font-mono text-[0.66rem] tracking-[0.18em] text-[#d7c9b5]/55 uppercase">
+        <p className="font-mono text-[0.66rem] tracking-[0.18em] text-(--ink-soft)/55 uppercase">
           EVID-{String(item.quantity).padStart(2, '0')} ·{' '}
           {item.productType === 'box' ? 'Box' : 'Item'}
         </p>
-        <h3 className="mt-1 font-heading text-base font-semibold tracking-wide text-[#fffaf0] uppercase">
+        <h3 className="mt-1 font-heading text-base font-semibold tracking-wide text-(--ink) uppercase">
           <Link
             href={`/loja/${item.productSlug}`}
-            className="transition hover:text-[#d7b56d]"
+            className="transition hover:text-(--red)"
           >
             {item.productName}
           </Link>
         </h3>
-        <p className="mt-2 text-sm text-[#c8bdad]">
+        <p className="mt-2 text-sm text-(--ink-soft)">
           {item.quantity} × {formatCurrency(item.unitPrice)}
         </p>
       </div>
 
-      <p className="font-heading text-lg font-semibold text-[#fffaf0]">
+      <p className="font-heading text-lg font-semibold text-(--ink)">
         {formatCurrency(lineTotal)}
       </p>
     </article>
@@ -382,8 +382,8 @@ function NextStepCard({
   text: string
 }) {
   return (
-    <article className="border border-[#fffaf0]/12 bg-[#0c0a09]/84 p-5 shadow-[0_16px_34px_rgba(0,0,0,0.28)]">
-      <div className="flex items-center gap-3 text-[#d7b56d]">
+    <article className="border border-[rgba(33,28,24,0.15)] bg-(--card) p-5 shadow-[0_18px_40px_rgba(33,28,24,0.28)]">
+      <div className="flex items-center gap-3 text-(--red)">
         <span className="flex size-9 items-center justify-center border border-[#d7b56d]/30 bg-[#d7b56d]/8">
           {icon}
         </span>
@@ -391,7 +391,7 @@ function NextStepCard({
           {label}
         </p>
       </div>
-      <p className="mt-4 text-sm/6 text-[#d7c9b5]">{text}</p>
+      <p className="mt-4 text-sm/6 text-(--ink-soft)">{text}</p>
     </article>
   )
 }

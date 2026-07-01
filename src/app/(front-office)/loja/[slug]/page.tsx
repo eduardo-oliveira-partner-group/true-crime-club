@@ -90,10 +90,10 @@ export default async function ProductDetailPage({
   ]
 
   return (
-    <div className="bg-[#090807] text-[#fffaf0]">
+    <div className="bg-(--paper) text-(--ink)">
       <ProductJsonLd product={product} path={`/loja/${product.slug}`} />
 
-      <section className="relative isolate overflow-hidden border-b border-[#fffaf0]/10 bg-[#090807]">
+      <section className="relative isolate overflow-hidden border-b border-[rgba(33,28,24,0.15)] bg-(--paper)">
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_12%_10%,rgba(216,65,50,0.12),transparent_32%),radial-gradient(circle_at_88%_18%,rgba(215,181,109,0.1),transparent_28%),linear-gradient(90deg,rgba(255,250,240,0.035)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.035)_1px,transparent_1px)] bg-size-[auto,auto,42px_42px,42px_42px]" />
 
         <div className="relative z-10 mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:py-16">
@@ -102,13 +102,13 @@ export default async function ProductDetailPage({
           </ScrollReveal>
 
           <ScrollReveal delay={0.06}>
-            <article className="relative overflow-hidden border border-[#fffaf0]/14 bg-[#0b0908]/92 shadow-[0_24px_64px_rgba(0,0,0,0.38)] lg:grid lg:grid-cols-2 lg:items-stretch">
+            <article className="relative overflow-hidden border border-[rgba(33,28,24,0.15)] bg-(--paper-soft)/92 shadow-[0_18px_40px_rgba(33,28,24,0.38)] lg:grid lg:grid-cols-2 lg:items-stretch">
               <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(255,250,240,0.03)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.03)_1px,transparent_1px)] bg-size-[38px_38px]" />
 
-              <div className="relative z-10 flex flex-col border-b border-[#fffaf0]/10 lg:border-r lg:border-b-0">
+              <div className="relative z-10 flex flex-col border-b border-[rgba(33,28,24,0.15)] lg:border-r lg:border-b-0">
                 <ProductDetailGallery product={product} />
 
-                <div className="hidden flex-col gap-4 border-t border-[#fffaf0]/10 bg-[#0c0a09]/60 p-5 sm:p-6 lg:mt-auto lg:flex">
+                <div className="hidden flex-col gap-4 border-t border-[rgba(33,28,24,0.15)] bg-(--card) p-5 sm:p-6 lg:mt-auto lg:flex">
                   <ProductDetailPricing
                     product={product}
                     variant="inline"
@@ -122,16 +122,16 @@ export default async function ProductDetailPage({
               </div>
 
               <div className="relative z-10 flex flex-col">
-                <header className="flex flex-wrap items-start justify-between gap-4 border-b border-[#fffaf0]/10 p-5 sm:px-7">
+                <header className="flex flex-wrap items-start justify-between gap-4 border-b border-[rgba(33,28,24,0.15)] p-5 sm:px-7">
                   <div className="flex items-center gap-3">
-                    <div className="flex size-10 items-center justify-center border border-[#fffaf0]/14 bg-[#fffaf0]/7 text-[#d7b56d]">
+                    <div className="flex size-10 items-center justify-center border border-[rgba(33,28,24,0.15)] bg-(--card)/7 text-(--red)">
                       <IconPackage className="size-5" />
                     </div>
                     <div>
-                      <p className="text-[0.65rem] font-semibold tracking-[0.2em] text-[#d7b56d] uppercase">
+                      <p className="text-[0.65rem] font-semibold tracking-[0.2em] text-(--red) uppercase">
                         Ficha do arquivo
                       </p>
-                      <p className="font-mono text-xs text-[#fffaf0]/45">
+                      <p className="font-mono text-xs text-(--ink)/45">
                         {getReferenceCode(product)}
                       </p>
                     </div>
@@ -142,11 +142,11 @@ export default async function ProductDetailPage({
                   <div className="space-y-6">
                     <ProductKicker product={product} />
 
-                    <h1 className="font-heading text-3xl/tight font-semibold tracking-wide text-[#fffaf0] uppercase sm:text-4xl">
+                    <h1 className="font-heading text-3xl/tight font-semibold tracking-wide text-(--ink) uppercase sm:text-4xl">
                       {product.name}
                     </h1>
 
-                    <div className="grid gap-3 border-y border-[#fffaf0]/10 py-5 text-sm text-[#d7c9b5] sm:grid-cols-2">
+                    <div className="grid gap-3 border-y border-[rgba(33,28,24,0.15)] py-5 text-sm text-(--ink-soft) sm:grid-cols-2">
                       {product.editionMonth ? (
                         <DetailDatum
                           icon={<IconCalendarEvent className="size-4" />}
@@ -171,7 +171,7 @@ export default async function ProductDetailPage({
                       />
                     </div>
 
-                    <p className="text-base/7 text-[#d7c9b5]">
+                    <p className="text-base/7 text-(--ink-soft)">
                       {product.description}
                     </p>
                   </div>
@@ -182,11 +182,11 @@ export default async function ProductDetailPage({
                       className="mt-6 hidden lg:block"
                     />
                   ) : (
-                    <div className="mt-auto hidden border-t border-[#fffaf0]/10 pt-5 lg:block">
-                      <p className="text-xs font-semibold tracking-[0.2em] text-[#d7b56d] uppercase">
+                    <div className="mt-auto hidden border-t border-[rgba(33,28,24,0.15)] pt-5 lg:block">
+                      <p className="text-xs font-semibold tracking-[0.2em] text-(--red) uppercase">
                         Nota do arquivo
                       </p>
-                      <p className="mt-2 text-sm/6 text-[#d7c9b5]">
+                      <p className="mt-2 text-sm/6 text-(--ink-soft)">
                         Peça curada pelo True Crime Club para ampliar a coleção
                         e manter a experiência investigativa entre entregas.
                       </p>
@@ -208,22 +208,22 @@ export default async function ProductDetailPage({
       </section>
 
       {product.includedItems?.length ? (
-        <section className="relative isolate overflow-hidden border-b border-[#fffaf0]/10 bg-[#171211] lg:hidden">
+        <section className="relative isolate overflow-hidden border-b border-[rgba(33,28,24,0.15)] bg-(--card) lg:hidden">
           <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.035)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.035)_1px,transparent_1px)] bg-size-[56px_56px]" />
 
           <div className="relative z-10 mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-20">
             <ScrollReveal>
               <div className="mb-8 max-w-2xl space-y-4">
                 <div className="flex items-center gap-4">
-                  <p className="text-xs font-semibold tracking-[0.22em] text-[#d7b56d] uppercase">
+                  <p className="text-xs font-semibold tracking-[0.22em] text-(--red) uppercase">
                     Conteúdo do arquivo
                   </p>
                   <span className="hidden h-px flex-1 bg-[#d7b56d]/45 sm:block" />
                 </div>
-                <h2 className="font-heading text-2xl/tight font-semibold tracking-tight text-[#fffaf0] sm:text-3xl">
+                <h2 className="font-heading text-2xl/tight font-semibold tracking-tight text-(--ink) sm:text-3xl">
                   O que compõe esta entrega.
                 </h2>
-                <p className="text-sm/6 text-[#d7c9b5]">
+                <p className="text-sm/6 text-(--ink-soft)">
                   Cada item foi curado para ampliar a experiência investigativa
                   e manter o valor percebido da coleção.
                 </p>
@@ -231,12 +231,12 @@ export default async function ProductDetailPage({
             </ScrollReveal>
 
             <ScrollReveal delay={0.08}>
-              <div className="border border-[#fffaf0]/12 bg-[#0c0a09]/88 p-6 shadow-[0_20px_48px_rgba(0,0,0,0.32)] sm:p-8">
+              <div className="border border-[rgba(33,28,24,0.15)] bg-(--card) p-6 shadow-[0_18px_40px_rgba(33,28,24,0.32)] sm:p-8">
                 <ul className="grid gap-3 sm:grid-cols-2">
                   {product.includedItems?.map((item: string) => (
                     <li
                       key={item}
-                      className="flex gap-3 border border-[#fffaf0]/10 bg-[#090807]/72 px-4 py-3 text-sm/6 text-[#d7c9b5]"
+                      className="flex gap-3 border border-[rgba(33,28,24,0.15)] bg-(--paper)/72 px-4 py-3 text-sm/6 text-(--ink-soft)"
                     >
                       <span className="mt-2 size-1.5 shrink-0 bg-[#d84132]" />
                       <span>{item}</span>
@@ -249,19 +249,19 @@ export default async function ProductDetailPage({
         </section>
       ) : null}
 
-      <section className="relative isolate overflow-hidden bg-[#0b0908]">
+      <section className="relative isolate overflow-hidden bg-(--paper-soft)">
         <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.03)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.03)_1px,transparent_1px)] bg-size-[56px_56px]" />
 
         <div className="relative z-10 mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-16">
           <ScrollReveal>
-            <div className="border border-[#fffaf0]/12 bg-[#0c0a09]/88 p-6 shadow-[0_20px_48px_rgba(0,0,0,0.32)] sm:p-8">
-              <p className="text-xs font-semibold tracking-[0.22em] text-[#d7b56d] uppercase">
+            <div className="border border-[rgba(33,28,24,0.15)] bg-(--card) p-6 shadow-[0_18px_40px_rgba(33,28,24,0.32)] sm:p-8">
+              <p className="text-xs font-semibold tracking-[0.22em] text-(--red) uppercase">
                 Regras de compra
               </p>
-              <h2 className="mt-3 font-heading text-xl font-semibold text-[#fffaf0] sm:text-2xl">
+              <h2 className="mt-3 font-heading text-xl font-semibold text-(--ink) sm:text-2xl">
                 Antes de adicionar ao carrinho
               </h2>
-              <ul className="mt-5 grid gap-3 text-sm/6 text-[#d7c9b5] sm:grid-cols-2">
+              <ul className="mt-5 grid gap-3 text-sm/6 text-(--ink-soft) sm:grid-cols-2">
                 <li className="flex gap-3">
                   <span className="mt-2 size-1.5 shrink-0 bg-[#d7b56d]" />
                   <span>
@@ -296,22 +296,22 @@ export default async function ProductDetailPage({
       </section>
 
       {related.length > 0 ? (
-        <section className="relative isolate overflow-hidden border-t border-[#fffaf0]/10 bg-[#171211]">
+        <section className="relative isolate overflow-hidden border-t border-[rgba(33,28,24,0.15)] bg-(--card)">
           <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_14%_8%,rgba(216,65,50,0.1),transparent_30%),linear-gradient(90deg,rgba(255,250,240,0.035)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.035)_1px,transparent_1px)] bg-size-[auto,56px_56px,56px_56px]" />
 
           <div className="relative z-10 mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-20">
             <ScrollReveal>
               <div className="mb-10 max-w-2xl space-y-4">
                 <div className="flex items-center gap-4">
-                  <p className="text-xs font-semibold tracking-[0.22em] text-[#d7b56d] uppercase">
+                  <p className="text-xs font-semibold tracking-[0.22em] text-(--red) uppercase">
                     Arquivos relacionados
                   </p>
                   <span className="hidden h-px flex-1 bg-[#d7b56d]/45 sm:block" />
                 </div>
-                <h2 className="font-heading text-2xl/tight font-semibold tracking-tight text-[#fffaf0] sm:text-3xl">
+                <h2 className="font-heading text-2xl/tight font-semibold tracking-tight text-(--ink) sm:text-3xl">
                   Continue montando o dossie.
                 </h2>
-                <p className="text-sm/6 text-[#d7c9b5]">
+                <p className="text-sm/6 text-(--ink-soft)">
                   Outras peças do arquivo que complementam esta entrega ou
                   ajudam a completar a coleção.
                 </p>
