@@ -1,10 +1,5 @@
 import type { Metadata } from 'next'
-import {
-  Archivo,
-  Hanken_Grotesk,
-  Space_Mono,
-  Special_Elite,
-} from 'next/font/google'
+import { Archivo, Hanken_Grotesk, Space_Mono } from 'next/font/google'
 
 import { getSeoEntry } from '@/src/lib/domain/repositories'
 import { buildMetadata } from '@/src/lib/seo'
@@ -25,13 +20,6 @@ const spaceMono = Space_Mono({
   display: 'swap',
 })
 
-const specialElite = Special_Elite({
-  subsets: ['latin'],
-  weight: '400',
-  variable: '--design-font-type',
-  display: 'swap',
-})
-
 const archivo = Archivo({
   subsets: ['latin'],
   weight: ['700', '800', '900'],
@@ -47,7 +35,7 @@ export const metadata: Metadata = buildMetadata({
 export default function HomePage() {
   return (
     <Landing
-      fontClassName={`${hankenGrotesk.variable} ${spaceMono.variable} ${specialElite.variable} ${archivo.variable}`}
+      fontClassName={`${hankenGrotesk.variable} ${spaceMono.variable} ${archivo.variable}`}
     />
   )
 }

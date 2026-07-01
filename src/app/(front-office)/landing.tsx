@@ -73,14 +73,12 @@ const tokens = {
 
 const JsReadyContext = createContext(false)
 
-/** Mono "typewriter" font stack reused across labels, badges and tags. */
-const fontType =
-  '[font-family:var(--design-font-type),var(--design-font-mono),monospace]'
+/** Mono font stack reused across labels, badges and tags. */
+const fontMono = '[font-family:var(--design-font-mono),monospace]'
+const fontType = fontMono
 /** Heading font stack reused across titles. */
 const fontHeading =
   '[font-family:var(--design-font-heading),system-ui,sans-serif]'
-/** Mono font stack reused across buttons and numeric labels. */
-const fontMono = '[font-family:var(--design-font-mono),monospace]'
 
 const navLinks = [
   { href: '#oque', label: 'O Clube' },

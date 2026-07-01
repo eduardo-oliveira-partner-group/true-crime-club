@@ -1,194 +1,152 @@
-import {
-  IconArchive,
-  IconArrowRight,
-  IconAward,
-  IconRefresh,
-} from '@tabler/icons-react'
+import { IconArrowRight, IconCheck, IconStarFilled } from '@tabler/icons-react'
 import Link from 'next/link'
+import type { CSSProperties } from 'react'
 
-import { Button } from '@/src/components/ui/button'
 import type { SubscriptionPlan } from '@/src/lib/domain/types'
 import { formatCurrency } from '@/src/lib/formatters'
-import { cn } from '@/src/lib/utils'
-
-interface PlanDossierMeta {
-  tabLabel: string
-  caseRef: string
-  microcopy: string
-  Icon: typeof IconRefresh
-}
-
-function getPlanDossierMeta(plan: SubscriptionPlan): PlanDossierMeta {
-  switch (plan.billingInterval) {
-    case 'monthly':
-      return {
-        tabLabel: 'Entrada recorrente',
-        caseRef: 'REF-M001',
-        microcopy: 'Cancele quando quiser',
-        Icon: IconRefresh,
-      }
-    case 'annual':
-      return {
-        tabLabel: 'Arquivo completo',
-        caseRef: 'REF-A012',
-        microcopy: plan.commitmentMonths
-          ? `Permanência de ${plan.commitmentMonths} meses`
-          : 'Compromisso anual',
-        Icon: IconAward,
-      }
-    case 'one_time':
-      return {
-        tabLabel: 'Caso isolado',
-        caseRef: 'REF-X001',
-        microcopy: 'Sem recorrência',
-        Icon: IconArchive,
-      }
-  }
-}
 
 interface PlanDossierCardProps {
   plan: SubscriptionPlan
 }
 
+const fontHeading =
+  '[font-family:var(--design-font-heading),system-ui,sans-serif]'
+const fontMono = '[font-family:var(--design-font-mono),monospace]'
+
 export function PlanDossierCard({ plan }: PlanDossierCardProps) {
-  const meta = getPlanDossierMeta(plan)
-  const PlanIcon = meta.Icon
   const isRecommended = plan.isRecommended === true
 
-  return (
-    <article
-      className={cn(
-        'group relative flex h-full flex-col border bg-[#fffaf2]/94 shadow-[0_9px_18px_rgba(63,46,34,0.07)] backdrop-blur-sm transition-transform duration-300 hover:-translate-y-1 dark:bg-[#0c0a09]/90 dark:shadow-[0_20px_48px_rgba(0,0,0,0.38)]',
-        isRecommended
-          ? 'border-[#9a662a]/42 shadow-[0_10px_20px_rgba(126,83,35,0.08),0_0_0_1px_rgba(154,102,42,0.08)_inset] dark:border-[#d7b56d]/55 dark:shadow-[0_24px_56px_rgba(0,0,0,0.42),0_0_0_1px_rgba(215,181,109,0.12)_inset]'
-          : plan.billingInterval === 'one_time'
-            ? 'border-dashed border-[#211c18]/12 dark:border-[#fffaf0]/10'
-            : 'border-[#211c18]/14 dark:border-[#fffaf0]/16',
-      )}
-    >
-      {isRecommended ? (
-        <span className="absolute top-0 right-5 z-10 -translate-y-1/2 border border-[#9a662a]/42 bg-[#fffaf2] px-2.5 py-1 font-heading text-[0.62rem] leading-none font-black tracking-[0.14em] text-[#8f6126] uppercase shadow-[0_4px_8px_rgba(63,46,34,0.08)] dark:border-[#d7b56d]/45 dark:bg-[#171211] dark:text-[#d7b56d] dark:shadow-[0_8px_20px_rgba(0,0,0,0.35)]">
-          Melhor escolha
-        </span>
-      ) : null}
+  if (plan.billingInterval === 'annual') {
+    // Annual Recommended Card Style
+    const priceFormatted = plan.pricePerMonth
+      ? formatCurrency(plan.pricePerMonth)
+      : formatCurrency(plan.price)
 
-      <div
-        className={cn(
-          'relative border-b px-5 py-3.5 sm:px-6',
-          isRecommended
-            ? 'border-[#9a662a]/28 bg-[linear-gradient(90deg,rgba(154,102,42,0.12)_0%,rgba(154,102,42,0.04)_100%)] dark:border-[#d7b56d]/30 dark:bg-[linear-gradient(90deg,rgba(215,181,109,0.14)_0%,rgba(215,181,109,0.04)_100%)]'
-            : plan.billingInterval === 'one_time'
-              ? 'border-[#211c18]/8 bg-[#efe4d4]/82 dark:border-[#fffaf0]/8 dark:bg-[#090807]/80'
-              : 'border-[#211c18]/10 bg-[#efe4d4]/70 dark:border-[#fffaf0]/10 dark:bg-[#171211]/72',
-        )}
-      >
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5">
-            <span
-              className={cn(
-                'inline-flex size-8 shrink-0 items-center justify-center',
-                isRecommended
-                  ? 'bg-[#9a662a]/12 text-[#8f6126] dark:bg-[#d7b56d]/18 dark:text-[#d7b56d]'
-                  : plan.billingInterval === 'one_time'
-                    ? 'bg-[#211c18]/6 text-[#6e6055] dark:bg-[#fffaf0]/6 dark:text-[#a89a88]'
-                    : 'bg-[#b5332a]/12 text-[#9f2d25] dark:bg-[#d84132]/18 dark:text-[#ffb0a5]',
-              )}
+    return (
+      <article className="relative mt-[26px] self-start h-full flex flex-col justify-end w-full">
+        <div className="absolute inset-0 z-0 translate-y-[-3px] rotate-[-2.5deg] rounded-2xl bg-(--purple-deep) shadow-[0_16px_30px_-16px_rgba(33,28,24,0.4)]" />
+        <div
+          className={`absolute top-[-29px] left-[30px] z-0 inline-flex origin-bottom-left rotate-[-2.5deg] items-center gap-[7px] rounded-t-[10px] bg-(--purple-deep) px-5 pt-[7px] pb-[26px] text-[11.5px] font-bold tracking-[0.06em] text-[#fbf4e3] uppercase shadow-[0_6px_14px_-8px_rgba(33,28,24,0.4)] ${fontMono}`}
+        >
+          <IconStarFilled size={14} aria-hidden />
+          <span>MAIS VANTAJOSO</span>
+        </div>
+        <div className="relative z-1 rounded-[14px_14px_16px_16px] bg-(--purple) px-[30px] pt-[34px] pb-[30px] text-[#f4efe6] shadow-[0_20px_40px_-14px_rgba(74,69,128,0.55)] flex flex-col h-full justify-between">
+          <div>
+            <div
+              className={`mb-[18px] text-[12.5px] tracking-[0.08em] text-[#f4cf5a] uppercase ${fontMono}`}
             >
-              <PlanIcon className="size-4" />
-            </span>
-            <p
-              className={cn(
-                'text-[0.68rem] font-semibold tracking-[0.22em] uppercase',
-                isRecommended
-                  ? 'text-[#8f6126] dark:text-[#d7b56d]'
-                  : 'text-[#5f5147] dark:text-[#d7c9b5]',
-              )}
-            >
-              {meta.tabLabel}
+              {plan.name}
+            </div>
+            <div className="mb-1.5 flex items-end gap-1.5">
+              <strong
+                className={`text-[48px] leading-[0.9] font-semibold ${fontHeading}`}
+              >
+                {priceFormatted}
+              </strong>
+              <span className={`pb-1.5 text-[13px] text-[#d8d6ea] ${fontMono}`}>
+                /mês
+              </span>
+            </div>
+            <p className="m-0 mb-[22px] text-[14px] text-[#d8d6ea]">
+              {plan.description}
             </p>
+            <div className="mb-[22px] h-[1.5px] [background:repeating-linear-gradient(90deg,rgba(255,255,255,0.28)_0,rgba(255,255,255,0.28)_5px,transparent_5px,transparent_9px)]" />
+            
+            <ul className="m-0 mb-[26px] flex list-none flex-col gap-[13px] p-0">
+              {plan.features.map((feature) => (
+                <li
+                  key={feature}
+                  className="flex items-start gap-[11px] text-[15px] leading-[1.4] text-[#f4efe6]"
+                >
+                  <IconCheck
+                    size={16}
+                    stroke={2.5}
+                    className="mt-0.5 flex-none text-[#F4CF5A]"
+                    aria-hidden
+                  />
+                  <span>{feature}</span>
+                </li>
+              ))}
+            </ul>
           </div>
-          <p className="shrink-0 font-mono text-[0.62rem] tracking-[0.18em] text-[#211c18]/34 uppercase dark:text-[#fffaf0]/28">
-            {meta.caseRef}
-          </p>
-        </div>
-      </div>
-
-      <div className="relative flex flex-1 flex-col px-5 py-6 sm:px-6">
-        <div
-          aria-hidden="true"
-          className={cn(
-            'pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100',
-            isRecommended
-              ? 'bg-[radial-gradient(circle_at_80%_0%,rgba(154,102,42,0.055),transparent_36%)] dark:bg-[radial-gradient(circle_at_80%_0%,rgba(215,181,109,0.12),transparent_34%)]'
-              : 'bg-[radial-gradient(circle_at_80%_0%,rgba(181,51,42,0.045),transparent_36%)] dark:bg-[radial-gradient(circle_at_80%_0%,rgba(216,65,50,0.1),transparent_34%)]',
-          )}
-        />
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(33,28,24,0.032)_1px,transparent_1px),linear-gradient(rgba(33,28,24,0.032)_1px,transparent_1px)] bg-size-[28px_28px] opacity-60 dark:bg-[linear-gradient(90deg,rgba(255,250,240,0.025)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.025)_1px,transparent_1px)] dark:opacity-40"
-        />
-
-        <div className="relative">
-          <h3 className="font-heading text-xl font-semibold tracking-tight text-[#211c18] sm:text-[1.35rem] dark:text-[#fffaf0]">
-            {plan.name}
-          </h3>
-          <p className="mt-3 min-h-12 text-sm/6 text-[#5f5147] dark:text-[#d7c9b5]">
-            {plan.description}
-          </p>
-        </div>
-
-        <div className="relative mt-6 shrink-0 border-y border-[#211c18]/10 py-5 dark:border-[#fffaf0]/10">
-          <p
-            className={cn(
-              'font-heading text-3xl font-black tracking-tight',
-              isRecommended
-                ? 'text-[#211c18] dark:text-[#f0e8dd]'
-                : 'text-[#211c18] dark:text-[#fffaf0]',
-            )}
+          <Link
+            href={`/checkout?plano=${plan.slug}`}
+            className={`group flex w-full items-center justify-center rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-(--yellow) px-4 py-[15px] text-[14px] leading-none font-bold tracking-[0.04em] text-(--ink) uppercase no-underline [transition:background-color_0.2s_ease,border-color_0.2s_ease,color_0.2s_ease] hover:bg-[#fbf4e3] hover:text-(--purple) ${fontMono}`}
           >
-            {plan.pricePerMonth
-              ? `${formatCurrency(plan.pricePerMonth)}/mês`
-              : formatCurrency(plan.price)}
-          </p>
-          <p className="mt-2 text-xs font-semibold tracking-[0.16em] text-[#8f6126] uppercase dark:text-[#d7b56d]/85">
-            {meta.microcopy}
-          </p>
+            Escolher plano
+            <IconArrowRight
+              size={16}
+              stroke={2}
+              className="inline-flex items-center leading-none [transition:translate_0.25s_cubic-bezier(0.22,1,0.36,1),transform_0.25s_cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-1"
+              aria-hidden
+            />
+          </Link>
         </div>
+      </article>
+    )
+  }
 
-        <ul className="relative mt-5 min-h-33 flex-1 space-y-3 text-sm text-[#4f433b] dark:text-[#e5d8c4]">
-          {plan.features.slice(0, 4).map((feature) => (
-            <li key={feature} className="flex gap-3">
-              <span
-                aria-hidden="true"
-                className={cn(
-                  'mt-[0.55rem] size-1.5 shrink-0 rounded-full',
-                  isRecommended
-                    ? 'bg-[#8f6126] dark:bg-[#d7b56d]'
-                    : 'bg-[#b5332a] dark:bg-[#d84132]',
-                )}
+  // Monthly / One Time Card Style
+  const isOneTime = plan.billingInterval === 'one_time'
+  const tabLabel = isOneTime ? 'CASO ISOLADO' : 'MENSAL'
+  const priceFormatted = plan.pricePerMonth
+    ? `${formatCurrency(plan.pricePerMonth)}`
+    : formatCurrency(plan.price)
+
+  return (
+    <article className="relative mt-[26px] rounded-[14px_14px_16px_16px] border border-[rgba(33,28,24,0.15)] bg-(--card) bg-[linear-gradient(180deg,rgba(255,255,255,0.55)_0%,rgba(255,255,255,0)_100px)] px-[30px] pt-[34px] pb-[30px] shadow-[0_16px_34px_-12px_rgba(33,28,24,0.2),inset_0_0_0_1px_rgba(255,255,255,0.5)] flex flex-col h-full justify-between">
+      <div>
+        <div
+          className={`absolute -top-px left-[26px] -translate-y-full rounded-t-[9px] border border-b-0 border-[rgba(33,28,24,0.18)] bg-(--paper-soft) px-4 py-[7px] pb-[9px] text-[10.5px] tracking-[0.14em] text-(--ink-mute) uppercase ${fontMono}`}
+        >
+          {tabLabel}
+        </div>
+        <div
+          className={`mb-[18px] text-[12.5px] tracking-[0.08em] text-(--ink-mute) uppercase ${fontMono}`}
+        >
+          {plan.name}
+        </div>
+        <div className="mb-1.5 flex items-end gap-1.5">
+          <strong
+            className={`text-[48px] leading-[0.9] font-semibold ${fontHeading}`}
+          >
+            {priceFormatted}
+          </strong>
+          {!isOneTime && (
+            <span className={`pb-1.5 text-[13px] text-(--ink-mute) ${fontMono}`}>
+              /mês
+            </span>
+          )}
+        </div>
+        <p className="m-0 mb-[22px] text-[14px] text-(--ink-mute)">
+          {plan.description}
+        </p>
+        <div className="mb-[22px] h-[1.5px] [background:repeating-linear-gradient(90deg,rgba(33,28,24,0.18)_0,rgba(33,28,24,0.18)_5px,transparent_5px,transparent_9px)]" />
+        
+        <ul className="m-0 mb-[26px] flex list-none flex-col gap-[13px] p-0">
+          {plan.features.map((feature) => (
+            <li
+              key={feature}
+              className="flex items-start gap-[11px] text-[15px] leading-[1.4] text-(--ink)"
+            >
+              <IconCheck
+                size={16}
+                stroke={2.5}
+                className="mt-0.5 flex-none text-(--teal)"
+                aria-hidden
               />
-              <span className="leading-6">{feature}</span>
+              <span>{feature}</span>
             </li>
           ))}
         </ul>
-
-        <div className="relative mt-auto shrink-0 pt-6">
-          <Button
-            asChild
-            className={cn(
-              'w-full',
-              isRecommended
-                ? 'bg-[#9a662a] text-white shadow-[0_14px_26px_rgba(154,102,42,0.2)] hover:bg-[#85551f] dark:bg-[#d7b56d] dark:text-[#171211] dark:shadow-[0_0_24px_rgba(215,181,109,0.28)] dark:hover:bg-[#e5c47d]'
-                : 'bg-[#b5332a] text-white hover:bg-[#982820] dark:bg-[#d84132] dark:hover:bg-[#b93227]',
-            )}
-          >
-            <Link href={`/checkout?plano=${plan.slug}`}>
-              Escolher
-              <IconArrowRight className="size-4" />
-            </Link>
-          </Button>
-        </div>
       </div>
+      <Link
+        href={`/checkout?plano=${plan.slug}`}
+        className={`flex w-full items-center justify-center rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-transparent px-4 py-[15px] text-[14px] leading-none font-bold tracking-[0.04em] text-(--ink) uppercase no-underline [transition:background-color_0.2s_ease,border-color_0.2s_ease,color_0.2s_ease] hover:bg-(--ink) hover:text-[#fbf9f6] ${fontMono}`}
+      >
+        Escolher plano
+      </Link>
     </article>
   )
 }

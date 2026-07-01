@@ -19,11 +19,6 @@ import finalCtaDossierPlate from '@/src/assets/images/home/final-cta-dossier-pla
 import investigationContinuousBg from '@/src/assets/images/home/investigation-continuous-bg.png'
 import plansDossierPlate from '@/src/assets/images/home/plans-dossier-plate.png'
 import previousBoxesBanner from '@/src/assets/images/home/previous-boxes-banner.png'
-import { CorkboardTimeline } from '@/src/components/home/corkboard-timeline'
-import { EvidenceInventoryGrid } from '@/src/components/home/evidence-inventory-grid'
-import { HeroCaseReveal } from '@/src/components/home/hero-case-reveal'
-import { PlanDossierCard } from '@/src/components/home/plan-dossier-card'
-import { PreviousBoxesShowcase } from '@/src/components/home/previous-boxes-showcase'
 import { Button } from '@/src/components/ui/button'
 import {
   ScrollReveal,
@@ -41,6 +36,12 @@ import {
 import { formatDate } from '@/src/lib/formatters'
 import { buildMetadata } from '@/src/lib/seo'
 import { cn } from '@/src/lib/utils'
+
+import { CorkboardTimeline } from './components/home/corkboard-timeline'
+import { EvidenceInventoryGrid } from './components/home/evidence-inventory-grid'
+import { HeroCaseReveal } from './components/home/hero-case-reveal'
+import { PlanDossierCard } from './components/home/plan-dossier-card'
+import { PreviousBoxesShowcase } from './components/home/previous-boxes-showcase'
 
 export const metadata = buildMetadata({
   path: '/design-sugerido',
