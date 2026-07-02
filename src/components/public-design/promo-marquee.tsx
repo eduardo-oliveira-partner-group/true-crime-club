@@ -1,5 +1,5 @@
-import { Marquee } from '@/src/components/ui/marquee'
 import { promoItems } from '@/src/app/(front-office)/_landing/content'
+import { Marquee } from '@/src/components/ui/marquee'
 import { fontType } from '@/src/lib/design/classes'
 
 export function PublicPromoMarquee() {

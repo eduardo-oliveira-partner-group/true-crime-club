@@ -142,7 +142,6 @@ function FeaturedProductCase({ product }: { product: Product }) {
           ) : (
             <EvidencePlaceholder product={product} />
           )}
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(14,16,20,0.02)_0%,rgba(14,16,20,0.56)_100%)]" />
           <AvailabilityBadge
             product={product}
             className="absolute top-4 left-4"

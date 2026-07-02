@@ -199,7 +199,7 @@ export function ProductQuickView({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: reduceMotion ? 0.01 : 0.22 }}
+      transition={{ duration: reduceMotion ? 0.01 : 0.3 }}
       style={designTokens}
     >
       <motion.button
@@ -210,16 +210,19 @@ export function ProductQuickView({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: reduceMotion ? 0.01 : 0.2 }}
+        transition={{ duration: reduceMotion ? 0.01 : 0.3 }}
       />
 
       <motion.article
         layoutId={`box-shell-${product.id}`}
         className={`relative z-10 grid w-full max-w-5xl overflow-hidden rounded-[14px_14px_16px_16px] border border-[rgba(33,28,24,0.16)] bg-(--card) text-(--ink) ${cardShadowBase} lg:max-h-[calc(100vh-3rem)] lg:grid-cols-[0.9fr_1.1fr]`}
+        initial={reduceMotion ? {} : { opacity: 0, scale: 0.95 }}
+        animate={reduceMotion ? {} : { opacity: 1, scale: 1 }}
+        exit={reduceMotion ? {} : { opacity: 0, scale: 0.95 }}
         transition={
           reduceMotion
             ? { duration: 0.01 }
-            : { type: 'spring', stiffness: 380, damping: 34, mass: 0.9 }
+            : { type: 'tween', duration: 0.3, ease: 'easeOut' }
         }
       >
         <div
@@ -249,7 +252,7 @@ export function ProductQuickView({
           transition={
             reduceMotion
               ? { duration: 0.01 }
-              : { type: 'spring', stiffness: 380, damping: 34, mass: 0.9 }
+              : { type: 'tween', duration: 0.3, ease: 'easeOut' }
           }
         >
           {productImage ? (
@@ -287,6 +290,11 @@ export function ProductQuickView({
             id={titleId}
             layoutId={`box-title-${product.id}`}
             className={`mt-6 text-3xl/tight font-semibold tracking-[-0.015em] text-(--ink) sm:text-4xl ${fontHeading}`}
+            transition={
+              reduceMotion
+                ? { duration: 0.01 }
+                : { type: 'tween', duration: 0.3, ease: 'easeOut' }
+            }
           >
             {product.name}
           </motion.h2>

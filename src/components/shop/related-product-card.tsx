@@ -53,7 +53,6 @@ export function RelatedProductCard({ product }: RelatedProductCardProps) {
           ) : (
             <div className="absolute inset-0 bg-(--card)" />
           )}
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(14,16,20,0.03)_0%,rgba(14,16,20,0.55)_100%)]" />
           <AvailabilityBadge
             product={product}
             className="absolute right-4 bottom-4"

@@ -190,7 +190,7 @@ export function ProductQuickView({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: reduceMotion ? 0.01 : 0.22 }}
+      transition={{ duration: reduceMotion ? 0.01 : 0.3 }}
     >
       <motion.button
         type="button"
@@ -200,16 +200,19 @@ export function ProductQuickView({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: reduceMotion ? 0.01 : 0.2 }}
+        transition={{ duration: reduceMotion ? 0.01 : 0.3 }}
       />
 
       <motion.article
         layoutId={`box-shell-${product.id}`}
         className="relative z-10 grid w-full max-w-5xl overflow-hidden border border-[#211c18]/16 bg-[#fffaf2] text-[#211c18] shadow-[0_32px_90px_rgba(63,46,34,0.28)] lg:max-h-[calc(100vh-3rem)] lg:grid-cols-[0.9fr_1.1fr] dark:border-[#fffaf0]/16 dark:bg-[#0b0908] dark:text-[#fffaf0] dark:shadow-[0_32px_90px_rgba(0,0,0,0.58)]"
+        initial={reduceMotion ? {} : { opacity: 0, scale: 0.95 }}
+        animate={reduceMotion ? {} : { opacity: 1, scale: 1 }}
+        exit={reduceMotion ? {} : { opacity: 0, scale: 0.95 }}
         transition={
           reduceMotion
             ? { duration: 0.01 }
-            : { type: 'spring', stiffness: 380, damping: 34, mass: 0.9 }
+            : { type: 'tween', duration: 0.3, ease: 'easeOut' }
         }
       >
         <div className="pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(90deg,rgba(33,28,24,0.04)_1px,transparent_1px),linear-gradient(rgba(33,28,24,0.04)_1px,transparent_1px)] bg-size-[38px_38px] dark:bg-[linear-gradient(90deg,rgba(255,250,240,0.035)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.035)_1px,transparent_1px)]" />
@@ -228,7 +231,7 @@ export function ProductQuickView({
           transition={
             reduceMotion
               ? { duration: 0.01 }
-              : { type: 'spring', stiffness: 380, damping: 34, mass: 0.9 }
+              : { type: 'tween', duration: 0.3, ease: 'easeOut' }
           }
         >
           {productImage ? (
@@ -262,6 +265,11 @@ export function ProductQuickView({
             id={titleId}
             layoutId={`box-title-${product.id}`}
             className="mt-6 font-heading text-3xl/tight font-semibold tracking-wide text-[#211c18] uppercase sm:text-4xl dark:text-[#fffaf0]"
+            transition={
+              reduceMotion
+                ? { duration: 0.01 }
+                : { type: 'tween', duration: 0.3, ease: 'easeOut' }
+            }
           >
             {product.name}
           </motion.h2>

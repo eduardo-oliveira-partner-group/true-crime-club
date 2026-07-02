@@ -246,7 +246,6 @@ function ProductArchiveCard({
           ) : (
             <EvidencePlaceholder product={product} />
           )}
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(14,16,20,0.02)_0%,rgba(14,16,20,0.58)_100%)]" />
           <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(244,236,220,0.045)_1px,transparent_1px),linear-gradient(rgba(244,236,220,0.045)_1px,transparent_1px)] bg-size-[34px_34px]" />
 
           {variant === 'box' ? (
