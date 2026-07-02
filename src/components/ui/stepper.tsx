@@ -252,7 +252,7 @@ function SlideTransition({
 
 const stepVariants = {
   enter: (dir: number) => ({
-    x: dir >= 0 ? '-100%' : '100%',
+    x: dir >= 0 ? '100%' : '-100%',
     opacity: 0,
   }),
   center: {
@@ -260,7 +260,7 @@ const stepVariants = {
     opacity: 1,
   },
   exit: (dir: number) => ({
-    x: dir >= 0 ? '50%' : '-50%',
+    x: dir >= 0 ? '-50%' : '50%',
     opacity: 0,
   }),
 }
@@ -305,9 +305,21 @@ function StepIndicator({
     >
       <motion.div
         variants={{
-          inactive: { scale: 1, backgroundColor: '#171211', color: '#bfb4a3' },
-          active: { scale: 1, backgroundColor: '#d7b56d', color: '#d7b56d' },
-          complete: { scale: 1, backgroundColor: '#d7b56d', color: '#171211' },
+          inactive: {
+            scale: 1,
+            backgroundColor: 'rgba(245,238,228,1)',
+            color: 'rgba(110,100,90,1)',
+          },
+          active: {
+            scale: 1,
+            backgroundColor: 'rgba(197,39,31,0.1)',
+            color: 'rgba(197,39,31,1)',
+          },
+          complete: {
+            scale: 1,
+            backgroundColor: 'rgba(26,165,135,1)',
+            color: 'rgba(251,249,246,1)',
+          },
         }}
         transition={{ duration: 0.3 }}
         className="stepper-indicator-inner"
@@ -326,8 +338,8 @@ function StepIndicator({
 
 function StepConnector({ isComplete }: { isComplete: boolean }) {
   const lineVariants = {
-    incomplete: { width: '0%', backgroundColor: 'transparent' },
-    complete: { width: '100%', backgroundColor: '#d7b56d' },
+    incomplete: { width: '0%', backgroundColor: 'rgba(26,165,135,0)' },
+    complete: { width: '100%', backgroundColor: 'rgba(26,165,135,1)' },
   }
 
   return (

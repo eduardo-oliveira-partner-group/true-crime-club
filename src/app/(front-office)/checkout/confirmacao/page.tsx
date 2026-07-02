@@ -11,8 +11,15 @@ import {
 import Image from 'next/image'
 import Link from 'next/link'
 
-import evidenceWorkbenchPlate from '@/src/assets/images/home/evidence-workbench-plate.png'
+import { DesignPageShell } from '@/src/components/public-design/design-page-shell'
 import { Button } from '@/src/components/ui/button'
+import {
+  dossierCardSurface,
+  fontHeading,
+  fontMono,
+  sectionFrame,
+  warmShadowClass,
+} from '@/src/lib/design/classes'
 import { getSeoEntry, listOrders } from '@/src/lib/domain/repositories'
 import type { CartItem } from '@/src/lib/domain/types'
 import {
@@ -23,6 +30,7 @@ import {
 } from '@/src/lib/formatters'
 import { getProductImage } from '@/src/lib/product-images'
 import { buildMetadata } from '@/src/lib/seo'
+import { cn } from '@/src/lib/utils'
 
 export const metadata = buildMetadata({
   path: '/checkout/confirmacao',
@@ -41,37 +49,46 @@ export default function ConfirmacaoPage() {
   const itemCount = order.items.reduce((sum, item) => sum + item.quantity, 0)
 
   return (
-    <div className="relative isolate min-h-svh overflow-hidden bg-(--paper) text-(--ink)">
-      <Image
-        src={evidenceWorkbenchPlate}
-        alt=""
-        fill
-        placeholder="blur"
-        sizes="100vw"
-        className="absolute inset-0 -z-30 object-cover object-center opacity-24 brightness-[0.48] saturate-[0.78]"
-      />
-      <div className="absolute inset-0 -z-20 bg-[linear-gradient(180deg,rgba(9,8,7,0.9)_0%,rgba(9,8,7,0.78)_42%,rgba(5,4,3,0.96)_100%),radial-gradient(circle_at_18%_12%,rgba(216,65,50,0.16),transparent_34%),radial-gradient(circle_at_82%_8%,rgba(215,181,109,0.13),transparent_32%)]" />
-      <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.028)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.028)_1px,transparent_1px)] bg-size-[42px_42px]" />
-
-      <div className="relative z-10 mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:py-16">
+    <DesignPageShell className="overflow-hidden">
+      <div className={cn(sectionFrame, 'relative z-10 py-12 lg:py-16')}>
         <header className="border-b border-[rgba(33,28,24,0.15)] pb-8">
           <div className="flex flex-wrap items-center gap-4">
-            <p className="text-xs font-semibold tracking-[0.26em] text-(--red) uppercase">
+            <p
+              className={cn(
+                fontMono,
+                'text-xs font-semibold tracking-[0.16em] text-(--red) uppercase',
+              )}
+            >
               Pedido confirmado
             </p>
-            <span className="hidden h-px flex-1 bg-[#d7b56d]/38 sm:block" />
-            <p className="font-mono text-[0.68rem] tracking-[0.18em] text-(--ink)/50 uppercase">
+            <span className="hidden h-px flex-1 border-t border-dashed border-[rgba(33,28,24,0.18)] sm:block" />
+            <p
+              className={cn(
+                fontMono,
+                'text-[0.68rem] tracking-[0.14em] text-(--ink-mute) uppercase',
+              )}
+            >
               PROC-08 · dossiê aberto
             </p>
           </div>
 
           <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_0.38fr] lg:items-end">
             <div className="flex flex-col gap-4">
-              <div className="inline-flex w-fit items-center gap-2 border border-[#d7b56d]/35 bg-(--card)/80 px-3 py-2 text-xs font-semibold tracking-[0.18em] text-(--red) uppercase backdrop-blur-sm">
+              <div
+                className={cn(
+                  fontMono,
+                  'inline-flex w-fit items-center gap-2 rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-(--paper-soft) px-3 py-2 text-xs font-semibold tracking-[0.14em] text-(--red) uppercase',
+                )}
+              >
                 <IconShieldCheck className="size-4" />
                 Sessão registrada
               </div>
-              <h1 className="max-w-3xl font-heading text-3xl/tight font-black tracking-wide text-(--ink) uppercase sm:text-4xl lg:text-5xl">
+              <h1
+                className={cn(
+                  fontHeading,
+                  'max-w-3xl text-3xl/tight font-semibold tracking-[-0.015em] text-balance text-(--ink) sm:text-4xl lg:text-5xl',
+                )}
+              >
                 O dossiê do seu pedido foi lacrado.
               </h1>
               <p className="max-w-2xl text-sm/6 text-(--ink-soft) sm:text-base/7">
@@ -81,11 +98,21 @@ export default function ConfirmacaoPage() {
               </p>
             </div>
 
-            <div className="border border-[#d7b56d]/35 bg-(--card)/85 p-5 shadow-[0_18px_40px_rgba(33,28,24,0.38)] backdrop-blur-sm">
-              <p className="text-[0.66rem] font-semibold tracking-[0.2em] text-(--red) uppercase">
+            <div className={cn(dossierCardSurface, warmShadowClass, 'p-5')}>
+              <p
+                className={cn(
+                  fontMono,
+                  'text-[0.66rem] font-semibold tracking-[0.16em] text-(--red) uppercase',
+                )}
+              >
                 Total confirmado
               </p>
-              <p className="mt-2 font-heading text-3xl font-black text-(--ink)">
+              <p
+                className={cn(
+                  fontHeading,
+                  'mt-2 text-3xl font-semibold text-(--ink)',
+                )}
+              >
                 {formatCurrency(order.total)}
               </p>
               <p className="mt-2 text-xs/5 text-(--ink-soft)">
@@ -107,22 +134,39 @@ export default function ConfirmacaoPage() {
               createdAt={formatDateTime(order.createdAt)}
             />
 
-            <section className="border border-[rgba(33,28,24,0.15)] bg-(--card)/78 p-5 shadow-[0_18px_40px_rgba(33,28,24,0.32)] sm:p-6">
+            <section
+              className={cn(dossierCardSurface, warmShadowClass, 'p-5 sm:p-6')}
+            >
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[rgba(33,28,24,0.15)] pb-4">
                 <div className="flex items-center gap-3">
-                  <span className="flex size-10 items-center justify-center bg-[#d84132]/18 text-(--red)">
+                  <span className="flex size-10 items-center justify-center rounded-[10px] bg-(--red)/10 text-(--red)">
                     <IconPackage className="size-5" />
                   </span>
                   <div>
-                    <p className="text-xs font-semibold tracking-[0.2em] text-(--red) uppercase">
+                    <p
+                      className={cn(
+                        fontMono,
+                        'text-xs font-semibold tracking-[0.16em] text-(--red) uppercase',
+                      )}
+                    >
                       Evidências do pedido
                     </p>
-                    <h2 className="font-heading text-xl font-semibold tracking-wide text-(--ink) uppercase">
+                    <h2
+                      className={cn(
+                        fontHeading,
+                        'text-xl font-semibold text-(--ink)',
+                      )}
+                    >
                       Itens catalogados
                     </h2>
                   </div>
                 </div>
-                <p className="font-mono text-[0.65rem] tracking-[0.16em] text-(--ink)/42 uppercase">
+                <p
+                  className={cn(
+                    fontMono,
+                    'text-[0.65rem] tracking-[0.14em] text-(--ink-mute) uppercase',
+                  )}
+                >
                   {String(order.items.length).padStart(2, '0')} registros
                 </p>
               </div>
@@ -163,12 +207,24 @@ export default function ConfirmacaoPage() {
           </main>
 
           <aside className="lg:sticky lg:top-24 lg:self-start">
-            <div className="border border-[rgba(33,28,24,0.15)] bg-(--card) p-5 shadow-[0_18px_40px_rgba(33,28,24,0.38)] backdrop-blur-sm sm:p-6">
+            <div
+              className={cn(dossierCardSurface, warmShadowClass, 'p-5 sm:p-6')}
+            >
               <div className="flex items-center justify-between border-b border-[rgba(33,28,24,0.15)] pb-4">
-                <p className="text-xs font-semibold tracking-[0.2em] text-(--red) uppercase">
+                <p
+                  className={cn(
+                    fontMono,
+                    'text-xs font-semibold tracking-[0.16em] text-(--red) uppercase',
+                  )}
+                >
                   Resumo financeiro
                 </p>
-                <p className="font-mono text-[0.62rem] tracking-[0.16em] text-(--ink)/40 uppercase">
+                <p
+                  className={cn(
+                    fontMono,
+                    'text-[0.62rem] tracking-[0.14em] text-(--ink-mute) uppercase',
+                  )}
+                >
                   {order.orderNumber}
                 </p>
               </div>
@@ -189,10 +245,20 @@ export default function ConfirmacaoPage() {
               </div>
 
               <div className="mt-5 flex items-end justify-between gap-4 border-t border-[#d7b56d]/30 pt-5">
-                <span className="text-xs font-semibold tracking-[0.18em] text-(--red) uppercase">
+                <span
+                  className={cn(
+                    fontMono,
+                    'text-xs font-semibold tracking-[0.14em] text-(--red) uppercase',
+                  )}
+                >
                   Total
                 </span>
-                <span className="font-heading text-2xl font-black text-(--ink)">
+                <span
+                  className={cn(
+                    fontHeading,
+                    'text-2xl font-semibold text-(--ink)',
+                  )}
+                >
                   {formatCurrency(order.total)}
                 </span>
               </div>
@@ -200,7 +266,10 @@ export default function ConfirmacaoPage() {
               <div className="mt-6 flex flex-col gap-3">
                 <Button
                   asChild
-                  className="h-11 rounded-none bg-[#d84132] px-5 text-white shadow-[0_0_24px_rgba(216,65,50,0.28)] hover:bg-[#b93227]"
+                  className={cn(
+                    fontMono,
+                    'h-11 rounded-[9px] bg-(--red) px-5 text-[#fbf9f6] shadow-[0_9px_22px_-8px_rgba(33,28,24,0.13)] hover:bg-(--red-deep)',
+                  )}
                 >
                   <Link href="/cliente/pedidos">
                     Ver meus pedidos
@@ -210,7 +279,10 @@ export default function ConfirmacaoPage() {
                 <Button
                   asChild
                   variant="outline"
-                  className="h-11 rounded-none border-[#d7b56d]/45 bg-transparent px-5 text-(--red) hover:bg-[#d7b56d]/12 hover:text-[#f0e8dd]"
+                  className={cn(
+                    fontMono,
+                    'h-11 rounded-[10px] border-[rgba(33,28,24,0.15)] bg-transparent px-5 text-(--ink) hover:bg-(--ink) hover:text-[#fbf9f6]',
+                  )}
                 >
                   <Link href="/">Voltar à home</Link>
                 </Button>
@@ -226,24 +298,31 @@ export default function ConfirmacaoPage() {
           </aside>
         </div>
       </div>
-    </div>
+    </DesignPageShell>
   )
 }
 
 function EmptyConfirmation() {
   return (
-    <div className="relative isolate min-h-svh overflow-hidden bg-(--paper) text-(--ink)">
-      <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.028)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.028)_1px,transparent_1px)] bg-size-[42px_42px]" />
-      <div className="absolute inset-x-0 top-0 -z-10 h-72 bg-[radial-gradient(ellipse_at_50%_-10%,rgba(216,65,50,0.12),transparent_62%)]" />
-
+    <DesignPageShell className="overflow-hidden">
       <div className="mx-auto flex min-h-[70svh] max-w-2xl flex-col items-center justify-center px-4 py-14 text-center sm:px-6">
-        <div className="flex size-14 items-center justify-center border border-[rgba(33,28,24,0.15)] bg-(--card) text-(--red)">
+        <div className="flex size-14 items-center justify-center rounded-[14px] border border-[rgba(33,28,24,0.15)] bg-(--card) text-(--red)">
           <IconClipboardText className="size-6" />
         </div>
-        <p className="mt-6 text-xs font-semibold tracking-[0.22em] text-(--red) uppercase">
+        <p
+          className={cn(
+            fontMono,
+            'mt-6 text-xs font-semibold tracking-[0.16em] text-(--red) uppercase',
+          )}
+        >
           Arquivo não localizado
         </p>
-        <h1 className="mt-3 font-heading text-3xl font-black tracking-wide text-(--ink) uppercase">
+        <h1
+          className={cn(
+            fontHeading,
+            'mt-3 text-3xl font-semibold tracking-[-0.015em] text-(--ink)',
+          )}
+        >
           Nenhum pedido encontrado.
         </h1>
         <p className="mt-3 max-w-md text-sm/6 text-(--ink-soft)">
@@ -252,7 +331,10 @@ function EmptyConfirmation() {
         </p>
         <Button
           asChild
-          className="mt-7 h-11 rounded-none bg-[#d84132] px-5 text-white shadow-[0_0_24px_rgba(216,65,50,0.28)] hover:bg-[#b93227]"
+          className={cn(
+            fontMono,
+            'mt-7 h-11 rounded-[9px] bg-(--red) px-5 text-[#fbf9f6] shadow-[0_9px_22px_-8px_rgba(33,28,24,0.13)] hover:bg-(--red-deep)',
+          )}
         >
           <Link href="/loja">
             Voltar à loja
@@ -260,7 +342,7 @@ function EmptyConfirmation() {
           </Link>
         </Button>
       </div>
-    </div>
+    </DesignPageShell>
   )
 }
 
@@ -283,18 +365,33 @@ function StatusPanel({
   ]
 
   return (
-    <section className="relative isolate overflow-hidden border border-[#d7b56d]/32 bg-(--card)/82 p-5 shadow-[0_18px_40px_rgba(33,28,24,0.36)] sm:p-6">
-      <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.024)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.024)_1px,transparent_1px)] bg-size-[34px_34px]" />
+    <section
+      className={cn(
+        dossierCardSurface,
+        warmShadowClass,
+        'relative isolate overflow-hidden p-5 sm:p-6',
+      )}
+    >
       <div className="flex flex-wrap items-start justify-between gap-5">
         <div className="flex gap-4">
-          <span className="flex size-12 shrink-0 items-center justify-center bg-[#d7b56d] text-[#171211]">
+          <span className="flex size-12 shrink-0 items-center justify-center rounded-[10px] bg-(--teal) text-[#fbf9f6]">
             <IconCheck className="size-6" />
           </span>
           <div>
-            <p className="text-xs font-semibold tracking-[0.2em] text-(--red) uppercase">
+            <p
+              className={cn(
+                fontMono,
+                'text-xs font-semibold tracking-[0.16em] text-(--red) uppercase',
+              )}
+            >
               Confirmação emitida
             </p>
-            <h2 className="mt-2 font-heading text-2xl font-black tracking-wide text-(--ink) uppercase">
+            <h2
+              className={cn(
+                fontHeading,
+                'mt-2 text-2xl font-semibold text-(--ink)',
+              )}
+            >
               Pagamento validado
             </h2>
             <p className="mt-2 max-w-xl text-sm/6 text-(--ink-soft)">
@@ -309,9 +406,14 @@ function StatusPanel({
         {statuses.map(([label, value]) => (
           <div
             key={label}
-            className="border border-[rgba(33,28,24,0.15)] bg-(--paper)/54 p-4"
+            className="rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-(--paper-soft) p-4"
           >
-            <dt className="text-[0.66rem] font-semibold tracking-[0.18em] text-(--red) uppercase">
+            <dt
+              className={cn(
+                fontMono,
+                'text-[0.66rem] font-semibold tracking-[0.14em] text-(--red) uppercase',
+              )}
+            >
               {label}
             </dt>
             <dd className="mt-2 text-sm font-medium text-(--ink)">{value}</dd>
@@ -327,10 +429,10 @@ function OrderItemCard({ item }: { item: CartItem }) {
   const lineTotal = item.unitPrice * item.quantity
 
   return (
-    <article className="flex flex-col gap-4 border border-[rgba(33,28,24,0.15)] bg-(--paper)/54 p-4 sm:flex-row sm:items-center">
+    <article className="flex flex-col gap-4 rounded-[12px] border border-[rgba(33,28,24,0.15)] bg-(--paper-soft) p-4 sm:flex-row sm:items-center">
       <Link
         href={`/loja/${item.productSlug}`}
-        className="relative aspect-4/3 w-full shrink-0 overflow-hidden border border-[rgba(33,28,24,0.15)] bg-(--paper-soft) sm:size-24"
+        className="relative aspect-4/3 w-full shrink-0 overflow-hidden rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-(--card) sm:size-24"
       >
         {productImage ? (
           <Image
@@ -348,11 +450,21 @@ function OrderItemCard({ item }: { item: CartItem }) {
       </Link>
 
       <div className="min-w-0 flex-1">
-        <p className="font-mono text-[0.66rem] tracking-[0.18em] text-(--ink-soft)/55 uppercase">
+        <p
+          className={cn(
+            fontMono,
+            'text-[0.66rem] tracking-[0.14em] text-(--ink-mute) uppercase',
+          )}
+        >
           EVID-{String(item.quantity).padStart(2, '0')} ·{' '}
           {item.productType === 'box' ? 'Box' : 'Item'}
         </p>
-        <h3 className="mt-1 font-heading text-base font-semibold tracking-wide text-(--ink) uppercase">
+        <h3
+          className={cn(
+            fontHeading,
+            'mt-1 text-base font-semibold text-(--ink)',
+          )}
+        >
           <Link
             href={`/loja/${item.productSlug}`}
             className="transition hover:text-(--red)"
@@ -365,7 +477,7 @@ function OrderItemCard({ item }: { item: CartItem }) {
         </p>
       </div>
 
-      <p className="font-heading text-lg font-semibold text-(--ink)">
+      <p className={cn(fontHeading, 'text-lg font-semibold text-(--ink)')}>
         {formatCurrency(lineTotal)}
       </p>
     </article>
@@ -382,12 +494,17 @@ function NextStepCard({
   text: string
 }) {
   return (
-    <article className="border border-[rgba(33,28,24,0.15)] bg-(--card) p-5 shadow-[0_18px_40px_rgba(33,28,24,0.28)]">
+    <article className={cn(dossierCardSurface, warmShadowClass, 'p-5')}>
       <div className="flex items-center gap-3 text-(--red)">
-        <span className="flex size-9 items-center justify-center border border-[#d7b56d]/30 bg-[#d7b56d]/8">
+        <span className="flex size-9 items-center justify-center rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-(--paper-soft)">
           {icon}
         </span>
-        <p className="text-xs font-semibold tracking-[0.2em] uppercase">
+        <p
+          className={cn(
+            fontMono,
+            'text-xs font-semibold tracking-[0.16em] uppercase',
+          )}
+        >
           {label}
         </p>
       </div>
@@ -400,7 +517,7 @@ function SummaryRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between gap-4">
       <span>{label}</span>
-      <span className="font-medium text-[#f0e8dd]">{value}</span>
+      <span className="font-medium text-(--ink)">{value}</span>
     </div>
   )
 }

@@ -28,6 +28,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/src/components/ui/tooltip'
+import {
+  dossierCardSurface,
+  fontHeading,
+  fontMono,
+  formInputClass,
+  warmShadowClass,
+} from '@/src/lib/design/classes'
 import { cn } from '@/src/lib/utils'
 
 export interface CheckoutAddress {
@@ -151,16 +158,41 @@ export function CheckoutStepper({
 
   return (
     <div className="space-y-7">
-      <div className="border border-[#fffaf0]/12 bg-[#0b0908] shadow-[0_20px_48px_rgba(0,0,0,0.38)]">
-        <div className="flex items-center justify-between border-b border-[#fffaf0]/12 px-5 py-3.5 sm:px-6">
-          <span className="flex size-8 items-center justify-center border border-[#d7b56d]/45 bg-[#171211] text-[#d7b56d]">
-            {(() => {
-              const StepIcon = steps[currentStep - 1]?.Icon ?? IconPackage
-              return <StepIcon className="size-4" />
-            })()}
-          </span>
-          <p className="font-mono text-[0.6rem] tracking-[0.18em] text-[#fffaf0]/45 uppercase">
-            {steps[currentStep - 1]?.code}/06 · {steps[currentStep - 1]?.label}
+      <div className={cn(dossierCardSurface, warmShadowClass)}>
+        <div className="flex items-center justify-between gap-4 border-b border-[rgba(33,28,24,0.12)] px-5 py-4 sm:px-6">
+          <div className="flex min-w-0 items-center gap-3">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-(--paper-soft) text-(--red)">
+              {(() => {
+                const StepIcon = steps[currentStep - 1]?.Icon ?? IconPackage
+                return <StepIcon className="size-5" />
+              })()}
+            </span>
+            <div className="min-w-0">
+              <p
+                className={cn(
+                  fontHeading,
+                  'truncate text-base font-semibold text-(--ink) sm:text-lg',
+                )}
+              >
+                {steps[currentStep - 1]?.label}
+              </p>
+              <p
+                className={cn(
+                  fontMono,
+                  'mt-1 text-[0.58rem] tracking-[0.14em] text-(--red) uppercase sm:hidden',
+                )}
+              >
+                Etapa {steps[currentStep - 1]?.code} de 06
+              </p>
+            </div>
+          </div>
+          <p
+            className={cn(
+              fontMono,
+              'shrink-0 text-[0.6rem] tracking-[0.14em] text-(--ink-mute) uppercase max-sm:hidden',
+            )}
+          >
+            {steps[currentStep - 1]?.code}/06
           </p>
         </div>
 
@@ -176,7 +208,7 @@ export function CheckoutStepper({
             stepCircleContainerClassName="space-y-6"
             stepContainerClassName="pb-5"
             contentClassName="pb-2"
-            footerClassName="border-t border-[#fffaf0]/10 pt-5"
+            footerClassName="border-t border-[rgba(33,28,24,0.12)] pt-5"
             backButtonText={
               <>
                 <IconArrowLeft className="size-4" />
@@ -216,17 +248,22 @@ export function CheckoutStepper({
                 code="STEP-01"
               >
                 {customer ? (
-                  <div className="border border-[#fffaf0]/12 bg-[#171211] p-4">
-                    <p className="font-heading text-sm font-semibold text-[#fffaf0]">
+                  <div className="rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-(--paper-soft) p-4">
+                    <p
+                      className={cn(
+                        fontHeading,
+                        'text-sm font-semibold text-(--ink)',
+                      )}
+                    >
                       {customer.name}
                     </p>
-                    <p className="mt-1 text-sm text-[#c8bdad]">
+                    <p className="mt-1 text-sm text-(--ink-soft)">
                       {customer.email}
                     </p>
                   </div>
                 ) : (
-                  <div className="border border-dashed border-[#d84132]/40 bg-[#d84132]/8 p-4">
-                    <p className="text-sm text-[#ffb0a5]">
+                  <div className="rounded-[10px] border border-dashed border-(--red)/40 bg-(--red)/8 p-4">
+                    <p className="text-sm text-(--ink-soft)">
                       Faça login para continuar o checkout.
                     </p>
                   </div>
@@ -234,7 +271,7 @@ export function CheckoutStepper({
                 <Button
                   asChild
                   variant="link"
-                  className="mt-3 h-auto p-0 text-[#d7b56d] hover:text-[#f0e8dd]"
+                  className="mt-3 h-auto rounded-[9px] p-0 text-(--red) hover:text-(--red-deep)"
                 >
                   <Link href="/login">Alterar conta</Link>
                 </Button>
@@ -250,7 +287,7 @@ export function CheckoutStepper({
               >
                 <div className="space-y-3">
                   {addresses.length === 0 ? (
-                    <p className="text-sm text-[#c8bdad]">
+                    <p className="text-sm text-(--ink-soft)">
                       Nenhum endereço cadastrado.
                     </p>
                   ) : (
@@ -284,10 +321,10 @@ export function CheckoutStepper({
                       trailing={
                         <span
                           className={cn(
-                            'font-heading text-sm font-bold',
+                            cn(fontHeading, 'text-sm font-bold'),
                             option.price === 0
-                              ? 'text-[#d7b56d]'
-                              : 'text-[#fffaf0]',
+                              ? 'text-(--teal-deep)'
+                              : 'text-(--ink)',
                           )}
                         >
                           {option.price === 0 ? 'Grátis' : `R$ ${option.price}`}
@@ -318,7 +355,7 @@ export function CheckoutStepper({
                     />
                   ))}
                 </div>
-                <p className="mt-4 text-[0.7rem]/5 text-[#bfb4a3]">
+                <p className="mt-4 text-[0.7rem]/5 text-(--ink-mute)">
                   Ambiente de validação — nenhum pagamento real será processado.
                 </p>
               </Section>
@@ -333,7 +370,7 @@ export function CheckoutStepper({
               >
                 {isSubscriptionFlow ? (
                   <>
-                    <p className="text-sm text-[#c8bdad]">
+                    <p className="text-sm text-(--ink-soft)">
                       {planName
                         ? `Para o ${planName}, capturamos suas preferências para curadoria das boxes.`
                         : 'Capturamos suas preferências para curadoria das boxes.'}
@@ -377,12 +414,12 @@ export function CheckoutStepper({
                         }
                         rows={3}
                         placeholder="Preferências de cores, estilo, alergias, etc."
-                        className="mt-4 w-full resize-none border border-[#fffaf0]/14 bg-[#171211] p-3 text-sm text-[#f0e8dd] placeholder:text-[#bfb4a3]/60 focus:border-[#d7b56d]/60 focus:outline-none"
+                        className={cn(formInputClass, 'mt-4 resize-none')}
                       />
                     </Field>
                   </>
                 ) : (
-                  <p className="text-sm text-[#c8bdad]">
+                  <p className="text-sm text-(--ink-soft)">
                     Etapa exclusiva para assinantes. Para compra avulsa, siga
                     para a revisão.
                   </p>
@@ -434,7 +471,7 @@ export function CheckoutStepper({
                   />
                 ) : null}
                 {error ? (
-                  <p className="mt-4 border border-[#d84132]/45 bg-[#d84132]/10 px-3 py-2 text-sm text-[#ffb0a5]">
+                  <p className="mt-4 rounded-[10px] border border-(--red)/45 bg-(--red)/10 px-3 py-2 text-sm text-(--ink)">
                     {error}
                   </p>
                 ) : null}
@@ -471,12 +508,12 @@ function StepIndicatorWithTooltip({
             aria-label={`Etapa ${stepMeta?.code} — ${stepMeta?.label}`}
             aria-current={status === 'active' ? 'step' : undefined}
             className={cn(
-              'flex size-8 shrink-0 items-center justify-center border transition-colors focus-visible:ring-2 focus-visible:ring-[#d7b56d]/50 focus-visible:outline-none',
+              'flex size-8 shrink-0 items-center justify-center rounded-[10px] border transition-colors focus-visible:ring-2 focus-visible:ring-(--red)/25 focus-visible:outline-none',
               status === 'active'
-                ? 'border-[#d7b56d] bg-[#d7b56d]/15 text-[#d7b56d]'
+                ? 'border-(--red) bg-(--red)/10 text-(--red)'
                 : status === 'complete'
-                  ? 'border-[#d7b56d]/60 bg-[#d7b56d] text-[#171211]'
-                  : 'border-[#fffaf0]/20 text-[#fffaf0]/45 hover:border-[#fffaf0]/35 hover:text-[#fffaf0]/70',
+                  ? 'border-(--teal) bg-(--teal) text-[#fbf9f6]'
+                  : 'border-[rgba(33,28,24,0.15)] text-(--ink-mute) hover:border-(--red)/35 hover:text-(--red)',
             )}
           >
             {status === 'complete' ? (
@@ -486,11 +523,24 @@ function StepIndicatorWithTooltip({
             )}
           </button>
         </TooltipTrigger>
-        <TooltipContent side="bottom">
-          <span className="font-mono text-[0.6rem] tracking-[0.18em] text-[#d7b56d] uppercase">
+        <TooltipContent
+          side="bottom"
+          className="border-[rgba(33,28,24,0.15)] bg-[#fbf9f6] text-[#211c18]"
+        >
+          <span
+            className={cn(
+              fontMono,
+              'text-[0.6rem] tracking-[0.14em] text-[#c5271f] uppercase',
+            )}
+          >
             {stepMeta?.code}/06
           </span>
-          <span className="mt-1 block font-heading text-sm font-semibold text-[#fffaf0]">
+          <span
+            className={cn(
+              fontHeading,
+              'mt-1 block text-sm font-semibold text-[#211c18]',
+            )}
+          >
             {stepMeta?.label}
           </span>
         </TooltipContent>
@@ -512,16 +562,31 @@ function Section({
 }) {
   return (
     <section className="space-y-4">
-      <div className="flex items-end justify-between gap-4 border-b border-[#fffaf0]/10 pb-3">
+      <div className="flex items-end justify-between gap-4 border-b border-dashed border-[rgba(33,28,24,0.12)] pb-3">
         <div>
-          <p className="text-[0.65rem] font-semibold tracking-[0.18em] text-[#d7b56d] uppercase">
+          <p
+            className={cn(
+              fontMono,
+              'text-[0.65rem] font-semibold tracking-[0.14em] text-(--red) uppercase',
+            )}
+          >
             {eyebrow}
           </p>
-          <h2 className="mt-1 font-heading text-lg font-semibold text-[#fffaf0]">
+          <h2
+            className={cn(
+              fontHeading,
+              'mt-1 text-lg font-semibold text-(--ink)',
+            )}
+          >
             {title}
           </h2>
         </div>
-        <p className="font-mono text-[0.6rem] tracking-[0.16em] text-[#fffaf0]/35 uppercase">
+        <p
+          className={cn(
+            fontMono,
+            'text-[0.6rem] tracking-[0.14em] text-(--ink-mute) uppercase',
+          )}
+        >
           {code}
         </p>
       </div>
@@ -539,7 +604,12 @@ function Field({
 }) {
   return (
     <label className="block space-y-1.5">
-      <span className="text-[0.65rem] font-semibold tracking-[0.18em] text-[#d7b56d] uppercase">
+      <span
+        className={cn(
+          fontMono,
+          'text-[0.65rem] font-semibold tracking-[0.14em] text-(--ink) uppercase',
+        )}
+      >
         {label}
       </span>
       {children}
@@ -562,7 +632,7 @@ function SelectInput({
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="h-10 w-full border border-[#fffaf0]/14 bg-[#171211] px-3 text-sm text-[#f0e8dd] focus:border-[#d7b56d]/60 focus:outline-none"
+      className={cn(formInputClass, 'h-10 px-3 py-0')}
     >
       <option value="">{placeholder}</option>
       {options.map((option) => (
@@ -592,10 +662,10 @@ function OptionCard({
   return (
     <label
       className={cn(
-        'flex cursor-pointer items-start gap-3 border p-4 text-sm transition-colors',
+        'flex cursor-pointer items-start gap-3 rounded-[10px] border p-4 text-sm transition-colors',
         selected
-          ? 'border-[#d7b56d]/60 bg-[#d7b56d]/8'
-          : 'border-[#fffaf0]/12 bg-[#171211] hover:border-[#fffaf0]/24',
+          ? 'border-(--teal) bg-(--teal)/8'
+          : 'border-[rgba(33,28,24,0.15)] bg-(--paper-soft) hover:border-(--red)/35',
       )}
     >
       <input
@@ -603,13 +673,13 @@ function OptionCard({
         name={name}
         checked={selected}
         onChange={onSelect}
-        className="mt-1 accent-[#d7b56d]"
+        className="mt-1 accent-(--teal)"
       />
       <span className="flex flex-1 items-start justify-between gap-4">
         <span>
-          <span className="font-medium text-[#f0e8dd]">{title}</span>
+          <span className="font-medium text-(--ink)">{title}</span>
           {detail ? (
-            <span className="mt-1 block text-[#c8bdad]">{detail}</span>
+            <span className="mt-1 block text-(--ink-soft)">{detail}</span>
           ) : null}
         </span>
         {trailing}
@@ -628,15 +698,20 @@ function Review({
   detail?: string
 }) {
   return (
-    <div className="flex items-start justify-between gap-4 border-b border-[#fffaf0]/10 py-3 last:border-0">
+    <div className="flex items-start justify-between gap-4 border-b border-dashed border-[rgba(33,28,24,0.12)] py-3 last:border-0">
       <div>
-        <p className="text-[0.65rem] font-semibold tracking-[0.18em] text-[#d7b56d] uppercase">
+        <p
+          className={cn(
+            fontMono,
+            'text-[0.65rem] font-semibold tracking-[0.14em] text-(--red) uppercase',
+          )}
+        >
           {label}
         </p>
-        <p className="mt-1 font-medium text-[#f0e8dd]">{value}</p>
-        {detail ? <p className="text-[#c8bdad]">{detail}</p> : null}
+        <p className="mt-1 font-medium text-(--ink)">{value}</p>
+        {detail ? <p className="text-(--ink-soft)">{detail}</p> : null}
       </div>
-      <IconCircleCheck className="size-5 text-[#d7b56d]" />
+      <IconCircleCheck className="size-5 text-(--teal)" />
     </div>
   )
 }

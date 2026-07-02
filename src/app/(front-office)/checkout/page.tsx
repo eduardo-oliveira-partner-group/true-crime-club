@@ -5,7 +5,16 @@ import {
   CheckoutStepper,
   type SubscriberPreferencesValue,
 } from '@/src/components/checkout/checkout-stepper'
+import { DesignPageShell } from '@/src/components/public-design/design-page-shell'
+import { SectionEyebrow } from '@/src/components/public-design/section-eyebrow'
 import { Button } from '@/src/components/ui/button'
+import {
+  dossierCardSurface,
+  fontHeading,
+  fontMono,
+  sectionFrame,
+  warmShadowClass,
+} from '@/src/lib/design/classes'
 import { getPlanBySlug, getSeoEntry } from '@/src/lib/domain/repositories'
 import type { CartItem } from '@/src/lib/domain/types'
 import { formatCurrency } from '@/src/lib/formatters'
@@ -19,6 +28,7 @@ import {
   getCustomerProfile,
   updateCustomerProfile,
 } from '@/src/lib/server/customer'
+import { cn } from '@/src/lib/utils'
 
 export const metadata: Metadata = buildMetadata({
   path: '/checkout',
@@ -70,25 +80,29 @@ export default async function CheckoutPage({
     (isSubscriptionFlow && plan ? plan.price : totals.total) + shipping.price
 
   return (
-    <div className="relative isolate min-h-svh overflow-hidden bg-(--paper) text-(--ink)">
-      <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.03)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.03)_1px,transparent_1px)] bg-size-[42px_42px]" />
-      <div className="absolute inset-x-0 top-0 -z-10 h-72 bg-[radial-gradient(ellipse_at_50%_-10%,rgba(216,65,50,0.1),transparent_60%)]" />
-
-      <div className="relative z-10 mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:py-16">
+    <DesignPageShell className="overflow-hidden">
+      <div className={cn(sectionFrame, 'relative z-10 py-12 lg:py-16')}>
         <header className="flex flex-col gap-5 border-b border-[rgba(33,28,24,0.15)] pb-8">
-          <div className="flex items-center gap-4">
-            <p className="text-xs font-semibold tracking-[0.28em] text-(--red) uppercase">
-              Checkout
-            </p>
-            <span className="h-px flex-1 bg-[#d7b56d]/40" />
-            <p className="font-mono text-[0.65rem] tracking-[0.18em] text-(--ink)/45 uppercase">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <SectionEyebrow className="mb-0">Checkout</SectionEyebrow>
+            <p
+              className={cn(
+                fontMono,
+                'text-[0.65rem] tracking-[0.14em] text-(--ink-mute) uppercase',
+              )}
+            >
               PROC-07 · sessão segura
             </p>
           </div>
 
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div className="space-y-3">
-              <h1 className="font-heading text-3xl font-black tracking-tight text-(--ink) uppercase sm:text-4xl">
+              <h1
+                className={cn(
+                  fontHeading,
+                  'max-w-2xl text-3xl/tight font-semibold tracking-[-0.015em] text-balance text-(--ink) sm:text-4xl',
+                )}
+              >
                 Finalize seu ingresso no clube
               </h1>
               <p className="max-w-xl text-sm/6 text-(--ink-soft)">
@@ -97,11 +111,27 @@ export default async function CheckoutPage({
               </p>
             </div>
             {plan ? (
-              <div className="border border-[#d7b56d]/40 bg-(--card)/80 px-4 py-3 backdrop-blur-sm">
-                <p className="text-[0.65rem] font-semibold tracking-[0.18em] text-(--red) uppercase">
+              <div
+                className={cn(
+                  dossierCardSurface,
+                  warmShadowClass,
+                  'rounded-[14px] px-4 py-3',
+                )}
+              >
+                <p
+                  className={cn(
+                    fontMono,
+                    'text-[0.65rem] font-semibold tracking-[0.14em] text-(--red) uppercase',
+                  )}
+                >
                   Assinatura selecionada
                 </p>
-                <p className="mt-1.5 flex items-baseline gap-2 font-heading text-sm font-semibold text-(--ink)">
+                <p
+                  className={cn(
+                    fontHeading,
+                    'mt-1.5 flex items-baseline gap-2 text-sm font-semibold text-(--ink)',
+                  )}
+                >
                   {plan.name}
                   <span className="text-(--red)">
                     {formatCurrency(plan.price)}
@@ -113,8 +143,13 @@ export default async function CheckoutPage({
         </header>
 
         {!isSubscriptionFlow && cart.items.length === 0 ? (
-          <div className="mt-10 border border-dashed border-[rgba(33,28,24,0.15)] bg-(--paper-soft) p-10 text-center">
-            <p className="text-xs font-semibold tracking-[0.2em] text-(--red) uppercase">
+          <div className="mt-10 rounded-[14px] border border-dashed border-[rgba(33,28,24,0.15)] bg-(--paper-soft) p-10 text-center">
+            <p
+              className={cn(
+                fontMono,
+                'text-xs font-semibold tracking-[0.16em] text-(--red) uppercase',
+              )}
+            >
               Arquivo vazio
             </p>
             <p className="mt-3 text-sm text-(--ink-soft)">
@@ -123,7 +158,10 @@ export default async function CheckoutPage({
             </p>
             <Button
               asChild
-              className="mt-6 h-11 border border-[#d7b56d]/50 bg-transparent px-5 text-(--red) hover:bg-[#d7b56d]/12 hover:text-[#f0e8dd]"
+              className={cn(
+                fontMono,
+                'mt-6 h-11 rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-transparent px-5 text-(--ink) hover:bg-(--ink) hover:text-[#fbf9f6]',
+              )}
             >
               <Link href="/loja">Ir para a loja</Link>
             </Button>
@@ -177,7 +215,7 @@ export default async function CheckoutPage({
           </div>
         )}
       </div>
-    </div>
+    </DesignPageShell>
   )
 }
 
@@ -207,12 +245,22 @@ function OrderSummary({
   const hasItems = (isSubscriptionFlow && planName != null) || items.length > 0
 
   return (
-    <section className="border border-[rgba(33,28,24,0.15)] bg-(--card) p-5 shadow-[0_18px_40px_rgba(33,28,24,0.38)] sm:p-6">
+    <section className={cn(dossierCardSurface, warmShadowClass, 'p-5 sm:p-6')}>
       <div className="flex items-center justify-between border-b border-[rgba(33,28,24,0.15)] pb-4">
-        <p className="text-xs font-semibold tracking-[0.2em] text-(--red) uppercase">
+        <p
+          className={cn(
+            fontMono,
+            'text-xs font-semibold tracking-[0.16em] text-(--red) uppercase',
+          )}
+        >
           Resumo do pedido
         </p>
-        <p className="font-mono text-[0.6rem] tracking-[0.16em] text-(--ink)/40 uppercase">
+        <p
+          className={cn(
+            fontMono,
+            'text-[0.6rem] tracking-[0.14em] text-(--ink-mute) uppercase',
+          )}
+        >
           DOSS-07
         </p>
       </div>
@@ -222,7 +270,7 @@ function OrderSummary({
           {isSubscriptionFlow && planName ? (
             <li className="flex justify-between gap-4">
               <span>{planName} (assinatura)</span>
-              <span className="font-medium text-[#f0e8dd]">
+              <span className="font-medium text-(--ink)">
                 {formatCurrency(planPrice ?? 0)}
               </span>
             </li>
@@ -230,7 +278,7 @@ function OrderSummary({
           {items.map((item) => (
             <li key={item.id} className="flex justify-between gap-4">
               <span>{item.label}</span>
-              <span className="font-medium text-[#f0e8dd]">{item.value}</span>
+              <span className="font-medium text-(--ink)">{item.value}</span>
             </li>
           ))}
         </ul>
@@ -243,19 +291,26 @@ function OrderSummary({
       <div className="mt-5 space-y-2 border-t border-[rgba(33,28,24,0.15)] pt-4 text-sm text-(--ink-soft)">
         <div className="flex justify-between gap-4">
           <span>Subtotal</span>
-          <span className="text-[#f0e8dd]">{subtotal}</span>
+          <span className="text-(--ink)">{subtotal}</span>
         </div>
         <div className="flex justify-between gap-4">
           <span>Frete</span>
-          <span className="text-[#f0e8dd]">{shipping}</span>
+          <span className="text-(--ink)">{shipping}</span>
         </div>
       </div>
 
       <div className="mt-4 flex items-end justify-between gap-4 border-t border-[#d7b56d]/30 pt-4">
-        <span className="text-xs font-semibold tracking-[0.18em] text-(--red) uppercase">
+        <span
+          className={cn(
+            fontMono,
+            'text-xs font-semibold tracking-[0.14em] text-(--red) uppercase',
+          )}
+        >
           Total
         </span>
-        <span className="font-heading text-2xl font-black text-(--ink)">
+        <span
+          className={cn(fontHeading, 'text-2xl font-semibold text-(--ink)')}
+        >
           {total}
         </span>
       </div>
