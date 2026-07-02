@@ -2,6 +2,12 @@ import { IconArrowLeft } from '@tabler/icons-react'
 import Link from 'next/link'
 
 import { Button } from '@/src/components/ui/button'
+import {
+  fontHeading,
+  fontMono,
+  formInputClass,
+  formLabelClass,
+} from '@/src/lib/design/classes'
 import { updateCard } from '@/src/lib/domain/repositories'
 
 export default function AtualizarCartaoPage() {
@@ -10,7 +16,7 @@ export default function AtualizarCartaoPage() {
       <Button
         asChild
         variant="ghost"
-        className="mb-6 h-auto gap-1 p-0 text-[#c8bdad] hover:bg-transparent hover:text-[#d7b56d]"
+        className="mb-6 h-auto gap-1 rounded-[9px] p-0 text-(--ink-mute) hover:bg-transparent hover:text-(--red)"
       >
         <Link href="/cliente/financeiro">
           <IconArrowLeft className="size-4" />
@@ -18,13 +24,17 @@ export default function AtualizarCartaoPage() {
         </Link>
       </Button>
 
-      <p className="text-xs font-semibold tracking-[0.24em] text-[#d7b56d] uppercase">
+      <p
+        className={`text-[13px] leading-none font-bold tracking-[0.12em] text-(--red) uppercase ${fontMono}`}
+      >
         Arquivo do assinante
       </p>
-      <h1 className="mt-2 font-heading text-2xl font-black tracking-tight text-[#fffaf0] uppercase">
+      <h1
+        className={`mt-2 text-2xl font-black tracking-tight text-(--ink) uppercase ${fontHeading}`}
+      >
         Atualizar cartão
       </h1>
-      <p className="mt-2 text-sm/6 text-[#d7c9b5]">
+      <p className="mt-2 text-sm/6 text-(--ink-mute)">
         Formulário mockado — dados não são enviados a nenhum gateway.
       </p>
 
@@ -40,36 +50,26 @@ export default function AtualizarCartaoPage() {
         }}
       >
         <div>
-          <label
-            className="text-xs font-semibold tracking-[0.2em] text-[#c8bdad] uppercase"
-            htmlFor="holder"
-          >
+          <label className={formLabelClass} htmlFor="holder">
             Nome no cartão
           </label>
-          <input
-            id="holder"
-            name="holder"
-            className="mt-2 w-full border border-[#fffaf0]/14 bg-[#0c0a09] px-4 py-3 text-sm text-[#fffaf0] transition outline-none placeholder:text-[#bfb4a3]/60 focus:border-[#d7b56d]/70 focus:bg-[#0b0908]"
-          />
+          <input id="holder" name="holder" className={formInputClass} />
         </div>
         <div>
-          <label
-            className="text-xs font-semibold tracking-[0.2em] text-[#c8bdad] uppercase"
-            htmlFor="lastFour"
-          >
+          <label className={formLabelClass} htmlFor="lastFour">
             Final do cartão
           </label>
           <input
             id="lastFour"
             name="lastFour"
             maxLength={4}
-            className="mt-2 w-full border border-[#fffaf0]/14 bg-[#0c0a09] px-4 py-3 text-sm text-[#fffaf0] transition outline-none placeholder:text-[#bfb4a3]/60 focus:border-[#d7b56d]/70 focus:bg-[#0b0908]"
+            className={formInputClass}
           />
         </div>
         <input type="hidden" name="brand" value="Visa" />
         <Button
           type="submit"
-          className="bg-[#d84132] text-white shadow-[0_0_26px_rgba(216,65,50,0.35)] hover:bg-[#b93227]"
+          className="rounded-[9px] bg-(--red) text-[#fbf9f6] shadow-[0_9px_22px_-8px_rgba(33,28,24,0.13)] hover:bg-(--red-deep)"
         >
           Salvar cartão (mock)
         </Button>

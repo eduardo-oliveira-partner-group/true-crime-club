@@ -3,6 +3,11 @@ import Link from 'next/link'
 
 import { Button } from '@/src/components/ui/button'
 import {
+  fontHeading,
+  fontMono,
+  transitionBgColor,
+} from '@/src/lib/design/classes'
+import {
   cancelSubscription,
   getSubscription,
 } from '@/src/lib/domain/repositories'
@@ -16,7 +21,7 @@ export default function CancelarAssinaturaPage() {
       <Button
         asChild
         variant="ghost"
-        className="mb-6 h-auto gap-1 p-0 text-[#c8bdad] hover:bg-transparent hover:text-[#d7b56d]"
+        className={`mb-6 h-auto gap-1 rounded-[9px] p-0 text-(--ink-mute) hover:bg-transparent hover:text-(--red)`}
       >
         <Link href="/cliente/assinatura">
           <IconArrowLeft className="size-4" />
@@ -24,21 +29,25 @@ export default function CancelarAssinaturaPage() {
         </Link>
       </Button>
 
-      <p className="text-xs font-semibold tracking-[0.24em] text-[#d84132] uppercase">
+      <p
+        className={`text-[13px] leading-none font-bold tracking-[0.12em] text-(--red) uppercase ${fontMono}`}
+      >
         Ação irreversível
       </p>
-      <h1 className="mt-2 font-heading text-2xl font-black tracking-tight text-[#fffaf0] uppercase">
+      <h1
+        className={`mt-2 text-2xl font-black tracking-tight text-(--ink) uppercase ${fontHeading}`}
+      >
         Cancelar assinatura
       </h1>
-      <p className="mt-2 text-sm/6 text-[#d7c9b5]">
+      <p className="mt-2 text-sm/6 text-(--ink-mute)">
         Simulação de cancelamento — nenhuma ação real será executada.
       </p>
 
       {subscription ? (
-        <div className="mt-5 border border-[#d84132]/40 bg-[#d84132]/10 p-5 text-sm">
-          <p className="text-[#f0e8dd]">
+        <div className="mt-5 rounded-[14px] border border-(--red)/25 bg-(--red)/6 p-5 text-sm">
+          <p className="text-(--ink-soft)">
             Plano atual:{' '}
-            <span className="font-semibold text-[#fffaf0]">
+            <span className={`font-semibold text-(--ink) ${fontHeading}`}>
               {subscription.planName}
             </span>{' '}
             ({formatSubscriptionStatus(subscription.status)})
@@ -55,7 +64,7 @@ export default function CancelarAssinaturaPage() {
       >
         <Button
           type="submit"
-          className="bg-[#d84132] text-white shadow-[0_0_26px_rgba(216,65,50,0.35)] hover:bg-[#b93227]"
+          className="rounded-[9px] bg-(--red) text-[#fbf9f6] shadow-[0_9px_22px_-8px_rgba(33,28,24,0.13)] hover:bg-(--red-deep)"
         >
           Confirmar cancelamento (mock)
         </Button>

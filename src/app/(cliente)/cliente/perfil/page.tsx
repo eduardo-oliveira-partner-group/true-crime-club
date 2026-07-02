@@ -12,7 +12,21 @@ import { useEffect } from 'react'
 
 import { Button } from '@/src/components/ui/button'
 import { apiClient } from '@/src/lib/api-client'
+import {
+  cardShadowBase,
+  dossierCardSurface,
+  fontHeading,
+  fontMono,
+  formInputClass,
+  formLabelClass,
+  transitionBgColor,
+} from '@/src/lib/design/classes'
 import type { Address } from '@/src/lib/domain/types'
+
+/** Shared class for inline edit/close action buttons. */
+const editBtnClass = `inline-flex cursor-pointer items-center gap-1.5 rounded-[9px] px-2 py-1 text-xs text-(--red) ${transitionBgColor} hover:bg-(--red)/8 hover:text-(--red-deep)`
+const saveBtnClass = `cursor-pointer rounded-[9px] p-1.5 text-(--teal) ${transitionBgColor} hover:bg-(--teal)/10`
+const cancelBtnClass = `cursor-pointer rounded-[9px] p-1.5 text-(--red) ${transitionBgColor} hover:bg-(--red)/10`
 
 export default function PerfilPage() {
   // State for Customer Info
@@ -168,7 +182,9 @@ export default function PerfilPage() {
 
   if (loading) {
     return (
-      <div className="flex h-48 animate-pulse items-center justify-center font-mono text-sm tracking-widest text-[#bfb4a3] uppercase">
+      <div
+        className={`flex h-48 animate-pulse items-center justify-center text-sm tracking-widest text-(--ink-mute) uppercase ${fontMono}`}
+      >
         Carregando informações da conta...
       </div>
     )
@@ -176,22 +192,28 @@ export default function PerfilPage() {
 
   return (
     <div>
-      <p className="text-xs font-semibold tracking-[0.24em] text-[#d7b56d] uppercase">
+      <p
+        className={`text-[13px] leading-none font-bold tracking-[0.12em] text-(--red) uppercase ${fontMono}`}
+      >
         Arquivo do assinante
       </p>
-      <h1 className="mt-2 font-heading text-2xl font-black tracking-tight text-[#fffaf0] uppercase">
+      <h1
+        className={`mt-2 text-2xl font-black tracking-tight text-(--ink) uppercase ${fontHeading}`}
+      >
         Minha conta
       </h1>
-      <p className="mt-2 text-sm/6 text-[#d7c9b5]">
+      <p className="mt-2 text-sm/6 text-(--ink-mute)">
         Gerencie suas informações cadastrais, de contato, preferências do clube
         e endereços de entrega das suas caixas.
       </p>
 
       <div className="mt-8 grid gap-6 md:grid-cols-2">
         {/* Card 1: Informações Básicas */}
-        <div className="border border-[#fffaf0]/12 bg-[#171211] p-5 shadow-[0_12px_32px_rgba(0,0,0,0.25)]">
-          <div className="flex items-center justify-between border-b border-[#fffaf0]/10 pb-3">
-            <h3 className="font-heading text-sm font-semibold tracking-wide text-[#fffaf0] uppercase">
+        <div className={`${dossierCardSurface} ${cardShadowBase} p-5`}>
+          <div className="flex items-center justify-between border-b border-dashed border-(--ink)/10 pb-3">
+            <h3
+              className={`text-sm font-semibold tracking-wide text-(--ink) uppercase ${fontHeading}`}
+            >
               Informações Básicas
             </h3>
             {!editBasics ? (
@@ -201,21 +223,18 @@ export default function PerfilPage() {
                   setTempCpf(cpf)
                   setEditBasics(true)
                 }}
-                className="inline-flex cursor-pointer items-center gap-1.5 text-xs text-[#d7b56d] transition-colors hover:text-[#fffaf0]"
+                className={editBtnClass}
               >
                 <IconEdit className="size-3.5" /> Editar
               </button>
             ) : (
               <div className="flex gap-2">
-                <button
-                  onClick={handleSaveBasics}
-                  className="cursor-pointer text-[#d7b56d] transition-colors hover:text-[#62d84e]"
-                >
+                <button onClick={handleSaveBasics} className={saveBtnClass}>
                   <IconCheck className="size-4" />
                 </button>
                 <button
                   onClick={() => setEditBasics(false)}
-                  className="cursor-pointer text-[#ffb0a5] transition-colors hover:text-[#fffaf0]"
+                  className={cancelBtnClass}
                 >
                   <IconX className="size-4" />
                 </button>
@@ -225,7 +244,9 @@ export default function PerfilPage() {
 
           <div className="mt-4 space-y-4">
             <div>
-              <p className="font-mono text-[10px] tracking-wide text-[#bfb4a3] uppercase">
+              <p
+                className={`text-[10px] tracking-wide text-(--ink-mute) uppercase ${fontMono}`}
+              >
                 Nome Completo
               </p>
               {editBasics ? (
@@ -233,14 +254,16 @@ export default function PerfilPage() {
                   type="text"
                   value={tempName}
                   onChange={(e) => setTempName(e.target.value)}
-                  className="mt-1 w-full border border-[#fffaf0]/14 bg-[#0c0a09] px-3 py-1.5 text-sm text-[#fffaf0] outline-none focus:border-[#d7b56d]/70"
+                  className={formInputClass}
                 />
               ) : (
-                <p className="mt-1 text-sm text-[#f0e8dd]">{name}</p>
+                <p className="mt-1 text-sm text-(--ink-soft)">{name}</p>
               )}
             </div>
             <div>
-              <p className="font-mono text-[10px] tracking-wide text-[#bfb4a3] uppercase">
+              <p
+                className={`text-[10px] tracking-wide text-(--ink-mute) uppercase ${fontMono}`}
+              >
                 CPF
               </p>
               {editBasics ? (
@@ -248,17 +271,19 @@ export default function PerfilPage() {
                   type="text"
                   value={tempCpf}
                   onChange={(e) => setTempCpf(e.target.value)}
-                  className="mt-1 w-full border border-[#fffaf0]/14 bg-[#0c0a09] px-3 py-1.5 text-sm text-[#fffaf0] outline-none focus:border-[#d7b56d]/70"
+                  className={formInputClass}
                 />
               ) : (
-                <p className="mt-1 text-sm text-[#f0e8dd]">{cpf}</p>
+                <p className="mt-1 text-sm text-(--ink-soft)">{cpf}</p>
               )}
             </div>
             <div>
-              <p className="font-mono text-[10px] tracking-wide text-[#bfb4a3] uppercase">
+              <p
+                className={`text-[10px] tracking-wide text-(--ink-mute) uppercase ${fontMono}`}
+              >
                 Senha
               </p>
-              <p className="mt-1 text-sm text-[#bfb4a3] italic">
+              <p className="mt-1 text-sm text-(--ink-mute) italic">
                 •••••••• (Edição restrita em modo mock)
               </p>
             </div>
@@ -266,9 +291,11 @@ export default function PerfilPage() {
         </div>
 
         {/* Card 2: Contato */}
-        <div className="border border-[#fffaf0]/12 bg-[#171211] p-5 shadow-[0_12px_32px_rgba(0,0,0,0.25)]">
-          <div className="flex items-center justify-between border-b border-[#fffaf0]/10 pb-3">
-            <h3 className="font-heading text-sm font-semibold tracking-wide text-[#fffaf0] uppercase">
+        <div className={`${dossierCardSurface} ${cardShadowBase} p-5`}>
+          <div className="flex items-center justify-between border-b border-dashed border-(--ink)/10 pb-3">
+            <h3
+              className={`text-sm font-semibold tracking-wide text-(--ink) uppercase ${fontHeading}`}
+            >
               Contato
             </h3>
             {!editContact ? (
@@ -278,21 +305,18 @@ export default function PerfilPage() {
                   setTempPhone(phone)
                   setEditContact(true)
                 }}
-                className="inline-flex cursor-pointer items-center gap-1.5 text-xs text-[#d7b56d] transition-colors hover:text-[#fffaf0]"
+                className={editBtnClass}
               >
                 <IconEdit className="size-3.5" /> Editar
               </button>
             ) : (
               <div className="flex gap-2">
-                <button
-                  onClick={handleSaveContact}
-                  className="cursor-pointer text-[#d7b56d] transition-colors hover:text-[#62d84e]"
-                >
+                <button onClick={handleSaveContact} className={saveBtnClass}>
                   <IconCheck className="size-4" />
                 </button>
                 <button
                   onClick={() => setEditContact(false)}
-                  className="cursor-pointer text-[#ffb0a5] transition-colors hover:text-[#fffaf0]"
+                  className={cancelBtnClass}
                 >
                   <IconX className="size-4" />
                 </button>
@@ -302,7 +326,9 @@ export default function PerfilPage() {
 
           <div className="mt-4 space-y-4">
             <div>
-              <p className="font-mono text-[10px] tracking-wide text-[#bfb4a3] uppercase">
+              <p
+                className={`text-[10px] tracking-wide text-(--ink-mute) uppercase ${fontMono}`}
+              >
                 E-mail
               </p>
               {editContact ? (
@@ -310,14 +336,16 @@ export default function PerfilPage() {
                   type="email"
                   value={tempEmail}
                   onChange={(e) => setTempEmail(e.target.value)}
-                  className="mt-1 w-full border border-[#fffaf0]/14 bg-[#0c0a09] px-3 py-1.5 text-sm text-[#fffaf0] outline-none focus:border-[#d7b56d]/70"
+                  className={formInputClass}
                 />
               ) : (
-                <p className="mt-1 text-sm text-[#f0e8dd]">{email}</p>
+                <p className="mt-1 text-sm text-(--ink-soft)">{email}</p>
               )}
             </div>
             <div>
-              <p className="font-mono text-[10px] tracking-wide text-[#bfb4a3] uppercase">
+              <p
+                className={`text-[10px] tracking-wide text-(--ink-mute) uppercase ${fontMono}`}
+              >
                 Telefone
               </p>
               {editContact ? (
@@ -325,19 +353,23 @@ export default function PerfilPage() {
                   type="text"
                   value={tempPhone}
                   onChange={(e) => setTempPhone(e.target.value)}
-                  className="mt-1 w-full border border-[#fffaf0]/14 bg-[#0c0a09] px-3 py-1.5 text-sm text-[#fffaf0] outline-none focus:border-[#d7b56d]/70"
+                  className={formInputClass}
                 />
               ) : (
-                <p className="mt-1 text-sm text-[#f0e8dd]">{phone}</p>
+                <p className="mt-1 text-sm text-(--ink-soft)">{phone}</p>
               )}
             </div>
           </div>
         </div>
 
         {/* Card 3: Dados Adicionais / Preferências */}
-        <div className="border border-[#fffaf0]/12 bg-[#171211] p-5 shadow-[0_12px_32px_rgba(0,0,0,0.25)] md:col-span-2">
-          <div className="flex items-center justify-between border-b border-[#fffaf0]/10 pb-3">
-            <h3 className="font-heading text-sm font-semibold tracking-wide text-[#fffaf0] uppercase">
+        <div
+          className={`${dossierCardSurface} ${cardShadowBase} p-5 md:col-span-2`}
+        >
+          <div className="flex items-center justify-between border-b border-dashed border-(--ink)/10 pb-3">
+            <h3
+              className={`text-sm font-semibold tracking-wide text-(--ink) uppercase ${fontHeading}`}
+            >
               Dados Adicionais & Preferências de Dossiê
             </h3>
             {!editPrefs ? (
@@ -348,21 +380,18 @@ export default function PerfilPage() {
                   setTempNotes(notes)
                   setEditPrefs(true)
                 }}
-                className="inline-flex cursor-pointer items-center gap-1.5 text-xs text-[#d7b56d] transition-colors hover:text-[#fffaf0]"
+                className={editBtnClass}
               >
                 <IconEdit className="size-3.5" /> Editar
               </button>
             ) : (
               <div className="flex gap-2">
-                <button
-                  onClick={handleSavePrefs}
-                  className="cursor-pointer text-[#d7b56d] transition-colors hover:text-[#62d84e]"
-                >
+                <button onClick={handleSavePrefs} className={saveBtnClass}>
                   <IconCheck className="size-4" />
                 </button>
                 <button
                   onClick={() => setEditPrefs(false)}
-                  className="cursor-pointer text-[#ffb0a5] transition-colors hover:text-[#fffaf0]"
+                  className={cancelBtnClass}
                 >
                   <IconX className="size-4" />
                 </button>
@@ -372,14 +401,16 @@ export default function PerfilPage() {
 
           <div className="mt-4 grid gap-6 md:grid-cols-3">
             <div>
-              <p className="font-mono text-[10px] tracking-wide text-[#bfb4a3] uppercase">
+              <p
+                className={`text-[10px] tracking-wide text-(--ink-mute) uppercase ${fontMono}`}
+              >
                 Tamanho de Camiseta
               </p>
               {editPrefs ? (
                 <select
                   value={tempShirt}
                   onChange={(e) => setTempShirt(e.target.value)}
-                  className="mt-1 w-full border border-[#fffaf0]/14 bg-[#0c0a09] px-3 py-1.5 text-sm text-[#fffaf0] outline-none focus:border-[#d7b56d]/70"
+                  className={formInputClass}
                 >
                   <option value="PP">PP</option>
                   <option value="P">P</option>
@@ -389,11 +420,13 @@ export default function PerfilPage() {
                   <option value="XG">XG</option>
                 </select>
               ) : (
-                <p className="mt-1 text-sm text-[#f0e8dd]">{shirtSize}</p>
+                <p className="mt-1 text-sm text-(--ink-soft)">{shirtSize}</p>
               )}
             </div>
             <div>
-              <p className="font-mono text-[10px] tracking-wide text-[#bfb4a3] uppercase">
+              <p
+                className={`text-[10px] tracking-wide text-(--ink-mute) uppercase ${fontMono}`}
+              >
                 Tamanho de Calçado
               </p>
               {editPrefs ? (
@@ -401,39 +434,45 @@ export default function PerfilPage() {
                   type="text"
                   value={tempShoe}
                   onChange={(e) => setTempShoe(e.target.value)}
-                  className="mt-1 w-full border border-[#fffaf0]/14 bg-[#0c0a09] px-3 py-1.5 text-sm text-[#fffaf0] outline-none focus:border-[#d7b56d]/70"
+                  className={formInputClass}
                 />
               ) : (
-                <p className="mt-1 text-sm text-[#f0e8dd]">{shoeSize}</p>
+                <p className="mt-1 text-sm text-(--ink-soft)">{shoeSize}</p>
               )}
             </div>
             <div>
-              <p className="font-mono text-[10px] tracking-wide text-[#bfb4a3] uppercase">
+              <p
+                className={`text-[10px] tracking-wide text-(--ink-mute) uppercase ${fontMono}`}
+              >
                 Observações de Produção
               </p>
               {editPrefs ? (
                 <textarea
                   value={tempNotes}
                   onChange={(e) => setTempNotes(e.target.value)}
-                  className="mt-1 h-12 w-full resize-none border border-[#fffaf0]/14 bg-[#0c0a09] px-3 py-1.5 text-sm text-[#fffaf0] outline-none focus:border-[#d7b56d]/70"
+                  className={`${formInputClass} h-12 resize-none`}
                 />
               ) : (
-                <p className="mt-1 text-sm text-[#f0e8dd]">{notes}</p>
+                <p className="mt-1 text-sm text-(--ink-soft)">{notes}</p>
               )}
             </div>
           </div>
         </div>
 
         {/* Card 4: Endereços */}
-        <div className="border border-[#fffaf0]/12 bg-[#171211] p-5 shadow-[0_12px_32px_rgba(0,0,0,0.25)] md:col-span-2">
-          <div className="flex items-center justify-between border-b border-[#fffaf0]/10 pb-3">
-            <h3 className="font-heading text-sm font-semibold tracking-wide text-[#fffaf0] uppercase">
+        <div
+          className={`${dossierCardSurface} ${cardShadowBase} p-5 md:col-span-2`}
+        >
+          <div className="flex items-center justify-between border-b border-dashed border-(--ink)/10 pb-3">
+            <h3
+              className={`text-sm font-semibold tracking-wide text-(--ink) uppercase ${fontHeading}`}
+            >
               Endereços de Entrega
             </h3>
             {!showAddAddress && (
               <button
                 onClick={() => setShowAddAddress(true)}
-                className="inline-flex cursor-pointer items-center gap-1.5 text-xs text-[#d7b56d] transition-colors hover:text-[#fffaf0]"
+                className={editBtnClass}
               >
                 <IconPlus className="size-3.5" /> Adicionar Endereço
               </button>
@@ -444,14 +483,16 @@ export default function PerfilPage() {
           {showAddAddress && (
             <form
               onSubmit={handleAddAddress}
-              className="mt-4 space-y-4 border border-[#fffaf0]/10 bg-[#0c0a09] p-4"
+              className="mt-4 space-y-4 rounded-[14px] border border-(--ink)/10 bg-(--paper-soft) p-4"
             >
-              <p className="text-xs font-semibold tracking-wide text-[#d7b56d] uppercase">
+              <p
+                className={`text-xs font-semibold tracking-wide text-(--red) uppercase ${fontMono}`}
+              >
                 Novo Endereço de Entrega
               </p>
               <div className="grid gap-4 md:grid-cols-3">
                 <div className="md:col-span-2">
-                  <label className="text-[10px] text-[#bfb4a3] uppercase">
+                  <label className={formLabelClass}>
                     Identificação (ex: Casa, Trabalho)
                   </label>
                   <input
@@ -459,90 +500,76 @@ export default function PerfilPage() {
                     required
                     value={newAddrLabel}
                     onChange={(e) => setNewAddrLabel(e.target.value)}
-                    className="mt-1 w-full border border-[#fffaf0]/14 bg-[#171211] px-3 py-1.5 text-sm text-[#fffaf0] outline-none"
+                    className={formInputClass}
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] text-[#bfb4a3] uppercase">
-                    CEP
-                  </label>
+                  <label className={formLabelClass}>CEP</label>
                   <input
                     type="text"
                     required
                     value={newAddrZip}
                     onChange={(e) => setNewAddrZip(e.target.value)}
-                    className="mt-1 w-full border border-[#fffaf0]/14 bg-[#171211] px-3 py-1.5 text-sm text-[#fffaf0] outline-none"
+                    className={formInputClass}
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="text-[10px] text-[#bfb4a3] uppercase">
-                    Logradouro / Rua
-                  </label>
+                  <label className={formLabelClass}>Logradouro / Rua</label>
                   <input
                     type="text"
                     required
                     value={newAddrStreet}
                     onChange={(e) => setNewAddrStreet(e.target.value)}
-                    className="mt-1 w-full border border-[#fffaf0]/14 bg-[#171211] px-3 py-1.5 text-sm text-[#fffaf0] outline-none"
+                    className={formInputClass}
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] text-[#bfb4a3] uppercase">
-                    Número
-                  </label>
+                  <label className={formLabelClass}>Número</label>
                   <input
                     type="text"
                     required
                     value={newAddrNumber}
                     onChange={(e) => setNewAddrNumber(e.target.value)}
-                    className="mt-1 w-full border border-[#fffaf0]/14 bg-[#171211] px-3 py-1.5 text-sm text-[#fffaf0] outline-none"
+                    className={formInputClass}
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] text-[#bfb4a3] uppercase">
-                    Complemento
-                  </label>
+                  <label className={formLabelClass}>Complemento</label>
                   <input
                     type="text"
                     value={newAddrComplement}
                     onChange={(e) => setNewAddrComplement(e.target.value)}
-                    className="mt-1 w-full border border-[#fffaf0]/14 bg-[#171211] px-3 py-1.5 text-sm text-[#fffaf0] outline-none"
+                    className={formInputClass}
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] text-[#bfb4a3] uppercase">
-                    Bairro
-                  </label>
+                  <label className={formLabelClass}>Bairro</label>
                   <input
                     type="text"
                     required
                     value={newAddrNeighborhood}
                     onChange={(e) => setNewAddrNeighborhood(e.target.value)}
-                    className="mt-1 w-full border border-[#fffaf0]/14 bg-[#171211] px-3 py-1.5 text-sm text-[#fffaf0] outline-none"
+                    className={formInputClass}
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] text-[#bfb4a3] uppercase">
-                    Cidade
-                  </label>
+                  <label className={formLabelClass}>Cidade</label>
                   <input
                     type="text"
                     required
                     value={newAddrCity}
                     onChange={(e) => setNewAddrCity(e.target.value)}
-                    className="mt-1 w-full border border-[#fffaf0]/14 bg-[#171211] px-3 py-1.5 text-sm text-[#fffaf0] outline-none"
+                    className={formInputClass}
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] text-[#bfb4a3] uppercase">
-                    Estado (UF)
-                  </label>
+                  <label className={formLabelClass}>Estado (UF)</label>
                   <input
                     type="text"
                     required
                     value={newAddrState}
                     onChange={(e) => setNewAddrState(e.target.value)}
-                    className="mt-1 w-full border border-[#fffaf0]/14 bg-[#171211] px-3 py-1.5 text-sm text-[#fffaf0] outline-none"
+                    className={formInputClass}
                   />
                 </div>
               </div>
@@ -551,7 +578,7 @@ export default function PerfilPage() {
                   type="button"
                   variant="outline"
                   size="sm"
-                  className="border-[#fffaf0]/20 text-[#fffaf0] hover:bg-[#fffaf0]/10"
+                  className="rounded-[9px]"
                   onClick={() => setShowAddAddress(false)}
                 >
                   Cancelar
@@ -559,7 +586,7 @@ export default function PerfilPage() {
                 <Button
                   type="submit"
                   size="sm"
-                  className="bg-[#d7b56d] text-[#171211] hover:bg-[#c69f54]"
+                  className="rounded-[9px] bg-(--red) text-[#fbf9f6] hover:bg-(--red-deep)"
                 >
                   Salvar Endereço
                 </Button>
@@ -570,38 +597,40 @@ export default function PerfilPage() {
           {/* Listagem de Endereços */}
           <div className="mt-4 space-y-3">
             {addresses.length === 0 ? (
-              <p className="text-sm text-[#bfb4a3] italic">
+              <p className="text-sm text-(--ink-mute) italic">
                 Nenhum endereço cadastrado.
               </p>
             ) : (
               addresses.map((addr) => (
                 <div
                   key={addr.id}
-                  className="flex items-start justify-between border border-[#fffaf0]/10 bg-[#0c0a09] p-4 text-sm"
+                  className="flex items-start justify-between rounded-[10px] border border-(--ink)/10 bg-(--paper-soft) p-4 text-sm"
                 >
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-heading text-xs font-bold text-[#d7b56d] uppercase">
+                      <span
+                        className={`text-xs font-bold text-(--red) uppercase ${fontHeading}`}
+                      >
                         {addr.label}
                       </span>
                       {addr.isDefault && (
-                        <span className="border border-[#d7b56d]/30 bg-[#d7b56d]/10 px-1.5 py-0.5 text-[9px] text-[#d7b56d] uppercase">
+                        <span className="rounded-[2px] border border-(--teal)/30 bg-(--teal)/10 px-1.5 py-0.5 text-[9px] text-(--teal) uppercase">
                           Padrão
                         </span>
                       )}
                     </div>
-                    <p className="mt-1 text-[#f0e8dd]">
+                    <p className="mt-1 text-(--ink-soft)">
                       {addr.street}, nº {addr.number}{' '}
                       {addr.complement && `(${addr.complement})`}
                     </p>
-                    <p className="text-xs text-[#c8bdad]">
+                    <p className="text-xs text-(--ink-mute)">
                       {addr.neighborhood} — {addr.city}/{addr.state} — CEP{' '}
                       {addr.zipCode}
                     </p>
                   </div>
                   <button
                     onClick={() => handleDeleteAddress(addr.id)}
-                    className="cursor-pointer p-1 text-[#ffb0a5] transition-colors hover:text-[#d84132]"
+                    className={`rounded-[9px] p-1 text-(--red) ${transitionBgColor} hover:bg-(--red)/10 hover:text-(--red-deep)`}
                   >
                     <IconTrash className="size-4" />
                   </button>

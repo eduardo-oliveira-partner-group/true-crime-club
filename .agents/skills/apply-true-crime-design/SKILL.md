@@ -51,6 +51,11 @@ When translating an existing page:
 - Keep page-specific content and IA intact unless the user asks for UX restructuring.
 - Prefer a small set of reusable additions over duplicating long Tailwind class strings across many files.
 - If the page is product or account UI rather than marketing, keep the same tokens but reduce art direction density. Design serves task completion there.
+- **Dashboard Card Header Standardization**: For cards in account UI/private dashboard pages, ensure card titles/eyebrows are structured consistently:
+  - Wrap headings in a container with a dashed bottom border: `border-b border-dashed border-(--ink)/10 pb-3`.
+  - Use heading font (`fontHeading`), size `text-sm`, semibold, uppercase, and standard ink color: `text-sm font-semibold tracking-wide text-(--ink) uppercase ${fontHeading}`.
+  - Position card contents in a dedicated `mt-4` block below the header.
+- **Context-Adaptive Skeletons & Shells**: When converting layout shells or skeletons (e.g., `PageSkeleton`), avoid hardcoded colors. Use theme CSS variables (like `bg-(--card)`, `bg-(--ink)`) so they adapt naturally to both paper and dark contexts.
 
 ## Done Criteria
 
@@ -63,4 +68,6 @@ When translating an existing page:
 - No public-front-office headings, prices, CTAs, product cards, or quick views use serif fonts.
 - No visible bordered UI element uses square corners or `rounded-none`.
 - Portals/dialogs/quick views use design tokens explicitly when they are rendered outside `DesignPageShell`.
+- Dashboard cards have unified `text-sm fontHeading text-(--ink)` headers and dashed border-bottom separators.
+- Skeletons use CSS variables instead of hardcoded background colors.
 - No absolute-ban patterns from `$impeccable` or this skill are introduced.

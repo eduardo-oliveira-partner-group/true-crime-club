@@ -1,6 +1,14 @@
 import { IconArrowRight } from '@tabler/icons-react'
 import Link from 'next/link'
 
+import {
+  cardShadowBase,
+  dossierCardSurface,
+  fontHeading,
+  fontMono,
+  transitionBgColor,
+  transitionCardHover,
+} from '@/src/lib/design/classes'
 import type { Order } from '@/src/lib/domain/types'
 import {
   formatCurrency,
@@ -11,11 +19,11 @@ import { listOrders } from '@/src/lib/server/customer'
 import { cn } from '@/src/lib/utils'
 
 const statusTone: Record<string, string> = {
-  entregue: 'text-[#d7b56d] border-[#d7b56d]/40 bg-[#d7b56d]/10',
-  enviado: 'text-[#d7b56d] border-[#d7b56d]/40 bg-[#d7b56d]/10',
-  processando: 'text-[#ffb0a5] border-[#d84132]/40 bg-[#d84132]/12',
-  pendente: 'text-[#ffb0a5] border-[#d84132]/40 bg-[#d84132]/12',
-  cancelado: 'text-[#bfb4a3] border-[#fffaf0]/20 bg-[#fffaf0]/5',
+  entregue: 'text-(--teal) border-(--teal)/30 bg-(--teal)/8',
+  enviado: 'text-(--teal) border-(--teal)/30 bg-(--teal)/8',
+  processando: 'text-(--amber) border-(--amber)/30 bg-(--amber)/8',
+  pendente: 'text-(--red) border-(--red)/25 bg-(--red)/6',
+  cancelado: 'text-(--ink-mute) border-(--ink)/15 bg-(--ink)/5',
 }
 
 export default async function PedidosPage() {
@@ -23,13 +31,17 @@ export default async function PedidosPage() {
 
   return (
     <div>
-      <p className="text-xs font-semibold tracking-[0.24em] text-[#d7b56d] uppercase">
+      <p
+        className={`text-[13px] leading-none font-bold tracking-[0.12em] text-(--red) uppercase ${fontMono}`}
+      >
         Arquivo do assinante
       </p>
-      <h1 className="mt-2 font-heading text-2xl font-black tracking-tight text-[#fffaf0] uppercase">
+      <h1
+        className={`mt-2 text-2xl font-black tracking-tight text-(--ink) uppercase ${fontHeading}`}
+      >
         Meus pedidos
       </h1>
-      <p className="mt-2 text-sm/6 text-[#d7c9b5]">
+      <p className="mt-2 text-sm/6 text-(--ink-mute)">
         Acompanhe status de pagamento, despacho e rastreio. Cobrança e envio
         seguem ciclos distintos.
       </p>
@@ -38,25 +50,29 @@ export default async function PedidosPage() {
         {orders.map((order: Order) => {
           const tone =
             statusTone[order.status] ??
-            'text-[#c8bdad] border-[#fffaf0]/18 bg-[#fffaf0]/5'
+            'text-(--ink-mute) border-(--ink)/15 bg-(--ink)/5'
           return (
             <Link
               key={order.id}
               href={`/cliente/pedidos/${order.id}`}
-              className="group block border border-[#fffaf0]/12 bg-[#171211] p-5 transition-all hover:-translate-y-0.5 hover:border-[#b98542]/55 hover:shadow-[0_20px_48px_rgba(0,0,0,0.38)]"
+              className={`group block ${dossierCardSurface} ${cardShadowBase} p-5 ${transitionCardHover} hover:-translate-y-0.5 hover:shadow-[0_24px_44px_-18px_rgba(33,28,24,0.3),inset_0_0_0_1px_rgba(255,255,255,0.6)]`}
             >
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <span className="font-mono text-[10px] tracking-[0.16em] text-[#bfb4a3] uppercase">
+                  <span
+                    className={`text-[10px] tracking-[0.16em] text-(--ink-mute) uppercase ${fontMono}`}
+                  >
                     PED
                   </span>
-                  <p className="font-heading text-sm font-semibold tracking-wide text-[#fffaf0]">
+                  <p
+                    className={`text-sm font-semibold tracking-wide text-(--ink) ${fontHeading}`}
+                  >
                     {order.orderNumber}
                   </p>
                 </div>
                 <span
                   className={cn(
-                    'border px-2.5 py-1 text-[10px] font-semibold tracking-[0.16em] uppercase',
+                    'rounded-[2px] border px-2.5 py-1 text-[10px] font-semibold tracking-[0.16em] uppercase',
                     tone,
                   )}
                 >
@@ -64,19 +80,21 @@ export default async function PedidosPage() {
                 </span>
               </div>
 
-              <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-[#fffaf0]/10 pt-3 text-sm">
-                <p className="text-[#c8bdad]">
+              <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-dashed border-(--ink)/10 pt-3 text-sm">
+                <p className="text-(--ink-mute)">
                   Pagamento:{' '}
-                  <span className="text-[#f0e8dd]">
+                  <span className="text-(--ink-soft)">
                     {formatPaymentStatus(order.paymentStatus)}
                   </span>
                 </p>
-                <p className="font-heading font-semibold text-[#d7b56d]">
+                <p className={`font-semibold text-(--red) ${fontHeading}`}>
                   {formatCurrency(order.total)}
                 </p>
               </div>
 
-              <div className="mt-3 flex items-center justify-end gap-1 text-xs font-semibold tracking-wide text-[#bfb4a3] transition-colors group-hover:text-[#d7b56d]">
+              <div
+                className={`mt-3 flex items-center justify-end gap-1 text-xs font-semibold tracking-wide text-(--ink-mute) ${transitionBgColor} group-hover:text-(--red)`}
+              >
                 Abrir dossiê
                 <IconArrowRight className="size-3.5" />
               </div>

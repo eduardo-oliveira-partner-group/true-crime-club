@@ -3,6 +3,13 @@ import Link from 'next/link'
 
 import { Button } from '@/src/components/ui/button'
 import {
+  cardShadowBase,
+  dossierCardSurface,
+  fontHeading,
+  fontMono,
+  transitionBgColor,
+} from '@/src/lib/design/classes'
+import {
   listInvoices,
   listPayments,
   renewPixPayment,
@@ -15,10 +22,10 @@ import {
 import { cn } from '@/src/lib/utils'
 
 const paymentTone: Record<string, string> = {
-  paid: 'text-[#d7b56d]',
-  pending: 'text-[#ffb0a5]',
-  refused: 'text-[#ffb0a5]',
-  expired: 'text-[#bfb4a3]',
+  paid: 'text-(--teal)',
+  pending: 'text-(--amber)',
+  refused: 'text-(--red)',
+  expired: 'text-(--ink-mute)',
 }
 
 export default function FinanceiroPage() {
@@ -31,19 +38,25 @@ export default function FinanceiroPage() {
 
   return (
     <div>
-      <p className="text-xs font-semibold tracking-[0.24em] text-[#d7b56d] uppercase">
+      <p
+        className={`text-[13px] leading-none font-bold tracking-[0.12em] text-(--red) uppercase ${fontMono}`}
+      >
         Arquivo do assinante
       </p>
-      <h1 className="mt-2 font-heading text-2xl font-black tracking-tight text-[#fffaf0] uppercase">
+      <h1
+        className={`mt-2 text-2xl font-black tracking-tight text-(--ink) uppercase ${fontHeading}`}
+      >
         Financeiro
       </h1>
-      <p className="mt-2 text-sm/6 text-[#d7c9b5]">
+      <p className="mt-2 text-sm/6 text-(--ink-mute)">
         Histórico de cobranças, faturas e recibos mockados.
       </p>
 
       {refused ? (
-        <div className="mt-6 border border-[#d84132]/45 bg-[#d84132]/12 p-5 text-sm/6 text-[#f0e8dd]">
-          <p className="text-xs font-semibold tracking-[0.2em] text-[#ffb0a5] uppercase">
+        <div className="mt-6 rounded-[14px] border border-(--red)/25 bg-(--red)/6 p-5 text-sm/6 text-(--ink-soft)">
+          <p
+            className={`text-xs font-semibold tracking-[0.2em] text-(--red) uppercase ${fontMono}`}
+          >
             Pagamento recusado
           </p>
           <p className="mt-2">
@@ -53,7 +66,7 @@ export default function FinanceiroPage() {
             asChild
             variant="outline"
             size="sm"
-            className="mt-4 border-[#d7b56d]/45 text-[#d7b56d] hover:bg-[#d7b56d]/12 hover:text-[#fffaf0]"
+            className={`mt-4 rounded-[9px] border-(--red)/30 text-(--red) ${transitionBgColor} hover:bg-(--red)/8 hover:text-(--red-deep)`}
           >
             <Link href="/cliente/financeiro/atualizar-cartao">
               Atualizar cartão
@@ -64,54 +77,64 @@ export default function FinanceiroPage() {
       ) : null}
 
       {pendingPix ? (
-        <div className="mt-6 border border-[#fffaf0]/12 bg-[#171211] p-5 text-sm/6 text-[#d7c9b5]">
-          <p className="text-xs font-semibold tracking-[0.2em] text-[#d7b56d] uppercase">
-            Pix pendente
-          </p>
-          <p className="mt-2">
-            Vencimento em{' '}
-            <span className="text-[#f0e8dd]">
-              {formatDate(pendingPix.dueDate)}
-            </span>
-          </p>
-          <form
-            className="mt-4"
-            action={async () => {
-              'use server'
-              renewPixPayment(pendingPix.id)
-            }}
-          >
-            <Button
-              type="submit"
-              size="sm"
-              className="bg-[#d7b56d] text-[#171211] hover:bg-[#c69f54]"
+        <div
+          className={`mt-6 ${dossierCardSurface} ${cardShadowBase} p-5 text-sm/6 text-(--ink-mute)`}
+        >
+          <div className="border-b border-dashed border-(--ink)/10 pb-3">
+            <h3
+              className={`text-sm font-semibold tracking-wide text-(--ink) uppercase ${fontHeading}`}
             >
-              Renovar Pix (mock)
-            </Button>
-          </form>
+              Pix pendente
+            </h3>
+          </div>
+          <div className="mt-4">
+            <p>
+              Vencimento em{' '}
+              <span className="text-(--ink-soft)">
+                {formatDate(pendingPix.dueDate)}
+              </span>
+            </p>
+            <form
+              className="mt-4"
+              action={async () => {
+                'use server'
+                renewPixPayment(pendingPix.id)
+              }}
+            >
+              <Button
+                type="submit"
+                size="sm"
+                className="rounded-[9px] bg-(--red) text-[#fbf9f6] hover:bg-(--red-deep)"
+              >
+                Renovar Pix (mock)
+              </Button>
+            </form>
+          </div>
         </div>
       ) : null}
 
       <section className="mt-8">
-        <h2 className="text-xs font-semibold tracking-[0.2em] text-[#d7b56d] uppercase">
+        <h2
+          className={`text-xs font-semibold tracking-[0.2em] text-(--red) uppercase ${fontMono}`}
+        >
           Cobranças
         </h2>
         <div className="mt-4 space-y-2">
           {payments.map((payment) => (
             <div
               key={payment.id}
-              className="flex flex-wrap items-center justify-between gap-2 border border-[#fffaf0]/10 bg-[#171211] p-3 text-sm"
+              className="flex flex-wrap items-center justify-between gap-2 rounded-[10px] border border-(--ink)/10 bg-(--card) p-3 text-sm"
             >
-              <span className="text-[#f0e8dd]">
+              <span className="text-(--ink-soft)">
                 {formatDate(payment.dueDate)}
               </span>
-              <span className="font-heading font-semibold text-[#d7b56d]">
+              <span className={`font-semibold text-(--red) ${fontHeading}`}>
                 {formatCurrency(payment.amount)}
               </span>
               <span
                 className={cn(
                   'text-xs font-semibold tracking-wide uppercase',
-                  paymentTone[payment.status] ?? 'text-[#c8bdad]',
+                  paymentTone[payment.status] ?? 'text-(--ink-mute)',
                 )}
               >
                 {formatPaymentStatus(payment.status)}
@@ -122,23 +145,27 @@ export default function FinanceiroPage() {
       </section>
 
       <section className="mt-8">
-        <h2 className="text-xs font-semibold tracking-[0.2em] text-[#d7b56d] uppercase">
+        <h2
+          className={`text-xs font-semibold tracking-[0.2em] text-(--red) uppercase ${fontMono}`}
+        >
           Faturas e recibos
         </h2>
         <div className="mt-4 space-y-2">
           {invoices.map((invoice) => (
             <div
               key={invoice.id}
-              className="flex flex-wrap items-center justify-between gap-2 border border-[#fffaf0]/10 bg-[#171211] p-3 text-sm"
+              className="flex flex-wrap items-center justify-between gap-2 rounded-[10px] border border-(--ink)/10 bg-(--card) p-3 text-sm"
             >
-              <span className="font-mono text-xs tracking-[0.12em] text-[#f0e8dd] uppercase">
+              <span
+                className={`text-xs tracking-[0.12em] text-(--ink-soft) uppercase ${fontMono}`}
+              >
                 {invoice.number}
               </span>
-              <span className="font-heading font-semibold text-[#d7b56d]">
+              <span className={`font-semibold text-(--red) ${fontHeading}`}>
                 {formatCurrency(invoice.amount)}
               </span>
               {invoice.downloadUrl ? (
-                <span className="text-[#d7b56d]">{invoice.downloadUrl}</span>
+                <span className="text-(--teal)">{invoice.downloadUrl}</span>
               ) : null}
             </div>
           ))}

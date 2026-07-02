@@ -2,6 +2,14 @@ import { IconArrowRight, IconLock } from '@tabler/icons-react'
 import Link from 'next/link'
 
 import {
+  cardShadowBase,
+  dossierCardSurface,
+  fontHeading,
+  fontMono,
+  transitionBgColor,
+  transitionCardHover,
+} from '@/src/lib/design/classes'
+import {
   getActiveCase,
   getSubscriberProgress,
   listClues,
@@ -14,9 +22,9 @@ import {
 import { cn } from '@/src/lib/utils'
 
 const statusTone: Record<string, string> = {
-  liberado: 'text-[#d7b56d] border-[#d7b56d]/40 bg-[#d7b56d]/10',
-  bloqueado: 'text-[#ffb0a5] border-[#d84132]/40 bg-[#d84132]/12',
-  em_breve: 'text-[#c8bdad] border-[#fffaf0]/18 bg-[#fffaf0]/5',
+  liberado: 'text-(--teal) border-(--teal)/30 bg-(--teal)/8',
+  bloqueado: 'text-(--red) border-(--red)/25 bg-(--red)/6',
+  em_breve: 'text-(--ink-mute) border-(--ink)/15 bg-(--ink)/5',
 }
 
 export default function ConteudosPage() {
@@ -26,38 +34,52 @@ export default function ConteudosPage() {
 
   return (
     <div>
-      <p className="text-xs font-semibold tracking-[0.24em] text-[#d7b56d] uppercase">
+      <p
+        className={`text-[13px] leading-none font-bold tracking-[0.12em] text-(--red) uppercase ${fontMono}`}
+      >
         Arquivo do assinante
       </p>
-      <h1 className="mt-2 font-heading text-2xl font-black tracking-tight text-[#fffaf0] uppercase">
+      <h1
+        className={`mt-2 text-2xl font-black tracking-tight text-(--ink) uppercase ${fontHeading}`}
+      >
         Conteúdos exclusivos
       </h1>
       {activeCase ? (
-        <p className="mt-2 text-sm/6 text-[#d7c9b5]">
+        <p className="mt-2 text-sm/6 text-(--ink-mute)">
           {activeCase.description}
         </p>
       ) : null}
 
       {progress ? (
-        <div className="mt-6 border border-[#b98542]/45 bg-[#171211] p-5">
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-xs font-semibold tracking-[0.2em] text-[#d7b56d] uppercase">
+        <div
+          className={`mt-6 ${dossierCardSurface} ${cardShadowBase} border-2 border-(--purple)/25 p-5`}
+        >
+          <div className="flex items-center justify-between border-b border-dashed border-(--ink)/10 pb-3">
+            <h3
+              className={`text-sm font-semibold tracking-wide text-(--ink) uppercase ${fontHeading}`}
+            >
               Progresso do caso
-            </span>
-            <span className="font-heading font-semibold text-[#fffaf0]">
+            </h3>
+            <span
+              className={`font-semibold text-(--ink) ${fontHeading} text-sm`}
+            >
               {progress.collectedClues}/{progress.totalClues} pistas ·{' '}
               {formatPercent(progress.percentComplete)}
             </span>
           </div>
-          <div className="mt-3 h-2 overflow-hidden bg-[#0c0a09]">
-            <div
-              className="h-full bg-linear-to-r from-[#d84132] to-[#d7b56d]"
-              style={{ width: `${progress.percentComplete}%` }}
-            />
+          <div className="mt-4">
+            <div className="h-2 overflow-hidden rounded-full bg-(--paper-soft)">
+              <div
+                className="h-full rounded-full bg-linear-to-r from-(--red) to-(--amber)"
+                style={{ width: `${progress.percentComplete}%` }}
+              />
+            </div>
+            <p
+              className={`mt-3 text-[11px] tracking-[0.12em] text-(--ink-mute) uppercase ${fontMono}`}
+            >
+              {progress.liveEventTitle} — {formatDate(progress.liveEventDate)}
+            </p>
           </div>
-          <p className="mt-3 font-mono text-[11px] tracking-[0.12em] text-[#bfb4a3] uppercase">
-            {progress.liveEventTitle} — {formatDate(progress.liveEventDate)}
-          </p>
         </div>
       ) : null}
 
@@ -66,35 +88,41 @@ export default function ConteudosPage() {
           const blocked = clue.status === 'bloqueado'
           const tone =
             statusTone[clue.status] ??
-            'text-[#c8bdad] border-[#fffaf0]/18 bg-[#fffaf0]/5'
+            'text-(--ink-mute) border-(--ink)/15 bg-(--ink)/5'
           return (
             <Link
               key={clue.id}
               href={`/cliente/conteudos/${clue.slug}`}
-              className="group flex items-center justify-between gap-3 border border-[#fffaf0]/12 bg-[#171211] p-5 transition-all hover:-translate-y-0.5 hover:border-[#b98542]/55 hover:shadow-[0_20px_48px_rgba(0,0,0,0.38)]"
+              className={`group flex items-center justify-between gap-3 ${dossierCardSurface} ${cardShadowBase} p-5 ${transitionCardHover} hover:-translate-y-0.5 hover:shadow-[0_24px_44px_-18px_rgba(33,28,24,0.3),inset_0_0_0_1px_rgba(255,255,255,0.6)]`}
             >
               <div className="min-w-0">
                 <div className="flex items-center gap-3">
-                  <span className="font-mono text-[10px] tracking-[0.16em] text-[#bfb4a3] uppercase">
+                  <span
+                    className={`text-[10px] tracking-[0.16em] text-(--ink-mute) uppercase ${fontMono}`}
+                  >
                     CICLO {clue.cycleNumber}
                   </span>
                   <span
                     className={cn(
-                      'border px-2 py-0.5 text-[10px] font-semibold tracking-[0.14em] uppercase',
+                      'rounded-[2px] border px-2 py-0.5 text-[10px] font-semibold tracking-[0.14em] uppercase',
                       tone,
                     )}
                   >
                     {formatContentStatus(clue.status)}
                   </span>
                 </div>
-                <p className="mt-2 font-heading text-base font-semibold text-[#fffaf0]">
+                <p
+                  className={`mt-2 text-base font-semibold text-(--ink) ${fontHeading}`}
+                >
                   {clue.title}
                 </p>
               </div>
               {blocked ? (
-                <IconLock className="size-5 shrink-0 text-[#ffb0a5]" />
+                <IconLock className="size-5 shrink-0 text-(--red)" />
               ) : (
-                <IconArrowRight className="size-4 shrink-0 text-[#bfb4a3] transition-colors group-hover:text-[#d7b56d]" />
+                <IconArrowRight
+                  className={`size-4 shrink-0 text-(--ink-mute) ${transitionBgColor} group-hover:text-(--red)`}
+                />
               )}
             </Link>
           )

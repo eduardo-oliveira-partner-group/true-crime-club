@@ -6,6 +6,15 @@ import { useEffect } from 'react'
 
 import { Button } from '@/src/components/ui/button'
 import { apiClient } from '@/src/lib/api-client'
+import {
+  cardShadowBase,
+  dossierCardSurface,
+  fontHeading,
+  fontMono,
+  formInputClass,
+  formLabelClass,
+  transitionBgColor,
+} from '@/src/lib/design/classes'
 import type { PaymentMethod } from '@/src/lib/domain/types'
 
 export default function CartoesPage() {
@@ -69,7 +78,9 @@ export default function CartoesPage() {
 
   if (loading) {
     return (
-      <div className="flex h-48 animate-pulse items-center justify-center font-mono text-sm tracking-widest text-[#bfb4a3] uppercase">
+      <div
+        className={`flex h-48 animate-pulse items-center justify-center text-sm tracking-widest text-(--ink-mute) uppercase ${fontMono}`}
+      >
         Carregando formas de pagamento...
       </div>
     )
@@ -77,13 +88,17 @@ export default function CartoesPage() {
 
   return (
     <div>
-      <p className="text-xs font-semibold tracking-[0.24em] text-[#d7b56d] uppercase">
+      <p
+        className={`text-[13px] leading-none font-bold tracking-[0.12em] text-(--red) uppercase ${fontMono}`}
+      >
         Arquivo do assinante
       </p>
-      <h1 className="mt-2 font-heading text-2xl font-black tracking-tight text-[#fffaf0] uppercase">
+      <h1
+        className={`mt-2 text-2xl font-black tracking-tight text-(--ink) uppercase ${fontHeading}`}
+      >
         Meus cartões
       </h1>
-      <p className="mt-2 text-sm/6 text-[#d7c9b5]">
+      <p className="mt-2 text-sm/6 text-(--ink-mute)">
         Gerencie as formas de pagamento vinculadas à sua assinatura e compras
         futuras no clube.
       </p>
@@ -92,18 +107,19 @@ export default function CartoesPage() {
       {showAddForm ? (
         <form
           onSubmit={handleAddCard}
-          className="mt-6 max-w-xl space-y-4 border border-[#fffaf0]/12 bg-[#171211] p-5"
+          className={`mt-6 max-w-xl ${dossierCardSurface} ${cardShadowBase} p-5`}
         >
-          <p className="text-xs font-semibold tracking-wide text-[#d7b56d] uppercase">
-            Adicionar Cartão de Crédito
-          </p>
+          <div className="border-b border-dashed border-(--ink)/10 pb-3">
+            <h3
+              className={`text-sm font-semibold tracking-wide text-(--ink) uppercase ${fontHeading}`}
+            >
+              Adicionar Cartão de Crédito
+            </h3>
+          </div>
 
-          <div className="space-y-4">
+          <div className="mt-4 space-y-4">
             <div>
-              <label
-                className="block text-[10px] text-[#bfb4a3] uppercase"
-                htmlFor="cardNumber"
-              >
+              <label className={formLabelClass} htmlFor="cardNumber">
                 Número do Cartão
               </label>
               <input
@@ -113,15 +129,12 @@ export default function CartoesPage() {
                 placeholder="4000 1234 5678 9010"
                 value={cardNumber}
                 onChange={(e) => setCardNumber(e.target.value)}
-                className="mt-1 w-full border border-[#fffaf0]/14 bg-[#0c0a09] px-3 py-1.5 text-sm text-[#fffaf0] outline-none focus:border-[#d7b56d]/70"
+                className={formInputClass}
               />
             </div>
 
             <div>
-              <label
-                className="block text-[10px] text-[#bfb4a3] uppercase"
-                htmlFor="holderName"
-              >
+              <label className={formLabelClass} htmlFor="holderName">
                 Nome do Titular (idêntico ao cartão)
               </label>
               <input
@@ -131,19 +144,17 @@ export default function CartoesPage() {
                 placeholder="MARIANA SILVA"
                 value={holderName}
                 onChange={(e) => setHolderName(e.target.value)}
-                className="mt-1 w-full border border-[#fffaf0]/14 bg-[#0c0a09] px-3 py-1.5 text-sm text-[#fffaf0] outline-none focus:border-[#d7b56d]/70"
+                className={formInputClass}
               />
             </div>
 
             <div className="grid grid-cols-3 gap-4">
               <div>
-                <label className="block text-[10px] text-[#bfb4a3] uppercase">
-                  Mês de Exp.
-                </label>
+                <label className={formLabelClass}>Mês de Exp.</label>
                 <select
                   value={expiryMonth}
                   onChange={(e) => setExpiryMonth(e.target.value)}
-                  className="mt-1 w-full border border-[#fffaf0]/14 bg-[#0c0a09] px-3 py-1.5 text-sm text-[#fffaf0] outline-none focus:border-[#d7b56d]/70"
+                  className={formInputClass}
                 >
                   {Array.from({ length: 12 }, (_, i) =>
                     String(i + 1).padStart(2, '0'),
@@ -155,13 +166,11 @@ export default function CartoesPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-[10px] text-[#bfb4a3] uppercase">
-                  Ano de Exp.
-                </label>
+                <label className={formLabelClass}>Ano de Exp.</label>
                 <select
                   value={expiryYear}
                   onChange={(e) => setExpiryYear(e.target.value)}
-                  className="mt-1 w-full border border-[#fffaf0]/14 bg-[#0c0a09] px-3 py-1.5 text-sm text-[#fffaf0] outline-none focus:border-[#d7b56d]/70"
+                  className={formInputClass}
                 >
                   {Array.from({ length: 10 }, (_, i) => String(2026 + i)).map(
                     (year) => (
@@ -173,10 +182,7 @@ export default function CartoesPage() {
                 </select>
               </div>
               <div>
-                <label
-                  className="block text-[10px] text-[#bfb4a3] uppercase"
-                  htmlFor="cvc"
-                >
+                <label className={formLabelClass} htmlFor="cvc">
                   CVC
                 </label>
                 <input
@@ -186,7 +192,7 @@ export default function CartoesPage() {
                   placeholder="123"
                   value={cvc}
                   onChange={(e) => setCvc(e.target.value)}
-                  className="mt-1 w-full border border-[#fffaf0]/14 bg-[#0c0a09] px-3 py-1.5 text-sm text-[#fffaf0] outline-none focus:border-[#d7b56d]/70"
+                  className={formInputClass}
                 />
               </div>
             </div>
@@ -197,7 +203,7 @@ export default function CartoesPage() {
               type="button"
               variant="outline"
               size="sm"
-              className="border-[#fffaf0]/20 text-[#fffaf0] hover:bg-[#fffaf0]/10"
+              className="rounded-[9px]"
               onClick={() => setShowAddForm(false)}
             >
               Cancelar
@@ -205,7 +211,7 @@ export default function CartoesPage() {
             <Button
               type="submit"
               size="sm"
-              className="bg-[#d7b56d] text-[#171211] hover:bg-[#c69f54]"
+              className="rounded-[9px] bg-(--red) text-[#fbf9f6] hover:bg-(--red-deep)"
             >
               Cadastrar Cartão
             </Button>
@@ -215,7 +221,7 @@ export default function CartoesPage() {
         <div className="mt-6">
           <Button
             onClick={() => setShowAddForm(true)}
-            className="inline-flex items-center gap-2 bg-[#d7b56d] text-[#171211] hover:bg-[#c69f54]"
+            className="inline-flex items-center gap-2 rounded-[9px] bg-(--red) text-[#fbf9f6] hover:bg-(--red-deep)"
           >
             <IconPlus className="size-4" /> Adicionar Cartão de Crédito
           </Button>
@@ -225,11 +231,13 @@ export default function CartoesPage() {
       {/* Listagem de Cartões */}
       <div className="mt-8 max-w-xl space-y-4">
         {cards.length === 0 ? (
-          <div className="border border-dashed border-[#fffaf0]/18 bg-[#171211]/60 p-8 text-center">
-            <p className="font-heading text-lg font-semibold text-[#f0e8dd]">
+          <div className="rounded-[14px] border border-dashed border-(--ink)/15 bg-(--paper-soft) p-8 text-center">
+            <p
+              className={`text-lg font-semibold text-(--ink-soft) ${fontHeading}`}
+            >
               Sua lista de cartões está vazia
             </p>
-            <p className="mt-2 text-sm text-[#c8bdad]">
+            <p className="mt-2 text-sm text-(--ink-mute)">
               Nenhuma credencial de faturamento ativa cadastrada.
             </p>
           </div>
@@ -237,24 +245,28 @@ export default function CartoesPage() {
           cards.map((card) => (
             <div
               key={card.id}
-              className="flex items-center justify-between border border-[#fffaf0]/10 bg-[#171211] p-5 shadow-[0_12px_32px_rgba(0,0,0,0.25)]"
+              className={`flex items-center justify-between ${dossierCardSurface} ${cardShadowBase} p-5`}
             >
               <div className="flex items-center gap-4">
-                <span className="flex size-10 items-center justify-center bg-[#b98542]/20 text-[#d7b56d]">
+                <span className="flex size-10 items-center justify-center rounded-[10px] bg-(--red)/10 text-(--red)">
                   <IconCreditCard className="size-5" />
                 </span>
                 <div>
                   <div className="flex items-center gap-2">
-                    <p className="font-heading text-sm font-semibold tracking-wide text-[#fffaf0]">
+                    <p
+                      className={`text-sm font-semibold tracking-wide text-(--ink) ${fontHeading}`}
+                    >
                       {card.brand} terminando em {card.lastFour}
                     </p>
                     {card.isDefault && (
-                      <span className="border border-[#d7b56d]/30 bg-[#d7b56d]/10 px-2 py-0.5 text-[9px] font-semibold tracking-wide text-[#d7b56d] uppercase">
+                      <span className="rounded-[2px] border border-(--teal)/30 bg-(--teal)/10 px-2 py-0.5 text-[9px] font-semibold tracking-wide text-(--teal) uppercase">
                         Principal
                       </span>
                     )}
                   </div>
-                  <p className="mt-0.5 font-mono text-xs tracking-wider text-[#bfb4a3]">
+                  <p
+                    className={`mt-0.5 text-xs tracking-wider text-(--ink-mute) ${fontMono}`}
+                  >
                     ID: {card.id.toUpperCase()}
                   </p>
                 </div>
@@ -262,7 +274,7 @@ export default function CartoesPage() {
 
               <button
                 onClick={() => handleDeleteCard(card.id)}
-                className="cursor-pointer p-1.5 text-[#ffb0a5] transition-colors hover:text-[#d84132]"
+                className={`cursor-pointer rounded-[9px] p-1.5 text-(--red) ${transitionBgColor} hover:bg-(--red)/10 hover:text-(--red-deep)`}
               >
                 <IconTrash className="size-4.5" />
               </button>
