@@ -1,17 +1,27 @@
 import { IconArrowRight, IconChevronDown } from '@tabler/icons-react'
-import Image from 'next/image'
 import Link from 'next/link'
 
-import previousBoxesBanner from '@/src/assets/images/home/previous-boxes-banner.png'
+import { DesignPageShell } from '@/src/components/public-design/design-page-shell'
+import { SectionEyebrow } from '@/src/components/public-design/section-eyebrow'
 import { JsonLd } from '@/src/components/seo/json-ld'
-import { Button } from '@/src/components/ui/button'
 import {
   ScrollReveal,
   ScrollRevealGroup,
   ScrollRevealItem,
 } from '@/src/components/ui/scroll-reveal'
+import {
+  arrowIconClass,
+  cardShadowBase,
+  ctaButtonBase,
+  dossierCardSurface,
+  fontHeading,
+  fontType,
+  sectionFrame,
+  transitionCardHover,
+} from '@/src/lib/design/classes'
 import { getDynamicContent, getSeoEntry } from '@/src/lib/domain/repositories'
 import { buildMetadata } from '@/src/lib/seo'
+import { cn } from '@/src/lib/utils'
 
 export const metadata = buildMetadata({
   path: '/faq',
@@ -67,66 +77,64 @@ export default function FaqPage() {
   }
 
   return (
-    <div className="bg-(--paper) text-(--ink)">
+    <DesignPageShell showOverlays={false}>
       <JsonLd data={faqJsonLd} />
-      <section className="relative isolate overflow-hidden border-b border-[rgba(33,28,24,0.15)] bg-(--paper)">
-        <Image
-          src={previousBoxesBanner}
-          alt=""
-          fill
-          priority
-          placeholder="blur"
-          sizes="100vw"
-          className="absolute inset-0 -z-20 object-cover object-[68%_center] brightness-[0.4] saturate-[0.8]"
-        />
-        <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(9,8,7,0.98)_0%,rgba(9,8,7,0.86)_42%,rgba(9,8,7,0.5)_72%,rgba(9,8,7,0.42)_100%),linear-gradient(180deg,rgba(9,8,7,0.58)_0%,rgba(9,8,7,0.94)_100%)]" />
-        <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.04)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.04)_1px,transparent_1px)] bg-size-[42px_42px]" />
 
-        <div className="relative z-10 mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-24">
+      {/* Hero Section */}
+      <section className="relative isolate overflow-hidden border-b border-[rgba(33,28,24,0.15)] bg-(--paper) py-16 lg:py-24">
+        <div className={`${sectionFrame} relative z-10 max-w-3xl`}>
           <ScrollReveal>
-            <div className="flex items-center gap-4">
-              <p className="text-xs font-semibold tracking-[0.24em] text-(--red) uppercase">
-                Dossiê de dúvidas
-              </p>
-              <span className="h-px flex-1 bg-[#d7b56d]/45" />
-            </div>
+            <SectionEyebrow>Dossiê de dúvidas</SectionEyebrow>
           </ScrollReveal>
 
           <ScrollReveal delay={0.08}>
-            <h1 className="mt-4 max-w-3xl font-heading text-3xl leading-[1.08] font-black tracking-tight text-(--ink) uppercase sm:text-5xl">
-              Perguntas frequentes
+            <h1
+              className={`mt-4 text-wrap-balance text-[clamp(42px,5.8vw,74px)] leading-[0.98] font-bold tracking-[-0.02em] text-(--ink) ${fontHeading}`}
+            >
+              Perguntas frequentes.
             </h1>
           </ScrollReveal>
 
           <ScrollReveal delay={0.14}>
-            <p className="mt-4 max-w-2xl text-base/7 text-(--ink-soft) sm:text-lg/8">
+            <p className="mt-6 text-[18px] leading-[1.65] text-(--ink-soft) sm:text-[19px]">
               {intro?.value ??
-                'Respostas para as dúvidas mais comuns sobre o clube.'}
+                'Respostas para as dúvidas mais comuns sobre o clube de assinatura.'}
             </p>
           </ScrollReveal>
         </div>
       </section>
 
-      <section className="relative isolate overflow-hidden border-b border-[rgba(33,28,24,0.15)] bg-(--paper-soft)">
-        <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.03)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.03)_1px,transparent_1px)] bg-size-[56px_56px]" />
-
-        <div className="relative z-10 mx-auto max-w-4xl px-4 py-14 sm:px-6 lg:py-20">
-          <ScrollRevealGroup className="space-y-3" staggerChildren={0.07}>
+      {/* Accordion / Questions Section */}
+      <section className="relative isolate overflow-hidden border-b border-[rgba(33,28,24,0.15)] bg-(--paper-soft) py-16 lg:py-24">
+        <div className={`${sectionFrame} max-w-4xl`}>
+          <ScrollRevealGroup className="space-y-4" staggerChildren={0.07}>
             {faqItems.map((item) => (
               <ScrollRevealItem key={item.code}>
-                <details className="group border border-[rgba(33,28,24,0.15)] bg-(--card) p-5 transition-colors hover:border-[#b98542]/45 sm:p-6">
-                  <summary className="flex cursor-pointer list-none items-start justify-between gap-4">
+                <details
+                  className={cn(
+                    'group relative p-5 transition-all duration-300 sm:p-6',
+                    dossierCardSurface,
+                    cardShadowBase,
+                    transitionCardHover,
+                    'hover:-translate-y-0.5 hover:shadow-[0_24px_44px_-18px_rgba(33,28,24,0.3)] hover:border-(--red)/30',
+                  )}
+                >
+                  <summary className="flex cursor-pointer list-none items-start justify-between gap-4 outline-none [&::-webkit-details-marker]:hidden">
                     <div className="flex items-start gap-4">
-                      <span className="mt-1 font-mono text-[10px] tracking-[0.16em] text-(--ink-mute) uppercase">
+                      <span
+                        className={`mt-1 text-[11px] font-bold tracking-[0.14em] text-(--red) uppercase ${fontType}`}
+                      >
                         {item.code}
                       </span>
-                      <span className="font-heading text-base font-semibold tracking-wide text-(--ink) sm:text-lg">
+                      <span
+                        className={`text-base font-semibold tracking-tight text-(--ink) sm:text-lg ${fontHeading}`}
+                      >
                         {item.question}
                       </span>
                     </div>
                     <IconChevronDown className="mt-0.5 size-5 shrink-0 text-(--red) transition-transform duration-300 group-open:rotate-180" />
                   </summary>
-                  <div className="mt-4 border-t border-[rgba(33,28,24,0.15)] pt-4 pl-[4.6rem] text-sm/6 text-(--ink-soft)">
+                  <div className="mt-4 border-t border-dashed border-[rgba(33,28,24,0.15)] pt-4 pl-[3.8rem] sm:pl-[4.8rem] text-[16px] leading-[1.6] text-(--ink-soft)">
                     {item.answer}
                   </div>
                 </details>
@@ -136,39 +144,48 @@ export default function FaqPage() {
         </div>
       </section>
 
-      <section className="relative isolate overflow-hidden bg-(--card) text-(--ink)">
-        <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.035)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.035)_1px,transparent_1px)] bg-size-[56px_56px]" />
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_82%_40%,rgba(216,65,50,0.12),transparent_34%)]" />
-
-        <div className="relative z-10 mx-auto flex max-w-6xl flex-col items-start gap-6 px-4 py-14 sm:px-6 md:flex-row md:items-center md:justify-between">
+      {/* CTA Section */}
+      <section className="relative isolate overflow-hidden bg-(--card) py-16 text-(--ink) lg:py-24">
+        <div className={`${sectionFrame} relative z-10 max-w-3xl text-center`}>
           <ScrollReveal>
-            <div className="max-w-2xl space-y-3">
-              <p className="text-xs font-semibold tracking-[0.22em] text-(--red) uppercase">
-                Ainda em dúvida?
-              </p>
-              <h2 className="font-heading text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
-                Entre no caso. O arquivo está aberto.
-              </h2>
-              <p className="max-w-xl text-sm/6 text-(--ink-soft)">
-                Garanta sua vaga no clube e comece a receber pistas, evidências
-                e edições exclusivas todo mês.
-              </p>
-            </div>
+            <SectionEyebrow className="justify-center">
+              Ainda em dúvida?
+            </SectionEyebrow>
           </ScrollReveal>
-          <ScrollReveal delay={0.12}>
-            <Button
-              asChild
-              size="lg"
-              className="bg-[#d84132] text-white shadow-[0_0_26px_rgba(216,65,50,0.35)] hover:bg-[#b93227]"
+
+          <ScrollReveal delay={0.08}>
+            <h2
+              className={`mt-4 text-wrap-balance text-[clamp(32px,4.5vw,56px)] leading-[1.02] font-semibold tracking-[-0.015em] text-(--ink) ${fontHeading}`}
             >
-              <Link href="/assinatura">
+              Entre no caso. O arquivo está aberto.
+            </h2>
+          </ScrollReveal>
+
+          <ScrollReveal delay={0.14}>
+            <p className="mx-auto mt-6 max-w-[60ch] text-[17px] leading-[1.6] text-(--ink-soft)">
+              Garanta sua vaga no clube e comece a receber pistas, evidências e
+              edições exclusivas todo mês.
+            </p>
+          </ScrollReveal>
+
+          <ScrollReveal delay={0.2}>
+            <div className="mt-8 flex justify-center">
+              <Link
+                href="/assinatura"
+                className={`group ${ctaButtonBase} gap-2 border border-[rgba(33,28,24,0.15)] bg-(--red) text-[#fbf9f6] shadow-[0_9px_22px_-8px_rgba(33,28,24,0.13)] hover:-translate-y-0.5 hover:bg-(--red-deep) hover:shadow-[0_14px_30px_-10px_rgba(33,28,24,0.22)]`}
+              >
                 Garantir minha vaga
-                <IconArrowRight className="size-4" />
+                <IconArrowRight
+                  size={16}
+                  stroke={2}
+                  className={arrowIconClass}
+                  aria-hidden
+                />
               </Link>
-            </Button>
+            </div>
           </ScrollReveal>
         </div>
       </section>
-    </div>
+    </DesignPageShell>
   )
 }
