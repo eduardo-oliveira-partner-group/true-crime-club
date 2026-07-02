@@ -139,9 +139,14 @@ export function PublicHeaderContent({ itemCount }: PublicHeaderContentProps) {
           {isLoggedIn ? (
             <Link
               href="/casos"
-              className={`relative inline-flex h-[42px] items-center leading-none text-[#1aa587] no-underline ${transitionColors} hover:text-(--teal-deep)`}
+              className="group relative inline-flex h-[42px] items-center leading-none no-underline"
             >
-              Casos
+              <span
+                data-text="Casos"
+                className="glitch-text leading-none text-[#15735d] drop-shadow-[0_0_5px_rgba(21,115,93,0.24)] transition-all group-hover:text-[#0f5f4e]"
+              >
+                Casos
+              </span>
             </Link>
           ) : null}
         </nav>
@@ -214,6 +219,20 @@ export function PublicHeaderContent({ itemCount }: PublicHeaderContentProps) {
               </Link>
             ),
           )}
+          {isLoggedIn ? (
+            <Link
+              href="/casos"
+              onClick={closeMenu}
+              className="group border-b border-[rgba(33,28,24,0.08)] px-1 py-[13px] no-underline"
+            >
+              <span
+                data-text="Casos"
+                className="glitch-text leading-none text-[#15735d] drop-shadow-[0_0_5px_rgba(21,115,93,0.24)] transition-all group-hover:text-[#0f5f4e]"
+              >
+                Casos
+              </span>
+            </Link>
+          ) : null}
           <div className="mt-[14px] flex gap-[10px]">
             <Link
               href={isLoggedIn ? '/cliente/perfil' : '/login'}
