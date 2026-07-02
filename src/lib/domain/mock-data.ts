@@ -160,6 +160,31 @@ export const mockProducts: Product[] = [
     relatedProductIds: ['prod-001'],
   },
   {
+    id: 'prod-007',
+    slug: 'edicao-copa-do-mundo',
+    name: 'Edição Copa do Mundo',
+    description:
+      'Um mistério nos bastidores do maior evento do futebol — itens temáticos e um caso completo que você resolve numa única caixa. Edição limitada, sem assinatura.',
+    shortDescription:
+      'Caso completo da Copa do Mundo em uma caixa avulsa exclusiva.',
+    type: 'box',
+    price: 16990,
+    images: ['design-sugerido/edicao-copa.png'],
+    categories: ['box', 'avulsa', 'edicao-especial'],
+    inStock: true,
+    availability: 'limited',
+    featured: true,
+    editionMonth: '2026-06',
+    cycleNumber: 5,
+    includedItems: [
+      'Caso completo em edição avulsa',
+      'Itens temáticos da Copa do Mundo',
+      'Compra sem assinatura',
+      'Estoque limitado',
+    ],
+    relatedProductIds: ['prod-005', 'prod-006'],
+  },
+  {
     id: 'prod-003',
     slug: 'caderno-investigacao-premium',
     name: 'Caderno de Investigação Premium',

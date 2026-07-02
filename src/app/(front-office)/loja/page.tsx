@@ -40,12 +40,15 @@ const caseNotes = [
   },
 ]
 
+const highlightedEditionSlug = 'edicao-copa-do-mundo'
+
 export default async function LojaPage() {
   const products: Product[] = listProducts()
 
   const boxProducts = products.filter((product) => product.type === 'box')
   const extraProducts = products.filter((product) => product.type !== 'box')
   const featuredBox =
+    boxProducts.find((product) => product.slug === highlightedEditionSlug) ??
     boxProducts.find((product) => product.availability === 'limited') ??
     boxProducts.find((product) => product.inStock) ??
     boxProducts[0]
