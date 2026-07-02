@@ -3,11 +3,11 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import previousBoxesBanner from '@/src/assets/images/home/previous-boxes-banner.png'
-import { ShopCatalog } from '@/src/components/shop/shop-catalog'
+import { ShopCatalog } from '@/src/app/(design-sugerido)/design-sugerido/components/shop/shop-catalog'
 import {
   AvailabilityBadge,
   PriceBlock,
-} from '@/src/components/ui/product-quick-view'
+} from '@/src/app/(design-sugerido)/design-sugerido/components/shop/product-quick-view'
 import { ScrollReveal } from '@/src/components/ui/scroll-reveal'
 import { listProducts } from '@/src/lib/domain/repositories'
 import type { Product } from '@/src/lib/domain/types'
@@ -38,7 +38,7 @@ export default async function LojaPage() {
     boxProducts[0]
 
   return (
-    <div className="bg-[#090807] text-[#fffaf0]">
+    <div className="dark bg-[#090807] text-[#fffaf0]">
       <section className="relative isolate overflow-hidden border-b border-[#fffaf0]/10 bg-[#090807]">
         <Image
           src={previousBoxesBanner}

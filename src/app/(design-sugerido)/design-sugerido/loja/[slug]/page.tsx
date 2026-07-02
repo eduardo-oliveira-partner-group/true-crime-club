@@ -8,15 +8,15 @@ import { notFound } from 'next/navigation'
 
 import { Breadcrumbs } from '@/src/components/seo/breadcrumbs'
 import { ProductJsonLd } from '@/src/components/seo/product-json-ld'
-import { ProductDetailActions } from '@/src/components/shop/product-detail-actions'
-import { ProductDetailGallery } from '@/src/components/shop/product-detail-gallery'
-import { ProductDetailIncludedPreview } from '@/src/components/shop/product-detail-included-preview'
-import { ProductDetailPricing } from '@/src/components/shop/product-detail-pricing'
-import { RelatedProductCard } from '@/src/components/shop/related-product-card'
+import { ProductDetailActions } from '@/src/app/(design-sugerido)/design-sugerido/components/shop/product-detail-actions'
+import { ProductDetailGallery } from '@/src/app/(design-sugerido)/design-sugerido/components/shop/product-detail-gallery'
+import { ProductDetailIncludedPreview } from '@/src/app/(design-sugerido)/design-sugerido/components/shop/product-detail-included-preview'
+import { ProductDetailPricing } from '@/src/app/(design-sugerido)/design-sugerido/components/shop/product-detail-pricing'
+import { RelatedProductCard } from '@/src/app/(design-sugerido)/design-sugerido/components/shop/related-product-card'
 import {
   DetailDatum,
   ProductKicker,
-} from '@/src/components/ui/product-quick-view'
+} from '@/src/app/(design-sugerido)/design-sugerido/components/shop/product-quick-view'
 import {
   ScrollReveal,
   ScrollRevealGroup,
@@ -83,7 +83,7 @@ export default async function ProductDetailPage({
   ]
 
   return (
-    <div className="bg-[#090807] text-[#fffaf0]">
+    <div className="dark bg-[#090807] text-[#fffaf0]">
       <ProductJsonLd
         product={product}
         path={`/design-sugerido/loja/${product.slug}`}
