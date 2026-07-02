@@ -2,12 +2,12 @@ import { IconSparkles } from '@tabler/icons-react'
 import Image from 'next/image'
 import Link from 'next/link'
 
-import previousBoxesBanner from '@/src/assets/images/home/previous-boxes-banner.png'
-import { ShopCatalog } from '@/src/app/(design-sugerido)/design-sugerido/components/shop/shop-catalog'
 import {
   AvailabilityBadge,
   PriceBlock,
 } from '@/src/app/(design-sugerido)/design-sugerido/components/shop/product-quick-view'
+import { ShopCatalog } from '@/src/app/(design-sugerido)/design-sugerido/components/shop/shop-catalog'
+import previousBoxesBanner from '@/src/assets/images/home/previous-boxes-banner.png'
 import { ScrollReveal } from '@/src/components/ui/scroll-reveal'
 import { listProducts } from '@/src/lib/domain/repositories'
 import type { Product } from '@/src/lib/domain/types'

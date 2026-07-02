@@ -17,13 +17,13 @@ import {
 import Image from 'next/image'
 import { useId, useLayoutEffect, useRef, useState } from 'react'
 
-import { GlowingCard } from '@/src/components/ui/glowing-card'
 import {
   AvailabilityBadge,
   DetailDatum,
   PriceBlock,
   ProductQuickView,
 } from '@/src/app/(design-sugerido)/design-sugerido/components/shop/product-quick-view'
+import { GlowingCard } from '@/src/components/ui/glowing-card'
 import {
   ScrollReveal,
   ScrollRevealGroup,

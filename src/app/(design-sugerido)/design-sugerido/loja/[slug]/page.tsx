@@ -6,17 +6,17 @@ import {
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
-import { Breadcrumbs } from '@/src/components/seo/breadcrumbs'
-import { ProductJsonLd } from '@/src/components/seo/product-json-ld'
 import { ProductDetailActions } from '@/src/app/(design-sugerido)/design-sugerido/components/shop/product-detail-actions'
 import { ProductDetailGallery } from '@/src/app/(design-sugerido)/design-sugerido/components/shop/product-detail-gallery'
 import { ProductDetailIncludedPreview } from '@/src/app/(design-sugerido)/design-sugerido/components/shop/product-detail-included-preview'
 import { ProductDetailPricing } from '@/src/app/(design-sugerido)/design-sugerido/components/shop/product-detail-pricing'
-import { RelatedProductCard } from '@/src/app/(design-sugerido)/design-sugerido/components/shop/related-product-card'
 import {
   DetailDatum,
   ProductKicker,
 } from '@/src/app/(design-sugerido)/design-sugerido/components/shop/product-quick-view'
+import { RelatedProductCard } from '@/src/app/(design-sugerido)/design-sugerido/components/shop/related-product-card'
+import { Breadcrumbs } from '@/src/components/seo/breadcrumbs'
+import { ProductJsonLd } from '@/src/components/seo/product-json-ld'
 import {
   ScrollReveal,
   ScrollRevealGroup,

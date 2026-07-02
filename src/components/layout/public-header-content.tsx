@@ -88,7 +88,7 @@ export function PublicHeaderContent({ itemCount }: PublicHeaderContentProps) {
         {isHome ? (
           <a
             href={logoHref}
-            className="flex min-w-0 items-center no-underline"
+            className="flex h-[42px] min-w-0 items-center no-underline"
             onClick={closeMenu}
           >
             <Image
@@ -101,7 +101,7 @@ export function PublicHeaderContent({ itemCount }: PublicHeaderContentProps) {
         ) : (
           <Link
             href={logoHref}
-            className="flex min-w-0 items-center no-underline"
+            className="flex h-[42px] min-w-0 items-center no-underline"
             onClick={closeMenu}
           >
             <Image
@@ -122,7 +122,7 @@ export function PublicHeaderContent({ itemCount }: PublicHeaderContentProps) {
               <a
                 key={link.href}
                 href={link.href}
-                className={`relative pb-[3px] text-(--ink) no-underline ${transitionColors} after:absolute after:inset-x-0 after:bottom-0 after:h-[1.5px] after:origin-left after:scale-x-0 after:bg-current after:content-[''] after:[transition:scale_0.28s_cubic-bezier(0.22,1,0.36,1),transform_0.28s_cubic-bezier(0.22,1,0.36,1)] hover:text-(--red) hover:after:scale-x-100`}
+                className={`relative inline-flex h-[42px] items-center leading-none text-(--ink) no-underline ${transitionColors} after:absolute after:inset-x-0 after:bottom-[9px] after:h-[1.5px] after:origin-left after:scale-x-0 after:bg-current after:content-[''] after:[transition:scale_0.28s_cubic-bezier(0.22,1,0.36,1),transform_0.28s_cubic-bezier(0.22,1,0.36,1)] hover:text-(--red) hover:after:scale-x-100`}
               >
                 {link.label}
               </a>
@@ -130,7 +130,7 @@ export function PublicHeaderContent({ itemCount }: PublicHeaderContentProps) {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`relative pb-[3px] text-(--ink) no-underline ${transitionColors} after:absolute after:inset-x-0 after:bottom-0 after:h-[1.5px] after:origin-left after:scale-x-0 after:bg-current after:content-[''] after:[transition:scale_0.28s_cubic-bezier(0.22,1,0.36,1),transform_0.28s_cubic-bezier(0.22,1,0.36,1)] hover:text-(--red) hover:after:scale-x-100`}
+                className={`relative inline-flex h-[42px] items-center leading-none text-(--ink) no-underline ${transitionColors} after:absolute after:inset-x-0 after:bottom-[9px] after:h-[1.5px] after:origin-left after:scale-x-0 after:bg-current after:content-[''] after:[transition:scale_0.28s_cubic-bezier(0.22,1,0.36,1),transform_0.28s_cubic-bezier(0.22,1,0.36,1)] hover:text-(--red) hover:after:scale-x-100`}
               >
                 {link.label}
               </Link>
@@ -139,7 +139,7 @@ export function PublicHeaderContent({ itemCount }: PublicHeaderContentProps) {
           {isLoggedIn ? (
             <Link
               href="/casos"
-              className={`relative pb-[3px] text-[#1aa587] no-underline ${transitionColors} hover:text-(--teal-deep)`}
+              className={`relative inline-flex h-[42px] items-center leading-none text-[#1aa587] no-underline ${transitionColors} hover:text-(--teal-deep)`}
             >
               Casos
             </Link>
@@ -149,7 +149,7 @@ export function PublicHeaderContent({ itemCount }: PublicHeaderContentProps) {
         <div className="flex items-center gap-4">
           <Link
             href={isLoggedIn ? '/cliente/perfil' : '/login'}
-            className={`inline-flex items-end gap-[7px] text-[13px] leading-none tracking-[0.04em] text-(--ink) uppercase no-underline ${transitionColors} hover:text-(--red) max-[860px]:hidden ${fontType}`}
+            className={`inline-flex h-[42px] items-center gap-[7px] text-[13px] leading-none tracking-[0.04em] text-(--ink) uppercase no-underline ${transitionColors} hover:text-(--red) max-[860px]:hidden ${fontType}`}
           >
             <IconUser size={16} stroke={2} className="shrink-0" aria-hidden />
             <span className="leading-none">
