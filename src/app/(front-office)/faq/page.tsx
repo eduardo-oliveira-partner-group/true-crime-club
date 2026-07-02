@@ -89,7 +89,7 @@ export default function FaqPage() {
 
           <ScrollReveal delay={0.08}>
             <h1
-              className={`mt-4 text-wrap-balance text-[clamp(42px,5.8vw,74px)] leading-[0.98] font-bold tracking-[-0.02em] text-(--ink) ${fontHeading}`}
+              className={`text-wrap-balance mt-4 text-[clamp(42px,5.8vw,74px)] leading-[0.98] font-bold tracking-[-0.02em] text-(--ink) ${fontHeading}`}
             >
               Perguntas frequentes.
             </h1>
@@ -116,7 +116,7 @@ export default function FaqPage() {
                     dossierCardSurface,
                     cardShadowBase,
                     transitionCardHover,
-                    'hover:-translate-y-0.5 hover:shadow-[0_24px_44px_-18px_rgba(33,28,24,0.3)] hover:border-(--red)/30',
+                    'hover:-translate-y-0.5 hover:border-(--red)/30 hover:shadow-[0_24px_44px_-18px_rgba(33,28,24,0.3)]',
                   )}
                 >
                   <summary className="flex cursor-pointer list-none items-start justify-between gap-4 outline-none [&::-webkit-details-marker]:hidden">
@@ -134,7 +134,7 @@ export default function FaqPage() {
                     </div>
                     <IconChevronDown className="mt-0.5 size-5 shrink-0 text-(--red) transition-transform duration-300 group-open:rotate-180" />
                   </summary>
-                  <div className="mt-4 border-t border-dashed border-[rgba(33,28,24,0.15)] pt-4 pl-[3.8rem] sm:pl-[4.8rem] text-[16px] leading-[1.6] text-(--ink-soft)">
+                  <div className="mt-4 border-t border-dashed border-[rgba(33,28,24,0.15)] pt-4 pl-[3.8rem] text-[16px] leading-[1.6] text-(--ink-soft) sm:pl-[4.8rem]">
                     {item.answer}
                   </div>
                 </details>
@@ -155,7 +155,7 @@ export default function FaqPage() {
 
           <ScrollReveal delay={0.08}>
             <h2
-              className={`mt-4 text-wrap-balance text-[clamp(32px,4.5vw,56px)] leading-[1.02] font-semibold tracking-[-0.015em] text-(--ink) ${fontHeading}`}
+              className={`text-wrap-balance mt-4 text-[clamp(32px,4.5vw,56px)] leading-[1.02] font-semibold tracking-[-0.015em] text-(--ink) ${fontHeading}`}
             >
               Entre no caso. O arquivo está aberto.
             </h2>

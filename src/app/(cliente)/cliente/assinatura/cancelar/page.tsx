@@ -2,11 +2,7 @@ import { IconArrowLeft } from '@tabler/icons-react'
 import Link from 'next/link'
 
 import { Button } from '@/src/components/ui/button'
-import {
-  fontHeading,
-  fontMono,
-  transitionBgColor,
-} from '@/src/lib/design/classes'
+import { fontHeading, fontMono } from '@/src/lib/design/classes'
 import {
   cancelSubscription,
   getSubscription,

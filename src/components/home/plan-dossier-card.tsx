@@ -1,6 +1,5 @@
 import { IconArrowRight, IconCheck, IconStarFilled } from '@tabler/icons-react'
 import Link from 'next/link'
-import type { CSSProperties } from 'react'
 
 import type { SubscriptionPlan } from '@/src/lib/domain/types'
 import { formatCurrency } from '@/src/lib/formatters'
@@ -14,8 +13,6 @@ const fontHeading =
 const fontMono = '[font-family:var(--design-font-mono),monospace]'
 
 export function PlanDossierCard({ plan }: PlanDossierCardProps) {
-  const isRecommended = plan.isRecommended === true
-
   if (plan.billingInterval === 'annual') {
     // Annual Recommended Card Style
     const priceFormatted = plan.pricePerMonth
