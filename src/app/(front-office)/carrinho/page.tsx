@@ -13,7 +13,20 @@ import { revalidatePath } from 'next/cache'
 import Image from 'next/image'
 import Link from 'next/link'
 
+import { DesignPageShell } from '@/src/components/public-design/design-page-shell'
+import { SectionEyebrow } from '@/src/components/public-design/section-eyebrow'
 import { Button } from '@/src/components/ui/button'
+import {
+  arrowIconClass,
+  buttonLiftShadow,
+  cardShadowBase,
+  dossierCardSurface,
+  fontHeading,
+  fontMono,
+  sectionFrame,
+  transitionCardHover,
+  transitionColors,
+} from '@/src/lib/design/classes'
 import { getSeoEntry } from '@/src/lib/domain/repositories'
 import type { CartItem } from '@/src/lib/domain/types'
 import { formatCurrency } from '@/src/lib/formatters'
@@ -48,27 +61,32 @@ export default async function CarrinhoPage() {
   const dossierCode = `CART-${String(cart.items.length).padStart(2, '0')}`
 
   return (
-    <div className="relative isolate min-h-svh overflow-hidden bg-(--paper) text-(--ink)">
-      <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.025)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.025)_1px,transparent_1px)] bg-size-[56px_56px]" />
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_18%_12%,rgba(216,65,50,0.08),transparent_32%),radial-gradient(circle_at_82%_8%,rgba(215,181,109,0.08),transparent_30%)]" />
-
-      <div className="relative z-10 mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-20">
-        <header className="flex flex-col gap-5 border-b border-[rgba(33,28,24,0.15)] pb-8">
+    <DesignPageShell>
+      <div className={cn(sectionFrame, 'relative z-10 py-14 lg:py-20')}>
+        <header className="flex flex-col gap-5 border-b border-dashed border-[rgba(33,28,24,0.18)] pb-8">
           <div className="flex flex-wrap items-center gap-4">
-            <p className="text-xs font-semibold tracking-[0.24em] text-(--red) uppercase">
-              Dossiê de compra
-            </p>
-            <span className="hidden h-px flex-1 bg-[#d7b56d]/35 sm:block" />
-            <p className="font-mono text-xs tracking-[0.16em] text-(--ink-soft)/55 uppercase">
+            <SectionEyebrow className="mb-0">Dossiê de compra</SectionEyebrow>
+            <span className="hidden h-px flex-1 bg-[rgba(33,28,24,0.14)] sm:block" />
+            <p
+              className={cn(
+                fontMono,
+                'rounded-[2px] border border-[rgba(33,28,24,0.15)] bg-(--paper-soft) px-3 py-2 text-[11px] font-bold tracking-[0.14em] text-(--ink-soft) uppercase',
+              )}
+            >
               {dossierCode}
             </p>
           </div>
           <div className="flex flex-wrap items-end justify-between gap-4">
-            <h1 className="font-heading text-3xl/tight font-black tracking-wide text-(--ink) uppercase sm:text-4xl lg:text-5xl">
+            <h1
+              className={cn(
+                fontHeading,
+                'text-wrap:balance max-w-[11ch] text-[clamp(2.5rem,5.6vw,4.625rem)] leading-[0.98] font-bold tracking-[-0.02em] text-(--ink)',
+              )}
+            >
               Seu carrinho
             </h1>
             {cart.items.length > 0 ? (
-              <p className="text-sm text-(--ink-soft)">
+              <p className="rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-(--card) px-4 py-3 text-sm font-medium text-(--ink-soft)">
                 {itemCount}{' '}
                 {itemCount === 1 ? 'peça em análise' : 'peças em análise'}
               </p>
@@ -87,9 +105,15 @@ export default async function CarrinhoPage() {
 
               <Link
                 href="/loja"
-                className="group inline-flex items-center gap-2 pt-2 text-sm font-medium text-(--red) transition hover:text-[#f4d891] focus-visible:ring-2 focus-visible:ring-[#d7b56d] focus-visible:outline-none"
+                className={cn(
+                  fontMono,
+                  transitionColors,
+                  'group inline-flex items-center gap-2 rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-(--paper-soft) px-4 py-3 text-[12px] font-bold tracking-[0.04em] text-(--red) uppercase hover:border-(--red) hover:bg-(--red) hover:text-[#fbf9f6] focus-visible:ring-2 focus-visible:ring-(--red)/25 focus-visible:outline-none',
+                )}
               >
-                <IconArrowRight className="size-4 rotate-180 transition group-hover:-translate-x-1" />
+                <IconArrowRight
+                  className={cn('size-4 rotate-180', arrowIconClass)}
+                />
                 Continuar investigando a loja
               </Link>
             </section>
@@ -111,20 +135,36 @@ export default async function CarrinhoPage() {
           </div>
         )}
       </div>
-    </div>
+    </DesignPageShell>
   )
 }
 
 function EmptyCart() {
   return (
-    <div className="mt-12 border border-dashed border-[rgba(33,28,24,0.15)] bg-(--card)/60 p-10 text-center">
-      <div className="mx-auto flex size-14 items-center justify-center border border-[rgba(33,28,24,0.15)] bg-(--paper) text-(--red)">
+    <div
+      className={cn(
+        dossierCardSurface,
+        cardShadowBase,
+        'mt-12 p-8 text-center sm:p-10',
+      )}
+    >
+      <div className="mx-auto flex size-14 items-center justify-center rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-(--paper-soft) text-(--red)">
         <IconShoppingBag className="size-6" />
       </div>
-      <p className="mt-5 text-xs font-semibold tracking-[0.2em] text-(--red) uppercase">
+      <p
+        className={cn(
+          fontMono,
+          'mt-5 text-xs font-bold tracking-[0.12em] text-(--red) uppercase',
+        )}
+      >
         Arquivo vazio
       </p>
-      <h2 className="mt-3 font-heading text-2xl font-semibold tracking-tight text-(--ink) sm:text-3xl">
+      <h2
+        className={cn(
+          fontHeading,
+          'mx-auto mt-3 max-w-xl text-2xl/tight font-semibold tracking-[-0.015em] text-(--ink) sm:text-3xl/tight',
+        )}
+      >
         Nenhuma evidência selecionada ainda.
       </h2>
       <p className="mx-auto mt-3 max-w-md text-sm/6 text-(--ink-soft)">
@@ -133,7 +173,11 @@ function EmptyCart() {
       </p>
       <Button
         asChild
-        className="mt-6 h-11 rounded-none bg-[#d84132] px-5 text-white shadow-[0_0_24px_rgba(216,65,50,0.3)] hover:bg-[#b93227]"
+        className={cn(
+          fontMono,
+          buttonLiftShadow,
+          'mt-6 h-11 rounded-[9px] border border-[rgba(33,28,24,0.15)] bg-(--red) px-5 text-[13px] font-bold tracking-[0.04em] text-[#fbf9f6] uppercase hover:-translate-y-0.5 hover:bg-(--red-deep) motion-reduce:hover:translate-y-0',
+        )}
       >
         <Link href="/loja">
           Ir para a loja
@@ -162,13 +206,18 @@ function CartLineItem({
   const itemCode = `EVID-${String(item.quantity).padStart(2, '0')}`
 
   return (
-    <article className="relative isolate overflow-hidden border border-[rgba(33,28,24,0.15)] bg-(--card)/70 shadow-[0_18px_40px_rgba(33,28,24,0.32)] transition hover:border-[rgba(33,28,24,0.15)]">
-      <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.022)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.022)_1px,transparent_1px)] bg-size-[34px_34px]" />
-
+    <article
+      className={cn(
+        dossierCardSurface,
+        cardShadowBase,
+        transitionCardHover,
+        'relative isolate overflow-hidden hover:-translate-y-1 hover:shadow-[0_24px_44px_-18px_rgba(33,28,24,0.3),inset_0_0_0_1px_rgba(255,255,255,0.6)]',
+      )}
+    >
       <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-stretch sm:gap-5 sm:p-5">
         <Link
           href={`/loja/${item.productSlug}`}
-          className="group relative aspect-square w-full shrink-0 overflow-hidden border border-[rgba(33,28,24,0.15)] bg-(--paper-soft) sm:size-28"
+          className="group relative aspect-square w-full shrink-0 overflow-hidden rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-(--paper-soft) sm:size-28"
         >
           {productImage ? (
             <Image
@@ -183,16 +232,25 @@ function CartLineItem({
               <IconShoppingBag className="size-7" />
             </div>
           )}
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(9,8,7,0.02)_0%,rgba(9,8,7,0.45)_100%)]" />
         </Link>
 
         <div className="flex min-w-0 flex-1 flex-col gap-4">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="min-w-0 space-y-1.5">
-              <p className="font-mono text-[0.68rem] tracking-[0.18em] text-(--ink-soft)/55 uppercase">
+              <p
+                className={cn(
+                  fontMono,
+                  'text-[0.68rem] font-bold tracking-[0.14em] text-(--ink-soft) uppercase',
+                )}
+              >
                 {itemCode} · {item.productType === 'box' ? 'Box' : 'Item'}
               </p>
-              <h3 className="font-heading text-lg/tight font-semibold tracking-wide text-(--ink) uppercase">
+              <h3
+                className={cn(
+                  fontHeading,
+                  'text-lg/tight font-semibold tracking-[-0.01em] text-(--ink)',
+                )}
+              >
                 <Link
                   href={`/loja/${item.productSlug}`}
                   className="transition hover:text-(--red)"
@@ -205,12 +263,17 @@ function CartLineItem({
                 <span className="text-(--ink-soft)/60">/ unidade</span>
               </p>
             </div>
-            <p className="font-heading text-lg leading-none font-semibold text-(--ink)">
+            <p
+              className={cn(
+                fontHeading,
+                'text-lg leading-none font-semibold text-(--ink)',
+              )}
+            >
               {formatCurrency(lineTotal)}
             </p>
           </div>
 
-          <div className="mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-[rgba(33,28,24,0.15)] pt-4">
+          <div className="mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-dashed border-[rgba(33,28,24,0.18)] pt-4">
             <QuantityControls itemId={item.id} quantity={item.quantity} />
             <form
               action={async () => {
@@ -223,7 +286,7 @@ function CartLineItem({
                 type="submit"
                 variant="ghost"
                 size="sm"
-                className="h-8 gap-1.5 rounded-none px-3 text-xs font-medium text-(--red) hover:bg-[#d84132]/12 hover:text-(--red)"
+                className="h-8 gap-1.5 rounded-[9px] px-3 text-xs font-medium text-(--red) hover:bg-(--red)/10 hover:text-(--red-deep)"
               >
                 <IconTrash className="size-4" />
                 Remover
@@ -244,14 +307,19 @@ function QuantityControls({
   quantity: number
 }) {
   const baseButton =
-    'flex size-8 items-center justify-center border border-[rgba(33,28,24,0.15)] bg-(--card)/6 text-(--ink) transition hover:bg-(--card)/12 disabled:opacity-40'
+    'flex size-8 items-center justify-center rounded-[9px] border border-[rgba(33,28,24,0.15)] bg-(--card) text-(--ink) transition hover:border-(--red) hover:text-(--red) disabled:pointer-events-none disabled:opacity-40'
 
   return (
     <div className="inline-flex items-center gap-2">
-      <span className="text-[0.68rem] font-semibold tracking-[0.18em] text-(--red) uppercase">
+      <span
+        className={cn(
+          fontMono,
+          'text-[0.68rem] font-bold tracking-[0.14em] text-(--red) uppercase',
+        )}
+      >
         Qtde
       </span>
-      <div className="inline-flex items-center gap-2 border border-[rgba(33,28,24,0.15)] bg-(--paper)/70 px-2 py-1.5">
+      <div className="inline-flex items-center gap-2 rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-(--paper-soft) px-2 py-1.5">
         <form
           action={async () => {
             'use server'
@@ -262,7 +330,7 @@ function QuantityControls({
           <button
             type="submit"
             aria-label="Diminuir quantidade"
-            className={cn(baseButton, 'rounded-none')}
+            className={baseButton}
             disabled={quantity <= 1}
           >
             <IconMinus className="size-3.5" />
@@ -270,7 +338,10 @@ function QuantityControls({
         </form>
         <span
           key={quantity}
-          className="min-w-6 text-center font-heading text-sm font-semibold text-(--ink)"
+          className={cn(
+            fontHeading,
+            'min-w-6 text-center text-sm font-semibold text-(--ink)',
+          )}
         >
           {quantity}
         </span>
@@ -284,7 +355,7 @@ function QuantityControls({
           <button
             type="submit"
             aria-label="Aumentar quantidade"
-            className={cn(baseButton, 'rounded-none')}
+            className={baseButton}
           >
             <IconPlus className="size-3.5" />
           </button>
@@ -312,11 +383,22 @@ function OrderSummary({
   couponCode?: string
 }) {
   return (
-    <div className="border border-[#b98542]/40 bg-(--paper-soft)/85 shadow-[0_18px_40px_rgba(33,28,24,0.42)] backdrop-blur-sm">
-      <div className="border-b border-[rgba(33,28,24,0.15)] p-5 sm:p-6">
+    <div
+      className={cn(
+        dossierCardSurface,
+        cardShadowBase,
+        'overflow-hidden bg-(--card)',
+      )}
+    >
+      <div className="border-b border-dashed border-[rgba(33,28,24,0.18)] p-5 sm:p-6">
         <div className="flex items-center gap-3">
           <IconClipboardText className="size-5 text-(--red)" />
-          <p className="text-xs font-semibold tracking-[0.22em] text-(--red) uppercase">
+          <p
+            className={cn(
+              fontMono,
+              'text-xs font-bold tracking-[0.12em] text-(--red) uppercase',
+            )}
+          >
             Resumo do pedido
           </p>
         </div>
@@ -346,13 +428,23 @@ function OrderSummary({
           </p>
         </div>
 
-        <div className="h-px bg-[#a78a5a]/30" />
+        <div className="h-px border-t border-dashed border-[rgba(33,28,24,0.18)]" />
 
         <div className="flex items-end justify-between gap-3">
-          <span className="text-xs font-semibold tracking-[0.2em] text-(--red) uppercase">
+          <span
+            className={cn(
+              fontMono,
+              'text-xs font-bold tracking-[0.12em] text-(--red) uppercase',
+            )}
+          >
             Total
           </span>
-          <span className="font-heading text-2xl leading-none font-black text-(--ink)">
+          <span
+            className={cn(
+              fontHeading,
+              'text-2xl leading-none font-bold text-(--ink)',
+            )}
+          >
             {formatCurrency(total)}
           </span>
         </div>
@@ -360,11 +452,15 @@ function OrderSummary({
         <CouponForm />
       </div>
 
-      <div className="border-t border-[rgba(33,28,24,0.15)] p-5 sm:p-6">
+      <div className="border-t border-dashed border-[rgba(33,28,24,0.18)] p-5 sm:p-6">
         <Button
           asChild
           size="lg"
-          className="h-12 w-full justify-between rounded-none bg-[#d84132] px-5 text-white shadow-[0_0_26px_rgba(216,65,50,0.32)] hover:bg-[#b93227]"
+          className={cn(
+            fontMono,
+            buttonLiftShadow,
+            'h-12 w-full justify-between rounded-[9px] border border-[rgba(33,28,24,0.15)] bg-(--red) px-5 text-[13px] font-bold tracking-[0.04em] text-[#fbf9f6] uppercase hover:-translate-y-0.5 hover:bg-(--red-deep) motion-reduce:hover:translate-y-0',
+          )}
         >
           <Link href="/checkout">
             Ir para checkout
@@ -423,7 +519,10 @@ function CouponForm() {
     >
       <label
         htmlFor="coupon"
-        className="text-[0.68rem] font-semibold tracking-[0.18em] text-(--red) uppercase"
+        className={cn(
+          fontMono,
+          'text-[0.68rem] font-bold tracking-[0.14em] text-(--red) uppercase',
+        )}
       >
         Cupom de desconto
       </label>
@@ -434,13 +533,13 @@ function CouponForm() {
             id="coupon"
             name="coupon"
             placeholder="Informe o código"
-            className="h-10 w-full rounded-none border border-[rgba(33,28,24,0.15)] bg-(--paper) pr-3 pl-9 text-sm text-(--ink) placeholder:text-(--ink-soft)/50 focus:border-[#d7b56d]/60 focus-visible:ring-2 focus-visible:ring-[#d7b56d]/40 focus-visible:outline-none"
+            className="h-10 w-full rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-(--paper-soft) pr-3 pl-9 text-sm text-(--ink) placeholder:text-(--ink-mute) focus:border-(--red) focus-visible:ring-2 focus-visible:ring-(--red)/20 focus-visible:outline-none"
           />
         </div>
         <Button
           type="submit"
           variant="outline"
-          className="h-10 shrink-0 rounded-none border-[rgba(33,28,24,0.15)] bg-(--card)/6 px-4 text-(--ink) hover:bg-(--card)/12 hover:text-(--ink)"
+          className="h-10 shrink-0 rounded-[9px] border-[rgba(33,28,24,0.15)] bg-(--card) px-4 text-(--ink) hover:border-(--ink) hover:bg-(--ink) hover:text-[#fbf9f6]"
         >
           Aplicar
         </Button>
