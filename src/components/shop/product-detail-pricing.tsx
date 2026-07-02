@@ -19,7 +19,7 @@ export function ProductDetailPricing({
     <div
       className={cn(
         variant === 'panel' &&
-          'border border-[rgba(33,28,24,0.15)] bg-(--paper-soft)/92 p-5 shadow-[0_18px_40px_rgba(33,28,24,0.32)] sm:p-6',
+          'rounded-[14px_14px_16px_16px] border border-[rgba(33,28,24,0.15)] bg-(--paper-soft)/92 p-5 shadow-[0_18px_40px_rgba(33,28,24,0.32)] sm:p-6',
         variant === 'inline' && 'border-t border-[rgba(33,28,24,0.15)] pt-6',
         className,
       )}

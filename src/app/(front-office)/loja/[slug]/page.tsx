@@ -6,6 +6,9 @@ import {
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
+import { DesignPageShell } from '@/src/components/public-design/design-page-shell'
+import { DossierCard } from '@/src/components/public-design/dossier-card'
+import { SectionEyebrow } from '@/src/components/public-design/section-eyebrow'
 import { Breadcrumbs } from '@/src/components/seo/breadcrumbs'
 import { ProductJsonLd } from '@/src/components/seo/product-json-ld'
 import { ProductDetailActions } from '@/src/components/shop/product-detail-actions'
@@ -22,6 +25,7 @@ import {
   ScrollRevealGroup,
   ScrollRevealItem,
 } from '@/src/components/ui/scroll-reveal'
+import { fontHeading, fontType, sectionFrame } from '@/src/lib/design/classes'
 import {
   getProductBySlug,
   getSeoEntry,
@@ -90,25 +94,21 @@ export default async function ProductDetailPage({
   ]
 
   return (
-    <div className="bg-(--paper) text-(--ink)">
+    <DesignPageShell showOverlays={false}>
       <ProductJsonLd product={product} path={`/loja/${product.slug}`} />
 
       <section className="relative isolate overflow-hidden border-b border-[rgba(33,28,24,0.15)] bg-(--paper)">
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_12%_10%,rgba(216,65,50,0.12),transparent_32%),radial-gradient(circle_at_88%_18%,rgba(215,181,109,0.1),transparent_28%),linear-gradient(90deg,rgba(255,250,240,0.035)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.035)_1px,transparent_1px)] bg-size-[auto,auto,42px_42px,42px_42px]" />
-
-        <div className="relative z-10 mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:py-16">
+        <div className={`${sectionFrame} relative z-10 py-10 lg:py-16`}>
           <ScrollReveal>
             <Breadcrumbs items={breadcrumbItems} className="mb-8" />
           </ScrollReveal>
 
           <ScrollReveal delay={0.06}>
-            <article className="relative overflow-hidden border border-[rgba(33,28,24,0.15)] bg-(--paper-soft)/92 shadow-[0_18px_40px_rgba(33,28,24,0.38)] lg:grid lg:grid-cols-2 lg:items-stretch">
-              <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(255,250,240,0.03)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.03)_1px,transparent_1px)] bg-size-[38px_38px]" />
-
+            <article className="relative overflow-hidden rounded-[14px_14px_16px_16px] border border-[rgba(33,28,24,0.15)] bg-(--card) shadow-[0_18px_40px_-18px_rgba(33,28,24,0.3),inset_0_0_0_1px_rgba(255,255,255,0.55)] lg:grid lg:grid-cols-2 lg:items-stretch">
               <div className="relative z-10 flex flex-col border-b border-[rgba(33,28,24,0.15)] lg:border-r lg:border-b-0">
                 <ProductDetailGallery product={product} />
 
-                <div className="hidden flex-col gap-4 border-t border-[rgba(33,28,24,0.15)] bg-(--card) p-5 sm:p-6 lg:mt-auto lg:flex">
+                <div className="hidden flex-col gap-4 border-t border-[rgba(33,28,24,0.15)] bg-(--paper-soft) p-5 sm:p-6 lg:mt-auto lg:flex">
                   <ProductDetailPricing
                     product={product}
                     variant="inline"
@@ -124,11 +124,13 @@ export default async function ProductDetailPage({
               <div className="relative z-10 flex flex-col">
                 <header className="flex flex-wrap items-start justify-between gap-4 border-b border-[rgba(33,28,24,0.15)] p-5 sm:px-7">
                   <div className="flex items-center gap-3">
-                    <div className="flex size-10 items-center justify-center border border-[rgba(33,28,24,0.15)] bg-(--card)/7 text-(--red)">
+                    <div className="flex size-10 items-center justify-center rounded-[2px] border border-[rgba(33,28,24,0.15)] bg-(--paper-soft) text-(--red)">
                       <IconPackage className="size-5" />
                     </div>
                     <div>
-                      <p className="text-[0.65rem] font-semibold tracking-[0.2em] text-(--red) uppercase">
+                      <p
+                        className={`text-[0.65rem] tracking-[0.16em] text-(--red) uppercase ${fontType}`}
+                      >
                         Ficha do arquivo
                       </p>
                       <p className="font-mono text-xs text-(--ink)/45">
@@ -209,18 +211,13 @@ export default async function ProductDetailPage({
 
       {product.includedItems?.length ? (
         <section className="relative isolate overflow-hidden border-b border-[rgba(33,28,24,0.15)] bg-(--card) lg:hidden">
-          <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.035)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.035)_1px,transparent_1px)] bg-size-[56px_56px]" />
-
-          <div className="relative z-10 mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-20">
+          <div className={`${sectionFrame} relative z-10 py-14 lg:py-20`}>
             <ScrollReveal>
               <div className="mb-8 max-w-2xl space-y-4">
-                <div className="flex items-center gap-4">
-                  <p className="text-xs font-semibold tracking-[0.22em] text-(--red) uppercase">
-                    Conteúdo do arquivo
-                  </p>
-                  <span className="hidden h-px flex-1 bg-[#d7b56d]/45 sm:block" />
-                </div>
-                <h2 className="font-heading text-2xl/tight font-semibold tracking-tight text-(--ink) sm:text-3xl">
+                <SectionEyebrow>Conteúdo do arquivo</SectionEyebrow>
+                <h2
+                  className={`text-2xl/tight font-semibold tracking-[-0.015em] text-(--ink) sm:text-3xl ${fontHeading}`}
+                >
                   O que compõe esta entrega.
                 </h2>
                 <p className="text-sm/6 text-(--ink-soft)">
@@ -231,34 +228,41 @@ export default async function ProductDetailPage({
             </ScrollReveal>
 
             <ScrollReveal delay={0.08}>
-              <div className="border border-[rgba(33,28,24,0.15)] bg-(--card) p-6 shadow-[0_18px_40px_rgba(33,28,24,0.32)] sm:p-8">
+              <DossierCard
+                className="p-6 sm:p-8"
+                showPin
+                pinColor="var(--teal)"
+              >
                 <ul className="grid gap-3 sm:grid-cols-2">
                   {product.includedItems?.map((item: string) => (
                     <li
                       key={item}
-                      className="flex gap-3 border border-[rgba(33,28,24,0.15)] bg-(--paper)/72 px-4 py-3 text-sm/6 text-(--ink-soft)"
+                      className="flex gap-3 rounded-[2px] border border-[rgba(33,28,24,0.15)] bg-(--paper-soft) px-4 py-3 text-sm/6 text-(--ink-soft)"
                     >
                       <span className="mt-2 size-1.5 shrink-0 bg-(--red)" />
                       <span>{item}</span>
                     </li>
                   ))}
                 </ul>
-              </div>
+              </DossierCard>
             </ScrollReveal>
           </div>
         </section>
       ) : null}
 
       <section className="relative isolate overflow-hidden bg-(--paper-soft)">
-        <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.03)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.03)_1px,transparent_1px)] bg-size-[56px_56px]" />
-
-        <div className="relative z-10 mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-16">
+        <div className={`${sectionFrame} relative z-10 py-14 lg:py-16`}>
           <ScrollReveal>
-            <div className="border border-[rgba(33,28,24,0.15)] bg-(--card) p-6 shadow-[0_18px_40px_rgba(33,28,24,0.32)] sm:p-8">
-              <p className="text-xs font-semibold tracking-[0.22em] text-(--red) uppercase">
-                Regras de compra
-              </p>
-              <h2 className="mt-3 font-heading text-xl font-semibold text-(--ink) sm:text-2xl">
+            <DossierCard
+              className="p-6 sm:p-8"
+              tabCode="NOTA"
+              tabLabel="regras de compra"
+              showPin
+              pinColor="var(--yellow)"
+            >
+              <h2
+                className={`text-xl font-semibold text-(--ink) sm:text-2xl ${fontHeading}`}
+              >
                 Antes de adicionar ao carrinho
               </h2>
               <ul className="mt-5 grid gap-3 text-sm/6 text-(--ink-soft) sm:grid-cols-2">
@@ -290,25 +294,20 @@ export default async function ProductDetailPage({
                   </span>
                 </li>
               </ul>
-            </div>
+            </DossierCard>
           </ScrollReveal>
         </div>
       </section>
 
       {related.length > 0 ? (
         <section className="relative isolate overflow-hidden border-t border-[rgba(33,28,24,0.15)] bg-(--card)">
-          <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_14%_8%,rgba(216,65,50,0.1),transparent_30%),linear-gradient(90deg,rgba(255,250,240,0.035)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.035)_1px,transparent_1px)] bg-size-[auto,56px_56px,56px_56px]" />
-
-          <div className="relative z-10 mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-20">
+          <div className={`${sectionFrame} relative z-10 py-14 lg:py-20`}>
             <ScrollReveal>
               <div className="mb-10 max-w-2xl space-y-4">
-                <div className="flex items-center gap-4">
-                  <p className="text-xs font-semibold tracking-[0.22em] text-(--red) uppercase">
-                    Arquivos relacionados
-                  </p>
-                  <span className="hidden h-px flex-1 bg-[#d7b56d]/45 sm:block" />
-                </div>
-                <h2 className="font-heading text-2xl/tight font-semibold tracking-tight text-(--ink) sm:text-3xl">
+                <SectionEyebrow>Arquivos relacionados</SectionEyebrow>
+                <h2
+                  className={`text-2xl/tight font-semibold tracking-[-0.015em] text-(--ink) sm:text-3xl ${fontHeading}`}
+                >
                   Continue montando o dossie.
                 </h2>
                 <p className="text-sm/6 text-(--ink-soft)">
@@ -331,6 +330,6 @@ export default async function ProductDetailPage({
           </div>
         </section>
       ) : null}
-    </div>
+    </DesignPageShell>
   )
 }

@@ -22,7 +22,7 @@ export function ProductDetailIncludedPreview({
         {items.map((item) => (
           <li
             key={item}
-            className="flex gap-3 border border-[rgba(33,28,24,0.15)] bg-(--paper)/72 px-4 py-3 text-sm/6 text-(--ink-soft)"
+            className="flex gap-3 rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-(--paper)/72 px-4 py-3 text-sm/6 text-(--ink-soft)"
           >
             <span className="mt-2 size-1.5 shrink-0 bg-[#d84132]" />
             <span>{item}</span>

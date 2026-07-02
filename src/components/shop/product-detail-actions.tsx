@@ -6,6 +6,7 @@ import { useState } from 'react'
 
 import { handleAddToCart } from '@/src/app/actions'
 import { Button } from '@/src/components/ui/button'
+import { fontMono } from '@/src/lib/design/classes'
 
 interface ProductDetailActionsProps {
   productId: string
@@ -37,7 +38,7 @@ export function ProductDetailActions({
         type="button"
         disabled={!inStock || isAdding}
         onClick={onAddToCart}
-        className="h-12 flex-1 rounded-none bg-[#d84132] px-6 text-base text-white shadow-[0_12px_32px_rgba(216,65,50,0.28)] hover:bg-[#b83227] disabled:opacity-50"
+        className={`h-12 flex-1 rounded-[10px] bg-[#d84132] px-6 text-base text-white shadow-[0_12px_32px_rgba(216,65,50,0.28)] hover:bg-[#b83227] disabled:opacity-50 ${fontMono}`}
       >
         <IconShoppingBag data-icon="inline-start" />
         {isAdding
@@ -49,7 +50,7 @@ export function ProductDetailActions({
       <Button
         asChild
         variant="outline"
-        className="h-12 rounded-none border-[#fffaf0]/22 bg-[#fffaf0]/6 text-[#fffaf0] hover:bg-[#fffaf0]/12 hover:text-[#fffaf0]"
+        className={`h-12 rounded-[10px] border-[#211c18]/18 bg-(--paper-soft) text-(--ink) hover:bg-(--ink) hover:text-[#fbf9f6] ${fontMono}`}
       >
         <Link href="/loja">Voltar à loja</Link>
       </Button>

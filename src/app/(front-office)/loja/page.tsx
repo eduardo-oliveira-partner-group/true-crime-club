@@ -2,13 +2,24 @@ import { IconSparkles } from '@tabler/icons-react'
 import Image from 'next/image'
 import Link from 'next/link'
 
-import previousBoxesBanner from '@/src/assets/images/home/previous-boxes-banner.png'
+import { DesignPageShell } from '@/src/components/public-design/design-page-shell'
+import { DossierCard } from '@/src/components/public-design/dossier-card'
+import { SectionEyebrow } from '@/src/components/public-design/section-eyebrow'
 import { ShopCatalog } from '@/src/components/shop/shop-catalog'
 import {
   AvailabilityBadge,
   PriceBlock,
 } from '@/src/components/ui/product-quick-view'
 import { ScrollReveal } from '@/src/components/ui/scroll-reveal'
+import {
+  arrowIconClass,
+  cardShadowHover,
+  ctaButtonBase,
+  fontHeading,
+  fontType,
+  sectionFrame,
+  transitionCardHover,
+} from '@/src/lib/design/classes'
 import { getSeoEntry, listProducts } from '@/src/lib/domain/repositories'
 import type { Product } from '@/src/lib/domain/types'
 import { getProductImage } from '@/src/lib/product-images'
@@ -20,10 +31,13 @@ export const metadata = buildMetadata({
   entry: getSeoEntry('/loja'),
 })
 
-const stats = [
-  { label: 'boxes no arquivo', value: '04' },
-  { label: 'preço assinante', value: 'R$159' },
-  { label: 'curadoria TCC', value: '100%' },
+const caseNotes = [
+  { label: 'Arquivo', value: 'boxes anteriores e itens extras' },
+  { label: 'Clube', value: 'preço de assinante quando houver plano ativo' },
+  {
+    label: 'Estoque',
+    value: 'compra liberada enquanto a peça estiver disponível',
+  },
 ]
 
 export default async function LojaPage() {
@@ -37,59 +51,45 @@ export default async function LojaPage() {
     boxProducts[0]
 
   return (
-    <div className="bg-(--paper) text-(--ink)">
+    <DesignPageShell showOverlays={false}>
       <section className="relative isolate overflow-hidden border-b border-[rgba(33,28,24,0.15)] bg-(--paper)">
-        <Image
-          src={previousBoxesBanner}
-          alt=""
-          fill
-          priority
-          placeholder="blur"
-          sizes="100vw"
-          className="absolute inset-0 -z-20 object-cover object-[68%_center] brightness-[0.74] saturate-[0.86]"
-        />
-        <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(9,8,7,0.98)_0%,rgba(9,8,7,0.86)_42%,rgba(9,8,7,0.42)_72%,rgba(9,8,7,0.34)_100%),linear-gradient(180deg,rgba(9,8,7,0.58)_0%,rgba(9,8,7,0.94)_100%)]" />
-        <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(255,250,240,0.04)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.04)_1px,transparent_1px)] bg-size-[42px_42px]" />
-
-        <div className="relative z-10 mx-auto grid min-h-[560px] max-w-6xl items-center gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:py-20">
+        <div
+          className={`${sectionFrame} relative z-10 grid min-h-[620px] items-center gap-12 py-16 lg:grid-cols-[0.88fr_1.12fr] lg:py-20`}
+        >
           <div className="max-w-2xl space-y-6">
             <ScrollReveal>
-              <div className="flex items-center gap-4">
-                <p className="text-xs font-semibold tracking-[0.24em] text-(--red) uppercase">
-                  Loja oficial
-                </p>
-                <span className="h-px flex-1 bg-[#d7b56d]/45" />
-              </div>
+              <SectionEyebrow>LOJA — arquivos liberados</SectionEyebrow>
             </ScrollReveal>
 
             <ScrollReveal delay={0.08}>
-              <h1 className="max-w-[20rem] font-heading text-3xl leading-[1.06] font-black text-(--ink) uppercase sm:max-w-2xl sm:text-5xl lg:text-6xl">
+              <h1
+                className={`text-wrap-balance max-w-[680px] text-[clamp(42px,5.8vw,74px)] leading-[0.98] font-bold tracking-[-0.02em] text-(--ink) ${fontHeading}`}
+              >
                 Arquivos abertos para colecionadores.
               </h1>
             </ScrollReveal>
 
             <ScrollReveal delay={0.14}>
-              <p className="max-w-xl text-base/7 text-(--ink-soft) sm:text-lg/8">
+              <p className="max-w-xl text-[18px] leading-[1.65] text-(--ink-soft) sm:text-[19px]">
                 Boxes anteriores, edições avulsas e itens complementares do True
                 Crime Club continuam disponíveis enquanto houver estoque.
               </p>
             </ScrollReveal>
 
             <ScrollReveal delay={0.2}>
-              <div className="grid max-w-xl grid-cols-3 border border-[rgba(33,28,24,0.15)] bg-(--paper)/72 backdrop-blur-sm">
-                {stats.map((stat, index) => (
+              <div className="grid max-w-xl gap-2 sm:grid-cols-3">
+                {caseNotes.map((note) => (
                   <div
-                    key={stat.label}
-                    className={cn(
-                      'min-w-0 p-3 sm:p-5',
-                      index > 0 ? 'border-l border-[rgba(33,28,24,0.15)]' : '',
-                    )}
+                    key={note.label}
+                    className="min-w-0 rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-(--card) p-3 shadow-[0_12px_26px_-18px_rgba(33,28,24,0.22)] sm:p-4"
                   >
-                    <p className="font-heading text-xl leading-none font-black text-(--ink) sm:text-3xl">
-                      {stat.value}
+                    <p
+                      className={`text-[10.5px] tracking-[0.14em] text-(--red) uppercase ${fontType}`}
+                    >
+                      {note.label}
                     </p>
-                    <p className="mt-2 text-[0.58rem]/4 font-semibold tracking-[0.12em] text-(--red) uppercase sm:text-[0.65rem] sm:tracking-[0.16em]">
-                      {stat.label}
+                    <p className="mt-2 text-sm/snug text-(--ink-soft)">
+                      {note.value}
                     </p>
                   </div>
                 ))}
@@ -106,7 +106,7 @@ export default async function LojaPage() {
       </section>
 
       <ShopCatalog boxProducts={boxProducts} extraProducts={extraProducts} />
-    </div>
+    </DesignPageShell>
   )
 }
 
@@ -116,41 +116,64 @@ function FeaturedProductCase({ product }: { product: Product }) {
   return (
     <Link
       href={`/loja/${product.slug}`}
-      className="group block border border-[#d7b56d]/28 bg-(--paper)/82 p-4 shadow-[0_18px_40px_rgba(33,28,24,0.42)] backdrop-blur-sm transition hover:border-[#d7b56d]/48 focus-visible:ring-2 focus-visible:ring-[#d7b56d] focus-visible:outline-none sm:p-5"
+      className={cn(
+        'group block focus-visible:ring-2 focus-visible:ring-(--yellow) focus-visible:outline-none',
+        transitionCardHover,
+        'hover:-translate-y-1 motion-reduce:transition-none motion-reduce:hover:translate-y-0',
+      )}
     >
-      <div className="relative aspect-4/3 overflow-hidden border border-[rgba(33,28,24,0.15)] bg-(--card)">
-        {productImage ? (
-          <Image
-            src={productImage}
-            alt={product.name}
-            fill
-            placeholder="blur"
-            sizes="(max-width: 1024px) 100vw, 560px"
-            className="object-cover object-center transition duration-500 group-hover:scale-[1.03]"
+      <DossierCard
+        tabCode="EVID"
+        tabLabel="arquivo em destaque"
+        showPin
+        pinColor="var(--yellow)"
+        className={cn('p-4 sm:p-5', cardShadowHover)}
+      >
+        <div className="relative aspect-4/3 overflow-hidden rounded-[4px_4px_10px_10px] border border-[rgba(33,28,24,0.15)] bg-(--card)">
+          {productImage ? (
+            <Image
+              src={productImage}
+              alt={product.name}
+              fill
+              placeholder="blur"
+              sizes="(max-width: 1024px) 100vw, 560px"
+              className="object-cover object-center transition duration-500 group-hover:scale-[1.03] motion-reduce:transition-none"
+            />
+          ) : (
+            <EvidencePlaceholder product={product} />
+          )}
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(14,16,20,0.02)_0%,rgba(14,16,20,0.56)_100%)]" />
+          <AvailabilityBadge
+            product={product}
+            className="absolute top-4 left-4"
           />
-        ) : (
-          <EvidencePlaceholder product={product} />
-        )}
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(9,8,7,0.02)_0%,rgba(9,8,7,0.58)_100%)]" />
-        <AvailabilityBadge
-          product={product}
-          className="absolute top-4 left-4"
-        />
-      </div>
-      <div className="grid gap-5 pt-5 sm:grid-cols-[1fr_auto] sm:items-end">
-        <div>
-          <p className="border-l-2 border-(--red) pl-3 text-xs font-semibold tracking-[0.2em] text-(--red) uppercase">
-            Arquivo em destaque
-          </p>
-          <h2 className="mt-3 font-heading text-2xl/tight font-semibold tracking-wide text-(--ink) uppercase">
-            {product.name}
-          </h2>
-          <p className="mt-2 line-clamp-2 text-sm/6 text-(--ink-soft)">
-            {product.shortDescription}
-          </p>
         </div>
-        <PriceBlock product={product} />
-      </div>
+        <div className="grid gap-5 pt-5 sm:grid-cols-[1fr_auto] sm:items-end">
+          <div>
+            <p
+              className={`text-[11px] tracking-[0.14em] text-(--red) uppercase ${fontType}`}
+            >
+              Arquivo em destaque
+            </p>
+            <h2
+              className={`mt-3 text-2xl/tight font-semibold text-(--ink) ${fontHeading}`}
+            >
+              {product.name}
+            </h2>
+            <p className="mt-2 line-clamp-2 text-sm/6 text-(--ink-soft)">
+              {product.shortDescription}
+            </p>
+          </div>
+          <div className="grid gap-3 sm:justify-items-end">
+            <PriceBlock product={product} />
+            <span
+              className={`${ctaButtonBase} border border-[rgba(33,28,24,0.15)] bg-(--red) text-[#fbf9f6]`}
+            >
+              Ver dossiê <span className={arrowIconClass}>→</span>
+            </span>
+          </div>
+        </div>
+      </DossierCard>
     </Link>
   )
 }

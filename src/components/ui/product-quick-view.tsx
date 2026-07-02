@@ -21,6 +21,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/src/components/ui/tooltip'
+import {
+  cardShadowBase,
+  fontHeading,
+  fontMono,
+  fontType,
+} from '@/src/lib/design/classes'
+import { designTokens } from '@/src/lib/design/tokens'
 import type { Product } from '@/src/lib/domain/types'
 import {
   formatAvailability,
@@ -53,7 +60,7 @@ export function AvailabilityBadge({
   return (
     <span
       className={cn(
-        'inline-flex shrink-0 items-center border px-3 py-1 text-xs font-semibold tracking-[0.14em] uppercase backdrop-blur-sm',
+        `inline-flex shrink-0 items-center rounded-[2px] border px-3 py-1 text-xs tracking-[0.14em] uppercase backdrop-blur-[2px] ${fontType}`,
         getAvailabilityTone(product.availability),
         className,
       )}
@@ -83,7 +90,7 @@ export function PriceBlock({
         </p>
         <p
           className={cn(
-            'font-heading leading-none font-semibold text-[#211c18]',
+            `leading-none font-semibold text-(--ink) ${fontHeading}`,
             compact ? 'text-xl' : 'text-3xl',
           )}
         >
@@ -96,7 +103,7 @@ export function PriceBlock({
   return (
     <p
       className={cn(
-        'font-heading leading-none font-semibold text-[#211c18]',
+        `leading-none font-semibold text-(--ink) ${fontHeading}`,
         compact ? 'text-xl' : 'text-3xl',
       )}
     >
@@ -116,7 +123,7 @@ export function DetailDatum({
 }) {
   return (
     <div className="flex items-center gap-3">
-      <div className="flex size-9 shrink-0 items-center justify-center border border-[#211c18]/14 bg-[#211c18]/7 text-(--amber)">
+      <div className="flex size-9 shrink-0 items-center justify-center rounded-[10px] border border-[#211c18]/14 bg-[#211c18]/7 text-(--amber)">
         {icon}
       </div>
       <div className="min-w-0">
@@ -140,7 +147,9 @@ export function ProductKicker({
 }) {
   return (
     <div className="flex flex-wrap items-start justify-between gap-3">
-      <p className="border-l-2 border-[#b5332a] pl-3 text-xs font-semibold tracking-[0.2em] text-[#9f2d25] uppercase">
+      <p
+        className={`inline-flex items-center gap-2 text-xs tracking-[0.16em] text-[#9f2d25] uppercase before:h-px before:w-5 before:bg-current before:content-[''] ${fontType}`}
+      >
         {product.type === 'box' ? 'Arquivo avulso' : 'Item especial'}
       </p>
       {showAvailability ? <AvailabilityBadge product={product} /> : null}
@@ -191,6 +200,7 @@ export function ProductQuickView({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: reduceMotion ? 0.01 : 0.22 }}
+      style={designTokens}
     >
       <motion.button
         type="button"
@@ -205,18 +215,29 @@ export function ProductQuickView({
 
       <motion.article
         layoutId={`box-shell-${product.id}`}
-        className="relative z-10 grid w-full max-w-5xl overflow-hidden border border-[#211c18]/16 bg-[#fffaf2] text-[#211c18] shadow-[0_32px_90px_rgba(63,46,34,0.28)] lg:max-h-[calc(100vh-3rem)] lg:grid-cols-[0.9fr_1.1fr]"
+        className={`relative z-10 grid w-full max-w-5xl overflow-hidden rounded-[14px_14px_16px_16px] border border-[rgba(33,28,24,0.16)] bg-(--card) text-(--ink) ${cardShadowBase} lg:max-h-[calc(100vh-3rem)] lg:grid-cols-[0.9fr_1.1fr]`}
         transition={
           reduceMotion
             ? { duration: 0.01 }
             : { type: 'spring', stiffness: 380, damping: 34, mass: 0.9 }
         }
       >
-        <div className="pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(90deg,rgba(33,28,24,0.04)_1px,transparent_1px),linear-gradient(rgba(33,28,24,0.04)_1px,transparent_1px)] bg-size-[38px_38px]" />
+        <div
+          className={`absolute top-0 left-8 z-30 inline-flex -translate-y-px items-center gap-[10px] rounded-b-[10px] border border-t-0 border-[rgba(33,28,24,0.18)] bg-(--paper-soft) px-[18px] py-[9px] pt-[11px] text-[11px] tracking-[0.14em] text-(--ink) uppercase ${fontType}`}
+        >
+          <span className="font-bold text-(--red)">
+            {product.type === 'box' ? `BOX-${evidenceNumber}` : 'ITEM'}
+          </span>
+          ficha rápida
+        </div>
+        <span
+          className="absolute top-[22px] right-20 z-30 size-[14px] rounded-full shadow-[0_3px_5px_rgba(33,28,24,0.45),inset_0_-2px_3px_rgba(0,0,0,0.3)] [background:radial-gradient(circle_at_35%_30%,rgba(255,255,255,0.7)_0%,var(--red)_55%,rgba(0,0,0,0.4)_100%)]"
+          aria-hidden="true"
+        />
         <button
           type="button"
           onClick={onClose}
-          className="fixed top-10 right-8 z-30 flex size-10 items-center justify-center border border-[#211c18]/18 bg-[#fffaf2]/82 text-[#211c18] backdrop-blur-sm transition hover:border-[#b5332a]/55 hover:bg-[#b5332a]/10 focus-visible:ring-2 focus-visible:ring-[#9a662a] focus-visible:outline-none sm:absolute sm:top-4 sm:right-4"
+          className="fixed top-10 right-8 z-30 flex size-10 items-center justify-center rounded-[10px] border border-[rgba(33,28,24,0.18)] bg-(--card)/88 text-(--ink) backdrop-blur-[2px] transition hover:border-(--red)/55 hover:bg-(--red)/10 focus-visible:ring-2 focus-visible:ring-(--amber) focus-visible:outline-none sm:absolute sm:top-4 sm:right-4"
           aria-label="Fechar"
         >
           <IconX className="size-5" />
@@ -224,7 +245,7 @@ export function ProductQuickView({
 
         <motion.div
           layoutId={`box-image-${product.id}`}
-          className="relative min-h-[260px] overflow-hidden bg-[#efe4d4] sm:min-h-[360px] lg:min-h-[620px]"
+          className="relative min-h-[260px] overflow-hidden bg-(--paper-soft) sm:min-h-[360px] lg:min-h-[620px]"
           transition={
             reduceMotion
               ? { duration: 0.01 }
@@ -242,18 +263,22 @@ export function ProductQuickView({
               priority
             />
           ) : null}
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(244,241,236,0.02)_0%,rgba(33,28,24,0.34)_100%)]" />
-          <div className="absolute bottom-5 left-5 z-20 border border-[#211c18]/20 bg-[#fffaf2]/86 px-4 py-3 backdrop-blur-sm">
-            <p className="text-[0.68rem] font-semibold tracking-[0.24em] text-(--amber) uppercase">
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(244,241,236,0.02)_0%,rgba(33,28,24,0.22)_100%)]" />
+          <div className="absolute bottom-5 left-5 z-20 rounded-[10px] border border-[rgba(33,28,24,0.2)] bg-(--paper-soft)/90 px-4 py-3 backdrop-blur-[2px]">
+            <p
+              className={`text-[0.68rem] tracking-[0.18em] text-(--amber) uppercase ${fontType}`}
+            >
               {product.type === 'box' ? 'Arquivo' : 'Item'}
             </p>
-            <p className="font-heading text-4xl leading-none font-semibold text-[#211c18]">
+            <p
+              className={`text-4xl leading-none font-semibold text-(--ink) ${fontHeading}`}
+            >
               {evidenceNumber}
             </p>
           </div>
         </motion.div>
 
-        <div className="relative z-20 flex flex-col p-5 pb-32 sm:p-7 sm:pb-32 lg:min-h-0 lg:overflow-y-auto lg:p-9">
+        <div className="relative z-20 flex flex-col bg-(--card) p-5 pb-32 sm:p-7 sm:pb-32 lg:min-h-0 lg:overflow-y-auto lg:p-9">
           <div className="pr-14 sm:pr-16">
             <ProductKicker product={product} showAvailability={false} />
           </div>
@@ -261,12 +286,12 @@ export function ProductQuickView({
           <motion.h2
             id={titleId}
             layoutId={`box-title-${product.id}`}
-            className="mt-6 font-heading text-3xl/tight font-semibold tracking-wide text-[#211c18] uppercase sm:text-4xl"
+            className={`mt-6 text-3xl/tight font-semibold tracking-[-0.015em] text-(--ink) sm:text-4xl ${fontHeading}`}
           >
             {product.name}
           </motion.h2>
 
-          <div className="mt-5 grid gap-3 border-y border-[#211c18]/10 py-5 text-sm text-(--ink-soft) sm:grid-cols-2">
+          <div className="mt-5 grid gap-3 border-y border-[rgba(33,28,24,0.1)] py-5 text-sm text-(--ink-soft) sm:grid-cols-2">
             {product.editionMonth ? (
               <DetailDatum
                 icon={<IconCalendarEvent className="size-4" />}
@@ -301,7 +326,7 @@ export function ProductQuickView({
             </div>
           ) : null}
 
-          <div className="mt-8 hidden flex-col gap-4 border-t border-[#211c18]/10 pt-6 lg:flex xl:flex-row xl:items-end xl:justify-between">
+          <div className="mt-8 hidden flex-col gap-4 border-t border-[rgba(33,28,24,0.1)] pt-6 lg:flex xl:flex-row xl:items-end xl:justify-between">
             <PriceBlock product={product} />
             <div className="flex w-full gap-3 xl:w-auto xl:min-w-88">
               <TooltipProvider delayDuration={150}>
@@ -311,7 +336,7 @@ export function ProductQuickView({
                       asChild
                       size="icon"
                       variant="outline"
-                      className="rounded-none border-[#211c18]/22 bg-[#211c18]/6 text-[#211c18] hover:bg-[#211c18]/10 hover:text-[#211c18]"
+                      className="rounded-[10px] border-[rgba(33,28,24,0.22)] bg-[rgba(33,28,24,0.06)] text-(--ink) hover:bg-[rgba(33,28,24,0.1)] hover:text-(--ink)"
                     >
                       <Link
                         href={`/loja/${product.slug}`}
@@ -330,7 +355,7 @@ export function ProductQuickView({
                 type="button"
                 disabled={!product.inStock || isAdding}
                 onClick={onAddToCart}
-                className="flex-1 rounded-none bg-[#b5332a] px-5 text-white hover:bg-[#982820] disabled:opacity-50"
+                className={`flex-1 rounded-[10px] bg-[#b5332a] px-5 text-white hover:bg-[#982820] disabled:opacity-50 ${fontMono}`}
               >
                 <IconShoppingBag data-icon="inline-start" />
                 {isAdding
@@ -343,7 +368,7 @@ export function ProductQuickView({
           </div>
         </div>
 
-        <div className="fixed inset-x-3 bottom-3 z-40 border border-[#211c18]/16 bg-[#fffaf2]/94 p-3 shadow-[0_18px_48px_rgba(63,46,34,0.22)] backdrop-blur-md lg:hidden">
+        <div className="fixed inset-x-3 bottom-3 z-40 rounded-[14px_14px_16px_16px] border border-[rgba(33,28,24,0.16)] bg-(--card)/94 p-3 shadow-[0_18px_48px_rgba(63,46,34,0.22)] backdrop-blur-md lg:hidden">
           <div className="flex items-end justify-between gap-3">
             <PriceBlock product={product} compact />
             <div className="flex shrink-0 gap-2">
@@ -354,7 +379,7 @@ export function ProductQuickView({
                       asChild
                       size="icon"
                       variant="outline"
-                      className="rounded-none border-[#211c18]/22 bg-[#211c18]/6 text-[#211c18] hover:bg-[#211c18]/10 hover:text-[#211c18]"
+                      className="rounded-[10px] border-[rgba(33,28,24,0.22)] bg-[rgba(33,28,24,0.06)] text-(--ink) hover:bg-[rgba(33,28,24,0.1)] hover:text-(--ink)"
                     >
                       <Link
                         href={`/loja/${product.slug}`}
@@ -374,7 +399,7 @@ export function ProductQuickView({
                 size="icon"
                 disabled={!product.inStock || isAdding}
                 onClick={onAddToCart}
-                className="rounded-none bg-[#b5332a] text-white hover:bg-[#982820] disabled:opacity-50"
+                className="rounded-[10px] bg-[#b5332a] text-white hover:bg-[#982820] disabled:opacity-50"
                 aria-label={
                   isAdding
                     ? 'Adicionando ao carrinho'
