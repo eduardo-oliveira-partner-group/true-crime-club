@@ -51,6 +51,32 @@ export function DesignButton({
   )
 }
 
+type DesignFormButtonProps = {
+  children: ReactNode
+  className?: string
+} & ComponentPropsWithoutRef<'button'>
+
+/** Primary submit button for forms (renders as button). */
+export function DesignFormButton({
+  children,
+  className,
+  type = 'submit',
+  ...props
+}: DesignFormButtonProps) {
+  return (
+    <button
+      type={type}
+      className={cn(
+        `${ctaButtonBase} group w-full gap-2 border border-[rgba(33,28,24,0.15)] bg-(--red) text-[#fbf9f6] shadow-[0_9px_22px_-8px_rgba(33,28,24,0.13)] hover:-translate-y-0.5 hover:bg-(--red-deep) hover:shadow-[0_14px_30px_-10px_rgba(33,28,24,0.22)] disabled:pointer-events-none disabled:opacity-50 motion-reduce:transition-none motion-reduce:hover:translate-y-0`,
+        className,
+      )}
+      {...props}
+    >
+      {children}
+    </button>
+  )
+}
+
 /** Compact action button with lift shadow. */
 export function DesignActionButton({
   children,

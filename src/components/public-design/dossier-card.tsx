@@ -28,10 +28,10 @@ export function DossierCard({
   return (
     <div
       className={cn(
-        'relative overflow-hidden',
+        'relative',
         dossierCardSurface,
         cardShadowBase,
-        "before:absolute before:inset-0 before:bg-[repeating-linear-gradient(var(--paper-soft)_0,var(--paper-soft)_31px,rgba(33,28,24,0.05)_31px,rgba(33,28,24,0.05)_32px)] before:opacity-40 before:content-['']",
+        "before:absolute before:inset-0 before:rounded-[inherit] before:bg-[repeating-linear-gradient(var(--paper-soft)_0,var(--paper-soft)_31px,rgba(33,28,24,0.05)_31px,rgba(33,28,24,0.05)_32px)] before:opacity-40 before:content-['']",
         className,
       )}
     >
