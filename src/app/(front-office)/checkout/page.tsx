@@ -76,8 +76,47 @@ export default async function CheckoutPage({
     type: method.type,
   }))
 
+  let discountAmount = 0
+  let subtotalAmount = totals.subtotal
+
+  if (isSubscriptionFlow && plan) {
+    if (plan.slug === 'anual') {
+      const monthlyPlan = getPlanBySlug('mensal')
+      const monthlyPrice = monthlyPlan ? monthlyPlan.price : 14990
+      const commitment = plan.commitmentMonths || 12
+      subtotalAmount = monthlyPrice * commitment
+      discountAmount = subtotalAmount - plan.price
+    } else {
+      subtotalAmount = plan.price
+      discountAmount = 0
+    }
+  } else {
+    discountAmount = totals.discount
+  }
+
   const total =
     (isSubscriptionFlow && plan ? plan.price : totals.total) + shipping.price
+
+  let installmentsCount = 1
+  let installmentValue = total
+
+  if (isSubscriptionFlow && plan) {
+    if (plan.slug === 'anual') {
+      installmentsCount = 12
+      installmentValue = plan.pricePerMonth ?? plan.price
+    } else {
+      installmentsCount = 1
+      installmentValue = plan.price
+    }
+  } else {
+    if (total > 10000) {
+      installmentsCount = 3
+      installmentValue = Math.round(total / 3)
+    } else {
+      installmentsCount = 1
+      installmentValue = total
+    }
+  }
 
   return (
     <DesignPageShell className="overflow-hidden">
@@ -167,159 +206,45 @@ export default async function CheckoutPage({
             </Button>
           </div>
         ) : (
-          <div className="mt-10 grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-10">
-            <div className="order-2 lg:order-1">
-              <CheckoutStepper
-                customer={
-                  customer
-                    ? { name: customer.name, email: customer.email }
-                    : null
-                }
-                addresses={addresses.map((a) => ({
-                  id: a.id,
-                  label: a.label,
-                  street: a.street,
-                  number: a.number,
-                  city: a.city,
-                  state: a.state,
-                  zipCode: a.zipCode,
-                }))}
-                paymentOptions={paymentOptions}
-                shippingOptions={shippingOptions}
-                isSubscriptionFlow={isSubscriptionFlow}
-                planName={plan?.name}
-                onSavePreferences={savePreferences}
-                onCreateOrder={submitOrder}
-              />
-            </div>
-
-            <aside className="order-1 lg:order-2">
-              <div className="lg:sticky lg:top-24">
-                <OrderSummary
-                  isSubscriptionFlow={isSubscriptionFlow}
-                  planName={plan?.name}
-                  planPrice={plan?.price}
-                  items={cart.items.map((item: CartItem) => ({
-                    id: item.id,
-                    label: `${item.productName} × ${item.quantity}`,
-                    value: formatCurrency(item.unitPrice * item.quantity),
-                  }))}
-                  subtotal={formatCurrency(
-                    isSubscriptionFlow && plan ? plan.price : totals.subtotal,
-                  )}
-                  shipping={formatCurrency(shipping.price)}
-                  total={formatCurrency(total)}
-                />
-              </div>
-            </aside>
+          <div className="mt-10">
+            <CheckoutStepper
+              customer={
+                customer ? { name: customer.name, email: customer.email } : null
+              }
+              addresses={addresses.map((a) => ({
+                id: a.id,
+                label: a.label,
+                street: a.street,
+                number: a.number,
+                city: a.city,
+                state: a.state,
+                zipCode: a.zipCode,
+              }))}
+              paymentOptions={paymentOptions}
+              shippingOptions={shippingOptions}
+              isSubscriptionFlow={isSubscriptionFlow}
+              planName={plan?.name}
+              planPrice={
+                isSubscriptionFlow && plan?.slug === 'anual'
+                  ? plan.pricePerMonth
+                  : plan?.price
+              }
+              cartItems={cart.items.map((item: CartItem) => ({
+                id: item.id,
+                label: `${item.productName} × ${item.quantity}`,
+                value: formatCurrency(item.unitPrice * item.quantity),
+              }))}
+              subtotalAmount={subtotalAmount}
+              discountAmount={discountAmount}
+              shippingPrice={shipping.price}
+              totalAmount={total}
+              onSavePreferences={savePreferences}
+              onCreateOrder={submitOrder}
+            />
           </div>
         )}
       </div>
     </DesignPageShell>
-  )
-}
-
-interface OrderSummaryItem {
-  id: string
-  label: string
-  value: string
-}
-
-function OrderSummary({
-  isSubscriptionFlow,
-  planName,
-  planPrice,
-  items,
-  subtotal,
-  shipping,
-  total,
-}: {
-  isSubscriptionFlow: boolean
-  planName?: string
-  planPrice?: number
-  items: OrderSummaryItem[]
-  subtotal: string
-  shipping: string
-  total: string
-}) {
-  const hasItems = (isSubscriptionFlow && planName != null) || items.length > 0
-
-  return (
-    <section className={cn(dossierCardSurface, warmShadowClass, 'p-5 sm:p-6')}>
-      <div className="flex items-center justify-between border-b border-[rgba(33,28,24,0.15)] pb-4">
-        <p
-          className={cn(
-            fontMono,
-            'text-xs font-semibold tracking-[0.16em] text-(--red) uppercase',
-          )}
-        >
-          Resumo do pedido
-        </p>
-        <p
-          className={cn(
-            fontMono,
-            'text-[0.6rem] tracking-[0.14em] text-(--ink-mute) uppercase',
-          )}
-        >
-          DOSS-07
-        </p>
-      </div>
-
-      {hasItems ? (
-        <ul className="mt-4 space-y-2.5 text-sm text-(--ink-soft)">
-          {isSubscriptionFlow && planName ? (
-            <li className="flex justify-between gap-4">
-              <span>{planName} (assinatura)</span>
-              <span className="font-medium text-(--ink)">
-                {formatCurrency(planPrice ?? 0)}
-              </span>
-            </li>
-          ) : null}
-          {items.map((item) => (
-            <li key={item.id} className="flex justify-between gap-4">
-              <span>{item.label}</span>
-              <span className="font-medium text-(--ink)">{item.value}</span>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="mt-4 text-sm text-(--ink-soft)">
-          Nenhum item selecionado.
-        </p>
-      )}
-
-      <div className="mt-5 space-y-2 border-t border-[rgba(33,28,24,0.15)] pt-4 text-sm text-(--ink-soft)">
-        <div className="flex justify-between gap-4">
-          <span>Subtotal</span>
-          <span className="text-(--ink)">{subtotal}</span>
-        </div>
-        <div className="flex justify-between gap-4">
-          <span>Frete</span>
-          <span className="text-(--ink)">{shipping}</span>
-        </div>
-      </div>
-
-      <div className="mt-4 flex items-end justify-between gap-4 border-t border-[#d7b56d]/30 pt-4">
-        <span
-          className={cn(
-            fontMono,
-            'text-xs font-semibold tracking-[0.14em] text-(--red) uppercase',
-          )}
-        >
-          Total
-        </span>
-        <span
-          className={cn(fontHeading, 'text-2xl font-semibold text-(--ink)')}
-        >
-          {total}
-        </span>
-      </div>
-
-      <p className="mt-4 text-[0.7rem]/5 text-(--ink-mute)">
-        Ambiente de validação — nenhum pagamento real será processado. O dossiê
-        do pedido é gerado ao finalizar.
-      </p>
-    </section>
   )
 }
 

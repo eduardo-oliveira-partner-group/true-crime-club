@@ -1,13 +1,6 @@
 'use client'
 
-import {
-  IconArrowRight,
-  IconCalendarEvent,
-  IconClipboardText,
-  IconFingerprint,
-  IconPackage,
-  IconSparkles,
-} from '@tabler/icons-react'
+import { IconArrowRight, IconSparkles } from '@tabler/icons-react'
 import {
   AnimatePresence,
   LayoutGroup,
@@ -17,11 +10,8 @@ import {
 import Image from 'next/image'
 import { useId, useLayoutEffect, useRef, useState } from 'react'
 
-import { DossierCard } from '@/src/components/public-design/dossier-card'
 import { SectionEyebrow } from '@/src/components/public-design/section-eyebrow'
 import {
-  AvailabilityBadge,
-  DetailDatum,
   PriceBlock,
   ProductQuickView,
 } from '@/src/components/ui/product-quick-view'
@@ -32,7 +22,6 @@ import {
 } from '@/src/components/ui/scroll-reveal'
 import {
   arrowIconClass,
-  cardShadowHover,
   fontHeading,
   fontMono,
   fontType,
@@ -40,7 +29,7 @@ import {
   transitionCardHover,
 } from '@/src/lib/design/classes'
 import type { Product } from '@/src/lib/domain/types'
-import { formatEditionMonth } from '@/src/lib/formatters'
+import { formatAvailability, formatEditionMonth } from '@/src/lib/formatters'
 import { getProductImage } from '@/src/lib/product-images'
 import { cn } from '@/src/lib/utils'
 
@@ -106,7 +95,7 @@ export function ShopCatalog({ boxProducts, extraProducts }: ShopCatalogProps) {
             <EmptyCatalog />
           ) : (
             <ScrollRevealGroup
-              className="grid items-stretch gap-5 lg:grid-cols-2 lg:gap-6"
+              className="grid items-stretch gap-[30px] sm:grid-cols-2 lg:grid-cols-3"
               staggerChildren={0.08}
             >
               {boxProducts.map((product) => (
@@ -135,7 +124,7 @@ export function ShopCatalog({ boxProducts, extraProducts }: ShopCatalogProps) {
             <EmptyCatalog />
           ) : (
             <ScrollRevealGroup
-              className="grid items-stretch gap-5 sm:grid-cols-2"
+              className="grid items-stretch gap-[30px] sm:grid-cols-2 lg:grid-cols-3"
               staggerChildren={0.08}
             >
               {extraProducts.map((product) => (
@@ -210,6 +199,17 @@ function ProductArchiveCard({
 }: ProductArchiveCardProps) {
   const productImage = getProductImage(product.images[0] ?? '')
   const evidenceNumber = String(product.cycleNumber ?? 0).padStart(2, '0')
+  const tabCode = variant === 'box' ? `BOX ${evidenceNumber}` : 'ITEM'
+  const tabLabel = variant === 'box' ? 'Arquivo avulso' : 'Peça extra'
+  const detailLabel = product.editionMonth
+    ? formatEditionMonth(product.editionMonth)
+    : (product.categories[0] ?? 'produto')
+  const backingRotation =
+    variant === 'box' ? 'rotate-[2.5deg]' : 'rotate-[-2.2deg]'
+  const tabRotation =
+    variant === 'box'
+      ? 'rotate-[2.5deg] origin-bottom-right right-4'
+      : 'rotate-[-2.5deg] origin-bottom-left left-4'
 
   return (
     <motion.button
@@ -217,22 +217,49 @@ function ProductArchiveCard({
       layoutId={`box-shell-${product.id}`}
       onClick={onOpen}
       className={cn(
-        'block size-full cursor-pointer appearance-none border-0 bg-transparent p-0 text-left text-inherit focus-visible:ring-2 focus-visible:ring-(--red) focus-visible:ring-offset-2 focus-visible:ring-offset-(--paper) focus-visible:outline-none',
+        'group relative block size-full cursor-pointer appearance-none border-0 bg-transparent p-0 pt-[25px] text-left text-inherit focus-visible:ring-2 focus-visible:ring-(--red) focus-visible:ring-offset-2 focus-visible:ring-offset-(--paper) focus-visible:outline-none',
         transitionCardHover,
-        'hover:-translate-y-1 motion-reduce:transition-none motion-reduce:hover:translate-y-0',
+        'motion-reduce:transition-none',
       )}
       aria-label={`Ver detalhes de ${product.name}`}
     >
-      <DossierCard
-        tabCode={variant === 'box' ? `BOX-${evidenceNumber}` : 'ITEM'}
-        tabLabel={variant === 'box' ? 'arquivo avulso' : 'peça extra'}
-        showPin
-        pinColor={variant === 'box' ? 'var(--red)' : 'var(--teal)'}
-        className={cn('group h-full overflow-hidden p-0', cardShadowHover)}
+      <div
+        aria-hidden="true"
+        className={cn(
+          'absolute inset-x-0 top-[25px] bottom-0 z-0 translate-y-[-3px] rounded-[10px] bg-(--yellow) shadow-[0_14px_26px_-14px_rgba(33,28,24,0.4)]',
+          backingRotation,
+        )}
       >
+        <span className="sr-only">folha de arquivo</span>
+      </div>
+
+      <div
+        className={cn(
+          `absolute top-0 z-0 inline-flex items-center gap-2 rounded-t-[8px] bg-(--yellow) px-[15px] pt-1.5 pb-6 text-[9.5px] tracking-wider text-(--ink) uppercase shadow-[0_6px_14px_-8px_rgba(33,28,24,0.4)] ${fontType}`,
+          tabRotation,
+        )}
+      >
+        <span className="font-bold text-(--red)">{tabCode}</span>
+        {tabLabel}
+      </div>
+
+      <div
+        className={cn(
+          'relative z-10 flex h-full flex-col overflow-hidden rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-(--card) text-(--ink) shadow-[0_9px_22px_-8px_rgba(33,28,24,0.35),inset_0_0_0_1px_rgba(255,255,255,0.5)]',
+          transitionCardHover,
+          'group-hover:translate-y-[-5px] group-hover:shadow-[0_20px_36px_-14px_rgba(33,28,24,0.45),inset_0_0_0_1px_rgba(255,255,255,0.6)] motion-reduce:transition-none motion-reduce:group-hover:translate-y-0',
+        )}
+      >
+        <div
+          aria-hidden="true"
+          className={`absolute top-[10px] right-[10px] z-20 rotate-[-9deg] border-2 border-[rgba(94,94,162,0.85)] bg-[rgba(251,249,246,0.65)] px-[9px] py-[5px] pb-1.5 text-[9.5px] font-bold tracking-[0.14em] text-[rgba(94,94,162,0.95)] uppercase shadow-[inset_0_0_0_1px_rgba(94,94,162,0.4)] backdrop-blur-[2px] ${fontType}`}
+        >
+          {formatAvailability(product.availability)}
+        </div>
+
         <motion.div
           layoutId={`box-image-${product.id}`}
-          className="relative aspect-4/3 h-auto w-full shrink-0 self-start overflow-hidden rounded-t-[14px] border-b border-[rgba(33,28,24,0.15)] bg-(--card)"
+          className="relative aspect-square w-full shrink-0 overflow-hidden border-b border-[rgba(33,28,24,0.15)] bg-(--card)"
         >
           {productImage ? (
             <Image
@@ -240,82 +267,41 @@ function ProductArchiveCard({
               alt={product.name}
               fill
               placeholder="blur"
-              sizes="(max-width: 768px) 100vw, 560px"
+              sizes="(max-width: 540px) 100vw, (max-width: 1024px) 50vw, 25vw"
               className="size-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-[1.03] motion-reduce:transition-none"
             />
           ) : (
             <EvidencePlaceholder product={product} />
           )}
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(244,236,220,0.045)_1px,transparent_1px),linear-gradient(rgba(244,236,220,0.045)_1px,transparent_1px)] bg-size-[34px_34px]" />
-
-          {variant === 'box' ? (
-            <div className="absolute top-4 left-4 rounded-[2px] border border-[rgba(33,28,24,0.15)] bg-(--paper)/88 px-3 py-2 backdrop-blur-[2px]">
-              <p
-                className={`text-[0.65rem] tracking-[0.16em] text-(--red) uppercase ${fontType}`}
-              >
-                Caixa
-              </p>
-              <p
-                className={`text-2xl leading-none font-semibold text-(--ink) ${fontHeading}`}
-              >
-                {evidenceNumber}
-              </p>
-            </div>
-          ) : (
-            <div className="absolute top-4 left-4 flex size-11 items-center justify-center rounded-[2px] border border-[rgba(33,28,24,0.15)] bg-(--paper)/88 text-(--teal) backdrop-blur-[2px]">
-              <IconClipboardText className="size-5" />
-            </div>
-          )}
-
-          <AvailabilityBadge
-            product={product}
-            className="absolute right-4 bottom-4"
-          />
         </motion.div>
 
-        <div className="relative z-20 flex w-full flex-1 flex-col p-5 sm:p-6">
-          <div className="grid w-full gap-3 border-b border-[rgba(33,28,24,0.15)] pb-4 text-sm text-(--ink-soft) sm:grid-cols-2">
-            {product.editionMonth ? (
-              <DetailDatum
-                icon={<IconCalendarEvent className="size-4" />}
-                label="Edição"
-                value={formatEditionMonth(product.editionMonth)}
-              />
-            ) : (
-              <DetailDatum
-                icon={<IconFingerprint className="size-4" />}
-                label="Categoria"
-                value={product.categories[0] ?? 'produto'}
-              />
-            )}
-            <DetailDatum
-              icon={<IconPackage className="size-4" />}
-              label="Tipo"
-              value={variant === 'box' ? 'Box avulsa' : 'Produto extra'}
-            />
+        <div className="relative z-20 flex w-full flex-1 flex-col px-4 pt-4 pb-[18px]">
+          <div
+            className={`mb-[5px] text-[10.5px] tracking-[0.06em] text-(--ink-mute) uppercase ${fontType}`}
+          >
+            {detailLabel}
           </div>
-
           <motion.h3
             layoutId={`box-title-${product.id}`}
-            className={`mt-5 line-clamp-2 min-h-[2lh] overflow-hidden text-2xl/tight font-semibold text-(--ink) ${fontHeading}`}
+            className={`m-0 mb-3 line-clamp-2 min-h-[2.24em] overflow-hidden text-[16.5px] leading-[1.12] font-semibold text-(--ink) ${fontHeading}`}
           >
             {product.name}
           </motion.h3>
-          <p className="mt-3 line-clamp-2 min-h-[2lh] overflow-hidden text-sm/6 text-(--ink-soft)">
+          <p className="line-clamp-2 min-h-[3em] overflow-hidden text-[13px] leading-normal text-(--ink-soft)">
             {product.shortDescription}
           </p>
 
-          <div className="mt-auto flex w-full items-end justify-between gap-4 border-t border-[rgba(33,28,24,0.15)] pt-5">
+          <div className="mt-auto flex w-full items-center justify-between gap-[10px] pt-5">
             <PriceBlock product={product} compact />
             <div
-              className={`inline-flex h-10 items-center justify-center gap-2 rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-(--red) px-4 py-2 text-[12px] font-bold tracking-[0.04em] text-[#fbf9f6] uppercase ${fontMono}`}
+              className={`inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg bg-(--ink) px-[13px] py-[9px] text-[11px] leading-none font-bold tracking-[0.04em] text-[#fbf9f6] uppercase ${fontMono} group-hover:bg-(--red)`}
             >
-              Ver detalhes
+              Ver
               <IconArrowRight className={cn('size-4', arrowIconClass)} />
             </div>
           </div>
         </div>
-      </DossierCard>
+      </div>
     </motion.button>
   )
 }
