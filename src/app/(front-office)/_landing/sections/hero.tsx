@@ -82,7 +82,7 @@ export function Hero() {
             </a>
           </div>
           <div
-            className={`mt-[30px] flex items-center gap-[18px] text-[12.5px] tracking-[0.02em] text-[#c9bfb0] ${fontType} ${heroRevealBase}`}
+            className={`mt-[30px] flex items-center gap-[18px] text-[12.5px] leading-none tracking-[0.02em] text-[#c9bfb0] ${fontType} ${heroRevealBase}`}
             style={{ animationDelay: '0.6s' }}
           >
             <div className="flex" aria-hidden="true">

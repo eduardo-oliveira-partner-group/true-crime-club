@@ -75,39 +75,47 @@ export function PlanCards() {
             <span>MAIS VANTAJOSO</span>
           </div>
           <div className="relative z-1 rounded-[14px_14px_16px_16px] bg-(--purple) px-[30px] pt-[34px] pb-[30px] text-[#f4efe6] shadow-[0_20px_40px_-14px_rgba(74,69,128,0.55)]">
-            <div
-              className={`mb-[18px] text-[12.5px] tracking-[0.08em] text-[#f4cf5a] uppercase ${fontType}`}
-            >
-              Plano Anual
+            <div className="mb-[18px] flex items-center justify-between">
+              <span
+                className={`text-[12.5px] tracking-[0.08em] text-[#f4cf5a] uppercase ${fontType}`}
+              >
+                Plano Anual
+              </span>
+              <span
+                className={`inline-flex items-center rounded-full bg-[#10b981] px-[14px] py-2 text-[12.5px] leading-none font-bold tracking-[0.04em] text-white uppercase ${fontType}`}
+              >
+                20% OFF
+              </span>
             </div>
             <div className="mb-1.5 flex items-end gap-1.5">
               <strong
                 className={`text-[48px] leading-[0.9] font-semibold ${fontHeading}`}
               >
-                R$ 129,90
+                R$ 119,90
               </strong>
               <span className={`pb-1.5 text-[13px] text-[#d8d6ea] ${fontType}`}>
                 /mês
               </span>
             </div>
-            <p className="m-0 mb-[22px] text-[14px] text-[#d8d6ea]">
-              Cobrado anualmente · economize R$ 240 no ano.
+            <p className="m-0 mb-[22px] min-h-[40px] text-[14px] text-[#d8d6ea]">
+              Melhor custo-benefício com cobrança anual no cartão e permanência
+              de 12 meses.
             </p>
             <div className="mb-[22px] h-[1.5px] [background:repeating-linear-gradient(90deg,rgba(255,255,255,0.28)_0,rgba(255,255,255,0.28)_5px,transparent_5px,transparent_9px)]" />
             <FeatureList
               color="#F4CF5A"
               items={[
                 'Tudo do plano mensal',
-                '2 meses grátis no ano',
-                'Brinde de boas-vindas exclusivo',
-                'Acesso antecipado às edições especiais',
+                'Economia equivalente a 2 meses',
+                'Prioridade em edições limitadas',
+                'Acesso antecipado a pistas extras',
               ]}
             />
             <Link
               href="/assinatura"
               className={`group flex w-full items-center justify-center rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-(--yellow) px-4 py-[15px] text-[14px] leading-none font-bold tracking-[0.04em] text-(--ink) uppercase no-underline ${transitionBgColor} hover:bg-[#fbf4e3] hover:text-(--purple) ${fontMono}`}
             >
-              Assinar anual{' '}
+              Escolher plano{' '}
               <IconArrowRight
                 size={16}
                 stroke={2}
