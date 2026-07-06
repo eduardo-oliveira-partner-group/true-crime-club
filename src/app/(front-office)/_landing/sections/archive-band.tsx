@@ -4,7 +4,10 @@ import { IconArrowRight } from '@tabler/icons-react'
 import Image from 'next/image'
 import Link from 'next/link'
 
-import { archiveBoxes } from '@/src/app/(front-office)/_landing/content'
+import {
+  getLandingArchiveItems,
+  type LandingArchiveItem,
+} from '@/src/app/(front-office)/_landing/landing-products'
 import { useReveal } from '@/src/app/(front-office)/_landing/reveal'
 import { SectionEyebrow } from '@/src/components/public-design/section-eyebrow'
 import {
@@ -14,8 +17,11 @@ import {
   transitionBgColor,
   transitionCardHover,
 } from '@/src/lib/design/classes'
+import { getProductImage } from '@/src/lib/product-images'
 
 export function ArchiveBand() {
+  const archiveItems = getLandingArchiveItems()
+
   return (
     <section
       id="arquivos"
@@ -33,8 +39,8 @@ export function ArchiveBand() {
           </h2>
         </div>
         <div className="mt-3 grid grid-cols-4 gap-[30px] max-[860px]:grid-cols-2 max-[540px]:grid-cols-1">
-          {archiveBoxes.map((box, index) => (
-            <ArchiveCard key={box.box} box={box} index={index} />
+          {archiveItems.map((box, index) => (
+            <ArchiveCard key={box.href} box={box} index={index} />
           ))}
         </div>
         <div className="mt-[46px] text-center">
@@ -60,10 +66,12 @@ function ArchiveCard({
   box,
   index,
 }: {
-  box: (typeof archiveBoxes)[number]
+  box: LandingArchiveItem
   index: number
 }) {
   const { ref, revealClassName, style } = useReveal(index * 80)
+  const image = getProductImage(box.imagePath)
+
   return (
     <article
       ref={ref}
@@ -87,14 +95,16 @@ function ArchiveCard({
           ARQUIVADO
         </div>
         <div className="relative aspect-square overflow-hidden border-b border-[rgba(33,28,24,0.15)]">
-          <Image
-            src={box.image}
-            alt={box.alt}
-            fill
-            sizes="(max-width: 540px) 100vw, (max-width: 860px) 50vw, 25vw"
-            style={{ objectPosition: box.objectPosition }}
-            className="block object-cover"
-          />
+          {image ? (
+            <Image
+              src={image}
+              alt={box.alt}
+              fill
+              sizes="(max-width: 540px) 100vw, (max-width: 860px) 50vw, 25vw"
+              style={{ objectPosition: box.objectPosition }}
+              className="block object-cover"
+            />
+          ) : null}
         </div>
         <div className="flex flex-1 flex-col px-4 pt-4 pb-[18px]">
           <div

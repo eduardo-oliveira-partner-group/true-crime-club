@@ -5,12 +5,7 @@ import {
   IconUsers,
   type TablerIcon,
 } from '@tabler/icons-react'
-import type { StaticImageData } from 'next/image'
 
-import archiveBox01 from '@/src/assets/images/design-sugerido/box-01.png'
-import archiveBox02 from '@/src/assets/images/design-sugerido/box-02.png'
-import archiveBox03 from '@/src/assets/images/design-sugerido/box-03.png'
-import archiveBox04 from '@/src/assets/images/design-sugerido/box-04.png'
 import logoBetoRibeiro from '@/src/assets/images/design-sugerido/logo-beto-ribeiro.png'
 import logoCorreioBraziliense from '@/src/assets/images/design-sugerido/logo-correio-braziliense.png'
 import logoIstoE from '@/src/assets/images/design-sugerido/logo-istoe.png'
@@ -128,53 +123,6 @@ export const testimonials = [
     user: '@thiagoreis',
     likes: '1.510',
     color: '#5E5EA2',
-  },
-]
-
-export const archiveBoxes: Array<{
-  box: string
-  title: string
-  price: string
-  href: string
-  image: StaticImageData
-  alt: string
-  objectPosition: string
-}> = [
-  {
-    box: 'BOX 01',
-    title: 'Primeira Página',
-    price: 'R$ 149,90',
-    href: '/loja/tcc-caixa-01-avulsa',
-    image: archiveBox01,
-    alt: 'Box 01 — Primeira Página',
-    objectPosition: '42% 38%',
-  },
-  {
-    box: 'BOX 02',
-    title: 'Tudo ao Meu Alcance',
-    price: 'R$ 149,90',
-    href: '/loja/tcc-caixa-02-avulsa',
-    image: archiveBox02,
-    alt: 'Box 02 — Tudo ao Meu Alcance',
-    objectPosition: 'center',
-  },
-  {
-    box: 'BOX 03',
-    title: 'Pena',
-    price: 'R$ 149,90',
-    href: '/loja/tcc-caixa-03-avulsa',
-    image: archiveBox03,
-    alt: 'Box 03 — Pena',
-    objectPosition: 'center',
-  },
-  {
-    box: 'BOX 04',
-    title: 'Estão de Olho em Você',
-    price: 'R$ 149,90',
-    href: '/loja/tcc-caixa-04-avulsa',
-    image: archiveBox04,
-    alt: 'Box 04 — Estão de Olho em Você',
-    objectPosition: 'center',
   },
 ]
 
