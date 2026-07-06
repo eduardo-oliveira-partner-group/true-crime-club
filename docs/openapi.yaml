@@ -29,6 +29,8 @@ tags:
     description: Casos, Pistas, Progresso e Arquivos Liberados
   - name: Conteúdo Dinâmico & SEO
     description: Textos de Páginas, Banners Editáveis e Tags de SEO
+  - name: CMS Delivery
+    description: Entrega de páginas e estruturas públicas gerenciadas pelo CMS.
 
 paths:
   # --- AUTENTICAÇÃO ---
@@ -639,6 +641,7 @@ paths:
   # --- CONTEUDO DINAMICO E SEO ---
   /conteudo-dinamico:
     get:
+      deprecated: true
       tags:
         - Conteúdo Dinâmico & SEO
       summary: Listar blocos de conteúdo dinâmico
@@ -662,6 +665,7 @@ paths:
 
   /conteudo-dinamico/{chave}:
     get:
+      deprecated: true
       tags:
         - Conteúdo Dinâmico & SEO
       summary: Obter bloco específico por chave
@@ -672,6 +676,7 @@ paths:
           schema:
             type: string
             example: home.hero.title
+          description: Chave única do bloco
       responses:
         '200':
           description: Bloco retornado.
@@ -684,6 +689,7 @@ paths:
 
   /seo:
     get:
+      deprecated: true
       tags:
         - Conteúdo Dinâmico & SEO
       summary: Obter entradas de SEO
@@ -702,6 +708,60 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EntradaSeo'
+
+  # --- CMS DELIVERY ---
+  /paginas:
+    get:
+      tags:
+        - CMS Delivery
+      summary: Obter páginas publicadas
+      description: Retorna uma única página publicada se o parâmetro rota for especificado, ou uma lista de páginas publicadas.
+      parameters:
+        - name: rota
+          in: query
+          required: false
+          schema:
+            type: string
+            example: /sobre-o-clube
+          description: Rota da página para obter a árvore completa de seções.
+      responses:
+        '200':
+          description: Página ou lista de páginas retornadas com sucesso.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/PaginaCms'
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/PaginaCms'
+        '404':
+          description: Página não encontrada.
+
+  /menus/{chave}:
+    get:
+      tags:
+        - CMS Delivery
+      summary: Obter navegação pública por chave
+      description: Retorna a estrutura de navegação do menu solicitado (ex. header-principal, footer-principal).
+      parameters:
+        - name: chave
+          in: path
+          required: true
+          schema:
+            type: string
+            example: header-principal
+          description: Chave única do menu.
+      responses:
+        '200':
+          description: Estrutura do menu.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MenuCms'
+        '404':
+          description: Menu não encontrado.
+
 
 components:
   schemas:
@@ -1242,3 +1302,137 @@ components:
         mensagem:
           type: string
           example: Credenciais inválidas.
+
+    PaginaCms:
+      type: object
+      required:
+        - id
+        - rota
+        - slug
+        - titulo
+        - status
+        - locale
+        - seo
+        - sections
+        - updatedAt
+      properties:
+        id:
+          type: string
+          example: page-001
+        rota:
+          type: string
+          example: /sobre-o-clube
+        slug:
+          type: string
+          example: sobre-o-clube
+        titulo:
+          type: string
+          example: Sobre o Clube
+        status:
+          type: string
+          enum: [publicada, rascunho]
+          example: publicada
+        locale:
+          type: string
+          example: pt-BR
+        seo:
+          $ref: '#/components/schemas/SeoPagina'
+        sections:
+          type: array
+          items:
+            $ref: '#/components/schemas/SecaoCms'
+        updatedAt:
+          type: string
+          example: '2026-07-06T16:21:32-03:00'
+
+    SeoPagina:
+      type: object
+      required:
+        - titulo
+        - descricao
+        - naoIndexar
+      properties:
+        titulo:
+          type: string
+          example: True Crime Club
+        descricao:
+          type: string
+          example: O primeiro clube de assinatura de true crime do Brasil.
+        urlCanonica:
+          type: string
+          example: https://truecrimeclub.com.br/sobre-o-clube
+        imagemCompartilhamento:
+          type: string
+          example: https://truecrimeclub.com.br/og-image.jpg
+        naoIndexar:
+          type: boolean
+          example: false
+
+    SecaoCms:
+      type: object
+      required:
+        - id
+        - tipo
+        - ordem
+      properties:
+        id:
+          type: string
+          example: section-001
+        tipo:
+          type: string
+          example: landing.hero
+        ordem:
+          type: integer
+          example: 1
+        props:
+          type: object
+          additionalProperties: true
+        dataBindings:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/DataBinding'
+
+    DataBinding:
+      type: object
+      required:
+        - target
+      properties:
+        target:
+          type: string
+          enum: [produtos, planos, casos, lista]
+          example: produtos
+        params:
+          type: object
+          additionalProperties: true
+
+    MenuCms:
+      type: object
+      required:
+        - chave
+        - itens
+      properties:
+        chave:
+          type: string
+          example: header-principal
+        itens:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItemMenuCms'
+
+    ItemMenuCms:
+      type: object
+      required:
+        - label
+        - href
+      properties:
+        label:
+          type: string
+          example: O Clube
+        href:
+          type: string
+          example: /#oque
+        itens:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItemMenuCms'
+

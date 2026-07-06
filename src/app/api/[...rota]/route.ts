@@ -1,7 +1,11 @@
 import { cookies } from 'next/headers'
 import { type NextRequest, NextResponse } from 'next/server'
 
-import { mockDynamicContent } from '@/src/lib/domain/mock-data'
+import {
+  mockCmsMenus,
+  mockCmsPages,
+  mockDynamicContent,
+} from '@/src/lib/domain/mock-data'
 import {
   cancelSubscription,
   createOrder,
@@ -732,6 +736,24 @@ async function handlePtBrApi(
       const entry = getSeoEntry(route)
       if (!entry) return error('Entrada de SEO não encontrada', 404)
       return json(toSeo(entry))
+    }
+
+    if (method === 'GET' && path === 'paginas') {
+      const route = searchParams.get('rota')
+      if (route) {
+        const page = mockCmsPages.find((p) => p.rota === route)
+        if (!page) return error('Página não encontrada', 404)
+        return json(page)
+      }
+      return json(mockCmsPages)
+    }
+
+    const menuMatch = path.match(/^menus\/([^/]+)$/)
+    if (method === 'GET' && menuMatch) {
+      const menuKey = decodeURIComponent(menuMatch[1])
+      const menu = mockCmsMenus[menuKey]
+      if (!menu) return error('Menu não encontrado', 404)
+      return json(menu)
     }
 
     return error('Rota pt-BR não encontrada na simulação da API', 404)

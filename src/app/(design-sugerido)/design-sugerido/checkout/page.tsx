@@ -150,6 +150,22 @@ export default async function CheckoutPage({
                 shippingOptions={shippingOptions}
                 isSubscriptionFlow={isSubscriptionFlow}
                 planName={plan?.name}
+                planPrice={
+                  isSubscriptionFlow && plan?.slug === 'anual'
+                    ? plan.pricePerMonth
+                    : plan?.price
+                }
+                cartItems={cart.items.map((item: CartItem) => ({
+                  id: item.id,
+                  label: `${item.productName} × ${item.quantity}`,
+                  value: formatCurrency(item.unitPrice * item.quantity),
+                }))}
+                subtotalAmount={
+                  isSubscriptionFlow && plan ? plan.price : totals.subtotal
+                }
+                discountAmount={totals.discount}
+                shippingPrice={shipping.price}
+                totalAmount={total}
                 onSavePreferences={savePreferences}
                 onCreateOrder={submitOrder}
               />

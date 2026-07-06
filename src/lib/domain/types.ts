@@ -226,6 +226,65 @@ export interface SeoEntry {
   noindex?: boolean
 }
 
+export interface DataBinding {
+  target: 'produtos' | 'planos' | 'casos' | 'lista'
+  params?: Record<string, unknown>
+}
+
+export type SecaoCmsTipo =
+  | 'landing.hero'
+  | 'landing.ribbon'
+  | 'landing.clubIntro'
+  | 'landing.featuredBy'
+  | 'landing.boxContents'
+  | 'landing.howItWorks'
+  | 'landing.testimonials'
+  | 'commerce.planCards'
+  | 'landing.standaloneEdition'
+  | 'commerce.productArchive'
+  | 'landing.finalCta'
+  | 'richText'
+  | 'faq'
+
+export interface SecaoCms {
+  id: string
+  tipo: SecaoCmsTipo
+  ordem: number
+  props?: Record<string, unknown>
+  dataBindings?: Record<string, DataBinding>
+}
+
+export interface SeoPagina {
+  titulo: string
+  descricao: string
+  urlCanonica?: string
+  imagemCompartilhamento?: string
+  naoIndexar?: boolean
+}
+
+export interface PaginaCms {
+  id: string
+  rota: string
+  slug: string
+  titulo: string
+  status: 'publicada' | 'rascunho'
+  locale: string
+  seo: SeoPagina
+  sections: SecaoCms[]
+  updatedAt: string
+}
+
+export interface ItemMenuCms {
+  label: string
+  href: string
+  itens?: ItemMenuCms[]
+}
+
+export interface MenuCms {
+  chave: string
+  itens: ItemMenuCms[]
+}
+
 export interface Case {
   id: string
   slug: string

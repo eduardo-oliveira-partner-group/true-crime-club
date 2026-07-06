@@ -12,7 +12,11 @@ import {
   transitionPolaroid,
 } from '@/src/lib/design/classes'
 
-export function Testimonials() {
+export function Testimonials({
+  items = testimonials,
+}: {
+  items?: typeof testimonials
+} = {}) {
   return (
     <section className={`${sectionFrame} pt-[84px] pb-6`}>
       <div className="mb-10 flex flex-wrap items-end justify-between gap-6">
@@ -31,7 +35,7 @@ export function Testimonials() {
         </div>
       </div>
       <div className="grid grid-cols-4 gap-[22px] max-[860px]:grid-cols-2 max-[540px]:flex max-[540px]:[scroll-snap-type:x_mandatory] max-[540px]:grid-cols-none max-[540px]:gap-[14px] max-[540px]:overflow-x-auto max-[540px]:mask-[linear-gradient(90deg,#000_80%,transparent_100%)] max-[540px]:pb-1.5 max-[540px]:[-webkit-overflow-scrolling:touch]">
-        {testimonials.map((testimonial, index) => (
+        {items.map((testimonial, index) => (
           <TestimonialCardItem
             key={testimonial.user}
             testimonial={testimonial}

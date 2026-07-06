@@ -1,9 +1,9 @@
 import type { MetadataRoute } from 'next'
 
-import { listProducts } from '@/src/lib/domain/repositories'
+import { listCmsPages, listProducts } from '@/src/lib/domain/repositories'
 import { siteConfig } from '@/src/lib/site'
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date()
 
   const staticRoutes: MetadataRoute.Sitemap = [
@@ -42,5 +42,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }),
   )
 
-  return [...staticRoutes, ...productRoutes]
+  const cmsPages = await listCmsPages()
+  const cmsRoutes: MetadataRoute.Sitemap = cmsPages
+    .filter((page) => page.rota !== '/' && page.status === 'publicada')
+    .map((page) => ({
+      url: `${siteConfig.url}${page.rota}`,
+      lastModified: new Date(page.updatedAt),
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    }))
+
+  return [...staticRoutes, ...productRoutes, ...cmsRoutes]
 }
