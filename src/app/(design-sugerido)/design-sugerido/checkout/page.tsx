@@ -34,7 +34,7 @@ export default async function CheckoutPage({
   searchParams,
 }: CheckoutPageProps) {
   const { plano } = await searchParams
-  const plan = plano ? getPlanBySlug(plano) : null
+  const plan = plano ? await getPlanBySlug(plano) : null
   const isSubscriptionFlow = Boolean(plan)
 
   const cart = getCartWithTotals()

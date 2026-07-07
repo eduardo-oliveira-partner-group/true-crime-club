@@ -1,6 +1,9 @@
+'use client'
+
 import { IconArrowRight } from '@tabler/icons-react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 
 import { getLandingStandaloneProduct } from '@/src/app/(front-office)/_landing/landing-products'
 import { SectionEyebrow } from '@/src/components/public-design/section-eyebrow'
@@ -12,11 +15,54 @@ import {
   sectionFrame,
   transitionLift,
 } from '@/src/lib/design/classes'
+import type { Product } from '@/src/lib/domain/types'
 import { formatCurrency } from '@/src/lib/formatters'
 import { getProductImage } from '@/src/lib/product-images'
 
 export function StandaloneEdition() {
-  const product = getLandingStandaloneProduct()
+  const [product, setProduct] = useState<Product | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    getLandingStandaloneProduct()
+      .then((data) => {
+        setProduct(data)
+        setLoading(false)
+      })
+      .catch((err) => {
+        console.error('Error fetching standalone product:', err)
+        setError('Não foi possível carregar a edição especial.')
+        setLoading(false)
+      })
+  }, [])
+
+  if (loading) {
+    return (
+      <section id="avulsas" className={`${sectionFrame} pt-[84px] pb-6`}>
+        <SectionEyebrow>05 — Edições especiais · avulsas</SectionEyebrow>
+        <h2
+          className={`m-0 mb-[14px] animate-pulse text-[clamp(28px,3.4vw,44px)] font-semibold ${fontHeading}`}
+        >
+          Buscando edição especial...
+        </h2>
+      </section>
+    )
+  }
+
+  if (error) {
+    return (
+      <section id="avulsas" className={`${sectionFrame} pt-[84px] pb-6`}>
+        <SectionEyebrow>05 — Edições especiais · avulsas</SectionEyebrow>
+        <h2
+          className={`m-0 mb-[14px] text-[clamp(24px,3vw,36px)] font-semibold text-(--red) ${fontHeading}`}
+        >
+          {error}
+        </h2>
+      </section>
+    )
+  }
+
   if (!product) return null
 
   const productImage = getProductImage(product.images[0] ?? '')

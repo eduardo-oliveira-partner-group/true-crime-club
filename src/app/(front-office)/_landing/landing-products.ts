@@ -42,16 +42,14 @@ export function toLandingArchiveItem(product: Product): LandingArchiveItem {
   }
 }
 
-export function getLandingArchiveItems(): LandingArchiveItem[] {
-  return listProducts({ category: 'arquivada' })
+export async function getLandingArchiveItems(): Promise<LandingArchiveItem[]> {
+  const products = await listProducts({ category: 'arquivada' })
+  return products
     .sort((a, b) => (a.cycleNumber ?? 0) - (b.cycleNumber ?? 0))
     .map(toLandingArchiveItem)
 }
 
-export function getLandingStandaloneProduct(): Product | null {
-  return (
-    listProducts({ category: 'edicao-especial' }).find(
-      (product) => product.type === 'box',
-    ) ?? null
-  )
+export async function getLandingStandaloneProduct(): Promise<Product | null> {
+  const products = await listProducts({ category: 'edicao-especial' })
+  return products.find((product) => product.type === 'box') ?? null
 }

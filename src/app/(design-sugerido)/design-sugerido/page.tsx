@@ -218,16 +218,18 @@ function DarkDividerMarquee() {
   )
 }
 
-export default function HomePage() {
+export default async function HomePage() {
   const heroTitle = getDynamicContent('home.hero.title')
   const heroBadge = getDynamicContent('home.hero.badge')
   const heroSubtitle = getDynamicContent('home.hero.subtitle')
   const heroCta = getDynamicContent('home.hero.cta')
   const finalCtaSubtitle = getDynamicContent('home.final_cta.subtitle')
   // const trustSupport = getDynamicContent('home.trust.support')
-  const featuredProducts = listProducts({ featured: true })
-  const boxProducts = listProducts().filter((product) => product.type === 'box')
-  const plans = listPlans()
+  const featuredProducts = await listProducts({ featured: true })
+  const boxProducts = (await listProducts()).filter(
+    (product) => product.type === 'box',
+  )
+  const plans = await listPlans()
   const activeCase = getActiveCase()
   const progress = activeCase ? getSubscriberProgress(activeCase.id) : null
   const featuredBox = featuredProducts.find((product) => product.type === 'box')

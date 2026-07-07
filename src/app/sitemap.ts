@@ -33,14 +33,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ]
 
-  const productRoutes: MetadataRoute.Sitemap = listProducts().map(
-    (product) => ({
-      url: `${siteConfig.url}/loja/${product.slug}`,
-      lastModified: now,
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    }),
-  )
+  const products = await listProducts()
+  const productRoutes: MetadataRoute.Sitemap = products.map((product) => ({
+    url: `${siteConfig.url}/loja/${product.slug}`,
+    lastModified: now,
+    changeFrequency: 'monthly',
+    priority: 0.7,
+  }))
 
   const cmsPages = await listCmsPages()
   const cmsRoutes: MetadataRoute.Sitemap = cmsPages

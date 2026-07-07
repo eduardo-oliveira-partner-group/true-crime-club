@@ -12,12 +12,13 @@ Gerado com o skill improve em 2026-06-24. Reconcile completo em 2026-06-26 @ `7f
 | 004 | Estratégia CMS para o Front Office | P1 | L | 003 | **DONE** — migrado para entrega de seções estruturadas via CMS Delivery |
 
 | 005 | Separar a landing page e promover seu design system no Front Office | P1 | L | - | **DONE** — commit `99b21da` no worktree `plan005-549b04b4`; typecheck/build exit 0; lint pré-existente (baseline @ `484bdfd` já falha) |
+| 006 | Integração da API Pública para Catálogo e Planos | P1 | M | - | **DONE** — verificado no worktree do subagent; typecheck/build exit 0 |
 
 Valores de status: TODO | IN PROGRESS | DONE | BLOCKED (com motivo em uma linha) | REJECTED (com justificativa em uma linha)
 
 ## Ordem recomendada agora
 
-O Plano 005 foi concluído. O Plano 004 foi executado sob a nova Estratégia CMS para o Front Office.
+Todos os planos de 001 a 006 foram concluídos.
 
 ## Notas de Dependência
 

@@ -452,20 +452,20 @@ function toSeo(entry: SeoEntry) {
   }
 }
 
-function findProduct(identifier: string) {
+async function findProduct(identifier: string) {
   const normalized = normalizeProductId(identifier)
   return (
-    getProductBySlug(identifier) ??
-    listProducts().find(
+    (await getProductBySlug(identifier)) ??
+    (await listProducts()).find(
       (product) => product.id === normalized || product.slug === identifier,
     ) ??
     null
   )
 }
 
-function findPlan(identifier: string) {
+async function findPlan(identifier: string) {
   return (
-    listPlans().find(
+    (await listPlans()).find(
       (plan) => plan.id === identifier || plan.slug === identifier,
     ) ?? null
   )
@@ -589,23 +589,23 @@ async function handlePtBrApi(
       const featuredParam = searchParams.get('destaque')
       const featured = featuredParam === 'true' ? true : undefined
       const category = searchParams.get('categoria') ?? undefined
-      return json(listProducts({ featured, category }).map(toProduct))
+      return json((await listProducts({ featured, category })).map(toProduct))
     }
 
     const productMatch = path.match(/^produtos\/([^/]+)$/)
     if (method === 'GET' && productMatch) {
-      const product = findProduct(decodeURIComponent(productMatch[1]))
+      const product = await findProduct(decodeURIComponent(productMatch[1]))
       if (!product) return error('Produto não encontrado', 404)
       return json(toProductDetails(product))
     }
 
     if (method === 'GET' && path === 'planos') {
-      return json(listPlans().map(toPlan))
+      return json((await listPlans()).map(toPlan))
     }
 
     const planMatch = path.match(/^planos\/([^/]+)$/)
     if (method === 'GET' && planMatch) {
-      const plan = findPlan(decodeURIComponent(planMatch[1]))
+      const plan = await findPlan(decodeURIComponent(planMatch[1]))
       if (!plan) return error('Plano não encontrado', 404)
       return json(toPlan(plan))
     }

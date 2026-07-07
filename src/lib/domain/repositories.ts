@@ -1,3 +1,5 @@
+import { apiClient } from '@/src/lib/api-client'
+
 import {
   initialCart,
   mockActiveCase,
@@ -26,6 +28,7 @@ import {
   isScenario,
   shouldReturnEmpty,
 } from './scenarios'
+import type { AvailabilityStatus, BillingInterval, ProductType } from './types'
 import type {
   Address,
   Cart,
@@ -65,11 +68,30 @@ function generateId(prefix: string): string {
   return `${prefix}-${Date.now().toString(36)}`
 }
 
-export function listProducts(options?: {
+export async function listProducts(options?: {
   featured?: boolean
   category?: string
-}): Product[] {
+}): Promise<Product[]> {
   throwIfError()
+
+  const isLocalMockMode =
+    !process.env.NEXT_PUBLIC_API_BASE_URL ||
+    process.env.NEXT_PUBLIC_LOCAL_MOCK === 'true' ||
+    process.env.NEXT_PUBLIC_MOCK_MODE === 'true' ||
+    process.env.LOCAL_MOCK_MODE === 'true'
+
+  if (!isLocalMockMode) {
+    try {
+      const apiProducts = await apiClient.products.list({
+        featured: options?.featured,
+        category: options?.category,
+      })
+      return apiProducts.map(mapApiProductToDomain)
+    } catch (e) {
+      console.warn('API listProducts error, falling back to local mocks:', e)
+    }
+  }
+
   let products = [...mockProducts]
 
   if (options?.featured) {
@@ -91,8 +113,35 @@ export function listProducts(options?: {
   return result ?? products
 }
 
-export function getProductBySlug(slug: string): Product | null {
+export async function getProductBySlug(slug: string): Promise<Product | null> {
   throwIfError()
+
+  const isLocalMockMode =
+    !process.env.NEXT_PUBLIC_API_BASE_URL ||
+    process.env.NEXT_PUBLIC_LOCAL_MOCK === 'true' ||
+    process.env.NEXT_PUBLIC_MOCK_MODE === 'true' ||
+    process.env.LOCAL_MOCK_MODE === 'true'
+
+  if (!isLocalMockMode) {
+    try {
+      const apiProduct = await apiClient.products.getBySlug(slug)
+      return mapApiProductToDomain(apiProduct)
+    } catch (error: any) {
+      const msg = error?.message || ''
+      if (
+        msg.includes('404') ||
+        msg.toLowerCase().includes('não encontrado') ||
+        msg.toLowerCase().includes('nao encontrado')
+      ) {
+        return null
+      }
+      console.warn(
+        'API getProductBySlug error, falling back to local mocks:',
+        error,
+      )
+    }
+  }
+
   const product = mockProducts.find((p) => p.slug === slug) ?? null
   if (!product && isScenario('empty')) {
     return null
@@ -103,15 +152,118 @@ export function getProductBySlug(slug: string): Product | null {
   return product
 }
 
-export function listPlans(): SubscriptionPlan[] {
+export async function listPlans(): Promise<SubscriptionPlan[]> {
   throwIfError()
+
+  const isLocalMockMode =
+    !process.env.NEXT_PUBLIC_API_BASE_URL ||
+    process.env.NEXT_PUBLIC_LOCAL_MOCK === 'true' ||
+    process.env.NEXT_PUBLIC_MOCK_MODE === 'true' ||
+    process.env.LOCAL_MOCK_MODE === 'true'
+
+  if (!isLocalMockMode) {
+    try {
+      const apiPlans = await apiClient.plans.list()
+      return apiPlans.map(mapApiPlanToDomain)
+    } catch (e) {
+      console.warn('API listPlans error, falling back to local mocks:', e)
+    }
+  }
+
   const result = shouldReturnEmpty(mockPlans)
   return result ?? mockPlans
 }
 
-export function getPlanBySlug(slug: string): SubscriptionPlan | null {
+export async function getPlanBySlug(
+  slug: string,
+): Promise<SubscriptionPlan | null> {
   throwIfError()
+
+  const isLocalMockMode =
+    !process.env.NEXT_PUBLIC_API_BASE_URL ||
+    process.env.NEXT_PUBLIC_LOCAL_MOCK === 'true' ||
+    process.env.NEXT_PUBLIC_MOCK_MODE === 'true' ||
+    process.env.LOCAL_MOCK_MODE === 'true'
+
+  if (!isLocalMockMode) {
+    try {
+      const apiPlan = await apiClient.plans.getBySlug(slug)
+      return mapApiPlanToDomain(apiPlan)
+    } catch (error: any) {
+      const msg = error?.message || ''
+      if (
+        msg.includes('404') ||
+        msg.toLowerCase().includes('não encontrado') ||
+        msg.toLowerCase().includes('nao encontrado')
+      ) {
+        return null
+      }
+      console.warn(
+        'API getPlanBySlug error, falling back to local mocks:',
+        error,
+      )
+    }
+  }
+
   return mockPlans.find((p) => p.slug === slug) ?? null
+}
+
+function mapApiProductToDomain(apiProduct: any): Product {
+  const availabilityMap: Record<string, AvailabilityStatus> = {
+    disponivel: 'available',
+    limitado: 'limited',
+    esgotado: 'out_of_stock',
+    em_breve: 'coming_soon',
+  }
+
+  const typeMap: Record<string, ProductType> = {
+    caixa: 'box',
+    produto: 'product',
+  }
+
+  return {
+    id: apiProduct.id,
+    slug: apiProduct.identificador,
+    name: apiProduct.nome,
+    description: apiProduct.descricao ?? '',
+    shortDescription: apiProduct.descricaoCurta ?? '',
+    type: typeMap[apiProduct.tipo] ?? 'product',
+    price: apiProduct.preco,
+    subscriberPrice: apiProduct.precoAssinante,
+    images: apiProduct.imagens ?? [],
+    categories: apiProduct.categorias ?? [],
+    inStock: apiProduct.emEstoque ?? false,
+    availability: availabilityMap[apiProduct.disponibilidade] ?? 'available',
+    featured:
+      apiProduct.categorias?.includes('destaque') ||
+      apiProduct.destaque ||
+      false,
+    includedItems: apiProduct.itensInclusos,
+    relatedProductIds: apiProduct.relacionados,
+    editionMonth: apiProduct.mesEdicao,
+    cycleNumber: apiProduct.ciclo,
+  }
+}
+
+function mapApiPlanToDomain(apiPlan: any): SubscriptionPlan {
+  const billingIntervalMap: Record<string, BillingInterval> = {
+    mensal: 'monthly',
+    anual: 'annual',
+    avulso: 'one_time',
+  }
+
+  return {
+    id: apiPlan.id,
+    slug: apiPlan.identificador,
+    name: apiPlan.nome,
+    description: apiPlan.descricao ?? '',
+    billingInterval: billingIntervalMap[apiPlan.intervaloCobranca] ?? 'monthly',
+    price: apiPlan.preco,
+    pricePerMonth: apiPlan.precoPorMes,
+    isRecommended: apiPlan.recomendado ?? false,
+    features: apiPlan.beneficios ?? [],
+    commitmentMonths: apiPlan.mesesCompromisso,
+  }
 }
 
 export function getCart(): Cart {

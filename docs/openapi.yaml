@@ -302,6 +302,10 @@ paths:
                 $ref: '#/components/schemas/ProdutoDetalhado'
         '404':
           description: Produto não encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
 
   /planos:
     get:
@@ -317,6 +321,32 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PlanoAssinatura'
+
+  /planos/{identificador}:
+    get:
+      tags:
+        - Catálogo
+      summary: Obter detalhes do plano pelo identificador
+      parameters:
+        - name: identificador
+          in: path
+          required: true
+          schema:
+            type: string
+            example: anual
+      responses:
+        '200':
+          description: Plano encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlanoAssinatura'
+        '404':
+          description: Plano não encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
 
   # --- CARRINHO ---
   /carrinho:

@@ -3,6 +3,7 @@
 import { IconArrowRight } from '@tabler/icons-react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 
 import {
   getLandingArchiveItems,
@@ -20,7 +21,82 @@ import {
 import { getProductImage } from '@/src/lib/product-images'
 
 export function ArchiveBand() {
-  const archiveItems = getLandingArchiveItems()
+  const [archiveItems, setArchiveItems] = useState<LandingArchiveItem[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    getLandingArchiveItems()
+      .then((data) => {
+        setArchiveItems(data)
+        setLoading(false)
+      })
+      .catch((err) => {
+        console.error('Error fetching archive items:', err)
+        setError('Não foi possível carregar os arquivos anteriores.')
+        setLoading(false)
+      })
+  }, [])
+
+  if (loading) {
+    return (
+      <section
+        id="arquivos"
+        className="relative mt-[88px] border-y border-[rgba(33,28,24,0.15)] text-(--paper) [background:var(--purple)]"
+      >
+        <div className="relative mx-auto max-w-[1180px] px-8 py-[68px] text-center">
+          <SectionEyebrow variant="yellow">
+            06 — Arquivos do clube
+          </SectionEyebrow>
+          <h2
+            className={`m-0 mt-4 animate-pulse text-[clamp(28px,3.4vw,44px)] font-semibold text-(--paper) ${fontHeading}`}
+          >
+            Carregando arquivos do clube...
+          </h2>
+        </div>
+      </section>
+    )
+  }
+
+  if (error) {
+    return (
+      <section
+        id="arquivos"
+        className="relative mt-[88px] border-y border-[rgba(33,28,24,0.15)] text-(--paper) [background:var(--purple)]"
+      >
+        <div className="relative mx-auto max-w-[1180px] px-8 py-[68px] text-center">
+          <SectionEyebrow variant="yellow">
+            06 — Arquivos do clube
+          </SectionEyebrow>
+          <h2
+            className={`m-0 mt-4 text-[clamp(24px,3vw,36px)] font-semibold text-(--yellow) ${fontHeading}`}
+          >
+            {error}
+          </h2>
+        </div>
+      </section>
+    )
+  }
+
+  if (archiveItems.length === 0) {
+    return (
+      <section
+        id="arquivos"
+        className="relative mt-[88px] border-y border-[rgba(33,28,24,0.15)] text-(--paper) [background:var(--purple)]"
+      >
+        <div className="relative mx-auto max-w-[1180px] px-8 py-[68px] text-center">
+          <SectionEyebrow variant="yellow">
+            06 — Arquivos do clube
+          </SectionEyebrow>
+          <h2
+            className={`m-0 mt-4 text-[clamp(24px,3vw,36px)] font-semibold text-(--paper-soft) ${fontHeading}`}
+          >
+            Nenhum arquivo disponível no momento.
+          </h2>
+        </div>
+      </section>
+    )
+  }
 
   return (
     <section

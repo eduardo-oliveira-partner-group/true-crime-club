@@ -44,7 +44,7 @@ export default async function CheckoutPage({
   searchParams,
 }: CheckoutPageProps) {
   const { plano } = await searchParams
-  const plan = plano ? getPlanBySlug(plano) : null
+  const plan = plano ? await getPlanBySlug(plano) : null
   const isSubscriptionFlow = Boolean(plan)
 
   const cart = getCartWithTotals()
@@ -81,7 +81,7 @@ export default async function CheckoutPage({
 
   if (isSubscriptionFlow && plan) {
     if (plan.slug === 'anual') {
-      const monthlyPlan = getPlanBySlug('mensal')
+      const monthlyPlan = await getPlanBySlug('mensal')
       const monthlyPrice = monthlyPlan ? monthlyPlan.price : 14990
       const commitment = plan.commitmentMonths || 12
       subtotalAmount = monthlyPrice * commitment
@@ -97,26 +97,26 @@ export default async function CheckoutPage({
   const total =
     (isSubscriptionFlow && plan ? plan.price : totals.total) + shipping.price
 
-  let installmentsCount = 1
-  let installmentValue = total
+  // let installmentsCount = 1
+  // let installmentValue = total
 
-  if (isSubscriptionFlow && plan) {
-    if (plan.slug === 'anual') {
-      installmentsCount = 12
-      installmentValue = plan.pricePerMonth ?? plan.price
-    } else {
-      installmentsCount = 1
-      installmentValue = plan.price
-    }
-  } else {
-    if (total > 10000) {
-      installmentsCount = 3
-      installmentValue = Math.round(total / 3)
-    } else {
-      installmentsCount = 1
-      installmentValue = total
-    }
-  }
+  // if (isSubscriptionFlow && plan) {
+  //   if (plan.slug === 'anual') {
+  //     installmentsCount = 12
+  //     installmentValue = plan.pricePerMonth ?? plan.price
+  //   } else {
+  //     installmentsCount = 1
+  //     installmentValue = plan.price
+  //   }
+  // } else {
+  //   if (total > 10000) {
+  //     installmentsCount = 3
+  //     installmentValue = Math.round(total / 3)
+  //   } else {
+  //     installmentsCount = 1
+  //     installmentValue = total
+  //   }
+  // }
 
   return (
     <DesignPageShell className="overflow-hidden">

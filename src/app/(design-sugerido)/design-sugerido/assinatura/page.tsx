@@ -12,8 +12,8 @@ export const metadata = buildMetadata({
   noindex: true,
 })
 
-export default function AssinaturaPage() {
-  const plans = listPlans()
+export default async function AssinaturaPage() {
+  const plans = await listPlans()
   const howItWorks = getDynamicContent('assinatura.how_it_works')
 
   return (
