@@ -44,7 +44,8 @@ function asOptionalNumber(value: JsonValue | undefined): number | undefined {
 }
 
 async function fetcher(endpoint: string, options: RequestInit = {}) {
-  const url = `/api${endpoint}`
+  const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || '/api'
+  const url = `${apiBaseUrl.replace(/\/$/, '')}${endpoint}`
   const headers = new Headers(options.headers || {})
 
   if (!headers.has('Content-Type') && !(options.body instanceof FormData)) {
