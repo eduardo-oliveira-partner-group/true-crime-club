@@ -12,6 +12,7 @@ import {
   AuthFormMeta,
 } from '@/src/components/public-design/auth-form'
 import { DesignFormButton } from '@/src/components/public-design/design-button'
+import { apiClient } from '@/src/lib/api-client'
 import { arrowIconClass, formLinkClass } from '@/src/lib/design/classes'
 
 export default function RecuperarSenhaPage() {
@@ -36,8 +37,7 @@ export default function RecuperarSenhaPage() {
     setIsLoading(true)
 
     try {
-      // Simulate API latency
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      await apiClient.auth.recoverPassword({ email: emailValue })
       setIsSuccess(true)
       setEmailValue('')
     } catch (err) {

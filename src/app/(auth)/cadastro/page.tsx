@@ -64,11 +64,8 @@ export default function CadastroPage() {
     setIsLoading(true)
 
     try {
-      // Simulate API registration latency
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      // Auto login
-      await apiClient.auth.login({
+      await apiClient.auth.register({
+        name: nameValue,
         email: emailValue,
         password: passwordValue,
       })

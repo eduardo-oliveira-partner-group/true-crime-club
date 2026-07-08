@@ -149,6 +149,63 @@ paths:
                     example: email_enviado
 
   # --- CLIENTES ENDEREÇOS E ATUALIZAÇÕES ---
+  /clientes:
+    post:
+      tags:
+        - Autenticação
+      summary: Cadastrar novo cliente
+      description: Cria uma nova conta de cliente e inicia a sessão.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - nome
+                - email
+                - senha
+              properties:
+                nome:
+                  type: string
+                  example: Mariana Silva
+                email:
+                  type: string
+                  format: email
+                  example: mariana.silva@email.com
+                senha:
+                  type: string
+                  format: password
+                  example: segredoforte
+                telefone:
+                  type: string
+                  example: (11) 98765-4321
+      responses:
+        '201':
+          description: Cliente cadastrado com sucesso.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: jwt_exemplo
+                  cliente:
+                    $ref: '#/components/schemas/Cliente'
+        '400':
+          description: Dados inválidos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+        '409':
+          description: E-mail já cadastrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+
   /clientes/{id}:
     patch:
       tags:
@@ -535,6 +592,37 @@ paths:
                 $ref: '#/components/schemas/Pedido'
 
   # --- CLIENTE PAINEL (PEDIDOS E ASSINATURA) ---
+  /cliente/perfil:
+    get:
+      tags:
+        - Cliente & Painel
+      summary: Obter perfil consolidado do cliente
+      description: Retorna dados cadastrais, endereços e métodos de pagamento do cliente autenticado.
+      responses:
+        '200':
+          description: Perfil retornado com sucesso.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cliente:
+                    $ref: '#/components/schemas/Cliente'
+                  enderecos:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Endereco'
+                  metodosPagamento:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MetodoPagamento'
+        '401':
+          description: Não autenticado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+
   /cliente/pedidos:
     get:
       tags:
@@ -1713,4 +1801,3 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ItemMenuCms'
-

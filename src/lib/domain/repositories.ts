@@ -912,6 +912,18 @@ export async function getCustomerProfile(): Promise<{
   }
 }
 
+export function createCustomerMock(body: {
+  name: string
+  email: string
+  phone?: string
+}): Customer {
+  mockCustomer.id = generateId('cust')
+  mockCustomer.name = body.name
+  mockCustomer.email = body.email
+  mockCustomer.phone = body.phone
+  return mockCustomer
+}
+
 export async function updateCustomerProfile(body: {
   name?: string
   email?: string

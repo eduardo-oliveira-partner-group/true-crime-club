@@ -9,6 +9,7 @@ import {
 import {
   addCustomerAddressMock,
   cancelSubscriptionMock,
+  createCustomerMock,
   createOrder,
   deleteCustomerAddressMock,
   getActiveCaseMock,
@@ -23,10 +24,10 @@ import {
   listAddressesMock,
   listCluesMock,
   listExclusiveContentMock,
+  listInvoicesMock,
   listOrdersMock,
   listPaymentMethodsMock,
   listPaymentsMock,
-  listInvoicesMock,
   listPlans,
   listProducts,
   reactivateSubscriptionMock,
@@ -45,11 +46,11 @@ import type {
   Customer,
   DynamicContentBlock,
   ExclusiveContent,
+  Invoice,
   Order,
   Payment,
   PaymentMethod,
   Product,
-  Invoice,
   SeoEntry,
   ShippingEstimate,
   SubscriberProgress,
@@ -563,6 +564,42 @@ async function handlePtBrApi(
             'Solicitação de recuperação de senha aceita no ambiente de simulação.',
         },
         202,
+      )
+    }
+
+    if (method === 'POST' && path === 'clientes') {
+      const body = await readJson(request)
+      const name = String(body.nome ?? '').trim()
+      const email = String(body.email ?? '').trim()
+      const password = String(body.senha ?? '')
+
+      if (!name || !email || !password) {
+        return error('Nome, e-mail e senha são obrigatórios.', 400)
+      }
+
+      const customer = createCustomerMock({
+        name,
+        email,
+        phone:
+          typeof body.telefone === 'string' && body.telefone.trim()
+            ? body.telefone
+            : undefined,
+      })
+
+      const cookieStore = await cookies()
+      cookieStore.set('tcc_session', 'mock-session-id', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        path: '/',
+        maxAge: 60 * 60 * 24 * 7,
+      })
+
+      return json(
+        {
+          token: 'jwt_exemplo',
+          cliente: toCustomer(customer),
+        },
+        201,
       )
     }
 

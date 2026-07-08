@@ -178,6 +178,24 @@ function fromAddress(address: {
 
 export const apiClient = {
   auth: {
+    register: async (body: {
+      name: string
+      email: string
+      password: string
+      phone?: string
+    }) =>
+      fetcher('/clientes', {
+        method: 'POST',
+        body: JSON.stringify({
+          nome: body.name,
+          email: body.email,
+          senha: body.password,
+          telefone: body.phone,
+        }),
+      }).then((data) => ({
+        ...data,
+        cliente: data.cliente ? toCustomer(data.cliente) : undefined,
+      })),
     login: async (body: { email: string; password: string }) =>
       fetcher('/autenticacao/entrar', {
         method: 'POST',
@@ -186,6 +204,11 @@ export const apiClient = {
         ...data,
         cliente: data.cliente ? toCustomer(data.cliente) : undefined,
       })),
+    recoverPassword: (body: { email: string }) =>
+      fetcher('/clientes/recuperar-senha', {
+        method: 'POST',
+        body: JSON.stringify({ email: body.email }),
+      }),
     logout: () => fetcher('/autenticacao/sair', { method: 'POST' }),
     me: () => fetcher('/autenticacao/cliente-atual').then(toCustomer),
   },
