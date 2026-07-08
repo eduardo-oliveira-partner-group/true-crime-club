@@ -7,25 +7,28 @@ import {
   mockDynamicContent,
 } from '@/src/lib/domain/mock-data'
 import {
-  cancelSubscription,
+  addCustomerAddressMock,
+  cancelSubscriptionMock,
   createOrder,
-  getActiveCase,
-  getCurrentCustomer,
+  deleteCustomerAddressMock,
+  getActiveCaseMock,
+  getCurrentCustomerMock,
   getDynamicContent,
   getDynamicContentByRoute,
-  getOrderById,
+  getOrderByIdMock,
   getProductBySlug,
   getSeoEntry,
-  getSubscriberProgress,
-  getSubscription,
-  listAddresses,
-  listClues,
-  listExclusiveContent,
-  listOrders,
-  listPaymentMethods,
+  getSubscriberProgressMock,
+  getSubscriptionMock,
+  listAddressesMock,
+  listCluesMock,
+  listExclusiveContentMock,
+  listOrdersMock,
+  listPaymentMethodsMock,
   listPlans,
   listProducts,
-  reactivateSubscription,
+  reactivateSubscriptionMock,
+  updateCustomerProfileMock,
 } from '@/src/lib/domain/repositories'
 import type {
   Address,
@@ -55,11 +58,6 @@ import {
   removeCartItemWithTotals,
   updateCartItemQuantityWithTotals,
 } from '@/src/lib/server/cart'
-import {
-  addCustomerAddress,
-  deleteCustomerAddress,
-  updateCustomerProfile,
-} from '@/src/lib/server/customer'
 
 type RouteContext = { params: Promise<{ rota: string[] }> }
 type JsonBody = Record<string, unknown>
@@ -483,7 +481,7 @@ async function handlePtBrApi(
   try {
     if (method === 'POST' && path === 'autenticacao/entrar') {
       const body = await readJson(request)
-      const customer = getCurrentCustomer()
+      const customer = getCurrentCustomerMock()
       if (!customer) return error('Cliente mock não encontrado', 404)
 
       const cookieStore = await cookies()
@@ -516,7 +514,7 @@ async function handlePtBrApi(
         return error('Não autenticado', 401)
       }
 
-      const customer = getCurrentCustomer()
+      const customer = getCurrentCustomerMock()
       if (!customer) return error('Cliente mock não encontrado', 404)
       return json(toCustomer(customer))
     }
@@ -535,20 +533,20 @@ async function handlePtBrApi(
     }
 
     if (method === 'GET' && path === 'cliente/perfil') {
-      const customer = getCurrentCustomer()
+      const customer = getCurrentCustomerMock()
       if (!customer) return error('Cliente mock não encontrado', 404)
 
       return json({
         cliente: toCustomer(customer),
-        enderecos: listAddresses().map(toAddress),
-        metodosPagamento: listPaymentMethods().map(toPaymentMethod),
+        enderecos: listAddressesMock().map(toAddress),
+        metodosPagamento: listPaymentMethodsMock().map(toPaymentMethod),
       })
     }
 
     const customerMatch = path.match(/^clientes\/([^/]+)$/)
     if (method === 'PATCH' && customerMatch) {
       const body = await readJson(request)
-      const customer = updateCustomerProfile({
+      const customer = updateCustomerProfileMock({
         name: body.nome as string | undefined,
         email: body.email as string | undefined,
         phone: body.telefone as string | undefined,
@@ -560,12 +558,12 @@ async function handlePtBrApi(
     const addressesMatch = path.match(/^clientes\/([^/]+)\/enderecos$/)
     if (addressesMatch) {
       if (method === 'GET') {
-        return json(listAddresses().map(toAddress))
+        return json(listAddressesMock().map(toAddress))
       }
 
       if (method === 'POST') {
         const body = await readJson(request)
-        const addresses = addCustomerAddress({
+        const addresses = addCustomerAddressMock({
           label: String(body.rotulo ?? ''),
           street: String(body.logradouro ?? ''),
           number: String(body.numero ?? ''),
@@ -581,7 +579,7 @@ async function handlePtBrApi(
 
     const addressMatch = path.match(/^clientes\/([^/]+)\/enderecos\/([^/]+)$/)
     if (method === 'DELETE' && addressMatch) {
-      deleteCustomerAddress(normalizeAddressId(addressMatch[2]))
+      deleteCustomerAddressMock(normalizeAddressId(addressMatch[2]))
       return json({ sucesso: true })
     }
 
@@ -657,19 +655,19 @@ async function handlePtBrApi(
     }
 
     if (method === 'GET' && path === 'cliente/pedidos') {
-      return json((await listOrders()).map(toOrder))
+      return json(listOrdersMock().map(toOrder))
     }
 
     const orderMatch = path.match(/^cliente\/pedidos\/([^/]+)$/)
     if (method === 'GET' && orderMatch) {
-      const order = getOrderById(normalizeOrderId(orderMatch[1]))
+      const order = getOrderByIdMock(normalizeOrderId(orderMatch[1]))
       if (!order) return error('Pedido não encontrado', 404)
       return json(toOrderDetails(order))
     }
 
     if (path === 'cliente/assinatura') {
       if (method === 'GET') {
-        const subscription = getSubscription()
+        const subscription = getSubscriptionMock()
         if (!subscription) return error('Nenhuma assinatura ativa', 404)
         return json(toSubscription(subscription))
       }
@@ -678,22 +676,22 @@ async function handlePtBrApi(
         const body = await readJson(request)
         const action = body.acao
         if (action === 'cancelar')
-          return json(toSubscription(cancelSubscription()))
+          return json(toSubscription(cancelSubscriptionMock()))
         if (action === 'reativar') {
-          return json(toSubscription(reactivateSubscription()))
+          return json(toSubscription(reactivateSubscriptionMock()))
         }
         return error('Ação inválida', 400)
       }
     }
 
     if (method === 'GET' && path === 'conteudos-exclusivos') {
-      return json(listExclusiveContent().map(toExclusiveContent))
+      return json(listExclusiveContentMock().map(toExclusiveContent))
     }
 
     const contentMatch = path.match(/^conteudos-exclusivos\/([^/]+)$/)
     if (method === 'GET' && contentMatch) {
       const content =
-        listExclusiveContent().find(
+        listExclusiveContentMock().find(
           (item) =>
             item.slug === decodeURIComponent(contentMatch[1]) ||
             item.id === decodeURIComponent(contentMatch[1]),
@@ -703,12 +701,12 @@ async function handlePtBrApi(
     }
 
     if (method === 'GET' && path === 'casos') {
-      const activeCase = getActiveCase()
-      const progress = getSubscriberProgress()
+      const activeCase = getActiveCaseMock()
+      const progress = getSubscriberProgressMock()
       return json({
         casoAtivo: activeCase ? toCase(activeCase) : null,
         progresso: progress ? toProgress(progress) : null,
-        pistas: listClues().map(toClue),
+        pistas: listCluesMock().map(toClue),
       })
     }
 

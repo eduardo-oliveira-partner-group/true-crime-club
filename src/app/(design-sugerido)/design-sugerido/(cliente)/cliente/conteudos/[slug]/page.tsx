@@ -14,7 +14,7 @@ export default async function ConteudoDetailPage({
   params,
 }: ConteudoDetailPageProps) {
   const { slug } = await params
-  const clue = getClueBySlug(slug)
+  const clue = await getClueBySlug(slug)
 
   if (!clue) {
     notFound()

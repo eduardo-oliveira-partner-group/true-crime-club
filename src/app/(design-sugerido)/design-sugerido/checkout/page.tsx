@@ -40,7 +40,7 @@ export default async function CheckoutPage({
   const cart = await getCartWithTotals()
   const totals = cart
 
-  const profile = getCustomerProfile()
+  const profile = await getCustomerProfile()
 
   const customer = profile.customer
   const addresses = profile.addresses || []
@@ -284,7 +284,7 @@ function OrderSummary({
 
 async function savePreferences(preferences: SubscriberPreferencesValue) {
   'use server'
-  updateCustomerProfile({ preferences })
+  await updateCustomerProfile({ preferences })
 }
 
 async function submitOrder() {

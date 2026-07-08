@@ -17,7 +17,7 @@ import {
 import { getSubscription } from '@/src/lib/server/customer'
 
 export default async function AssinaturaClientePage() {
-  const subscription = getSubscription()
+  const subscription = await getSubscription()
 
   if (!subscription) {
     return (

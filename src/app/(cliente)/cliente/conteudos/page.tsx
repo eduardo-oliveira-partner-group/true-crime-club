@@ -27,10 +27,10 @@ const statusTone: Record<string, string> = {
   em_breve: 'text-(--ink-mute) border-(--ink)/15 bg-(--ink)/5',
 }
 
-export default function ConteudosPage() {
-  const activeCase = getActiveCase()
-  const clues = listClues(activeCase?.id)
-  const progress = activeCase ? getSubscriberProgress(activeCase.id) : null
+export default async function ConteudosPage() {
+  const activeCase = await getActiveCase()
+  const clues = await listClues(activeCase?.id)
+  const progress = activeCase ? await getSubscriberProgress(activeCase.id) : null
 
   return (
     <div>

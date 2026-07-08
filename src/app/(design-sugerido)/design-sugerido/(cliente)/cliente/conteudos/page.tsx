@@ -19,10 +19,10 @@ const statusTone: Record<string, string> = {
   em_breve: 'text-[#c8bdad] border-[#fffaf0]/18 bg-[#fffaf0]/5',
 }
 
-export default function ConteudosPage() {
-  const activeCase = getActiveCase()
-  const clues = listClues(activeCase?.id)
-  const progress = activeCase ? getSubscriberProgress(activeCase.id) : null
+export default async function ConteudosPage() {
+  const activeCase = await getActiveCase()
+  const clues = await listClues(activeCase?.id)
+  const progress = activeCase ? await getSubscriberProgress(activeCase.id) : null
 
   return (
     <div>

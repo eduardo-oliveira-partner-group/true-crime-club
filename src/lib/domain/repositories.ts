@@ -34,6 +34,7 @@ import type {
   Cart,
   CartItem,
   Case,
+  CaseFile,
   Clue,
   CouponResult,
   Customer,
@@ -70,6 +71,25 @@ function isConnectionRefused(error: any): boolean {
   const msg = String(error.message || '')
   const causeMsg = error.cause ? String(error.cause.message || '') : ''
   return msg.includes('ECONNREFUSED') || causeMsg.includes('ECONNREFUSED')
+}
+
+function isLocalMockMode(): boolean {
+  return (
+    !process.env.NEXT_PUBLIC_API_BASE_URL ||
+    process.env.NEXT_PUBLIC_LOCAL_MOCK === 'true' ||
+    process.env.NEXT_PUBLIC_MOCK_MODE === 'true' ||
+    process.env.LOCAL_MOCK_MODE === 'true'
+  )
+}
+
+function isNotFoundError(error: any): boolean {
+  const msg = String(error?.message || '')
+  return (
+    msg.includes('404') ||
+    msg.toLowerCase().includes('não encontrado') ||
+    msg.toLowerCase().includes('nao encontrado') ||
+    msg.toLowerCase().includes('nenhuma assinatura')
+  )
 }
 
 function throwIfError(): void {
@@ -570,6 +590,140 @@ function mapApiOrderToDomain(apiOrder: any): Order {
   }
 }
 
+function mapApiCaseFileToDomain(file: any): CaseFile {
+  const typeMap: Record<string, 'pdf' | 'image' | 'audio' | 'video'> = {
+    pdf: 'pdf',
+    imagem: 'image',
+    audio: 'audio',
+    video: 'video',
+  }
+
+  return {
+    id: file.id,
+    name: file.nome,
+    type: typeMap[file.tipo] ?? 'pdf',
+    downloadUrl: file.urlDownload,
+    sizeLabel: file.tamanho,
+  }
+}
+
+function mapApiSubscriptionToDomain(apiSub: any): Subscription {
+  const statusMap: Record<string, Subscription['status']> = {
+    ativa: 'active',
+    pagamento_pendente: 'pending_payment',
+    cancelada: 'cancelled',
+    pausada: 'paused',
+    vencida: 'past_due',
+  }
+
+  return {
+    id: apiSub.id,
+    customerId: apiSub.idCliente ?? mockCustomer.id,
+    planId: apiSub.idPlano,
+    planName: apiSub.nomePlano,
+    status: statusMap[apiSub.status] ?? 'active',
+    startedAt: apiSub.iniciadaEm,
+    nextBillingDate: apiSub.proximaCobrancaEm,
+    nextBillingAmount: apiSub.valorProximaCobranca,
+    currentCycleBoxId: apiSub.idCaixaCicloAtual,
+    currentCycleBoxName: apiSub.nomeCaixaCicloAtual,
+    canCancel: apiSub.podeCancelar ?? false,
+    canReactivate: apiSub.podeReativar ?? false,
+    cancelledAt: apiSub.canceladaEm,
+  }
+}
+
+function mapApiCaseToDomain(apiCase: any): Case {
+  return {
+    id: apiCase.id,
+    slug: apiCase.identificador,
+    title: apiCase.titulo,
+    description: apiCase.descricao,
+    year: apiCase.ano,
+    totalClues: apiCase.totalPistas,
+    liveEventDate: apiCase.dataEventoAoVivo,
+    liveEventTitle: apiCase.tituloEventoAoVivo,
+  }
+}
+
+function mapApiProgressToDomain(apiProgress: any): SubscriberProgress {
+  return {
+    caseId: apiProgress.idCaso,
+    collectedClues: apiProgress.pistasColetadas,
+    totalClues: apiProgress.totalPistas,
+    currentCycle: apiProgress.cicloAtual,
+    liveEventDate: apiProgress.dataEventoAoVivo,
+    liveEventTitle: apiProgress.tituloEventoAoVivo,
+    percentComplete: apiProgress.percentualCompleto,
+  }
+}
+
+function mapApiClueToDomain(apiClue: any): Clue {
+  return {
+    id: apiClue.id,
+    slug: apiClue.identificador,
+    caseId: apiClue.idCaso,
+    title: apiClue.titulo,
+    description: apiClue.descricao,
+    cycleNumber: apiClue.numeroCiclo,
+    status: apiClue.status === 'bloqueado' ? 'bloqueado' : 'liberado',
+    blockedReason: apiClue.motivoBloqueio,
+    files: Array.isArray(apiClue.arquivos)
+      ? apiClue.arquivos.map(mapApiCaseFileToDomain)
+      : [],
+    releasedAt: apiClue.liberadoEm,
+  }
+}
+
+function mapApiExclusiveContentToDomain(apiContent: any): ExclusiveContent {
+  const contentTypeMap: Record<string, ExclusiveContent['type']> = {
+    pista: 'clue',
+    video: 'video',
+    documento: 'document',
+    artigo: 'article',
+  }
+
+  return {
+    id: apiContent.id,
+    slug: apiContent.identificador,
+    title: apiContent.titulo,
+    description: apiContent.descricao,
+    status: apiContent.status === 'bloqueado' ? 'bloqueado' : 'liberado',
+    cycleNumber: apiContent.numeroCiclo,
+    blockedReason: apiContent.motivoBloqueio,
+    type: contentTypeMap[apiContent.tipo] ?? 'clue',
+    files: Array.isArray(apiContent.arquivos)
+      ? apiContent.arquivos.map(mapApiCaseFileToDomain)
+      : [],
+  }
+}
+
+async function fetchCasesBundle(): Promise<{
+  activeCase: Case | null
+  progress: SubscriberProgress | null
+  clues: Clue[]
+} | null> {
+  if (isLocalMockMode()) {
+    return null
+  }
+
+  try {
+    const data = await apiClient.cases.getData()
+    return {
+      activeCase: data.casoAtivo ? mapApiCaseToDomain(data.casoAtivo) : null,
+      progress: data.progresso ? mapApiProgressToDomain(data.progresso) : null,
+      clues: Array.isArray(data.pistas)
+        ? data.pistas.map(mapApiClueToDomain)
+        : [],
+    }
+  } catch (error) {
+    if (!isConnectionRefused(error)) {
+      console.warn('API cases.getData error, falling back to local mocks:', error)
+    }
+    return null
+  }
+}
+
 export async function createOrder(input?: {
   customerId?: string
   shipping?: number
@@ -633,12 +787,162 @@ export async function createOrder(input?: {
   return order
 }
 
-export function getCurrentCustomer(): Customer | null {
+export function getCurrentCustomerMock(): Customer | null {
   throwIfError()
   if (isScenario('empty')) {
     return null
   }
   return mockCustomer
+}
+
+export async function getCurrentCustomer(): Promise<Customer | null> {
+  const profile = await getCustomerProfile()
+  return profile.customer
+}
+
+export async function getCustomerProfile(): Promise<{
+  customer: Customer | null
+  addresses: Address[]
+  paymentMethods: PaymentMethod[]
+}> {
+  throwIfError()
+
+  if (!isLocalMockMode()) {
+    try {
+      return await apiClient.customer.getProfile()
+    } catch (error) {
+      if (!isConnectionRefused(error)) {
+        console.warn('API getProfile error, falling back to local mocks:', error)
+      }
+    }
+  }
+
+  return {
+    customer: getCurrentCustomerMock(),
+    addresses: listAddressesMock(),
+    paymentMethods: listPaymentMethodsMock(),
+  }
+}
+
+export async function updateCustomerProfile(body: {
+  name?: string
+  email?: string
+  phone?: string
+  preferences?: Partial<SubscriberPreferences>
+}): Promise<Customer> {
+  throwIfError()
+
+  if (!isLocalMockMode()) {
+    try {
+      return await apiClient.customer.updateProfile(body)
+    } catch (error) {
+      if (!isConnectionRefused(error)) {
+        console.warn(
+          'API updateProfile error, falling back to local mocks:',
+          error,
+        )
+      }
+    }
+  }
+
+  return updateCustomerProfileMock(body)
+}
+
+export function updateCustomerProfileMock(body: {
+  name?: string
+  email?: string
+  phone?: string
+  preferences?: Partial<SubscriberPreferences>
+}): Customer {
+  if (body.name !== undefined) mockCustomer.name = body.name
+  if (body.email !== undefined) mockCustomer.email = body.email
+  if (body.phone !== undefined) mockCustomer.phone = body.phone
+  if (body.preferences !== undefined) {
+    mockCustomer.preferences = {
+      ...mockCustomer.preferences,
+      ...body.preferences,
+    }
+  }
+  return mockCustomer
+}
+
+export async function addCustomerAddress(body: {
+  label: string
+  street: string
+  number: string
+  complement?: string
+  neighborhood: string
+  city: string
+  state: string
+  zipCode: string
+}): Promise<Address[]> {
+  throwIfError()
+
+  if (!isLocalMockMode()) {
+    try {
+      return await apiClient.customer.addAddress(body)
+    } catch (error) {
+      if (!isConnectionRefused(error)) {
+        console.warn('API addAddress error, falling back to local mocks:', error)
+      }
+    }
+  }
+
+  return addCustomerAddressMock(body)
+}
+
+export function addCustomerAddressMock(body: {
+  label: string
+  street: string
+  number: string
+  complement?: string
+  neighborhood: string
+  city: string
+  state: string
+  zipCode: string
+}): Address[] {
+  const newAddress: Address = {
+    id: `addr-${Date.now()}`,
+    label: body.label,
+    street: body.street,
+    number: body.number,
+    complement: body.complement,
+    neighborhood: body.neighborhood,
+    city: body.city,
+    state: body.state,
+    zipCode: body.zipCode,
+    isDefault: mockAddresses.length === 0,
+  }
+
+  mockAddresses.push(newAddress)
+  return [...mockAddresses]
+}
+
+export async function deleteCustomerAddress(id: string): Promise<Address[]> {
+  throwIfError()
+
+  if (!isLocalMockMode()) {
+    try {
+      return await apiClient.customer.deleteAddress(id)
+    } catch (error) {
+      if (!isConnectionRefused(error)) {
+        console.warn(
+          'API deleteAddress error, falling back to local mocks:',
+          error,
+        )
+      }
+    }
+  }
+
+  return deleteCustomerAddressMock(id)
+}
+
+export function deleteCustomerAddressMock(id: string): Address[] {
+  const index = mockAddresses.findIndex((addr) => addr.id === id)
+  if (index !== -1) {
+    mockAddresses.splice(index, 1)
+  }
+  return [...mockAddresses]
 }
 
 export function updateSubscriberPreferences(
@@ -652,16 +956,26 @@ export function updateSubscriberPreferences(
   return updated
 }
 
-export function listAddresses(): Address[] {
+export function listAddressesMock(): Address[] {
   throwIfError()
   const result = shouldReturnEmpty(mockAddresses)
   return result ?? mockAddresses
 }
 
-export function listPaymentMethods(): PaymentMethod[] {
+export function listPaymentMethodsMock(): PaymentMethod[] {
   throwIfError()
   const result = shouldReturnEmpty(mockPaymentMethods)
   return result ?? mockPaymentMethods
+}
+
+export async function listAddresses(): Promise<Address[]> {
+  const profile = await getCustomerProfile()
+  return profile.addresses
+}
+
+export async function listPaymentMethods(): Promise<PaymentMethod[]> {
+  const profile = await getCustomerProfile()
+  return profile.paymentMethods
 }
 
 export async function listOrders(): Promise<Order[]> {
@@ -685,16 +999,63 @@ export async function listOrders(): Promise<Order[]> {
     }
   }
 
+  return listOrdersMock()
+}
+
+export function listOrdersMock(): Order[] {
+  throwIfError()
   const result = shouldReturnEmpty(mockOrders)
   return result ?? mockOrders
 }
 
-export function getOrderById(id: string): Order | null {
+export async function getOrderById(id: string): Promise<Order | null> {
   throwIfError()
+
+  if (!isLocalMockMode()) {
+    try {
+      const apiOrder = await apiClient.customer.getOrder(id)
+      return mapApiOrderToDomain(apiOrder)
+    } catch (error) {
+      if (isNotFoundError(error)) {
+        return null
+      }
+      if (!isConnectionRefused(error)) {
+        console.warn('API getOrderById error, falling back to local mocks:', error)
+      }
+    }
+  }
+
+  return getOrderByIdMock(id)
+}
+
+export function getOrderByIdMock(id: string): Order | null {
   return mockOrders.find((o) => o.id === id) ?? null
 }
 
-export function getSubscription(): Subscription | null {
+export async function getSubscription(): Promise<Subscription | null> {
+  throwIfError()
+
+  if (!isLocalMockMode()) {
+    try {
+      const apiSub = await apiClient.customer.getSubscription()
+      return mapApiSubscriptionToDomain(apiSub)
+    } catch (error) {
+      if (isNotFoundError(error)) {
+        return null
+      }
+      if (!isConnectionRefused(error)) {
+        console.warn(
+          'API getSubscription error, falling back to local mocks:',
+          error,
+        )
+      }
+    }
+  }
+
+  return getSubscriptionMock()
+}
+
+export function getSubscriptionMock(): Subscription | null {
   throwIfError()
   if (isScenario('empty')) {
     return null
@@ -723,8 +1084,27 @@ export function getSubscription(): Subscription | null {
   return subscriptionState
 }
 
-export function cancelSubscription(): Subscription {
+export async function cancelSubscription(): Promise<Subscription> {
   throwIfError()
+
+  if (!isLocalMockMode()) {
+    try {
+      const apiSub = await apiClient.customer.cancelSubscription()
+      return mapApiSubscriptionToDomain(apiSub)
+    } catch (error) {
+      if (!isConnectionRefused(error)) {
+        console.warn(
+          'API cancelSubscription error, falling back to local mocks:',
+          error,
+        )
+      }
+    }
+  }
+
+  return cancelSubscriptionMock()
+}
+
+export function cancelSubscriptionMock(): Subscription {
   subscriptionState = {
     ...subscriptionState,
     status: 'cancelled',
@@ -735,8 +1115,27 @@ export function cancelSubscription(): Subscription {
   return subscriptionState
 }
 
-export function reactivateSubscription(): Subscription {
+export async function reactivateSubscription(): Promise<Subscription> {
   throwIfError()
+
+  if (!isLocalMockMode()) {
+    try {
+      const apiSub = await apiClient.customer.reactivateSubscription()
+      return mapApiSubscriptionToDomain(apiSub)
+    } catch (error) {
+      if (!isConnectionRefused(error)) {
+        console.warn(
+          'API reactivateSubscription error, falling back to local mocks:',
+          error,
+        )
+      }
+    }
+  }
+
+  return reactivateSubscriptionMock()
+}
+
+export function reactivateSubscriptionMock(): Subscription {
   subscriptionState = {
     ...subscriptionState,
     status: 'active',
@@ -816,8 +1215,29 @@ export function updateCard(input: {
   return updated
 }
 
-export function listExclusiveContent(): ExclusiveContent[] {
+export async function listExclusiveContent(): Promise<ExclusiveContent[]> {
   throwIfError()
+
+  if (!isLocalMockMode()) {
+    try {
+      const apiContent = await apiClient.exclusiveContent.list()
+      return apiContent.map(mapApiExclusiveContentToDomain)
+    } catch (error) {
+      if (!isConnectionRefused(error)) {
+        console.warn(
+          'API listExclusiveContent error, falling back to local mocks:',
+          error,
+        )
+      }
+    }
+  }
+
+  return listExclusiveContentMock()
+}
+
+export function listExclusiveContentMock(): ExclusiveContent[] {
+  throwIfError()
+
   let content = [...mockExclusiveContent]
 
   if (isScenario('blocked')) {
@@ -836,10 +1256,28 @@ export function listExclusiveContent(): ExclusiveContent[] {
   return result ?? content
 }
 
-export function getExclusiveContentBySlug(
+export async function getExclusiveContentBySlug(
   slug: string,
-): ExclusiveContent | null {
+): Promise<ExclusiveContent | null> {
   throwIfError()
+
+  if (!isLocalMockMode()) {
+    try {
+      const apiContent = await apiClient.exclusiveContent.getBySlug(slug)
+      return mapApiExclusiveContentToDomain(apiContent)
+    } catch (error) {
+      if (isNotFoundError(error)) {
+        return null
+      }
+      if (!isConnectionRefused(error)) {
+        console.warn(
+          'API getExclusiveContentBySlug error, falling back to local mocks:',
+          error,
+        )
+      }
+    }
+  }
+
   return mockExclusiveContent.find((c) => c.slug === slug) ?? null
 }
 
@@ -927,7 +1365,18 @@ export async function getCmsMenu(chave: string): Promise<MenuCms | null> {
   return mockCmsMenus[chave] ?? null
 }
 
-export function getActiveCase(): Case | null {
+export async function getActiveCase(): Promise<Case | null> {
+  throwIfError()
+
+  const bundle = await fetchCasesBundle()
+  if (bundle) {
+    return bundle.activeCase
+  }
+
+  return getActiveCaseMock()
+}
+
+export function getActiveCaseMock(): Case | null {
   throwIfError()
   if (isScenario('empty')) {
     return null
@@ -935,8 +1384,22 @@ export function getActiveCase(): Case | null {
   return mockActiveCase
 }
 
-export function listClues(caseId?: string): Clue[] {
+export async function listClues(caseId?: string): Promise<Clue[]> {
   throwIfError()
+
+  const bundle = await fetchCasesBundle()
+  if (bundle) {
+    return caseId
+      ? bundle.clues.filter((c) => c.caseId === caseId)
+      : bundle.clues
+  }
+
+  return listCluesMock(caseId)
+}
+
+export function listCluesMock(caseId?: string): Clue[] {
+  throwIfError()
+
   let clues = caseId
     ? mockClues.filter((c) => c.caseId === caseId)
     : [...mockClues]
@@ -957,12 +1420,62 @@ export function listClues(caseId?: string): Clue[] {
   return result ?? clues
 }
 
-export function getClueBySlug(slug: string): Clue | null {
+export async function getClueBySlug(slug: string): Promise<Clue | null> {
   throwIfError()
+
+  const bundle = await fetchCasesBundle()
+  if (bundle) {
+    const fromBundle = bundle.clues.find((c) => c.slug === slug)
+    if (fromBundle) {
+      return fromBundle
+    }
+  }
+
+  if (!isLocalMockMode()) {
+    try {
+      const apiContent = await apiClient.exclusiveContent.getBySlug(slug)
+      const mapped = mapApiExclusiveContentToDomain(apiContent)
+      return {
+        id: mapped.id,
+        slug: mapped.slug,
+        caseId: bundle?.activeCase?.id ?? mockActiveCase.id,
+        title: mapped.title,
+        description: mapped.description,
+        cycleNumber: mapped.cycleNumber,
+        status: mapped.status,
+        blockedReason: mapped.blockedReason,
+        files: mapped.files ?? [],
+      }
+    } catch (error) {
+      if (isNotFoundError(error)) {
+        return null
+      }
+      if (!isConnectionRefused(error)) {
+        console.warn('API getClueBySlug error, falling back to local mocks:', error)
+      }
+    }
+  }
+
   return mockClues.find((c) => c.slug === slug) ?? null
 }
 
-export function getSubscriberProgress(
+export async function getSubscriberProgress(
+  caseId?: string,
+): Promise<SubscriberProgress | null> {
+  throwIfError()
+
+  const bundle = await fetchCasesBundle()
+  if (bundle?.progress) {
+    if (caseId && bundle.progress.caseId !== caseId) {
+      return null
+    }
+    return bundle.progress
+  }
+
+  return getSubscriberProgressMock(caseId)
+}
+
+export function getSubscriberProgressMock(
   caseId?: string,
 ): SubscriberProgress | null {
   throwIfError()

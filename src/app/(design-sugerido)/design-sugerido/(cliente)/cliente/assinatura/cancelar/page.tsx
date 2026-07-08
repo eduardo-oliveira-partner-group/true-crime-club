@@ -8,8 +8,8 @@ import {
 } from '@/src/lib/domain/repositories'
 import { formatSubscriptionStatus } from '@/src/lib/formatters'
 
-export default function CancelarAssinaturaPage() {
-  const subscription = getSubscription()
+export default async function CancelarAssinaturaPage() {
+  const subscription = await getSubscription()
 
   return (
     <div>
@@ -50,7 +50,7 @@ export default function CancelarAssinaturaPage() {
         className="mt-6"
         action={async () => {
           'use server'
-          cancelSubscription()
+          await cancelSubscription()
         }}
       >
         <Button

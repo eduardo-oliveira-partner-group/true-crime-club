@@ -20,7 +20,7 @@ export default async function PedidoDetailPage({
   params,
 }: PedidoDetailPageProps) {
   const { id } = await params
-  const order = getOrderById(id)
+  const order = await getOrderById(id)
 
   if (!order) {
     notFound()
