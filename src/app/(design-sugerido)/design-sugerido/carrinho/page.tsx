@@ -38,7 +38,7 @@ export const metadata = buildMetadata({
 export default async function CarrinhoPage() {
   const cart = await getCartWithTotals()
   const totals = cart
-  const shipping = calculateShipping(sampleZipCode)
+  const shipping = await calculateShipping(sampleZipCode)
   const grandTotal = totals.total + shipping.price
   const itemCount = cart.items.reduce(
     (sum: number, item: CartItem) => sum + item.quantity,

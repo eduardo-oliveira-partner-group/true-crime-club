@@ -649,15 +649,15 @@ async function handlePtBrApi(
 
     if (method === 'POST' && path === 'finalizacao/frete') {
       const body = await readJson(request)
-      return json(toShipping(calculateShipping(String(body.cep ?? ''))))
+      return json(toShipping(await calculateShipping(String(body.cep ?? ''))))
     }
 
     if (method === 'POST' && path === 'finalizacao/pedido') {
-      return json(toOrderDetails(createOrder()), 201)
+      return json(toOrderDetails(await createOrder()), 201)
     }
 
     if (method === 'GET' && path === 'cliente/pedidos') {
-      return json(listOrders().map(toOrder))
+      return json((await listOrders()).map(toOrder))
     }
 
     const orderMatch = path.match(/^cliente\/pedidos\/([^/]+)$/)
