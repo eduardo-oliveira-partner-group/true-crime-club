@@ -2,7 +2,7 @@
 
 > **Executor instructions**: Follow this plan step by step. Run every verification command and confirm the expected result before moving to the next step. If anything in the "STOP conditions" section occurs, stop and report — do not improvise. When done, update the status row for this plan in `plans/README.md` — unless a reviewer dispatched you and told you they maintain the index.
 >
-> **Drift check (run first)**: `git diff --stat 26db9e3..HEAD -- src/lib/api-client.ts src/lib/domain/repositories.ts src/lib/server/customer.ts src/app/(auth) src/app/(cliente) docs/openapi.yaml`
+> **Drift check (run first)**: `git diff --stat 94cc25f..HEAD -- src/lib/api-client.ts src/lib/domain/repositories.ts src/lib/server/customer.ts src/app/(auth) src/app/(cliente) docs/openapi.yaml`
 > If any in-scope file changed since this plan was written, compare the "Current state" excerpts against the live code before proceeding; on a mismatch, treat it as a STOP condition.
 
 ## Status
@@ -12,8 +12,8 @@
 - **Risk**: MED
 - **Depends on**: plans/009-public-api-checkout-integration.md
 - **Category**: direction
-- **Planned at**: commit `26db9e3`, 2026-07-08
-- **Progress**: DONE — merge `26db9e3`; Subfatias A/B/C1/C2/C3/D concluídas
+- **Planned at**: commit `94cc25f`, 2026-07-08
+- **Progress**: DONE — `26db9e3` (A/B/C1/D) + `94cc25f` (C2/C3 financeiro)
 
 ## Objetivo
 
@@ -21,17 +21,14 @@ Migrar a área do cliente para a API pública, preservando mocks locais enquanto
 
 ## Current state
 
-### Já migrado em `26db9e3` (não refazer)
+### Entregue (não refazer)
 
 - `src/lib/server/customer.ts` — reexporta funções API-first de `repositories.ts`.
-- `src/lib/domain/repositories.ts` — `getCustomerProfile`, `updateCustomerProfile`, `addCustomerAddress`, `deleteCustomerAddress`, `listOrders`, `getOrderById`, `getSubscription`, `cancelSubscription`, `reactivateSubscription`, `listExclusiveContent`, `getActiveCase`, `listClues`, `getSubscriberProgress` API-first com fallback mock.
-- `src/app/api/[...rota]/route.ts` — handler mock usa helpers `*Mock` (evita recursão com wrappers API-first).
-- Telas migradas: `/cliente/pedidos/[id]`, `/cliente/assinatura`, `/cliente/assinatura/cancelar`, `/cliente/conteudos`, `/cliente/conteudos/[slug]`.
-- `docs/openapi.yaml` — contratos de auth, pedidos, assinatura, conteúdos e casos presentes.
-
-### Ainda mock-only (Subfatia C2/C3 — escopo restante)
-
-Nenhum — financeiro migrado para API-first com fallback mock.
+- `src/lib/domain/repositories.ts` — perfil, pedidos, assinatura, financeiro (`listPayments`, `listInvoices`, `renewPixPayment`, `updateCard`), conteúdos e casos API-first com fallback mock via helpers `*Mock`.
+- `src/lib/api-client.ts:309-328` — `listPayments`, `getPayment`, `renewPixPayment`, `listInvoices`, `updateCard`.
+- `src/app/api/[...rota]/route.ts` — handler mock usa helpers `*Mock` (evita recursão); rotas financeiras em `94cc25f`.
+- Telas migradas: `/cliente/pedidos/[id]`, `/cliente/assinatura`, `/cliente/assinatura/cancelar`, `/cliente/financeiro`, `/cliente/financeiro/atualizar-cartao`, `/cliente/conteudos`, `/cliente/conteudos/[slug]`.
+- `docs/openapi.yaml` — contratos de auth, pedidos, assinatura, financeiro, conteúdos e casos presentes.
 
 ### Padrão a seguir
 
