@@ -420,8 +420,30 @@ export async function removeCartItem(itemId: string): Promise<Cart> {
   return await getCart()
 }
 
-export function calculateShipping(zipCode: string): ShippingEstimate {
+export async function calculateShipping(zipCode: string): Promise<ShippingEstimate> {
   throwIfError()
+
+  const isLocalMockMode =
+    !process.env.NEXT_PUBLIC_API_BASE_URL ||
+    process.env.NEXT_PUBLIC_LOCAL_MOCK === 'true' ||
+    process.env.NEXT_PUBLIC_MOCK_MODE === 'true' ||
+    process.env.LOCAL_MOCK_MODE === 'true'
+
+  if (!isLocalMockMode) {
+    try {
+      const apiResult = await apiClient.checkout.calculateShipping(zipCode)
+      return {
+        region: apiResult.regiao,
+        price: apiResult.preco,
+        estimatedDays: apiResult.prazoEstimado,
+      }
+    } catch (e) {
+      if (!isConnectionRefused(e)) {
+        console.warn('API calculateShipping error, falling back to local mocks:', e)
+      }
+    }
+  }
+
   const normalized = zipCode.replace(/\D/g, '')
   const rate =
     SHIPPING_RATES[normalized] ??
@@ -498,11 +520,87 @@ export function getCartTotals(cart: Cart) {
   return { subtotal, discount, shipping, total }
 }
 
-export function createOrder(input?: {
+function mapApiOrderToDomain(apiOrder: any): Order {
+  const statusMap: Record<string, Order['status']> = {
+    pagamento_pendente: 'pending_payment',
+    pago: 'paid',
+    em_processamento: 'processing',
+    aguardando_envio: 'awaiting_shipment',
+    enviado: 'shipped',
+    entregue: 'delivered',
+    cancelado: 'cancelled',
+  }
+
+  const paymentStatusMap: Record<string, Order['paymentStatus']> = {
+    pendente: 'pending',
+    pago: 'paid',
+    recusado: 'refused',
+    expirado: 'expired',
+    estornado: 'refunded',
+  }
+
+  return {
+    id: apiOrder.id,
+    orderNumber: apiOrder.numeroPedido,
+    customerId: apiOrder.idCliente ?? mockCustomer.id,
+    items: Array.isArray(apiOrder.itens)
+      ? apiOrder.itens.map((item: any) => ({
+          id: item.id,
+          productId: item.idProduto,
+          productSlug: item.identificadorProduto,
+          productName: item.nomeProduto,
+          productType: item.tipoProduto === 'caixa' ? 'box' : 'product',
+          quantity: item.quantidade,
+          unitPrice: item.precoUnitario,
+          image: item.imagem,
+        }))
+      : [],
+    status: statusMap[apiOrder.status] ?? 'paid',
+    paymentStatus: paymentStatusMap[apiOrder.statusPagamento] ?? 'paid',
+    subtotal: apiOrder.subtotal,
+    shipping: apiOrder.frete,
+    discount: apiOrder.desconto,
+    total: apiOrder.total,
+    createdAt: apiOrder.criadoEm,
+    billingCycleNote: apiOrder.observacaoCicloCobranca,
+    shippingCycleNote: apiOrder.observacaoCicloEnvio,
+    trackingCode: apiOrder.codigoRastreio,
+    trackingUrl: apiOrder.urlRastreio,
+    invoicePlaceholder: apiOrder.notaFiscalPlaceholder ?? 'Nota fiscal disponível após confirmação do pagamento.',
+  }
+}
+
+export async function createOrder(input?: {
   customerId?: string
   shipping?: number
-}): Order {
+  enderecoId?: string
+  pagamentoMetodoId?: string
+}): Promise<Order> {
   throwIfError()
+
+  const isLocalMockMode =
+    !process.env.NEXT_PUBLIC_API_BASE_URL ||
+    process.env.NEXT_PUBLIC_LOCAL_MOCK === 'true' ||
+    process.env.NEXT_PUBLIC_MOCK_MODE === 'true' ||
+    process.env.LOCAL_MOCK_MODE === 'true'
+
+  if (!isLocalMockMode) {
+    try {
+      const apiOrder = await apiClient.checkout.createOrder({
+        enderecoId: input?.enderecoId,
+        pagamentoMetodoId: input?.pagamentoMetodoId,
+      })
+      const mapped = mapApiOrderToDomain(apiOrder)
+      mockOrders.unshift(mapped)
+      cartState = structuredClone(initialCart)
+      return mapped
+    } catch (e) {
+      if (!isConnectionRefused(e)) {
+        console.warn('API createOrder error, falling back to local mocks:', e)
+      }
+    }
+  }
+
   const cart = structuredClone(cartState)
   const { subtotal, discount, shipping, total } = getCartTotals(cart)
   const now = new Date()
@@ -566,8 +664,27 @@ export function listPaymentMethods(): PaymentMethod[] {
   return result ?? mockPaymentMethods
 }
 
-export function listOrders(): Order[] {
+export async function listOrders(): Promise<Order[]> {
   throwIfError()
+
+  const isLocalMockMode =
+    !process.env.NEXT_PUBLIC_API_BASE_URL ||
+    process.env.NEXT_PUBLIC_LOCAL_MOCK === 'true' ||
+    process.env.NEXT_PUBLIC_MOCK_MODE === 'true' ||
+    process.env.LOCAL_MOCK_MODE === 'true'
+
+  if (!isLocalMockMode) {
+    try {
+      const apiOrders = await apiClient.customer.listOrders()
+      const mapped = apiOrders.map(mapApiOrderToDomain)
+      return mapped
+    } catch (e) {
+      if (!isConnectionRefused(e)) {
+        console.warn('API listOrders error, falling back to local mocks:', e)
+      }
+    }
+  }
+
   const result = shouldReturnEmpty(mockOrders)
   return result ?? mockOrders
 }

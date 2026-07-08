@@ -58,7 +58,7 @@ export default async function CheckoutPage({
 
   let shipping = { price: 0, estimatedDays: '5-8 dias úteis', region: '' }
   if (addresses[0]?.zipCode) {
-    shipping = calculateShipping(addresses[0].zipCode)
+    shipping = await calculateShipping(addresses[0].zipCode)
   }
 
   const shippingOptions = [
@@ -255,5 +255,5 @@ async function savePreferences(preferences: SubscriberPreferencesValue) {
 
 async function submitOrder() {
   'use server'
-  createOrder()
+  await createOrder()
 }

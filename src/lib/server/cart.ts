@@ -1,8 +1,8 @@
 import {
   addCartItem,
   applyCoupon,
-  calculateShipping,
-  createOrder,
+  calculateShipping as repoCalculateShipping,
+  createOrder as repoCreateOrder,
   getCart,
   getCartTotals,
   removeCartItem,
@@ -43,4 +43,12 @@ export async function removeCartItemWithTotals(itemId: string): Promise<CartWith
   return withTotals(await removeCartItem(itemId))
 }
 
-export { applyCoupon, calculateShipping, createOrder }
+export async function calculateShipping(zipCode: string) {
+  return repoCalculateShipping(zipCode)
+}
+
+export async function createOrder(input?: Parameters<typeof repoCreateOrder>[0]) {
+  return repoCreateOrder(input)
+}
+
+export { applyCoupon }
