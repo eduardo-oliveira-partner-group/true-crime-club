@@ -13,12 +13,19 @@ Gerado com o skill improve em 2026-06-24. Reconcile completo em 2026-06-26 @ `7f
 
 | 005 | Separar a landing page e promover seu design system no Front Office | P1 | L | - | **DONE** — commit `99b21da` no worktree `plan005-549b04b4`; typecheck/build exit 0; lint pré-existente (baseline @ `484bdfd` já falha) |
 | 006 | Integração da API Pública para Catálogo e Planos | P1 | M | - | **DONE** — verificado no worktree do subagent; typecheck/build exit 0 |
+| 007 | Fechamento de Catálogo/Planos e Fallback Intencional | P1 | S | 006 | **DONE** — verificado no worktree do subagent; typecheck/build exit 0 |
+| 008 | Integração pública de Carrinho | P1 | M | 007 + API plano 003 | TODO |
+| 009 | Integração pública de Checkout | P1 | M | 008 + API plano 004 | TODO |
+| 010 | Integração pública da Área do Cliente | P1 | L | 009 + API plano 005 | TODO |
 
 Valores de status: TODO | IN PROGRESS | DONE | BLOCKED (com motivo em uma linha) | REJECTED (com justificativa em uma linha)
 
 ## Ordem recomendada agora
 
-Todos os planos de 001 a 006 foram concluídos.
+1. Executar o Plano 007 para fechar a fatia atual e silenciar fallback esperado no build.
+2. Executar o Plano 008 em conjunto com o contrato de carrinho da API.
+3. Executar o Plano 009 apenas depois do carrinho estabilizado.
+4. Executar o Plano 010 por subfatias, porque depende de sessão, pedidos, assinatura, financeiro e conteúdo.
 
 ## Notas de Dependência
 
@@ -29,4 +36,3 @@ Todos os planos de 001 a 006 foram concluídos.
 ## Itens Considerados e Rejeitados
 
 - Nenhum. Estes planos vieram de planejamento de produto/tarefa, não de uma auditoria de bugs.
-
