@@ -254,7 +254,10 @@ function QuantityControls({
         <form
           action={async () => {
             'use server'
-            await updateCartItemQuantityWithTotals(itemId, Math.max(quantity - 1, 1))
+            await updateCartItemQuantityWithTotals(
+              itemId,
+              Math.max(quantity - 1, 1),
+            )
             revalidatePath('/carrinho')
           }}
         >

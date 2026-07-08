@@ -16,7 +16,7 @@ Gerado com o skill improve em 2026-06-24. Reconcile completo em 2026-07-08 @ `94
 | 008 | Integração pública de Carrinho | P1 | M | 007 | **DONE** — reverificado @ `94cc25f`; typecheck/build exit 0 |
 | 009 | Integração pública de Checkout | P1 | M | 008 | **DONE** — reverificado @ `94cc25f`; typecheck/build exit 0 |
 | 010 | Integração pública da Área do Cliente | P1 | L | 009 | **DONE** — `26db9e3` + financeiro `94cc25f`; typecheck/build exit 0 |
-| 011 | Suprimir warnings ENOTFOUND no fallback do build | P2 | S | 007 | **TODO** |
+| 011 | Suprimir warnings ENOTFOUND no fallback do build | P2 | S | 007 | **DONE** — verificado @ `d2bcbfd`; build silencioso offline |
 
 Valores de status: TODO | IN PROGRESS | DONE | BLOCKED (com motivo em uma linha) | REJECTED (com justificativa em uma linha)
 

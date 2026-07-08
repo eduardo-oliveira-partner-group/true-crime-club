@@ -231,7 +231,9 @@ export default async function HomePage() {
   )
   const plans = await listPlans()
   const activeCase = await getActiveCase()
-  const progress = activeCase ? await getSubscriberProgress(activeCase.id) : null
+  const progress = activeCase
+    ? await getSubscriberProgress(activeCase.id)
+    : null
   const featuredBox = featuredProducts.find((product) => product.type === 'box')
   const liveEventDate = progress?.liveEventDate ?? activeCase?.liveEventDate
   const liveEventTitle =

@@ -731,13 +731,13 @@ async function handlePtBrApi(
       return json(toPayment(payment))
     }
 
-    const renewPixMatch = path.match(/^cliente\/pagamentos\/([^/]+)\/renovar-pix$/)
+    const renewPixMatch = path.match(
+      /^cliente\/pagamentos\/([^/]+)\/renovar-pix$/,
+    )
     if (method === 'POST' && renewPixMatch) {
       try {
         return json(
-          toPayment(
-            renewPixPaymentMock(decodeURIComponent(renewPixMatch[1])),
-          ),
+          toPayment(renewPixPaymentMock(decodeURIComponent(renewPixMatch[1]))),
         )
       } catch (err) {
         const message =

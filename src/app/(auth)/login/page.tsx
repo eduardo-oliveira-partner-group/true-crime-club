@@ -48,6 +48,9 @@ export default function LoginPage() {
     if (!emailValue) {
       currentErrors.email = 'E-mail é obrigatório.'
       hasErrors = true
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue)) {
+      currentErrors.email = 'E-mail inválido.'
+      hasErrors = true
     }
     if (!passwordValue) {
       currentErrors.password = 'Senha é obrigatória.'

@@ -384,7 +384,10 @@ export async function addCartItem(input: {
   return await getCart()
 }
 
-export async function updateCartItemQuantity(itemId: string, quantity: number): Promise<Cart> {
+export async function updateCartItemQuantity(
+  itemId: string,
+  quantity: number,
+): Promise<Cart> {
   throwIfError()
 
   const isLocalMockMode =
@@ -398,7 +401,10 @@ export async function updateCartItemQuantity(itemId: string, quantity: number): 
       return await apiClient.cart.updateQuantity(itemId, quantity)
     } catch (e) {
       if (!isConnectionRefused(e)) {
-        console.warn('API updateCartItemQuantity error, falling back to local mocks:', e)
+        console.warn(
+          'API updateCartItemQuantity error, falling back to local mocks:',
+          e,
+        )
         throw e
       }
     }
@@ -430,7 +436,10 @@ export async function removeCartItem(itemId: string): Promise<Cart> {
       return await apiClient.cart.removeItem(itemId)
     } catch (e) {
       if (!isConnectionRefused(e)) {
-        console.warn('API removeCartItem error, falling back to local mocks:', e)
+        console.warn(
+          'API removeCartItem error, falling back to local mocks:',
+          e,
+        )
         throw e
       }
     }
@@ -440,7 +449,9 @@ export async function removeCartItem(itemId: string): Promise<Cart> {
   return await getCart()
 }
 
-export async function calculateShipping(zipCode: string): Promise<ShippingEstimate> {
+export async function calculateShipping(
+  zipCode: string,
+): Promise<ShippingEstimate> {
   throwIfError()
 
   const isLocalMockMode =
@@ -459,7 +470,10 @@ export async function calculateShipping(zipCode: string): Promise<ShippingEstima
       }
     } catch (e) {
       if (!isConnectionRefused(e)) {
-        console.warn('API calculateShipping error, falling back to local mocks:', e)
+        console.warn(
+          'API calculateShipping error, falling back to local mocks:',
+          e,
+        )
       }
     }
   }
@@ -761,7 +775,10 @@ async function fetchCasesBundle(): Promise<{
     }
   } catch (error) {
     if (!isConnectionRefused(error)) {
-      console.warn('API cases.getData error, falling back to local mocks:', error)
+      console.warn(
+        'API cases.getData error, falling back to local mocks:',
+        error,
+      )
     }
     return null
   }
@@ -855,7 +872,10 @@ export async function getCustomerProfile(): Promise<{
       return await apiClient.customer.getProfile()
     } catch (error) {
       if (!isConnectionRefused(error)) {
-        console.warn('API getProfile error, falling back to local mocks:', error)
+        console.warn(
+          'API getProfile error, falling back to local mocks:',
+          error,
+        )
       }
     }
   }
@@ -926,7 +946,10 @@ export async function addCustomerAddress(body: {
       return await apiClient.customer.addAddress(body)
     } catch (error) {
       if (!isConnectionRefused(error)) {
-        console.warn('API addAddress error, falling back to local mocks:', error)
+        console.warn(
+          'API addAddress error, falling back to local mocks:',
+          error,
+        )
       }
     }
   }
@@ -1063,7 +1086,10 @@ export async function getOrderById(id: string): Promise<Order | null> {
         return null
       }
       if (!isConnectionRefused(error)) {
-        console.warn('API getOrderById error, falling back to local mocks:', error)
+        console.warn(
+          'API getOrderById error, falling back to local mocks:',
+          error,
+        )
       }
     }
   }
@@ -1317,7 +1343,10 @@ export async function updateCard(input: {
       return await apiClient.customer.updateCard(input)
     } catch (error) {
       if (!isConnectionRefused(error)) {
-        console.warn('API updateCard error, falling back to local mocks:', error)
+        console.warn(
+          'API updateCard error, falling back to local mocks:',
+          error,
+        )
       }
     }
   }
@@ -1578,7 +1607,10 @@ export async function getClueBySlug(slug: string): Promise<Clue | null> {
         return null
       }
       if (!isConnectionRefused(error)) {
-        console.warn('API getClueBySlug error, falling back to local mocks:', error)
+        console.warn(
+          'API getClueBySlug error, falling back to local mocks:',
+          error,
+        )
       }
     }
   }

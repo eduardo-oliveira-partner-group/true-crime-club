@@ -39,7 +39,9 @@ export async function updateCartItemQuantityWithTotals(
   return withTotals(await updateCartItemQuantity(itemId, quantity))
 }
 
-export async function removeCartItemWithTotals(itemId: string): Promise<CartWithTotals> {
+export async function removeCartItemWithTotals(
+  itemId: string,
+): Promise<CartWithTotals> {
   return withTotals(await removeCartItem(itemId))
 }
 
@@ -47,7 +49,9 @@ export async function calculateShipping(zipCode: string) {
   return repoCalculateShipping(zipCode)
 }
 
-export async function createOrder(input?: Parameters<typeof repoCreateOrder>[0]) {
+export async function createOrder(
+  input?: Parameters<typeof repoCreateOrder>[0],
+) {
   return repoCreateOrder(input)
 }
 

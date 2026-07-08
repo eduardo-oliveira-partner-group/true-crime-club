@@ -4,7 +4,10 @@ import { PublicHeaderContent } from './public-header-content'
 
 export async function PublicHeader() {
   const cart = await getCart()
-  const itemCount = cart.items.reduce((sum: number, item: any) => sum + item.quantity, 0)
+  const itemCount = cart.items.reduce(
+    (sum: number, item: any) => sum + item.quantity,
+    0,
+  )
 
   return <PublicHeaderContent itemCount={itemCount} />
 }

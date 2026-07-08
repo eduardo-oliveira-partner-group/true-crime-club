@@ -22,7 +22,9 @@ const statusTone: Record<string, string> = {
 export default async function ConteudosPage() {
   const activeCase = await getActiveCase()
   const clues = await listClues(activeCase?.id)
-  const progress = activeCase ? await getSubscriberProgress(activeCase.id) : null
+  const progress = activeCase
+    ? await getSubscriberProgress(activeCase.id)
+    : null
 
   return (
     <div>

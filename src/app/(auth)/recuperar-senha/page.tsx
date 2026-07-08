@@ -28,6 +28,9 @@ export default function RecuperarSenhaPage() {
     if (!emailValue) {
       setError('E-mail é obrigatório.')
       return
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue)) {
+      setError('E-mail inválido.')
+      return
     }
 
     setIsLoading(true)
