@@ -14,8 +14,8 @@ Gerado com o skill improve em 2026-06-24. Reconcile completo em 2026-06-26 @ `7f
 | 005 | Separar a landing page e promover seu design system no Front Office | P1 | L | - | **DONE** — commit `99b21da` no worktree `plan005-549b04b4`; typecheck/build exit 0; lint pré-existente (baseline @ `484bdfd` já falha) |
 | 006 | Integração da API Pública para Catálogo e Planos | P1 | M | - | **DONE** — verificado no worktree do subagent; typecheck/build exit 0 |
 | 007 | Fechamento de Catálogo/Planos e Fallback Intencional | P1 | S | 006 | **DONE** — verificado no worktree do subagent; typecheck/build exit 0 |
-| 008 | Integração pública de Carrinho | P1 | M | 007 + API plano 003 | TODO |
-| 009 | Integração pública de Checkout | P1 | M | 008 + API plano 004 | TODO |
+| 008 | Integração pública de Carrinho | P1 | M | 007 + API plano 003 | DONE — verificado no worktree do subagent; typecheck/build exit 0 |
+| 009 | Integração pública de Checkout | P1 | M | 008 + API plano 004 | DONE — verificado no worktree do subagent; typecheck/build exit 0 |
 | 010 | Integração pública da Área do Cliente | P1 | L | 009 + API plano 005 | TODO |
 
 Valores de status: TODO | IN PROGRESS | DONE | BLOCKED (com motivo em uma linha) | REJECTED (com justificativa em uma linha)
