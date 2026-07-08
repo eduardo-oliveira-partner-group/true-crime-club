@@ -27,7 +27,7 @@ const statusTone: Record<string, string> = {
 }
 
 export default async function PedidosPage() {
-  const orders: Order[] = listOrders()
+  const orders: Order[] = await listOrders()
 
   return (
     <div>

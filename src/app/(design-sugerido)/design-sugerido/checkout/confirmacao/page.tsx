@@ -30,8 +30,8 @@ export const metadata = buildMetadata({
   noindex: true,
 })
 
-export default function ConfirmacaoPage() {
-  const orders = listOrders()
+export default async function ConfirmacaoPage() {
+  const orders = await listOrders()
   const order = orders[0]
 
   if (!order) {
