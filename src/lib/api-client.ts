@@ -178,10 +178,10 @@ function fromAddress(address: {
 
 export const apiClient = {
   auth: {
-    login: async (body: { email: string }) =>
+    login: async (body: { email: string; password: string }) =>
       fetcher('/autenticacao/entrar', {
         method: 'POST',
-        body: JSON.stringify(body),
+        body: JSON.stringify({ email: body.email, senha: body.password }),
       }).then((data) => ({
         ...data,
         cliente: data.cliente ? toCustomer(data.cliente) : undefined,

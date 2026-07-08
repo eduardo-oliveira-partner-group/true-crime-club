@@ -26,8 +26,9 @@ export default function LoginPage() {
   const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const email = e.currentTarget.email.value
+    const password = e.currentTarget.password.value
     try {
-      await apiClient.auth.login({ email })
+      await apiClient.auth.login({ email, password })
       localStorage.setItem('isLoggedIn', 'true')
       router.push('/design-sugerido/cliente/pedidos')
     } catch (err) {

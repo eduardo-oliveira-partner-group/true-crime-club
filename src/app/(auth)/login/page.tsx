@@ -64,7 +64,7 @@ export default function LoginPage() {
     try {
       // Simulate slight network latency to let user feel the interaction
       await new Promise((resolve) => setTimeout(resolve, 800))
-      await apiClient.auth.login({ email: emailValue })
+      await apiClient.auth.login({ email: emailValue, password: passwordValue })
       localStorage.setItem('isLoggedIn', 'true')
       router.push('/cliente/pedidos')
     } catch (err) {

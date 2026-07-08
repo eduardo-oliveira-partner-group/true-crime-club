@@ -65,7 +65,10 @@ export default function CadastroPage() {
       await new Promise((resolve) => setTimeout(resolve, 1000))
 
       // Auto login
-      await apiClient.auth.login({ email: emailValue })
+      await apiClient.auth.login({
+        email: emailValue,
+        password: passwordValue,
+      })
       localStorage.setItem('isLoggedIn', 'true')
 
       setIsSuccess(true)
