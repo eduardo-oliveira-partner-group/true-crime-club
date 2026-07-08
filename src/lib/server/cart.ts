@@ -21,26 +21,26 @@ function withTotals(cart: Cart): CartWithTotals {
   return { ...cart, ...getCartTotals(cart) }
 }
 
-export function getCartWithTotals(): CartWithTotals {
-  return withTotals(getCart())
+export async function getCartWithTotals(): Promise<CartWithTotals> {
+  return withTotals(await getCart())
 }
 
-export function addCartItemWithTotals(input: {
+export async function addCartItemWithTotals(input: {
   productId: string
   quantity?: number
-}): CartWithTotals {
-  return withTotals(addCartItem(input))
+}): Promise<CartWithTotals> {
+  return withTotals(await addCartItem(input))
 }
 
-export function updateCartItemQuantityWithTotals(
+export async function updateCartItemQuantityWithTotals(
   itemId: string,
   quantity: number,
-): CartWithTotals {
-  return withTotals(updateCartItemQuantity(itemId, quantity))
+): Promise<CartWithTotals> {
+  return withTotals(await updateCartItemQuantity(itemId, quantity))
 }
 
-export function removeCartItemWithTotals(itemId: string): CartWithTotals {
-  return withTotals(removeCartItem(itemId))
+export async function removeCartItemWithTotals(itemId: string): Promise<CartWithTotals> {
+  return withTotals(await removeCartItem(itemId))
 }
 
 export { applyCoupon, calculateShipping, createOrder }

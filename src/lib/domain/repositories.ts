@@ -288,16 +288,51 @@ function mapApiPlanToDomain(apiPlan: any): SubscriptionPlan {
   }
 }
 
-export function getCart(): Cart {
+export async function getCart(): Promise<Cart> {
   throwIfError()
+
+  const isLocalMockMode =
+    !process.env.NEXT_PUBLIC_API_BASE_URL ||
+    process.env.NEXT_PUBLIC_LOCAL_MOCK === 'true' ||
+    process.env.NEXT_PUBLIC_MOCK_MODE === 'true' ||
+    process.env.LOCAL_MOCK_MODE === 'true'
+
+  if (!isLocalMockMode) {
+    try {
+      return await apiClient.cart.get()
+    } catch (e) {
+      if (!isConnectionRefused(e)) {
+        console.warn('API getCart error, falling back to local mocks:', e)
+      }
+    }
+  }
+
   return structuredClone(cartState)
 }
 
-export function addCartItem(input: {
+export async function addCartItem(input: {
   productId: string
   quantity?: number
-}): Cart {
+}): Promise<Cart> {
   throwIfError()
+
+  const isLocalMockMode =
+    !process.env.NEXT_PUBLIC_API_BASE_URL ||
+    process.env.NEXT_PUBLIC_LOCAL_MOCK === 'true' ||
+    process.env.NEXT_PUBLIC_MOCK_MODE === 'true' ||
+    process.env.LOCAL_MOCK_MODE === 'true'
+
+  if (!isLocalMockMode) {
+    try {
+      return await apiClient.cart.addItem(input.productId, input.quantity ?? 1)
+    } catch (e) {
+      if (!isConnectionRefused(e)) {
+        console.warn('API addCartItem error, falling back to local mocks:', e)
+        throw e
+      }
+    }
+  }
+
   const product = mockProducts.find((p) => p.id === input.productId)
   if (!product) {
     throw new Error('Produto não encontrado.')
@@ -326,11 +361,29 @@ export function addCartItem(input: {
     cartState.items.push(item)
   }
 
-  return getCart()
+  return await getCart()
 }
 
-export function updateCartItemQuantity(itemId: string, quantity: number): Cart {
+export async function updateCartItemQuantity(itemId: string, quantity: number): Promise<Cart> {
   throwIfError()
+
+  const isLocalMockMode =
+    !process.env.NEXT_PUBLIC_API_BASE_URL ||
+    process.env.NEXT_PUBLIC_LOCAL_MOCK === 'true' ||
+    process.env.NEXT_PUBLIC_MOCK_MODE === 'true' ||
+    process.env.LOCAL_MOCK_MODE === 'true'
+
+  if (!isLocalMockMode) {
+    try {
+      return await apiClient.cart.updateQuantity(itemId, quantity)
+    } catch (e) {
+      if (!isConnectionRefused(e)) {
+        console.warn('API updateCartItemQuantity error, falling back to local mocks:', e)
+        throw e
+      }
+    }
+  }
+
   const item = cartState.items.find((i) => i.id === itemId)
   if (!item) {
     throw new Error('Item não encontrado no carrinho.')
@@ -340,13 +393,31 @@ export function updateCartItemQuantity(itemId: string, quantity: number): Cart {
   } else {
     item.quantity = quantity
   }
-  return getCart()
+  return await getCart()
 }
 
-export function removeCartItem(itemId: string): Cart {
+export async function removeCartItem(itemId: string): Promise<Cart> {
   throwIfError()
+
+  const isLocalMockMode =
+    !process.env.NEXT_PUBLIC_API_BASE_URL ||
+    process.env.NEXT_PUBLIC_LOCAL_MOCK === 'true' ||
+    process.env.NEXT_PUBLIC_MOCK_MODE === 'true' ||
+    process.env.LOCAL_MOCK_MODE === 'true'
+
+  if (!isLocalMockMode) {
+    try {
+      return await apiClient.cart.removeItem(itemId)
+    } catch (e) {
+      if (!isConnectionRefused(e)) {
+        console.warn('API removeCartItem error, falling back to local mocks:', e)
+        throw e
+      }
+    }
+  }
+
   cartState.items = cartState.items.filter((i) => i.id !== itemId)
-  return getCart()
+  return await getCart()
 }
 
 export function calculateShipping(zipCode: string): ShippingEstimate {
@@ -364,8 +435,32 @@ export function calculateShipping(zipCode: string): ShippingEstimate {
   }
 }
 
-export function applyCoupon(code: string): CouponResult {
+export async function applyCoupon(code: string): Promise<CouponResult> {
   throwIfError()
+
+  const isLocalMockMode =
+    !process.env.NEXT_PUBLIC_API_BASE_URL ||
+    process.env.NEXT_PUBLIC_LOCAL_MOCK === 'true' ||
+    process.env.NEXT_PUBLIC_MOCK_MODE === 'true' ||
+    process.env.LOCAL_MOCK_MODE === 'true'
+
+  if (!isLocalMockMode) {
+    try {
+      const apiResult = await apiClient.cart.applyCoupon(code)
+      return {
+        valid: apiResult.valido ?? apiResult.valid ?? false,
+        code: apiResult.codigo ?? apiResult.code ?? code,
+        discount: apiResult.desconto ?? apiResult.discount ?? 0,
+        message: apiResult.mensagem ?? apiResult.message ?? '',
+      }
+    } catch (e) {
+      if (!isConnectionRefused(e)) {
+        console.warn('API applyCoupon error, falling back to local mocks:', e)
+        throw e
+      }
+    }
+  }
+
   const normalized = code.trim().toUpperCase()
   const discount = VALID_COUPONS[normalized]
 
@@ -391,7 +486,7 @@ export function applyCoupon(code: string): CouponResult {
   }
 }
 
-export function getCartTotals(cart: Cart = getCart()) {
+export function getCartTotals(cart: Cart) {
   const subtotal = cart.items.reduce(
     (sum, item) => sum + item.unitPrice * item.quantity,
     0,
@@ -408,7 +503,7 @@ export function createOrder(input?: {
   shipping?: number
 }): Order {
   throwIfError()
-  const cart = getCart()
+  const cart = structuredClone(cartState)
   const { subtotal, discount, shipping, total } = getCartTotals(cart)
   const now = new Date()
 

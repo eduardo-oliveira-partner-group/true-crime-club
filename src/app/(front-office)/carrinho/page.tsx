@@ -50,7 +50,7 @@ export const metadata = buildMetadata({
 })
 
 export default async function CarrinhoPage() {
-  const cart = getCartWithTotals()
+  const cart = await getCartWithTotals()
   const totals = cart
   const shipping = calculateShipping(sampleZipCode)
   const grandTotal = totals.total + shipping.price
@@ -278,7 +278,7 @@ function CartLineItem({
             <form
               action={async () => {
                 'use server'
-                removeCartItemWithTotals(item.id)
+                await removeCartItemWithTotals(item.id)
                 revalidatePath('/carrinho')
               }}
             >
@@ -323,7 +323,7 @@ function QuantityControls({
         <form
           action={async () => {
             'use server'
-            updateCartItemQuantityWithTotals(itemId, Math.max(quantity - 1, 1))
+            await updateCartItemQuantityWithTotals(itemId, Math.max(quantity - 1, 1))
             revalidatePath('/carrinho')
           }}
         >
@@ -348,7 +348,7 @@ function QuantityControls({
         <form
           action={async () => {
             'use server'
-            updateCartItemQuantityWithTotals(itemId, quantity + 1)
+            await updateCartItemQuantityWithTotals(itemId, quantity + 1)
             revalidatePath('/carrinho')
           }}
         >
@@ -512,7 +512,7 @@ function CouponForm() {
     <form
       action={async (formData) => {
         'use server'
-        applyCoupon(String(formData.get('coupon') ?? ''))
+        await applyCoupon(String(formData.get('coupon') ?? ''))
         revalidatePath('/carrinho')
       }}
       className="mt-2 space-y-2"
