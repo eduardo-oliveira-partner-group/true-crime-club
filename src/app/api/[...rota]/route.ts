@@ -25,9 +25,13 @@ import {
   listExclusiveContentMock,
   listOrdersMock,
   listPaymentMethodsMock,
+  listPaymentsMock,
+  listInvoicesMock,
   listPlans,
   listProducts,
   reactivateSubscriptionMock,
+  renewPixPaymentMock,
+  updateCardMock,
   updateCustomerProfileMock,
 } from '@/src/lib/domain/repositories'
 import type {
@@ -42,8 +46,10 @@ import type {
   DynamicContentBlock,
   ExclusiveContent,
   Order,
+  Payment,
   PaymentMethod,
   Product,
+  Invoice,
   SeoEntry,
   ShippingEstimate,
   SubscriberProgress,
@@ -370,6 +376,34 @@ function toSubscription(subscription: Subscription) {
   }
 }
 
+function toPayment(payment: Payment) {
+  return {
+    id: payment.id,
+    idPedido: payment.orderId,
+    idAssinatura: payment.subscriptionId,
+    valor: payment.amount,
+    status: toPaymentStatus(payment.status),
+    metodo: payment.method === 'pix' ? 'pix' : 'cartao_credito',
+    vencimento: payment.dueDate,
+    pagoEm: payment.paidAt,
+    pixQrCode: payment.pixQrCode,
+    pixExpiraEm: payment.pixExpiresAt,
+    motivoRecusa: payment.refusalReason,
+  }
+}
+
+function toInvoice(invoice: Invoice) {
+  return {
+    id: invoice.id,
+    numero: invoice.number,
+    idPagamento: invoice.paymentId,
+    valor: invoice.amount,
+    emitidoEm: invoice.issuedAt,
+    urlRecibo: invoice.receiptUrl,
+    urlDownload: invoice.downloadUrl,
+  }
+}
+
 function toCaseFile(file: CaseFile) {
   return {
     id: file.id,
@@ -682,6 +716,51 @@ async function handlePtBrApi(
         }
         return error('Ação inválida', 400)
       }
+    }
+
+    if (method === 'GET' && path === 'cliente/pagamentos') {
+      return json(listPaymentsMock().map(toPayment))
+    }
+
+    const paymentMatch = path.match(/^cliente\/pagamentos\/([^/]+)$/)
+    if (method === 'GET' && paymentMatch) {
+      const payment = listPaymentsMock().find(
+        (item) => item.id === decodeURIComponent(paymentMatch[1]),
+      )
+      if (!payment) return error('Pagamento não encontrado', 404)
+      return json(toPayment(payment))
+    }
+
+    const renewPixMatch = path.match(/^cliente\/pagamentos\/([^/]+)\/renovar-pix$/)
+    if (method === 'POST' && renewPixMatch) {
+      try {
+        return json(
+          toPayment(
+            renewPixPaymentMock(decodeURIComponent(renewPixMatch[1])),
+          ),
+        )
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : 'Pagamento não encontrado'
+        return error(message, 404)
+      }
+    }
+
+    if (method === 'GET' && path === 'cliente/faturas') {
+      return json(listInvoicesMock().map(toInvoice))
+    }
+
+    if (method === 'POST' && path === 'cliente/cartao') {
+      const body = await readJson(request)
+      return json(
+        toPaymentMethod(
+          updateCardMock({
+            holderName: String(body.nomeImpresso ?? ''),
+            lastFour: String(body.ultimosQuatro ?? '0000').slice(-4),
+            brand: String(body.bandeira ?? 'Visa'),
+          }),
+        ),
+      )
     }
 
     if (method === 'GET' && path === 'conteudos-exclusivos') {

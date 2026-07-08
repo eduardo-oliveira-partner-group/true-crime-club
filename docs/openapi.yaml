@@ -9,8 +9,10 @@ info:
     * Datas seguem o formato ISO 8601 (`YYYY-MM-DDTHH:mm:ss.sssZ`).
   version: 1.0.0
 servers:
+  - url: http://localhost:8000/api
+    description: API FastAPI local (tcc-front-office-api)
   - url: http://localhost:3000/api
-    description: Servidor local de simulação
+    description: Servidor local de simulação (proxy Next)
   - url: https://api.truecrimeclub.com.br/v1
     description: Servidor de produção futuro
 
@@ -24,7 +26,7 @@ tags:
   - name: Finalização & Frete
     description: Cálculo de Frete e Fechamento de Pedidos
   - name: Cliente & Painel
-    description: Informações Pessoais, Endereços e Assinatura do Cliente
+    description: Informações Pessoais, Endereços, Assinatura, Pagamentos e Faturas do Cliente
   - name: Conteúdo & Investigação
     description: Casos, Pistas, Progresso e Arquivos Liberados
   - name: Conteúdo Dinâmico & SEO
@@ -608,6 +610,133 @@ paths:
               schema:
                 $ref: '#/components/schemas/Assinatura'
 
+  /cliente/pagamentos:
+    get:
+      tags:
+        - Cliente & Painel
+      summary: Listar cobranças e pagamentos do cliente
+      description: |
+        Histórico de cobranças da assinatura e de pedidos avulsos.
+        Usado em `/cliente/financeiro` (`listPayments`).
+      responses:
+        '200':
+          description: Lista de pagamentos/cobranças.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Pagamento'
+
+  /cliente/pagamentos/{id}:
+    get:
+      tags:
+        - Cliente & Painel
+      summary: Detalhar cobrança/pagamento
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: pagamento-001
+      responses:
+        '200':
+          description: Detalhes do pagamento.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pagamento'
+        '404':
+          description: Pagamento não encontrado.
+
+  /cliente/pagamentos/{id}/renovar-pix:
+    post:
+      tags:
+        - Cliente & Painel
+      summary: Renovar QR Code Pix de um pagamento pendente
+      description: |
+        Gera novo QR Code e nova expiração para pagamento Pix pendente.
+        Usado em `/cliente/financeiro` (`renewPixPayment`).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: pagamento-004
+      responses:
+        '200':
+          description: Pagamento Pix renovado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pagamento'
+        '404':
+          description: Pagamento não encontrado.
+        '409':
+          description: Pagamento já pago ou não elegível para renovação.
+        '410':
+          description: Pagamento expirado definitivamente.
+
+  /cliente/faturas:
+    get:
+      tags:
+        - Cliente & Painel
+      summary: Listar faturas e recibos do cliente
+      description: |
+        Histórico de faturas/recibos associados às cobranças.
+        Usado em `/cliente/financeiro` (`listInvoices`).
+      responses:
+        '200':
+          description: Lista de faturas.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Fatura'
+
+  /cliente/cartao:
+    post:
+      tags:
+        - Cliente & Painel
+      summary: Atualizar cartão padrão do cliente
+      description: |
+        Atualiza o meio de pagamento cartão padrão.
+        Usado em `/cliente/financeiro/atualizar-cartao` (`updateCard`).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - nomeImpresso
+                - ultimosQuatro
+                - bandeira
+              properties:
+                nomeImpresso:
+                  type: string
+                  example: Mariana Silva
+                ultimosQuatro:
+                  type: string
+                  example: "4242"
+                bandeira:
+                  type: string
+                  example: Visa
+                token:
+                  type: string
+                  description: Token do gateway (mock/futuro).
+                  example: tok_novo
+      responses:
+        '200':
+          description: Cartão atualizado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetodoPagamento'
+
   # --- CONTEÚDO & INVESTIGAÇÃO ---
   /conteudos-exclusivos:
     get:
@@ -1179,6 +1308,115 @@ components:
         podeReativar:
           type: boolean
           example: false
+
+    MetodoPagamento:
+      type: object
+      properties:
+        id:
+          type: string
+          example: metodo-pagamento-001
+        tipo:
+          type: string
+          enum: [cartao_credito, pix]
+          example: cartao_credito
+        rotulo:
+          type: string
+          example: Visa terminando em 4242
+        ultimosQuatro:
+          type: string
+          example: "4242"
+        bandeira:
+          type: string
+          example: Visa
+        padrao:
+          type: boolean
+          example: true
+
+    Pagamento:
+      type: object
+      required:
+        - id
+        - valor
+        - status
+        - metodo
+        - vencimento
+      properties:
+        id:
+          type: string
+          example: pagamento-001
+        idPedido:
+          type: string
+          description: Presente quando a cobrança está ligada a um pedido avulso.
+          example: pedido-001
+        idAssinatura:
+          type: string
+          description: Presente quando a cobrança está ligada à assinatura.
+          example: assinatura-001
+        valor:
+          type: integer
+          description: Valor em centavos.
+          example: 14990
+        status:
+          type: string
+          enum: [pendente, pago, recusado, expirado, estornado]
+          example: pago
+        metodo:
+          type: string
+          enum: [cartao_credito, pix]
+          example: cartao_credito
+        vencimento:
+          type: string
+          format: date-time
+          example: "2026-03-01T00:00:00.000Z"
+        pagoEm:
+          type: string
+          format: date-time
+          example: "2026-03-01T08:12:00.000Z"
+        pixQrCode:
+          type: string
+          description: Payload EMV do QR Code Pix, quando metodo=pix e status=pendente.
+          example: 00020126580014BR.GOV.BCB.PIX0136mock-pix-qr-code
+        pixExpiraEm:
+          type: string
+          format: date-time
+          example: "2026-04-01T23:59:00.000Z"
+        motivoRecusa:
+          type: string
+          description: Motivo legível quando status=recusado.
+          example: Cartão recusado pelo emissor. Tente outro meio.
+
+    Fatura:
+      type: object
+      required:
+        - id
+        - numero
+        - idPagamento
+        - valor
+        - emitidoEm
+      properties:
+        id:
+          type: string
+          example: fatura-001
+        numero:
+          type: string
+          example: REC-202603-0042
+        idPagamento:
+          type: string
+          example: pagamento-001
+        valor:
+          type: integer
+          description: Valor em centavos.
+          example: 14990
+        emitidoEm:
+          type: string
+          format: date-time
+          example: "2026-03-01T08:15:00.000Z"
+        urlRecibo:
+          type: string
+          example: /simulacao/recibos/rec-202603-0042.pdf
+        urlDownload:
+          type: string
+          example: /simulacao/recibos/rec-202603-0042.pdf
 
     ConteudoExclusivo:
       type: object

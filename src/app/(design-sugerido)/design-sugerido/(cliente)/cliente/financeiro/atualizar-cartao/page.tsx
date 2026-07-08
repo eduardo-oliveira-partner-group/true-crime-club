@@ -32,7 +32,7 @@ export default function AtualizarCartaoPage() {
         className="mt-6 max-w-md space-y-5"
         action={async (formData) => {
           'use server'
-          updateCard({
+          await updateCard({
             holderName: String(formData.get('holder') ?? ''),
             lastFour: String(formData.get('lastFour') ?? '0000').slice(-4),
             brand: String(formData.get('brand') ?? 'Visa'),

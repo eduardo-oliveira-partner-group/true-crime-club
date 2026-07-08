@@ -28,9 +28,9 @@ const paymentTone: Record<string, string> = {
   expired: 'text-(--ink-mute)',
 }
 
-export default function FinanceiroPage() {
-  const payments = listPayments()
-  const invoices = listInvoices()
+export default async function FinanceiroPage() {
+  const payments = await listPayments()
+  const invoices = await listInvoices()
   const pendingPix = payments.find(
     (p) => p.method === 'pix' && p.status === 'pending',
   )
@@ -98,7 +98,7 @@ export default function FinanceiroPage() {
               className="mt-4"
               action={async () => {
                 'use server'
-                renewPixPayment(pendingPix.id)
+                await renewPixPayment(pendingPix.id)
               }}
             >
               <Button

@@ -2,7 +2,7 @@
 
 > **Executor instructions**: Follow this plan step by step. Run every verification command and confirm the expected result before moving to the next step. If anything in the "STOP conditions" section occurs, stop and report — do not improvise. When done, update the status row for this plan in `plans/README.md` — unless a reviewer dispatched you and told you they maintain the index.
 >
-> **Drift check (run first)**: `git diff --stat cbf9847..HEAD -- src/lib/api-client.ts src/lib/domain/repositories.ts src/lib/server/customer.ts src/app/(auth) src/app/(cliente) docs/openapi.yaml`
+> **Drift check (run first)**: `git diff --stat 26db9e3..HEAD -- src/lib/api-client.ts src/lib/domain/repositories.ts src/lib/server/customer.ts src/app/(auth) src/app/(cliente) docs/openapi.yaml`
 > If any in-scope file changed since this plan was written, compare the "Current state" excerpts against the live code before proceeding; on a mismatch, treat it as a STOP condition.
 
 ## Status
@@ -12,8 +12,8 @@
 - **Risk**: MED
 - **Depends on**: plans/009-public-api-checkout-integration.md
 - **Category**: direction
-- **Planned at**: commit `cbf9847`, 2026-07-08
-- **Progress**: ~85% — worktree `7161484`; financeiro pendente (sem contrato openapi)
+- **Planned at**: commit `26db9e3`, 2026-07-08
+- **Progress**: DONE — merge `26db9e3`; Subfatias A/B/C1/C2/C3/D concluídas
 
 ## Objetivo
 
@@ -21,25 +21,17 @@ Migrar a área do cliente para a API pública, preservando mocks locais enquanto
 
 ## Current state
 
-### Já migrado (não refazer)
+### Já migrado em `26db9e3` (não refazer)
 
-- `src/lib/api-client.ts:179-317` — clientes `auth`, `customer`, `exclusiveContent`, `cases` definidos.
-- `src/app/(auth)/login/page.tsx` — login via `apiClient.auth.login` + `auth.me`.
-- `src/app/(cliente)/cliente/perfil/page.tsx` — perfil/endereços via `apiClient.customer` direto.
-- `src/app/(cliente)/cliente/cartoes/page.tsx` — métodos de pagamento via `apiClient.customer.getProfile`.
-- `src/lib/domain/repositories.ts:667-690` — `listOrders()` API-first com fallback mock.
-- `docs/openapi.yaml` — contratos de `/autenticacao/*`, `/cliente/pedidos`, `/cliente/assinatura` presentes.
+- `src/lib/server/customer.ts` — reexporta funções API-first de `repositories.ts`.
+- `src/lib/domain/repositories.ts` — `getCustomerProfile`, `updateCustomerProfile`, `addCustomerAddress`, `deleteCustomerAddress`, `listOrders`, `getOrderById`, `getSubscription`, `cancelSubscription`, `reactivateSubscription`, `listExclusiveContent`, `getActiveCase`, `listClues`, `getSubscriberProgress` API-first com fallback mock.
+- `src/app/api/[...rota]/route.ts` — handler mock usa helpers `*Mock` (evita recursão com wrappers API-first).
+- Telas migradas: `/cliente/pedidos/[id]`, `/cliente/assinatura`, `/cliente/assinatura/cancelar`, `/cliente/conteudos`, `/cliente/conteudos/[slug]`.
+- `docs/openapi.yaml` — contratos de auth, pedidos, assinatura, conteúdos e casos presentes.
 
-### Ainda mock-only (escopo deste plano)
+### Ainda mock-only (Subfatia C2/C3 — escopo restante)
 
-- `src/lib/domain/repositories.ts:692-695` — `getOrderById()` lê só `mockOrders`.
-- `src/lib/domain/repositories.ts:697-724` — `getSubscription()` / `cancelSubscription()` mock.
-- `src/lib/domain/repositories.ts` — `listPayments`, `listInvoices`, `getActiveCase`, `listClues`, `getSubscriberProgress` sem tentativa API.
-- `src/lib/server/customer.ts` — camada legada mock para perfil; telas de perfil já bypassam, mas pedidos/assinatura ainda importam daqui.
-- `src/app/(cliente)/cliente/pedidos/[id]/page.tsx:29` — `getOrderById(id)` mock.
-- `src/app/(cliente)/cliente/assinatura/page.tsx:17` — `getSubscription()` mock.
-- `src/app/(cliente)/cliente/financeiro/page.tsx:12-16` — `listPayments/listInvoices` mock.
-- `src/app/(cliente)/cliente/conteudos/page.tsx:13-16` — repositórios mock.
+Nenhum — financeiro migrado para API-first com fallback mock.
 
 ### Padrão a seguir
 

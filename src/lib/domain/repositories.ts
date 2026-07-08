@@ -586,7 +586,50 @@ function mapApiOrderToDomain(apiOrder: any): Order {
     shippingCycleNote: apiOrder.observacaoCicloEnvio,
     trackingCode: apiOrder.codigoRastreio,
     trackingUrl: apiOrder.urlRastreio,
-    invoicePlaceholder: apiOrder.notaFiscalPlaceholder ?? 'Nota fiscal disponível após confirmação do pagamento.',
+    invoicePlaceholder:
+      apiOrder.notaFiscalPlaceholder ??
+      'Nota fiscal disponível após confirmação do pagamento.',
+  }
+}
+
+function mapApiPaymentToDomain(apiPayment: any): Payment {
+  const statusMap: Record<string, Payment['status']> = {
+    pendente: 'pending',
+    pago: 'paid',
+    recusado: 'refused',
+    expirado: 'expired',
+    estornado: 'refunded',
+  }
+
+  const methodMap: Record<string, Payment['method']> = {
+    cartao_credito: 'credit_card',
+    pix: 'pix',
+  }
+
+  return {
+    id: apiPayment.id,
+    orderId: apiPayment.idPedido,
+    subscriptionId: apiPayment.idAssinatura,
+    amount: apiPayment.valor,
+    status: statusMap[apiPayment.status] ?? 'paid',
+    method: methodMap[apiPayment.metodo] ?? 'credit_card',
+    dueDate: apiPayment.vencimento,
+    paidAt: apiPayment.pagoEm,
+    pixQrCode: apiPayment.pixQrCode,
+    pixExpiresAt: apiPayment.pixExpiraEm,
+    refusalReason: apiPayment.motivoRecusa,
+  }
+}
+
+function mapApiInvoiceToDomain(apiInvoice: any): Invoice {
+  return {
+    id: apiInvoice.id,
+    number: apiInvoice.numero,
+    paymentId: apiInvoice.idPagamento,
+    amount: apiInvoice.valor,
+    issuedAt: apiInvoice.emitidoEm,
+    receiptUrl: apiInvoice.urlRecibo,
+    downloadUrl: apiInvoice.urlDownload,
   }
 }
 
@@ -1146,7 +1189,27 @@ export function reactivateSubscriptionMock(): Subscription {
   return subscriptionState
 }
 
-export function listPayments(): Payment[] {
+export async function listPayments(): Promise<Payment[]> {
+  throwIfError()
+
+  if (!isLocalMockMode()) {
+    try {
+      const apiPayments = await apiClient.customer.listPayments()
+      return apiPayments.map(mapApiPaymentToDomain)
+    } catch (error) {
+      if (!isConnectionRefused(error)) {
+        console.warn(
+          'API listPayments error, falling back to local mocks:',
+          error,
+        )
+      }
+    }
+  }
+
+  return listPaymentsMock()
+}
+
+export function listPaymentsMock(): Payment[] {
   throwIfError()
   let payments = [...paymentsState]
 
@@ -1173,13 +1236,57 @@ export function listPayments(): Payment[] {
   return result ?? payments
 }
 
-export function listInvoices(): Invoice[] {
+export async function listInvoices(): Promise<Invoice[]> {
+  throwIfError()
+
+  if (!isLocalMockMode()) {
+    try {
+      const apiInvoices = await apiClient.customer.listInvoices()
+      return apiInvoices.map(mapApiInvoiceToDomain)
+    } catch (error) {
+      if (!isConnectionRefused(error)) {
+        console.warn(
+          'API listInvoices error, falling back to local mocks:',
+          error,
+        )
+      }
+    }
+  }
+
+  return listInvoicesMock()
+}
+
+export function listInvoicesMock(): Invoice[] {
   throwIfError()
   const result = shouldReturnEmpty(mockInvoices)
   return result ?? mockInvoices
 }
 
-export function renewPixPayment(paymentId: string): Payment {
+export async function renewPixPayment(paymentId: string): Promise<Payment> {
+  throwIfError()
+
+  if (!isLocalMockMode()) {
+    try {
+      const apiPayment = await apiClient.customer.renewPixPayment(paymentId)
+      const mapped = mapApiPaymentToDomain(apiPayment)
+      paymentsState = paymentsState.map((payment) =>
+        payment.id === paymentId ? mapped : payment,
+      )
+      return mapped
+    } catch (error) {
+      if (!isConnectionRefused(error)) {
+        console.warn(
+          'API renewPixPayment error, falling back to local mocks:',
+          error,
+        )
+      }
+    }
+  }
+
+  return renewPixPaymentMock(paymentId)
+}
+
+export function renewPixPaymentMock(paymentId: string): Payment {
   throwIfError()
   const payment = paymentsState.find((p) => p.id === paymentId)
   if (!payment) {
@@ -1198,7 +1305,27 @@ export function renewPixPayment(paymentId: string): Payment {
   return renewed
 }
 
-export function updateCard(input: {
+export async function updateCard(input: {
+  holderName: string
+  lastFour: string
+  brand: string
+}): Promise<PaymentMethod> {
+  throwIfError()
+
+  if (!isLocalMockMode()) {
+    try {
+      return await apiClient.customer.updateCard(input)
+    } catch (error) {
+      if (!isConnectionRefused(error)) {
+        console.warn('API updateCard error, falling back to local mocks:', error)
+      }
+    }
+  }
+
+  return updateCardMock(input)
+}
+
+export function updateCardMock(input: {
   holderName: string
   lastFour: string
   brand: string

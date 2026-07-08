@@ -306,6 +306,26 @@ export const apiClient = {
         method: 'POST',
         body: JSON.stringify({ acao: 'reativar' }),
       }),
+    listPayments: () => fetcher('/cliente/pagamentos'),
+    getPayment: (id: string) => fetcher(`/cliente/pagamentos/${id}`),
+    renewPixPayment: (id: string) =>
+      fetcher(`/cliente/pagamentos/${id}/renovar-pix`, {
+        method: 'POST',
+      }),
+    listInvoices: () => fetcher('/cliente/faturas'),
+    updateCard: (body: {
+      holderName: string
+      lastFour: string
+      brand: string
+    }) =>
+      fetcher('/cliente/cartao', {
+        method: 'POST',
+        body: JSON.stringify({
+          nomeImpresso: body.holderName,
+          ultimosQuatro: body.lastFour,
+          bandeira: body.brand,
+        }),
+      }).then(toPaymentMethod),
   },
   exclusiveContent: {
     list: () => fetcher('/conteudos-exclusivos'),
