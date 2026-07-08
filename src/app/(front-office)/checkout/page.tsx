@@ -47,7 +47,7 @@ export default async function CheckoutPage({
   const plan = plano ? await getPlanBySlug(plano) : null
   const isSubscriptionFlow = Boolean(plan)
 
-  const cart = getCartWithTotals()
+  const cart = await getCartWithTotals()
   const totals = cart
 
   const profile = getCustomerProfile()

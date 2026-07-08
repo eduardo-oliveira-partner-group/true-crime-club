@@ -611,12 +611,12 @@ async function handlePtBrApi(
     }
 
     if (method === 'GET' && path === 'carrinho') {
-      return json(toCart(getCartWithTotals()))
+      return json(toCart(await getCartWithTotals()))
     }
 
     if (method === 'POST' && path === 'carrinho/itens') {
       const body = await readJson(request)
-      const cart = addCartItemWithTotals({
+      const cart = await addCartItemWithTotals({
         productId: normalizeProductId(String(body.idProduto ?? '')),
         quantity:
           typeof body.quantidade === 'number' ? body.quantidade : undefined,
@@ -630,7 +630,7 @@ async function handlePtBrApi(
 
       if (method === 'PUT') {
         const body = await readJson(request)
-        const cart = updateCartItemQuantityWithTotals(
+        const cart = await updateCartItemQuantityWithTotals(
           itemId,
           Number(body.quantidade),
         )
@@ -638,13 +638,13 @@ async function handlePtBrApi(
       }
 
       if (method === 'DELETE') {
-        return json(toCart(removeCartItemWithTotals(itemId)))
+        return json(toCart(await removeCartItemWithTotals(itemId)))
       }
     }
 
     if (method === 'POST' && path === 'carrinho/cupom') {
       const body = await readJson(request)
-      return json(toCoupon(applyCoupon(String(body.codigo ?? ''))))
+      return json(toCoupon(await applyCoupon(String(body.codigo ?? ''))))
     }
 
     if (method === 'POST' && path === 'finalizacao/frete') {

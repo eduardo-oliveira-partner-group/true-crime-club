@@ -1052,6 +1052,16 @@ components:
           type: string
           example: SP
 
+        subtotal:
+          type: integer
+          example: 14990
+        desconto:
+          type: integer
+          example: 1000
+        total:
+          type: integer
+          example: 13990
+
     ResultadoCupom:
       type: object
       properties:
