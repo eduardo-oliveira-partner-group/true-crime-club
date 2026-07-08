@@ -58,6 +58,20 @@ let cartState: Cart = structuredClone(initialCart)
 let subscriptionState: Subscription = structuredClone(mockSubscription)
 let paymentsState: Payment[] = structuredClone(mockPayments)
 
+function isConnectionRefused(error: any): boolean {
+  if (!error) return false
+  if (error.code === 'ECONNREFUSED') return true
+  if (error.cause) {
+    if (error.cause.code === 'ECONNREFUSED') return true
+    if (Array.isArray(error.cause.errors)) {
+      return error.cause.errors.some((err: any) => err?.code === 'ECONNREFUSED')
+    }
+  }
+  const msg = String(error.message || '')
+  const causeMsg = error.cause ? String(error.cause.message || '') : ''
+  return msg.includes('ECONNREFUSED') || causeMsg.includes('ECONNREFUSED')
+}
+
 function throwIfError(): void {
   if (isScenario('error')) {
     throw new Error(getScenarioErrorMessage())
@@ -88,7 +102,9 @@ export async function listProducts(options?: {
       })
       return apiProducts.map(mapApiProductToDomain)
     } catch (e) {
-      console.warn('API listProducts error, falling back to local mocks:', e)
+      if (!isConnectionRefused(e)) {
+        console.warn('API listProducts error, falling back to local mocks:', e)
+      }
     }
   }
 
@@ -135,10 +151,12 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
       ) {
         return null
       }
-      console.warn(
-        'API getProductBySlug error, falling back to local mocks:',
-        error,
-      )
+      if (!isConnectionRefused(error)) {
+        console.warn(
+          'API getProductBySlug error, falling back to local mocks:',
+          error,
+        )
+      }
     }
   }
 
@@ -166,7 +184,9 @@ export async function listPlans(): Promise<SubscriptionPlan[]> {
       const apiPlans = await apiClient.plans.list()
       return apiPlans.map(mapApiPlanToDomain)
     } catch (e) {
-      console.warn('API listPlans error, falling back to local mocks:', e)
+      if (!isConnectionRefused(e)) {
+        console.warn('API listPlans error, falling back to local mocks:', e)
+      }
     }
   }
 
@@ -198,10 +218,12 @@ export async function getPlanBySlug(
       ) {
         return null
       }
-      console.warn(
-        'API getPlanBySlug error, falling back to local mocks:',
-        error,
-      )
+      if (!isConnectionRefused(error)) {
+        console.warn(
+          'API getPlanBySlug error, falling back to local mocks:',
+          error,
+        )
+      }
     }
   }
 
