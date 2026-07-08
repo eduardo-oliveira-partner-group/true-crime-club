@@ -59,18 +59,43 @@ let cartState: Cart = structuredClone(initialCart)
 let subscriptionState: Subscription = structuredClone(mockSubscription)
 let paymentsState: Payment[] = structuredClone(mockPayments)
 
-function isConnectionRefused(error: any): boolean {
-  if (!error) return false
-  if (error.code === 'ECONNREFUSED') return true
-  if (error.cause) {
-    if (error.cause.code === 'ECONNREFUSED') return true
-    if (Array.isArray(error.cause.errors)) {
-      return error.cause.errors.some((err: any) => err?.code === 'ECONNREFUSED')
+const OFFLINE_ERROR_CODES = new Set([
+  'ECONNREFUSED',
+  'ENOTFOUND',
+  'EAI_AGAIN',
+  'ETIMEDOUT',
+  'ENETUNREACH',
+  'UND_ERR_CONNECT_TIMEOUT',
+])
+
+function getErrorChain(error: unknown): unknown[] {
+  const chain: unknown[] = []
+  let current: unknown = error
+  const seen = new Set<unknown>()
+  while (current && !seen.has(current)) {
+    seen.add(current)
+    chain.push(current)
+    if (typeof current === 'object' && current !== null) {
+      const node = current as { cause?: unknown; errors?: unknown[] }
+      if (Array.isArray(node.errors)) {
+        chain.push(...node.errors)
+      }
+      current = node.cause
+      continue
     }
+    break
   }
-  const msg = String(error.message || '')
-  const causeMsg = error.cause ? String(error.cause.message || '') : ''
-  return msg.includes('ECONNREFUSED') || causeMsg.includes('ECONNREFUSED')
+  return chain
+}
+
+function isExpectedOfflineFetchError(error: unknown): boolean {
+  return getErrorChain(error).some((node) => {
+    if (!node || typeof node !== 'object') return false
+    const record = node as { code?: string; message?: string }
+    if (record.code && OFFLINE_ERROR_CODES.has(record.code)) return true
+    const msg = String(record.message ?? '')
+    return msg.includes('ECONNREFUSED') || msg.includes('ENOTFOUND')
+  })
 }
 
 function isLocalMockMode(): boolean {
@@ -122,7 +147,7 @@ export async function listProducts(options?: {
       })
       return apiProducts.map(mapApiProductToDomain)
     } catch (e) {
-      if (!isConnectionRefused(e)) {
+      if (!isExpectedOfflineFetchError(e)) {
         console.warn('API listProducts error, falling back to local mocks:', e)
       }
     }
@@ -171,7 +196,7 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
       ) {
         return null
       }
-      if (!isConnectionRefused(error)) {
+      if (!isExpectedOfflineFetchError(error)) {
         console.warn(
           'API getProductBySlug error, falling back to local mocks:',
           error,
@@ -204,7 +229,7 @@ export async function listPlans(): Promise<SubscriptionPlan[]> {
       const apiPlans = await apiClient.plans.list()
       return apiPlans.map(mapApiPlanToDomain)
     } catch (e) {
-      if (!isConnectionRefused(e)) {
+      if (!isExpectedOfflineFetchError(e)) {
         console.warn('API listPlans error, falling back to local mocks:', e)
       }
     }
@@ -238,7 +263,7 @@ export async function getPlanBySlug(
       ) {
         return null
       }
-      if (!isConnectionRefused(error)) {
+      if (!isExpectedOfflineFetchError(error)) {
         console.warn(
           'API getPlanBySlug error, falling back to local mocks:',
           error,
@@ -321,7 +346,7 @@ export async function getCart(): Promise<Cart> {
     try {
       return await apiClient.cart.get()
     } catch (e) {
-      if (!isConnectionRefused(e)) {
+      if (!isExpectedOfflineFetchError(e)) {
         console.warn('API getCart error, falling back to local mocks:', e)
       }
     }
@@ -346,7 +371,7 @@ export async function addCartItem(input: {
     try {
       return await apiClient.cart.addItem(input.productId, input.quantity ?? 1)
     } catch (e) {
-      if (!isConnectionRefused(e)) {
+      if (!isExpectedOfflineFetchError(e)) {
         console.warn('API addCartItem error, falling back to local mocks:', e)
         throw e
       }
@@ -397,7 +422,7 @@ export async function updateCartItemQuantity(itemId: string, quantity: number): 
     try {
       return await apiClient.cart.updateQuantity(itemId, quantity)
     } catch (e) {
-      if (!isConnectionRefused(e)) {
+      if (!isExpectedOfflineFetchError(e)) {
         console.warn('API updateCartItemQuantity error, falling back to local mocks:', e)
         throw e
       }
@@ -429,7 +454,7 @@ export async function removeCartItem(itemId: string): Promise<Cart> {
     try {
       return await apiClient.cart.removeItem(itemId)
     } catch (e) {
-      if (!isConnectionRefused(e)) {
+      if (!isExpectedOfflineFetchError(e)) {
         console.warn('API removeCartItem error, falling back to local mocks:', e)
         throw e
       }
@@ -458,7 +483,7 @@ export async function calculateShipping(zipCode: string): Promise<ShippingEstima
         estimatedDays: apiResult.prazoEstimado,
       }
     } catch (e) {
-      if (!isConnectionRefused(e)) {
+      if (!isExpectedOfflineFetchError(e)) {
         console.warn('API calculateShipping error, falling back to local mocks:', e)
       }
     }
@@ -496,7 +521,7 @@ export async function applyCoupon(code: string): Promise<CouponResult> {
         message: apiResult.mensagem ?? apiResult.message ?? '',
       }
     } catch (e) {
-      if (!isConnectionRefused(e)) {
+      if (!isExpectedOfflineFetchError(e)) {
         console.warn('API applyCoupon error, falling back to local mocks:', e)
         throw e
       }
@@ -760,7 +785,7 @@ async function fetchCasesBundle(): Promise<{
         : [],
     }
   } catch (error) {
-    if (!isConnectionRefused(error)) {
+    if (!isExpectedOfflineFetchError(error)) {
       console.warn('API cases.getData error, falling back to local mocks:', error)
     }
     return null
@@ -792,7 +817,7 @@ export async function createOrder(input?: {
       cartState = structuredClone(initialCart)
       return mapped
     } catch (e) {
-      if (!isConnectionRefused(e)) {
+      if (!isExpectedOfflineFetchError(e)) {
         console.warn('API createOrder error, falling back to local mocks:', e)
       }
     }
@@ -854,7 +879,7 @@ export async function getCustomerProfile(): Promise<{
     try {
       return await apiClient.customer.getProfile()
     } catch (error) {
-      if (!isConnectionRefused(error)) {
+      if (!isExpectedOfflineFetchError(error)) {
         console.warn('API getProfile error, falling back to local mocks:', error)
       }
     }
@@ -879,7 +904,7 @@ export async function updateCustomerProfile(body: {
     try {
       return await apiClient.customer.updateProfile(body)
     } catch (error) {
-      if (!isConnectionRefused(error)) {
+      if (!isExpectedOfflineFetchError(error)) {
         console.warn(
           'API updateProfile error, falling back to local mocks:',
           error,
@@ -925,7 +950,7 @@ export async function addCustomerAddress(body: {
     try {
       return await apiClient.customer.addAddress(body)
     } catch (error) {
-      if (!isConnectionRefused(error)) {
+      if (!isExpectedOfflineFetchError(error)) {
         console.warn('API addAddress error, falling back to local mocks:', error)
       }
     }
@@ -968,7 +993,7 @@ export async function deleteCustomerAddress(id: string): Promise<Address[]> {
     try {
       return await apiClient.customer.deleteAddress(id)
     } catch (error) {
-      if (!isConnectionRefused(error)) {
+      if (!isExpectedOfflineFetchError(error)) {
         console.warn(
           'API deleteAddress error, falling back to local mocks:',
           error,
@@ -1036,7 +1061,7 @@ export async function listOrders(): Promise<Order[]> {
       const mapped = apiOrders.map(mapApiOrderToDomain)
       return mapped
     } catch (e) {
-      if (!isConnectionRefused(e)) {
+      if (!isExpectedOfflineFetchError(e)) {
         console.warn('API listOrders error, falling back to local mocks:', e)
       }
     }
@@ -1062,7 +1087,7 @@ export async function getOrderById(id: string): Promise<Order | null> {
       if (isNotFoundError(error)) {
         return null
       }
-      if (!isConnectionRefused(error)) {
+      if (!isExpectedOfflineFetchError(error)) {
         console.warn('API getOrderById error, falling back to local mocks:', error)
       }
     }
@@ -1086,7 +1111,7 @@ export async function getSubscription(): Promise<Subscription | null> {
       if (isNotFoundError(error)) {
         return null
       }
-      if (!isConnectionRefused(error)) {
+      if (!isExpectedOfflineFetchError(error)) {
         console.warn(
           'API getSubscription error, falling back to local mocks:',
           error,
@@ -1135,7 +1160,7 @@ export async function cancelSubscription(): Promise<Subscription> {
       const apiSub = await apiClient.customer.cancelSubscription()
       return mapApiSubscriptionToDomain(apiSub)
     } catch (error) {
-      if (!isConnectionRefused(error)) {
+      if (!isExpectedOfflineFetchError(error)) {
         console.warn(
           'API cancelSubscription error, falling back to local mocks:',
           error,
@@ -1166,7 +1191,7 @@ export async function reactivateSubscription(): Promise<Subscription> {
       const apiSub = await apiClient.customer.reactivateSubscription()
       return mapApiSubscriptionToDomain(apiSub)
     } catch (error) {
-      if (!isConnectionRefused(error)) {
+      if (!isExpectedOfflineFetchError(error)) {
         console.warn(
           'API reactivateSubscription error, falling back to local mocks:',
           error,
@@ -1197,7 +1222,7 @@ export async function listPayments(): Promise<Payment[]> {
       const apiPayments = await apiClient.customer.listPayments()
       return apiPayments.map(mapApiPaymentToDomain)
     } catch (error) {
-      if (!isConnectionRefused(error)) {
+      if (!isExpectedOfflineFetchError(error)) {
         console.warn(
           'API listPayments error, falling back to local mocks:',
           error,
@@ -1244,7 +1269,7 @@ export async function listInvoices(): Promise<Invoice[]> {
       const apiInvoices = await apiClient.customer.listInvoices()
       return apiInvoices.map(mapApiInvoiceToDomain)
     } catch (error) {
-      if (!isConnectionRefused(error)) {
+      if (!isExpectedOfflineFetchError(error)) {
         console.warn(
           'API listInvoices error, falling back to local mocks:',
           error,
@@ -1274,7 +1299,7 @@ export async function renewPixPayment(paymentId: string): Promise<Payment> {
       )
       return mapped
     } catch (error) {
-      if (!isConnectionRefused(error)) {
+      if (!isExpectedOfflineFetchError(error)) {
         console.warn(
           'API renewPixPayment error, falling back to local mocks:',
           error,
@@ -1316,7 +1341,7 @@ export async function updateCard(input: {
     try {
       return await apiClient.customer.updateCard(input)
     } catch (error) {
-      if (!isConnectionRefused(error)) {
+      if (!isExpectedOfflineFetchError(error)) {
         console.warn('API updateCard error, falling back to local mocks:', error)
       }
     }
@@ -1350,7 +1375,7 @@ export async function listExclusiveContent(): Promise<ExclusiveContent[]> {
       const apiContent = await apiClient.exclusiveContent.list()
       return apiContent.map(mapApiExclusiveContentToDomain)
     } catch (error) {
-      if (!isConnectionRefused(error)) {
+      if (!isExpectedOfflineFetchError(error)) {
         console.warn(
           'API listExclusiveContent error, falling back to local mocks:',
           error,
@@ -1396,7 +1421,7 @@ export async function getExclusiveContentBySlug(
       if (isNotFoundError(error)) {
         return null
       }
-      if (!isConnectionRefused(error)) {
+      if (!isExpectedOfflineFetchError(error)) {
         console.warn(
           'API getExclusiveContentBySlug error, falling back to local mocks:',
           error,
@@ -1577,7 +1602,7 @@ export async function getClueBySlug(slug: string): Promise<Clue | null> {
       if (isNotFoundError(error)) {
         return null
       }
-      if (!isConnectionRefused(error)) {
+      if (!isExpectedOfflineFetchError(error)) {
         console.warn('API getClueBySlug error, falling back to local mocks:', error)
       }
     }
