@@ -57,7 +57,7 @@ export default async function CancelarAssinaturaPage() {
           type="submit"
           className="bg-[#d84132] text-white shadow-[0_0_26px_rgba(216,65,50,0.35)] hover:bg-[#b93227]"
         >
-          Confirmar cancelamento (mock)
+          Confirmar cancelamento
         </Button>
       </form>
     </div>

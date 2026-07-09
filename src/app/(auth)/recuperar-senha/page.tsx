@@ -85,7 +85,7 @@ export default function RecuperarSenhaPage() {
           disabled={isLoading}
         />
         <DesignFormButton disabled={isLoading}>
-          {isLoading ? 'Localizando registro...' : 'Enviar link (mock)'}
+          {isLoading ? 'Localizando registro...' : 'Enviar link'}
           {!isLoading ? (
             <span className={arrowIconClass} aria-hidden>
               →

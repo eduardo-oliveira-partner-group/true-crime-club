@@ -259,7 +259,7 @@ export default function PerfilPage() {
                 Senha
               </p>
               <p className="mt-1 text-sm text-[#bfb4a3] italic">
-                •••••••• (Edição restrita em modo mock)
+                •••••••• (Edição restrita)
               </p>
             </div>
           </div>

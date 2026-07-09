@@ -49,7 +49,7 @@ export default async function FinanceiroPage() {
         Financeiro
       </h1>
       <p className="mt-2 text-sm/6 text-(--ink-mute)">
-        Histórico de cobranças, faturas e recibos mockados.
+        Histórico de cobranças, faturas e recibos.
       </p>
 
       {refused ? (
@@ -106,7 +106,7 @@ export default async function FinanceiroPage() {
                 size="sm"
                 className="rounded-[9px] bg-(--red) text-[#fbf9f6] hover:bg-(--red-deep)"
               >
-                Renovar Pix (mock)
+                Renovar Pix
               </Button>
             </form>
           </div>

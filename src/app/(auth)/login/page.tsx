@@ -1,6 +1,6 @@
 'use client'
 
-import { IconArrowRight, IconLock } from '@tabler/icons-react'
+import { IconArrowRight, IconLock, IconUser } from '@tabler/icons-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { FormEvent, useEffect, useState } from 'react'
@@ -95,8 +95,7 @@ export default function LoginPage() {
       <AuthFormMeta left="CLUB · LOGIN" right="Sessão segura" />
 
       <p className="mt-4 text-sm/6 text-(--ink-soft)">
-        Autenticação mockada — use qualquer e-mail e senha para simular o acesso
-        ao seu dossiê pessoal.
+        Use seu e-mail e senha cadastrados para acessar o seu dossiê pessoal.
       </p>
 
       {errors.general ? (
@@ -104,6 +103,33 @@ export default function LoginPage() {
           {errors.general}
         </div>
       ) : null}
+
+      <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+        <button
+          type="button"
+          disabled={isLoading}
+          onClick={() => {
+            setEmailValue('carlos.souza@email.com')
+            setPasswordValue('senha-falsa-123')
+          }}
+          className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-[9px] border border-[rgba(33,28,24,0.15)] bg-(--paper-soft) px-3 py-2 [font-family:var(--design-font-mono)] text-xs font-bold tracking-wider text-(--ink) uppercase transition-colors hover:bg-(--ink) hover:text-[#fbf9f6] disabled:opacity-50"
+        >
+          <IconUser className="size-3.5" stroke={1.75} />
+          Usuário 1
+        </button>
+        <button
+          type="button"
+          disabled={isLoading}
+          onClick={() => {
+            setEmailValue('mariana.silva@email.com')
+            setPasswordValue('senha-falsa-123')
+          }}
+          className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-[9px] border border-[rgba(33,28,24,0.15)] bg-(--paper-soft) px-3 py-2 [font-family:var(--design-font-mono)] text-xs font-bold tracking-wider text-(--ink) uppercase transition-colors hover:bg-(--ink) hover:text-[#fbf9f6] disabled:opacity-50"
+        >
+          <IconUser className="size-3.5" stroke={1.75} />
+          Usuário 2
+        </button>
+      </div>
 
       <form className="mt-6 space-y-5" onSubmit={handleLogin} noValidate>
         <AuthFormField
@@ -132,7 +158,7 @@ export default function LoginPage() {
         />
         <DesignFormButton disabled={isLoading}>
           <IconLock className="size-4" stroke={1.75} />
-          {isLoading ? 'Acessando arquivo...' : 'Entrar no clube (mock)'}
+          {isLoading ? 'Acessando arquivo...' : 'Entrar no clube'}
           {!isLoading ? (
             <span className={arrowIconClass} aria-hidden>
               →

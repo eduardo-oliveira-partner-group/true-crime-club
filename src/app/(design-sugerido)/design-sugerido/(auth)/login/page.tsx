@@ -1,6 +1,6 @@
 'use client'
 
-import { IconArrowRight, IconFingerprint, IconLock } from '@tabler/icons-react'
+import { IconArrowRight, IconFingerprint, IconLock, IconUser } from '@tabler/icons-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { FormEvent, useEffect, useState } from 'react'
@@ -10,6 +10,7 @@ import { apiClient } from '@/src/lib/api-client'
 
 export default function LoginPage() {
   const [emailValue, setEmailValue] = useState('')
+  const [passwordValue, setPasswordValue] = useState('')
   const router = useRouter()
 
   useEffect(() => {
@@ -61,9 +62,33 @@ export default function LoginPage() {
       </div>
 
       <p className="mt-4 text-sm/6 text-[#d7c9b5]">
-        Autenticação mockada — use qualquer combinação para simular o acesso ao
-        seu dossiê pessoal.
+        Use seu e-mail e senha para acessar o seu dossiê pessoal.
       </p>
+
+      <div className="mt-4 flex flex-col sm:flex-row gap-2">
+        <button
+          type="button"
+          onClick={() => {
+            setEmailValue('carlos.souza@email.com')
+            setPasswordValue('senha-falsa-123')
+          }}
+          className="flex flex-1 items-center justify-center gap-1.5 border border-[#fffaf0]/14 bg-[#0c0a09] px-3 py-2 text-xs font-semibold text-[#d7b56d] transition hover:bg-[#fffaf0]/10 focus:border-[#d7b56d]/70 focus:bg-[#0b0908] cursor-pointer"
+        >
+          <IconUser className="size-3.5" />
+          Usuário 1
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setEmailValue('mariana.silva@email.com')
+            setPasswordValue('senha-falsa-123')
+          }}
+          className="flex flex-1 items-center justify-center gap-1.5 border border-[#fffaf0]/14 bg-[#0c0a09] px-3 py-2 text-xs font-semibold text-[#d7b56d] transition hover:bg-[#fffaf0]/10 focus:border-[#d7b56d]/70 focus:bg-[#0b0908] cursor-pointer"
+        >
+          <IconUser className="size-3.5" />
+          Usuário 2
+        </button>
+      </div>
 
       <form className="mt-6 space-y-5" onSubmit={handleLogin}>
         <div>
@@ -92,6 +117,9 @@ export default function LoginPage() {
           <input
             id="password"
             type="password"
+            name="password"
+            value={passwordValue}
+            onChange={(e) => setPasswordValue(e.target.value)}
             className="mt-2 w-full border border-[#fffaf0]/14 bg-[#0c0a09] px-4 py-3 text-sm text-[#fffaf0] transition outline-none placeholder:text-[#bfb4a3]/60 focus:border-[#d7b56d]/70 focus:bg-[#0b0908]"
           />
         </div>
@@ -101,7 +129,7 @@ export default function LoginPage() {
           className="w-full bg-[#d84132] text-white shadow-[0_0_26px_rgba(216,65,50,0.35)] hover:bg-[#b93227]"
         >
           <IconLock className="size-4" />
-          Entrar no clube (mock)
+          Entrar no clube
           <IconArrowRight className="size-4" />
         </Button>
       </form>

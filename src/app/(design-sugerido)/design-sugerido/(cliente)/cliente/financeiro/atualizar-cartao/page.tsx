@@ -25,7 +25,8 @@ export default function AtualizarCartaoPage() {
         Atualizar cartão
       </h1>
       <p className="mt-2 text-sm/6 text-[#d7c9b5]">
-        Formulário mockado — dados não são enviados a nenhum gateway.
+        Atualize os dados de cobrança do cartão de crédito padrão para sua
+        assinatura.
       </p>
 
       <form
@@ -71,7 +72,7 @@ export default function AtualizarCartaoPage() {
           type="submit"
           className="bg-[#d84132] text-white shadow-[0_0_26px_rgba(216,65,50,0.35)] hover:bg-[#b93227]"
         >
-          Salvar cartão (mock)
+          Salvar cartão
         </Button>
       </form>
     </div>

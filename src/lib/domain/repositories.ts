@@ -355,13 +355,14 @@ function mapApiProductToDomain(apiProduct: ApiProduct): Product {
     name: apiProduct.nome,
     description: apiProduct.descricao ?? '',
     shortDescription: apiProduct.descricaoCurta ?? '',
-    type: typeMap[apiProduct.tipo] ?? 'product',
+    type: typeMap[apiProduct.tipo ?? ''] ?? 'product',
     price: apiProduct.preco,
     subscriberPrice: apiProduct.precoAssinante,
     images: apiProduct.imagens ?? [],
     categories: apiProduct.categorias ?? [],
     inStock: apiProduct.emEstoque ?? false,
-    availability: availabilityMap[apiProduct.disponibilidade] ?? 'available',
+    availability:
+      availabilityMap[apiProduct.disponibilidade ?? ''] ?? 'available',
     featured:
       apiProduct.categorias?.includes('destaque') ||
       apiProduct.destaque ||
@@ -385,7 +386,8 @@ function mapApiPlanToDomain(apiPlan: ApiPlan): SubscriptionPlan {
     slug: apiPlan.identificador,
     name: apiPlan.nome,
     description: apiPlan.descricao ?? '',
-    billingInterval: billingIntervalMap[apiPlan.intervaloCobranca] ?? 'monthly',
+    billingInterval:
+      billingIntervalMap[apiPlan.intervaloCobranca ?? ''] ?? 'monthly',
     price: apiPlan.preco,
     pricePerMonth: apiPlan.precoPorMes,
     isRecommended: apiPlan.recomendado ?? false,
@@ -590,8 +592,8 @@ function mapApiOrderToDomain(apiOrder: ApiOrder): Order {
           image: item.imagem,
         }))
       : [],
-    status: statusMap[apiOrder.status] ?? 'paid',
-    paymentStatus: paymentStatusMap[apiOrder.statusPagamento] ?? 'paid',
+    status: statusMap[apiOrder.status ?? ''] ?? 'paid',
+    paymentStatus: paymentStatusMap[apiOrder.statusPagamento ?? ''] ?? 'paid',
     subtotal: apiOrder.subtotal,
     shipping: apiOrder.frete,
     discount: apiOrder.desconto,
@@ -626,8 +628,8 @@ function mapApiPaymentToDomain(apiPayment: ApiPayment): Payment {
     orderId: apiPayment.idPedido,
     subscriptionId: apiPayment.idAssinatura,
     amount: apiPayment.valor,
-    status: statusMap[apiPayment.status] ?? 'paid',
-    method: methodMap[apiPayment.metodo] ?? 'credit_card',
+    status: statusMap[apiPayment.status ?? ''] ?? 'paid',
+    method: methodMap[apiPayment.metodo ?? ''] ?? 'credit_card',
     dueDate: apiPayment.vencimento,
     paidAt: apiPayment.pagoEm,
     pixQrCode: apiPayment.pixQrCode,
@@ -659,7 +661,7 @@ function mapApiCaseFileToDomain(file: ApiCaseFile): CaseFile {
   return {
     id: file.id,
     name: file.nome,
-    type: typeMap[file.tipo] ?? 'pdf',
+    type: typeMap[file.tipo ?? ''] ?? 'pdf',
     downloadUrl: file.urlDownload,
     sizeLabel: file.tamanho,
   }
@@ -679,7 +681,7 @@ function mapApiSubscriptionToDomain(apiSub: ApiSubscription): Subscription {
     customerId: apiSub.idCliente ?? mockCustomer.id,
     planId: apiSub.idPlano,
     planName: apiSub.nomePlano,
-    status: statusMap[apiSub.status] ?? 'active',
+    status: statusMap[apiSub.status ?? ''] ?? 'active',
     startedAt: apiSub.iniciadaEm,
     nextBillingDate: apiSub.proximaCobrancaEm,
     nextBillingAmount: apiSub.valorProximaCobranca,
@@ -751,7 +753,7 @@ function mapApiExclusiveContentToDomain(
     status: apiContent.status === 'bloqueado' ? 'bloqueado' : 'liberado',
     cycleNumber: apiContent.numeroCiclo,
     blockedReason: apiContent.motivoBloqueio,
-    type: contentTypeMap[apiContent.tipo] ?? 'clue',
+    type: contentTypeMap[apiContent.tipo ?? ''] ?? 'clue',
     files: Array.isArray(apiContent.arquivos)
       ? apiContent.arquivos.map(mapApiCaseFileToDomain)
       : [],

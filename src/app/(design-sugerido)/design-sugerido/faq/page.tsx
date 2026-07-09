@@ -47,7 +47,7 @@ const faqItems = [
   {
     code: 'FAQ-05',
     question: 'Quais formas de pagamento são aceitas?',
-    answer: 'Cartão de crédito e Pix (mockados nesta versão de validação).',
+    answer: 'Cartão de crédito e Pix.',
   },
 ]
 

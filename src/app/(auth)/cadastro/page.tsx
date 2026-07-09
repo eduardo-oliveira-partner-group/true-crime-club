@@ -154,7 +154,7 @@ export default function CadastroPage() {
             ? 'Registrando informações...'
             : isSuccess
               ? 'Acesso liberado!'
-              : 'Abrir meu dossiê (mock)'}
+              : 'Abrir meu dossiê'}
           {!isLoading && !isSuccess ? (
             <span className={arrowIconClass} aria-hidden>
               →

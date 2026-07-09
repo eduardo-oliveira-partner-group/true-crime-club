@@ -372,8 +372,8 @@ export function CheckoutStepper({
                         title={option.label}
                         detail={
                           option.type === 'pix'
-                            ? 'Pagamento via Pix (mockado)'
-                            : 'Cartão de crédito (mockado)'
+                            ? 'Pagamento via Pix'
+                            : 'Cartão de crédito'
                         }
                       />
                     ))}
