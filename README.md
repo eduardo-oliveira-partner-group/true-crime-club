@@ -88,3 +88,14 @@ npx shadcn@latest add button
 ```tsx
 import { Button } from "@/components/ui/button";
 ```
+
+### Configuração de Ambiente
+
+Por padrão, a aplicação exige que a variável `NEXT_PUBLIC_API_BASE_URL` esteja configurada apontando para um backend de API ativo.
+
+Caso deseje executar o projeto em modo de desenvolvimento utilizando dados mockados locais, habilite o modo mock explicitamente em seu arquivo `.env.local`:
+
+```dotenv
+# Ativa o modo de simulação local com dados mockados
+NEXT_PUBLIC_LOCAL_MOCK=true
+```

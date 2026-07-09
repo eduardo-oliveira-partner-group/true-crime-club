@@ -1,6 +1,8 @@
 import { IconArrowRight, IconChevronDown } from '@tabler/icons-react'
 import Link from 'next/link'
+import { notFound } from 'next/navigation'
 
+import { PageRenderer } from '@/src/app/(front-office)/_landing/landing'
 import { DesignPageShell } from '@/src/components/public-design/design-page-shell'
 import { SectionEyebrow } from '@/src/components/public-design/section-eyebrow'
 import { JsonLd } from '@/src/components/seo/json-ld'
@@ -19,14 +21,35 @@ import {
   sectionFrame,
   transitionCardHover,
 } from '@/src/lib/design/classes'
-import { getDynamicContent, getSeoEntry } from '@/src/lib/domain/repositories'
+import {
+  getCmsPageByRoute,
+  getDynamicContent,
+  getSeoEntry,
+  isLocalMockMode,
+} from '@/src/lib/domain/repositories'
 import { buildMetadata } from '@/src/lib/seo'
 import { cn } from '@/src/lib/utils'
 
-export const metadata = buildMetadata({
-  path: '/faq',
-  entry: getSeoEntry('/faq'),
-})
+export async function generateMetadata() {
+  const page = await getCmsPageByRoute('/faq')
+  if (page && page.status === 'publicada') {
+    return buildMetadata({
+      path: '/faq',
+      entry: {
+        title: page.seo.titulo,
+        description: page.seo.descricao,
+        canonical: page.seo.urlCanonica,
+        ogImage: page.seo.imagemCompartilhamento,
+        noindex: page.seo.naoIndexar,
+      },
+    })
+  }
+
+  return buildMetadata({
+    path: '/faq',
+    entry: getSeoEntry('/faq'),
+  })
+}
 
 const faqItems = [
   {
@@ -56,11 +79,49 @@ const faqItems = [
   {
     code: 'FAQ-05',
     question: 'Quais formas de pagamento são aceitas?',
-    answer: 'Cartão de crédito e Pix (mockados nesta versão de validação).',
+    answer:
+      'Cartão de crédito e Pix (cadastro de faturamento ativo via painel do cliente).',
   },
 ]
 
-export default function FaqPage() {
+export default async function FaqPage() {
+  const isMock = isLocalMockMode()
+  const page = await getCmsPageByRoute('/faq')
+
+  if (!isMock && (!page || page.status !== 'publicada')) {
+    notFound()
+  }
+
+  if (page && page.status === 'publicada') {
+    const faqSections = page.sections.filter((s) => s.tipo === 'faq')
+    const faqItemsFromCms = faqSections.flatMap(
+      (s) => (s.props?.items || []) as { question: string; answer: string }[],
+    )
+
+    const faqJsonLd = {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: faqItemsFromCms.map((item) => ({
+        '@type': 'Question',
+        name: item.question,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: item.answer,
+        },
+      })),
+    }
+
+    return (
+      <DesignPageShell showOverlays={false}>
+        <JsonLd data={faqJsonLd} />
+        <main>
+          <PageRenderer sections={page.sections} />
+        </main>
+      </DesignPageShell>
+    )
+  }
+
+  // Fallback local mock mode
   const intro = getDynamicContent('faq.intro')
 
   const faqJsonLd = {

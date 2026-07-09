@@ -337,3 +337,25 @@ export interface RepositoryResult<T> {
   error?: string
   loading?: boolean
 }
+
+export type InvestigationFileType = 'audio' | 'image' | 'text' | 'sheet'
+
+export interface InvestigationFile {
+  id: string
+  name: string
+  type: InvestigationFileType
+  modified: string
+  size: string
+  downloadUrl?: string
+  content?: string
+  corrupted?: boolean
+  columns?: string[]
+  rows?: string[][]
+  fragment?: string
+}
+
+export interface InvestigationFilesByBox {
+  id: string
+  arquivos: InvestigationFile[]
+  documentos: InvestigationFile[]
+}

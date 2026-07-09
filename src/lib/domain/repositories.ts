@@ -1,4 +1,5 @@
 import { apiClient } from '@/src/lib/api-client'
+import { isExplicitLocalMockMode } from '@/src/lib/api-mode'
 
 import {
   initialCart,
@@ -10,6 +11,7 @@ import {
   mockCustomer,
   mockDynamicContent,
   mockExclusiveContent,
+  mockFilesByBox,
   mockInvoices,
   mockOrders,
   mockPaymentMethods,
@@ -40,6 +42,7 @@ import type {
   Customer,
   DynamicContentBlock,
   ExclusiveContent,
+  InvestigationFilesByBox,
   Invoice,
   MenuCms,
   Order,
@@ -58,57 +61,171 @@ import type {
 let cartState: Cart = structuredClone(initialCart)
 let subscriptionState: Subscription = structuredClone(mockSubscription)
 let paymentsState: Payment[] = structuredClone(mockPayments)
+let paymentMethodsState: PaymentMethod[] = [...mockPaymentMethods]
 
-const OFFLINE_ERROR_CODES = new Set([
-  'ECONNREFUSED',
-  'ENOTFOUND',
-  'EAI_AGAIN',
-  'ETIMEDOUT',
-  'ENETUNREACH',
-  'UND_ERR_CONNECT_TIMEOUT',
-])
-
-function getErrorChain(error: unknown): unknown[] {
-  const chain: unknown[] = []
-  let current: unknown = error
-  const seen = new Set<unknown>()
-  while (current && !seen.has(current)) {
-    seen.add(current)
-    chain.push(current)
-    if (typeof current === 'object' && current !== null) {
-      const node = current as { cause?: unknown; errors?: unknown[] }
-      if (Array.isArray(node.errors)) {
-        chain.push(...node.errors)
-      }
-      current = node.cause
-      continue
-    }
-    break
-  }
-  return chain
+type ApiProduct = {
+  id: string
+  identificador: string
+  nome: string
+  descricao?: string
+  descricaoCurta?: string
+  tipo?: string
+  preco: number
+  precoAssinante?: number
+  imagens?: string[]
+  categorias?: string[]
+  emEstoque?: boolean
+  disponibilidade?: string
+  destaque?: boolean
+  itensInclusos?: string[]
+  relacionados?: string[]
+  mesEdicao?: string
+  ciclo?: number
 }
 
-function isExpectedOfflineFetchError(error: unknown): boolean {
-  return getErrorChain(error).some((node) => {
-    if (!node || typeof node !== 'object') return false
-    const record = node as { code?: string; message?: string }
-    if (record.code && OFFLINE_ERROR_CODES.has(record.code)) return true
-    const msg = String(record.message ?? '')
-    return msg.includes('ECONNREFUSED') || msg.includes('ENOTFOUND')
-  })
+type ApiPlan = {
+  id: string
+  identificador: string
+  nome: string
+  descricao?: string
+  intervaloCobranca?: string
+  preco: number
+  precoPorMes?: number
+  recomendado?: boolean
+  beneficios?: string[]
+  mesesCompromisso?: number
 }
 
-function isLocalMockMode(): boolean {
-  return (
-    !process.env.NEXT_PUBLIC_API_BASE_URL ||
-    process.env.NEXT_PUBLIC_LOCAL_MOCK === 'true' ||
-    process.env.NEXT_PUBLIC_MOCK_MODE === 'true' ||
-    process.env.LOCAL_MOCK_MODE === 'true'
-  )
+type ApiCartItem = {
+  id: string
+  idProduto: string
+  identificadorProduto: string
+  nomeProduto: string
+  tipoProduto?: string
+  quantidade: number
+  precoUnitario: number
+  imagem?: string
 }
 
-function isNotFoundError(error: any): boolean {
-  const msg = String(error?.message || '')
+type ApiOrder = {
+  id: string
+  numeroPedido: string
+  idCliente?: string
+  itens?: ApiCartItem[]
+  status?: string
+  statusPagamento?: string
+  subtotal: number
+  frete: number
+  desconto: number
+  total: number
+  criadoEm: string
+  observacaoCicloCobranca?: string
+  observacaoCicloEnvio?: string
+  codigoRastreio?: string
+  urlRastreio?: string
+  notaFiscalPlaceholder?: string
+}
+
+type ApiPayment = {
+  id: string
+  idPedido?: string
+  idAssinatura?: string
+  valor: number
+  status?: string
+  metodo?: string
+  vencimento: string
+  pagoEm?: string
+  pixQrCode?: string
+  pixExpiraEm?: string
+  motivoRecusa?: string
+}
+
+type ApiInvoice = {
+  id: string
+  numero: string
+  idPagamento: string
+  valor: number
+  emitidoEm: string
+  urlRecibo?: string
+  urlDownload?: string
+}
+
+type ApiCaseFile = {
+  id: string
+  nome: string
+  tipo?: string
+  urlDownload: string
+  tamanho?: string
+}
+
+type ApiSubscription = {
+  id: string
+  idCliente?: string
+  idPlano: string
+  nomePlano: string
+  status?: string
+  iniciadaEm: string
+  proximaCobrancaEm: string
+  valorProximaCobranca: number
+  idCaixaCicloAtual?: string
+  nomeCaixaCicloAtual?: string
+  podeCancelar?: boolean
+  podeReativar?: boolean
+  canceladaEm?: string
+}
+
+type ApiCase = {
+  id: string
+  identificador: string
+  titulo: string
+  descricao: string
+  ano: number
+  totalPistas: number
+  dataEventoAoVivo: string
+  tituloEventoAoVivo: string
+}
+
+type ApiProgress = {
+  idCaso: string
+  pistasColetadas: number
+  totalPistas: number
+  cicloAtual: number
+  dataEventoAoVivo: string
+  tituloEventoAoVivo: string
+  percentualCompleto: number
+}
+
+type ApiClue = {
+  id: string
+  identificador: string
+  idCaso: string
+  titulo: string
+  descricao: string
+  numeroCiclo: number
+  status?: string
+  motivoBloqueio?: string
+  arquivos?: ApiCaseFile[]
+  liberadoEm?: string
+}
+
+type ApiExclusiveContent = {
+  id: string
+  identificador: string
+  titulo: string
+  descricao: string
+  status?: string
+  numeroCiclo: number
+  motivoBloqueio?: string
+  tipo?: string
+  arquivos?: ApiCaseFile[]
+}
+
+export function isLocalMockMode(): boolean {
+  return isExplicitLocalMockMode()
+}
+
+function isNotFoundError(error: unknown): boolean {
+  const msg = error instanceof Error ? error.message : ''
   return (
     msg.includes('404') ||
     msg.toLowerCase().includes('não encontrado') ||
@@ -133,24 +250,12 @@ export async function listProducts(options?: {
 }): Promise<Product[]> {
   throwIfError()
 
-  const isLocalMockMode =
-    !process.env.NEXT_PUBLIC_API_BASE_URL ||
-    process.env.NEXT_PUBLIC_LOCAL_MOCK === 'true' ||
-    process.env.NEXT_PUBLIC_MOCK_MODE === 'true' ||
-    process.env.LOCAL_MOCK_MODE === 'true'
-
-  if (!isLocalMockMode) {
-    try {
-      const apiProducts = await apiClient.products.list({
-        featured: options?.featured,
-        category: options?.category,
-      })
-      return apiProducts.map(mapApiProductToDomain)
-    } catch (e) {
-      if (!isExpectedOfflineFetchError(e)) {
-        console.warn('API listProducts error, falling back to local mocks:', e)
-      }
-    }
+  if (!isLocalMockMode()) {
+    const apiProducts = await apiClient.products.list({
+      featured: options?.featured,
+      category: options?.category,
+    })
+    return apiProducts.map(mapApiProductToDomain)
   }
 
   let products = [...mockProducts]
@@ -177,31 +282,15 @@ export async function listProducts(options?: {
 export async function getProductBySlug(slug: string): Promise<Product | null> {
   throwIfError()
 
-  const isLocalMockMode =
-    !process.env.NEXT_PUBLIC_API_BASE_URL ||
-    process.env.NEXT_PUBLIC_LOCAL_MOCK === 'true' ||
-    process.env.NEXT_PUBLIC_MOCK_MODE === 'true' ||
-    process.env.LOCAL_MOCK_MODE === 'true'
-
-  if (!isLocalMockMode) {
+  if (!isLocalMockMode()) {
     try {
       const apiProduct = await apiClient.products.getBySlug(slug)
       return mapApiProductToDomain(apiProduct)
-    } catch (error: any) {
-      const msg = error?.message || ''
-      if (
-        msg.includes('404') ||
-        msg.toLowerCase().includes('não encontrado') ||
-        msg.toLowerCase().includes('nao encontrado')
-      ) {
+    } catch (error: unknown) {
+      if (isNotFoundError(error)) {
         return null
       }
-      if (!isExpectedOfflineFetchError(error)) {
-        console.warn(
-          'API getProductBySlug error, falling back to local mocks:',
-          error,
-        )
-      }
+      throw error
     }
   }
 
@@ -218,21 +307,9 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
 export async function listPlans(): Promise<SubscriptionPlan[]> {
   throwIfError()
 
-  const isLocalMockMode =
-    !process.env.NEXT_PUBLIC_API_BASE_URL ||
-    process.env.NEXT_PUBLIC_LOCAL_MOCK === 'true' ||
-    process.env.NEXT_PUBLIC_MOCK_MODE === 'true' ||
-    process.env.LOCAL_MOCK_MODE === 'true'
-
-  if (!isLocalMockMode) {
-    try {
-      const apiPlans = await apiClient.plans.list()
-      return apiPlans.map(mapApiPlanToDomain)
-    } catch (e) {
-      if (!isExpectedOfflineFetchError(e)) {
-        console.warn('API listPlans error, falling back to local mocks:', e)
-      }
-    }
+  if (!isLocalMockMode()) {
+    const apiPlans = await apiClient.plans.list()
+    return apiPlans.map(mapApiPlanToDomain)
   }
 
   const result = shouldReturnEmpty(mockPlans)
@@ -244,38 +321,22 @@ export async function getPlanBySlug(
 ): Promise<SubscriptionPlan | null> {
   throwIfError()
 
-  const isLocalMockMode =
-    !process.env.NEXT_PUBLIC_API_BASE_URL ||
-    process.env.NEXT_PUBLIC_LOCAL_MOCK === 'true' ||
-    process.env.NEXT_PUBLIC_MOCK_MODE === 'true' ||
-    process.env.LOCAL_MOCK_MODE === 'true'
-
-  if (!isLocalMockMode) {
+  if (!isLocalMockMode()) {
     try {
       const apiPlan = await apiClient.plans.getBySlug(slug)
       return mapApiPlanToDomain(apiPlan)
-    } catch (error: any) {
-      const msg = error?.message || ''
-      if (
-        msg.includes('404') ||
-        msg.toLowerCase().includes('não encontrado') ||
-        msg.toLowerCase().includes('nao encontrado')
-      ) {
+    } catch (error: unknown) {
+      if (isNotFoundError(error)) {
         return null
       }
-      if (!isExpectedOfflineFetchError(error)) {
-        console.warn(
-          'API getPlanBySlug error, falling back to local mocks:',
-          error,
-        )
-      }
+      throw error
     }
   }
 
   return mockPlans.find((p) => p.slug === slug) ?? null
 }
 
-function mapApiProductToDomain(apiProduct: any): Product {
+function mapApiProductToDomain(apiProduct: ApiProduct): Product {
   const availabilityMap: Record<string, AvailabilityStatus> = {
     disponivel: 'available',
     limitado: 'limited',
@@ -312,7 +373,7 @@ function mapApiProductToDomain(apiProduct: any): Product {
   }
 }
 
-function mapApiPlanToDomain(apiPlan: any): SubscriptionPlan {
+function mapApiPlanToDomain(apiPlan: ApiPlan): SubscriptionPlan {
   const billingIntervalMap: Record<string, BillingInterval> = {
     mensal: 'monthly',
     anual: 'annual',
@@ -336,20 +397,8 @@ function mapApiPlanToDomain(apiPlan: any): SubscriptionPlan {
 export async function getCart(): Promise<Cart> {
   throwIfError()
 
-  const isLocalMockMode =
-    !process.env.NEXT_PUBLIC_API_BASE_URL ||
-    process.env.NEXT_PUBLIC_LOCAL_MOCK === 'true' ||
-    process.env.NEXT_PUBLIC_MOCK_MODE === 'true' ||
-    process.env.LOCAL_MOCK_MODE === 'true'
-
-  if (!isLocalMockMode) {
-    try {
-      return await apiClient.cart.get()
-    } catch (e) {
-      if (!isExpectedOfflineFetchError(e)) {
-        console.warn('API getCart error, falling back to local mocks:', e)
-      }
-    }
+  if (!isLocalMockMode()) {
+    return await apiClient.cart.get()
   }
 
   return structuredClone(cartState)
@@ -361,21 +410,8 @@ export async function addCartItem(input: {
 }): Promise<Cart> {
   throwIfError()
 
-  const isLocalMockMode =
-    !process.env.NEXT_PUBLIC_API_BASE_URL ||
-    process.env.NEXT_PUBLIC_LOCAL_MOCK === 'true' ||
-    process.env.NEXT_PUBLIC_MOCK_MODE === 'true' ||
-    process.env.LOCAL_MOCK_MODE === 'true'
-
-  if (!isLocalMockMode) {
-    try {
-      return await apiClient.cart.addItem(input.productId, input.quantity ?? 1)
-    } catch (e) {
-      if (!isExpectedOfflineFetchError(e)) {
-        console.warn('API addCartItem error, falling back to local mocks:', e)
-        throw e
-      }
-    }
+  if (!isLocalMockMode()) {
+    return await apiClient.cart.addItem(input.productId, input.quantity ?? 1)
   }
 
   const product = mockProducts.find((p) => p.id === input.productId)
@@ -415,24 +451,8 @@ export async function updateCartItemQuantity(
 ): Promise<Cart> {
   throwIfError()
 
-  const isLocalMockMode =
-    !process.env.NEXT_PUBLIC_API_BASE_URL ||
-    process.env.NEXT_PUBLIC_LOCAL_MOCK === 'true' ||
-    process.env.NEXT_PUBLIC_MOCK_MODE === 'true' ||
-    process.env.LOCAL_MOCK_MODE === 'true'
-
-  if (!isLocalMockMode) {
-    try {
-      return await apiClient.cart.updateQuantity(itemId, quantity)
-    } catch (e) {
-      if (!isExpectedOfflineFetchError(e)) {
-        console.warn(
-          'API updateCartItemQuantity error, falling back to local mocks:',
-          e,
-        )
-        throw e
-      }
-    }
+  if (!isLocalMockMode()) {
+    return await apiClient.cart.updateQuantity(itemId, quantity)
   }
 
   const item = cartState.items.find((i) => i.id === itemId)
@@ -450,24 +470,8 @@ export async function updateCartItemQuantity(
 export async function removeCartItem(itemId: string): Promise<Cart> {
   throwIfError()
 
-  const isLocalMockMode =
-    !process.env.NEXT_PUBLIC_API_BASE_URL ||
-    process.env.NEXT_PUBLIC_LOCAL_MOCK === 'true' ||
-    process.env.NEXT_PUBLIC_MOCK_MODE === 'true' ||
-    process.env.LOCAL_MOCK_MODE === 'true'
-
-  if (!isLocalMockMode) {
-    try {
-      return await apiClient.cart.removeItem(itemId)
-    } catch (e) {
-      if (!isExpectedOfflineFetchError(e)) {
-        console.warn(
-          'API removeCartItem error, falling back to local mocks:',
-          e,
-        )
-        throw e
-      }
-    }
+  if (!isLocalMockMode()) {
+    return await apiClient.cart.removeItem(itemId)
   }
 
   cartState.items = cartState.items.filter((i) => i.id !== itemId)
@@ -479,27 +483,12 @@ export async function calculateShipping(
 ): Promise<ShippingEstimate> {
   throwIfError()
 
-  const isLocalMockMode =
-    !process.env.NEXT_PUBLIC_API_BASE_URL ||
-    process.env.NEXT_PUBLIC_LOCAL_MOCK === 'true' ||
-    process.env.NEXT_PUBLIC_MOCK_MODE === 'true' ||
-    process.env.LOCAL_MOCK_MODE === 'true'
-
-  if (!isLocalMockMode) {
-    try {
-      const apiResult = await apiClient.checkout.calculateShipping(zipCode)
-      return {
-        region: apiResult.regiao,
-        price: apiResult.preco,
-        estimatedDays: apiResult.prazoEstimado,
-      }
-    } catch (e) {
-      if (!isExpectedOfflineFetchError(e)) {
-        console.warn(
-          'API calculateShipping error, falling back to local mocks:',
-          e,
-        )
-      }
+  if (!isLocalMockMode()) {
+    const apiResult = await apiClient.checkout.calculateShipping(zipCode)
+    return {
+      region: apiResult.regiao,
+      price: apiResult.preco,
+      estimatedDays: apiResult.prazoEstimado,
     }
   }
 
@@ -519,26 +508,13 @@ export async function calculateShipping(
 export async function applyCoupon(code: string): Promise<CouponResult> {
   throwIfError()
 
-  const isLocalMockMode =
-    !process.env.NEXT_PUBLIC_API_BASE_URL ||
-    process.env.NEXT_PUBLIC_LOCAL_MOCK === 'true' ||
-    process.env.NEXT_PUBLIC_MOCK_MODE === 'true' ||
-    process.env.LOCAL_MOCK_MODE === 'true'
-
-  if (!isLocalMockMode) {
-    try {
-      const apiResult = await apiClient.cart.applyCoupon(code)
-      return {
-        valid: apiResult.valido ?? apiResult.valid ?? false,
-        code: apiResult.codigo ?? apiResult.code ?? code,
-        discount: apiResult.desconto ?? apiResult.discount ?? 0,
-        message: apiResult.mensagem ?? apiResult.message ?? '',
-      }
-    } catch (e) {
-      if (!isExpectedOfflineFetchError(e)) {
-        console.warn('API applyCoupon error, falling back to local mocks:', e)
-        throw e
-      }
+  if (!isLocalMockMode()) {
+    const apiResult = await apiClient.cart.applyCoupon(code)
+    return {
+      valid: apiResult.valido ?? apiResult.valid ?? false,
+      code: apiResult.codigo ?? apiResult.code ?? code,
+      discount: apiResult.desconto ?? apiResult.discount ?? 0,
+      message: apiResult.mensagem ?? apiResult.message ?? '',
     }
   }
 
@@ -579,7 +555,7 @@ export function getCartTotals(cart: Cart) {
   return { subtotal, discount, shipping, total }
 }
 
-function mapApiOrderToDomain(apiOrder: any): Order {
+function mapApiOrderToDomain(apiOrder: ApiOrder): Order {
   const statusMap: Record<string, Order['status']> = {
     pagamento_pendente: 'pending_payment',
     pago: 'paid',
@@ -603,7 +579,7 @@ function mapApiOrderToDomain(apiOrder: any): Order {
     orderNumber: apiOrder.numeroPedido,
     customerId: apiOrder.idCliente ?? mockCustomer.id,
     items: Array.isArray(apiOrder.itens)
-      ? apiOrder.itens.map((item: any) => ({
+      ? apiOrder.itens.map((item: ApiCartItem) => ({
           id: item.id,
           productId: item.idProduto,
           productSlug: item.identificadorProduto,
@@ -631,7 +607,7 @@ function mapApiOrderToDomain(apiOrder: any): Order {
   }
 }
 
-function mapApiPaymentToDomain(apiPayment: any): Payment {
+function mapApiPaymentToDomain(apiPayment: ApiPayment): Payment {
   const statusMap: Record<string, Payment['status']> = {
     pendente: 'pending',
     pago: 'paid',
@@ -660,7 +636,7 @@ function mapApiPaymentToDomain(apiPayment: any): Payment {
   }
 }
 
-function mapApiInvoiceToDomain(apiInvoice: any): Invoice {
+function mapApiInvoiceToDomain(apiInvoice: ApiInvoice): Invoice {
   return {
     id: apiInvoice.id,
     number: apiInvoice.numero,
@@ -672,7 +648,7 @@ function mapApiInvoiceToDomain(apiInvoice: any): Invoice {
   }
 }
 
-function mapApiCaseFileToDomain(file: any): CaseFile {
+function mapApiCaseFileToDomain(file: ApiCaseFile): CaseFile {
   const typeMap: Record<string, 'pdf' | 'image' | 'audio' | 'video'> = {
     pdf: 'pdf',
     imagem: 'image',
@@ -689,7 +665,7 @@ function mapApiCaseFileToDomain(file: any): CaseFile {
   }
 }
 
-function mapApiSubscriptionToDomain(apiSub: any): Subscription {
+function mapApiSubscriptionToDomain(apiSub: ApiSubscription): Subscription {
   const statusMap: Record<string, Subscription['status']> = {
     ativa: 'active',
     pagamento_pendente: 'pending_payment',
@@ -715,7 +691,7 @@ function mapApiSubscriptionToDomain(apiSub: any): Subscription {
   }
 }
 
-function mapApiCaseToDomain(apiCase: any): Case {
+function mapApiCaseToDomain(apiCase: ApiCase): Case {
   return {
     id: apiCase.id,
     slug: apiCase.identificador,
@@ -728,7 +704,7 @@ function mapApiCaseToDomain(apiCase: any): Case {
   }
 }
 
-function mapApiProgressToDomain(apiProgress: any): SubscriberProgress {
+function mapApiProgressToDomain(apiProgress: ApiProgress): SubscriberProgress {
   return {
     caseId: apiProgress.idCaso,
     collectedClues: apiProgress.pistasColetadas,
@@ -740,7 +716,7 @@ function mapApiProgressToDomain(apiProgress: any): SubscriberProgress {
   }
 }
 
-function mapApiClueToDomain(apiClue: any): Clue {
+function mapApiClueToDomain(apiClue: ApiClue): Clue {
   return {
     id: apiClue.id,
     slug: apiClue.identificador,
@@ -757,7 +733,9 @@ function mapApiClueToDomain(apiClue: any): Clue {
   }
 }
 
-function mapApiExclusiveContentToDomain(apiContent: any): ExclusiveContent {
+function mapApiExclusiveContentToDomain(
+  apiContent: ApiExclusiveContent,
+): ExclusiveContent {
   const contentTypeMap: Record<string, ExclusiveContent['type']> = {
     pista: 'clue',
     video: 'video',
@@ -789,23 +767,13 @@ async function fetchCasesBundle(): Promise<{
     return null
   }
 
-  try {
-    const data = await apiClient.cases.getData()
-    return {
-      activeCase: data.casoAtivo ? mapApiCaseToDomain(data.casoAtivo) : null,
-      progress: data.progresso ? mapApiProgressToDomain(data.progresso) : null,
-      clues: Array.isArray(data.pistas)
-        ? data.pistas.map(mapApiClueToDomain)
-        : [],
-    }
-  } catch (error) {
-    if (!isExpectedOfflineFetchError(error)) {
-      console.warn(
-        'API cases.getData error, falling back to local mocks:',
-        error,
-      )
-    }
-    return null
+  const data = await apiClient.cases.getData()
+  return {
+    activeCase: data.casoAtivo ? mapApiCaseToDomain(data.casoAtivo) : null,
+    progress: data.progresso ? mapApiProgressToDomain(data.progresso) : null,
+    clues: Array.isArray(data.pistas)
+      ? data.pistas.map(mapApiClueToDomain)
+      : [],
   }
 }
 
@@ -817,27 +785,15 @@ export async function createOrder(input?: {
 }): Promise<Order> {
   throwIfError()
 
-  const isLocalMockMode =
-    !process.env.NEXT_PUBLIC_API_BASE_URL ||
-    process.env.NEXT_PUBLIC_LOCAL_MOCK === 'true' ||
-    process.env.NEXT_PUBLIC_MOCK_MODE === 'true' ||
-    process.env.LOCAL_MOCK_MODE === 'true'
-
-  if (!isLocalMockMode) {
-    try {
-      const apiOrder = await apiClient.checkout.createOrder({
-        enderecoId: input?.enderecoId,
-        pagamentoMetodoId: input?.pagamentoMetodoId,
-      })
-      const mapped = mapApiOrderToDomain(apiOrder)
-      mockOrders.unshift(mapped)
-      cartState = structuredClone(initialCart)
-      return mapped
-    } catch (e) {
-      if (!isExpectedOfflineFetchError(e)) {
-        console.warn('API createOrder error, falling back to local mocks:', e)
-      }
-    }
+  if (!isLocalMockMode()) {
+    const apiOrder = await apiClient.checkout.createOrder({
+      enderecoId: input?.enderecoId,
+      pagamentoMetodoId: input?.pagamentoMetodoId,
+    })
+    const mapped = mapApiOrderToDomain(apiOrder)
+    mockOrders.unshift(mapped)
+    cartState = structuredClone(initialCart)
+    return mapped
   }
 
   const cart = structuredClone(cartState)
@@ -893,16 +849,7 @@ export async function getCustomerProfile(): Promise<{
   throwIfError()
 
   if (!isLocalMockMode()) {
-    try {
-      return await apiClient.customer.getProfile()
-    } catch (error) {
-      if (!isExpectedOfflineFetchError(error)) {
-        console.warn(
-          'API getProfile error, falling back to local mocks:',
-          error,
-        )
-      }
-    }
+    return await apiClient.customer.getProfile()
   }
 
   return {
@@ -933,16 +880,7 @@ export async function updateCustomerProfile(body: {
   throwIfError()
 
   if (!isLocalMockMode()) {
-    try {
-      return await apiClient.customer.updateProfile(body)
-    } catch (error) {
-      if (!isExpectedOfflineFetchError(error)) {
-        console.warn(
-          'API updateProfile error, falling back to local mocks:',
-          error,
-        )
-      }
-    }
+    return await apiClient.customer.updateProfile(body)
   }
 
   return updateCustomerProfileMock(body)
@@ -979,16 +917,7 @@ export async function addCustomerAddress(body: {
   throwIfError()
 
   if (!isLocalMockMode()) {
-    try {
-      return await apiClient.customer.addAddress(body)
-    } catch (error) {
-      if (!isExpectedOfflineFetchError(error)) {
-        console.warn(
-          'API addAddress error, falling back to local mocks:',
-          error,
-        )
-      }
-    }
+    return await apiClient.customer.addAddress(body)
   }
 
   return addCustomerAddressMock(body)
@@ -1025,16 +954,7 @@ export async function deleteCustomerAddress(id: string): Promise<Address[]> {
   throwIfError()
 
   if (!isLocalMockMode()) {
-    try {
-      return await apiClient.customer.deleteAddress(id)
-    } catch (error) {
-      if (!isExpectedOfflineFetchError(error)) {
-        console.warn(
-          'API deleteAddress error, falling back to local mocks:',
-          error,
-        )
-      }
-    }
+    return await apiClient.customer.deleteAddress(id)
   }
 
   return deleteCustomerAddressMock(id)
@@ -1067,8 +987,8 @@ export function listAddressesMock(): Address[] {
 
 export function listPaymentMethodsMock(): PaymentMethod[] {
   throwIfError()
-  const result = shouldReturnEmpty(mockPaymentMethods)
-  return result ?? mockPaymentMethods
+  const result = shouldReturnEmpty(paymentMethodsState)
+  return result ?? paymentMethodsState
 }
 
 export async function listAddresses(): Promise<Address[]> {
@@ -1084,22 +1004,10 @@ export async function listPaymentMethods(): Promise<PaymentMethod[]> {
 export async function listOrders(): Promise<Order[]> {
   throwIfError()
 
-  const isLocalMockMode =
-    !process.env.NEXT_PUBLIC_API_BASE_URL ||
-    process.env.NEXT_PUBLIC_LOCAL_MOCK === 'true' ||
-    process.env.NEXT_PUBLIC_MOCK_MODE === 'true' ||
-    process.env.LOCAL_MOCK_MODE === 'true'
-
-  if (!isLocalMockMode) {
-    try {
-      const apiOrders = await apiClient.customer.listOrders()
-      const mapped = apiOrders.map(mapApiOrderToDomain)
-      return mapped
-    } catch (e) {
-      if (!isExpectedOfflineFetchError(e)) {
-        console.warn('API listOrders error, falling back to local mocks:', e)
-      }
-    }
+  if (!isLocalMockMode()) {
+    const apiOrders = await apiClient.customer.listOrders()
+    const mapped = apiOrders.map(mapApiOrderToDomain)
+    return mapped
   }
 
   return listOrdersMock()
@@ -1122,12 +1030,7 @@ export async function getOrderById(id: string): Promise<Order | null> {
       if (isNotFoundError(error)) {
         return null
       }
-      if (!isExpectedOfflineFetchError(error)) {
-        console.warn(
-          'API getOrderById error, falling back to local mocks:',
-          error,
-        )
-      }
+      throw error
     }
   }
 
@@ -1149,12 +1052,7 @@ export async function getSubscription(): Promise<Subscription | null> {
       if (isNotFoundError(error)) {
         return null
       }
-      if (!isExpectedOfflineFetchError(error)) {
-        console.warn(
-          'API getSubscription error, falling back to local mocks:',
-          error,
-        )
-      }
+      throw error
     }
   }
 
@@ -1194,17 +1092,7 @@ export async function cancelSubscription(): Promise<Subscription> {
   throwIfError()
 
   if (!isLocalMockMode()) {
-    try {
-      const apiSub = await apiClient.customer.cancelSubscription()
-      return mapApiSubscriptionToDomain(apiSub)
-    } catch (error) {
-      if (!isExpectedOfflineFetchError(error)) {
-        console.warn(
-          'API cancelSubscription error, falling back to local mocks:',
-          error,
-        )
-      }
-    }
+    return await apiClient.customer.cancelSubscription()
   }
 
   return cancelSubscriptionMock()
@@ -1225,17 +1113,7 @@ export async function reactivateSubscription(): Promise<Subscription> {
   throwIfError()
 
   if (!isLocalMockMode()) {
-    try {
-      const apiSub = await apiClient.customer.reactivateSubscription()
-      return mapApiSubscriptionToDomain(apiSub)
-    } catch (error) {
-      if (!isExpectedOfflineFetchError(error)) {
-        console.warn(
-          'API reactivateSubscription error, falling back to local mocks:',
-          error,
-        )
-      }
-    }
+    return await apiClient.customer.reactivateSubscription()
   }
 
   return reactivateSubscriptionMock()
@@ -1256,17 +1134,8 @@ export async function listPayments(): Promise<Payment[]> {
   throwIfError()
 
   if (!isLocalMockMode()) {
-    try {
-      const apiPayments = await apiClient.customer.listPayments()
-      return apiPayments.map(mapApiPaymentToDomain)
-    } catch (error) {
-      if (!isExpectedOfflineFetchError(error)) {
-        console.warn(
-          'API listPayments error, falling back to local mocks:',
-          error,
-        )
-      }
-    }
+    const apiPayments = await apiClient.customer.listPayments()
+    return apiPayments.map(mapApiPaymentToDomain)
   }
 
   return listPaymentsMock()
@@ -1303,17 +1172,8 @@ export async function listInvoices(): Promise<Invoice[]> {
   throwIfError()
 
   if (!isLocalMockMode()) {
-    try {
-      const apiInvoices = await apiClient.customer.listInvoices()
-      return apiInvoices.map(mapApiInvoiceToDomain)
-    } catch (error) {
-      if (!isExpectedOfflineFetchError(error)) {
-        console.warn(
-          'API listInvoices error, falling back to local mocks:',
-          error,
-        )
-      }
-    }
+    const apiInvoices = await apiClient.customer.listInvoices()
+    return apiInvoices.map(mapApiInvoiceToDomain)
   }
 
   return listInvoicesMock()
@@ -1329,21 +1189,12 @@ export async function renewPixPayment(paymentId: string): Promise<Payment> {
   throwIfError()
 
   if (!isLocalMockMode()) {
-    try {
-      const apiPayment = await apiClient.customer.renewPixPayment(paymentId)
-      const mapped = mapApiPaymentToDomain(apiPayment)
-      paymentsState = paymentsState.map((payment) =>
-        payment.id === paymentId ? mapped : payment,
-      )
-      return mapped
-    } catch (error) {
-      if (!isExpectedOfflineFetchError(error)) {
-        console.warn(
-          'API renewPixPayment error, falling back to local mocks:',
-          error,
-        )
-      }
-    }
+    const apiPayment = await apiClient.customer.renewPixPayment(paymentId)
+    const mapped = mapApiPaymentToDomain(apiPayment)
+    paymentsState = paymentsState.map((payment) =>
+      payment.id === paymentId ? mapped : payment,
+    )
+    return mapped
   }
 
   return renewPixPaymentMock(paymentId)
@@ -1372,20 +1223,12 @@ export async function updateCard(input: {
   holderName: string
   lastFour: string
   brand: string
+  token?: string
 }): Promise<PaymentMethod> {
   throwIfError()
 
   if (!isLocalMockMode()) {
-    try {
-      return await apiClient.customer.updateCard(input)
-    } catch (error) {
-      if (!isExpectedOfflineFetchError(error)) {
-        console.warn(
-          'API updateCard error, falling back to local mocks:',
-          error,
-        )
-      }
-    }
+    return await apiClient.customer.updateCard(input)
   }
 
   return updateCardMock(input)
@@ -1395,6 +1238,7 @@ export function updateCardMock(input: {
   holderName: string
   lastFour: string
   brand: string
+  token?: string
 }): PaymentMethod {
   throwIfError()
   const updated: PaymentMethod = {
@@ -1408,21 +1252,83 @@ export function updateCardMock(input: {
   return updated
 }
 
+export async function listInvestigationFilesByBox(): Promise<
+  InvestigationFilesByBox[]
+> {
+  throwIfError()
+
+  if (!isLocalMockMode()) {
+    return await apiClient.cases.listFiles()
+  }
+
+  return listInvestigationFilesByBoxMock()
+}
+
+export function listInvestigationFilesByBoxMock(): InvestigationFilesByBox[] {
+  throwIfError()
+  const keys = Object.keys(mockFilesByBox)
+  return keys.map((key) => ({
+    id: key,
+    arquivos: mockFilesByBox[key].arquivos,
+    documentos: mockFilesByBox[key].documentos,
+  }))
+}
+
+export async function listCards(): Promise<PaymentMethod[]> {
+  throwIfError()
+
+  if (!isLocalMockMode()) {
+    return await apiClient.customer.listCards()
+  }
+
+  return listPaymentMethodsMock().filter((pm) => pm.type === 'credit_card')
+}
+
+export async function addCard(input: {
+  token: string
+  holderName: string
+  lastFour: string
+  brand: string
+}): Promise<PaymentMethod> {
+  throwIfError()
+
+  if (!isLocalMockMode()) {
+    return await apiClient.customer.addCard(input)
+  }
+
+  const newCard: PaymentMethod = {
+    id: `pm-${Date.now()}`,
+    type: 'credit_card',
+    label: `${input.brand} terminando em ${input.lastFour}`,
+    lastFour: input.lastFour,
+    brand: input.brand,
+    isDefault:
+      paymentMethodsState.filter((pm) => pm.type === 'credit_card').length ===
+      0,
+  }
+
+  paymentMethodsState.push(newCard)
+  return newCard
+}
+
+export async function deleteCard(id: string): Promise<{ sucesso: boolean }> {
+  throwIfError()
+
+  if (!isLocalMockMode()) {
+    await apiClient.customer.deleteCard(id)
+    return { sucesso: true }
+  }
+
+  paymentMethodsState = paymentMethodsState.filter((card) => card.id !== id)
+  return { sucesso: true }
+}
+
 export async function listExclusiveContent(): Promise<ExclusiveContent[]> {
   throwIfError()
 
   if (!isLocalMockMode()) {
-    try {
-      const apiContent = await apiClient.exclusiveContent.list()
-      return apiContent.map(mapApiExclusiveContentToDomain)
-    } catch (error) {
-      if (!isExpectedOfflineFetchError(error)) {
-        console.warn(
-          'API listExclusiveContent error, falling back to local mocks:',
-          error,
-        )
-      }
-    }
+    const apiContent = await apiClient.exclusiveContent.list()
+    return apiContent.map(mapApiExclusiveContentToDomain)
   }
 
   return listExclusiveContentMock()
@@ -1462,12 +1368,7 @@ export async function getExclusiveContentBySlug(
       if (isNotFoundError(error)) {
         return null
       }
-      if (!isExpectedOfflineFetchError(error)) {
-        console.warn(
-          'API getExclusiveContentBySlug error, falling back to local mocks:',
-          error,
-        )
-      }
+      throw error
     }
   }
 
@@ -1643,12 +1544,7 @@ export async function getClueBySlug(slug: string): Promise<Clue | null> {
       if (isNotFoundError(error)) {
         return null
       }
-      if (!isExpectedOfflineFetchError(error)) {
-        console.warn(
-          'API getClueBySlug error, falling back to local mocks:',
-          error,
-        )
-      }
+      throw error
     }
   }
 

@@ -1,11 +1,9 @@
 'use client'
 
 import { IconCreditCard, IconPlus, IconTrash } from '@tabler/icons-react'
-import { useState } from 'react'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 import { Button } from '@/src/components/ui/button'
-import { apiClient } from '@/src/lib/api-client'
 import {
   cardShadowBase,
   dossierCardSurface,
@@ -15,23 +13,23 @@ import {
   formLabelClass,
   transitionBgColor,
 } from '@/src/lib/design/classes'
+import { addCard, deleteCard, listCards } from '@/src/lib/domain/repositories'
 import type { PaymentMethod } from '@/src/lib/domain/types'
+
+function getErrorMessage(error: unknown, fallback: string): string {
+  return error instanceof Error ? error.message : fallback
+}
 
 export default function CartoesPage() {
   const [cards, setCards] = useState<PaymentMethod[]>([])
   const [loading, setLoading] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    apiClient.customer
-      .getProfile()
+    listCards()
       .then((data) => {
-        if (data.paymentMethods) {
-          setCards(
-            (data.paymentMethods as PaymentMethod[]).filter(
-              (pm) => pm.type === 'credit_card',
-            ),
-          )
-        }
+        setCards(data)
       })
       .catch((e) => console.error(e))
       .finally(() => setLoading(false))
@@ -44,36 +42,52 @@ export default function CartoesPage() {
   const [expiryYear, setExpiryYear] = useState('2026')
   const [cvc, setCvc] = useState('')
 
-  const handleAddCard = (e: React.FormEvent) => {
+  const handleAddCard = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!cardNumber || !holderName || !cvc) return
 
     const lastFour = cardNumber.replace(/\s+/g, '').slice(-4)
-    // Detect brand based on first digit (simplistic mock)
     const brand = cardNumber.startsWith('5') ? 'Mastercard' : 'Visa'
+    const token = `tok_mock_${Date.now()}`
 
-    const newCard: PaymentMethod = {
-      id: `pm-${Date.now()}`,
-      type: 'credit_card',
-      label: `${brand} terminando em ${lastFour}`,
-      lastFour,
-      brand,
-      isDefault: cards.length === 0,
+    setSubmitting(true)
+    setError(null)
+    try {
+      const newCard = await addCard({
+        token,
+        holderName,
+        lastFour,
+        brand,
+      })
+      setCards([...cards, newCard])
+      setShowAddForm(false)
+
+      // Reset form fields
+      setCardNumber('')
+      setHolderName('')
+      setExpiryMonth('01')
+      setExpiryYear('2026')
+      setCvc('')
+    } catch (e: unknown) {
+      console.error(e)
+      setError(getErrorMessage(e, 'Erro ao adicionar cartão.'))
+    } finally {
+      setSubmitting(false)
     }
-
-    setCards([...cards, newCard])
-    setShowAddForm(false)
-
-    // Reset form fields
-    setCardNumber('')
-    setHolderName('')
-    setExpiryMonth('01')
-    setExpiryYear('2026')
-    setCvc('')
   }
 
-  const handleDeleteCard = (id: string) => {
-    setCards(cards.filter((card) => card.id !== id))
+  const handleDeleteCard = async (id: string) => {
+    setSubmitting(true)
+    setError(null)
+    try {
+      await deleteCard(id)
+      setCards(cards.filter((card) => card.id !== id))
+    } catch (e: unknown) {
+      console.error(e)
+      setError(getErrorMessage(e, 'Erro ao remover cartão.'))
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   if (loading) {
@@ -198,11 +212,16 @@ export default function CartoesPage() {
             </div>
           </div>
 
+          {error && (
+            <p className="mt-2 text-xs font-semibold text-(--red)">{error}</p>
+          )}
+
           <div className="flex justify-end gap-2 pt-2">
             <Button
               type="button"
               variant="outline"
               size="sm"
+              disabled={submitting}
               className="rounded-[9px]"
               onClick={() => setShowAddForm(false)}
             >
@@ -211,9 +230,10 @@ export default function CartoesPage() {
             <Button
               type="submit"
               size="sm"
+              disabled={submitting}
               className="rounded-[9px] bg-(--red) text-[#fbf9f6] hover:bg-(--red-deep)"
             >
-              Cadastrar Cartão
+              {submitting ? 'Salvando...' : 'Cadastrar Cartão'}
             </Button>
           </div>
         </form>
@@ -273,8 +293,9 @@ export default function CartoesPage() {
               </div>
 
               <button
+                disabled={submitting}
                 onClick={() => handleDeleteCard(card.id)}
-                className={`cursor-pointer rounded-[9px] p-1.5 text-(--red) ${transitionBgColor} hover:bg-(--red)/10 hover:text-(--red-deep)`}
+                className={`cursor-pointer rounded-[9px] p-1.5 text-(--red) ${transitionBgColor} hover:bg-(--red)/10 hover:text-(--red-deep) disabled:opacity-50`}
               >
                 <IconTrash className="size-4.5" />
               </button>

@@ -7,10 +7,12 @@ import {
   mockDynamicContent,
 } from '@/src/lib/domain/mock-data'
 import {
+  addCard,
   addCustomerAddressMock,
   cancelSubscriptionMock,
   createCustomerMock,
   createOrder,
+  deleteCard,
   deleteCustomerAddressMock,
   getActiveCaseMock,
   getCurrentCustomerMock,
@@ -24,6 +26,7 @@ import {
   listAddressesMock,
   listCluesMock,
   listExclusiveContentMock,
+  listInvestigationFilesByBoxMock,
   listInvoicesMock,
   listOrdersMock,
   listPaymentMethodsMock,
@@ -46,6 +49,7 @@ import type {
   Customer,
   DynamicContentBlock,
   ExclusiveContent,
+  InvestigationFile,
   Invoice,
   Order,
   Payment,
@@ -241,6 +245,22 @@ function toPaymentMethod(method: PaymentMethod) {
     ultimosQuatro: method.lastFour,
     bandeira: method.brand,
     padrao: method.isDefault,
+  }
+}
+
+function toArquivoCasoInvestigativo(file: InvestigationFile) {
+  return {
+    id: file.id,
+    nome: file.name,
+    tipo: file.type,
+    modificadoEm: file.modified,
+    tamanho: file.size,
+    urlDownload: file.downloadUrl,
+    conteudo: file.content,
+    corrompido: file.corrupted,
+    colunas: file.columns,
+    linhas: file.rows,
+    fragmento: file.fragment,
   }
 }
 
@@ -795,9 +815,47 @@ async function handlePtBrApi(
             holderName: String(body.nomeImpresso ?? ''),
             lastFour: String(body.ultimosQuatro ?? '0000').slice(-4),
             brand: String(body.bandeira ?? 'Visa'),
+            token: body.token ? String(body.token) : undefined,
           }),
         ),
       )
+    }
+
+    if (method === 'GET' && path === 'cliente/cartoes') {
+      return json(
+        listPaymentMethodsMock()
+          .filter((pm) => pm.type === 'credit_card')
+          .map(toPaymentMethod),
+      )
+    }
+
+    if (method === 'POST' && path === 'cliente/cartoes') {
+      const body = await readJson(request)
+      const newCard = await addCard({
+        token: String(body.token ?? ''),
+        holderName: String(body.nomeImpresso ?? ''),
+        lastFour: String(body.ultimosQuatro ?? '0000').slice(-4),
+        brand: String(body.bandeira ?? 'Visa'),
+      })
+      return json(toPaymentMethod(newCard), 201)
+    }
+
+    const cardMatch = path.match(/^cliente\/cartoes\/([^/]+)$/)
+    if (method === 'DELETE' && cardMatch) {
+      const id = decodeURIComponent(cardMatch[1])
+      await deleteCard(id)
+      return json({ sucesso: true })
+    }
+
+    if (method === 'GET' && path === 'casos/arquivos') {
+      const boxes = listInvestigationFilesByBoxMock()
+      return json({
+        boxes: boxes.map((box) => ({
+          id: box.id,
+          arquivos: box.arquivos.map(toArquivoCasoInvestigativo),
+          documentos: box.documentos.map(toArquivoCasoInvestigativo),
+        })),
+      })
     }
 
     if (method === 'GET' && path === 'conteudos-exclusivos') {

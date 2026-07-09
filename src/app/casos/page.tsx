@@ -19,6 +19,7 @@ import { useEffect, useRef, useState } from 'react'
 import CRTEffect from 'vault66-crt-effect'
 
 import { apiClient } from '@/src/lib/api-client'
+import type { InvestigationFile } from '@/src/lib/domain/types'
 
 import styles from './crt-screen.module.css'
 
@@ -28,146 +29,6 @@ type ViewStage =
   | 'casos-list'
   | 'caso-detail'
   | 'arquivos-list'
-
-interface CasoFile {
-  id: string
-  name: string
-  type: 'audio' | 'image' | 'text' | 'sheet'
-  modified: string
-  size: string
-  downloadUrl?: string
-  content?: string
-  corrupted?: boolean
-  columns?: string[]
-  rows?: string[][]
-  fragment?: string
-}
-
-// Mock Files mapped by Box and Category
-const mockFilesByBox: Record<
-  string,
-  Record<'arquivos' | 'documentos', CasoFile[]>
-> = {
-  'box-1': { arquivos: [], documentos: [] },
-  'box-2': { arquivos: [], documentos: [] },
-  'box-3': { arquivos: [], documentos: [] },
-  'box-4': {
-    arquivos: [
-      {
-        id: 'audio_larissa',
-        name: 'Audio_Larissa.mp3',
-        type: 'audio',
-        modified: '22/02/2026 23:17',
-        size: '412 KB',
-        downloadUrl: '/audio/AUD_PD_01.m4a',
-        fragment:
-          '…achei melhor gravar do que escrever. o que eu descobri sobre as datas do—',
-        corrupted: true,
-      },
-      {
-        id: 'foto_mesa',
-        name: 'fotos_mesa_de_trabalho_Larissa.Jpg',
-        type: 'image',
-        modified: '31/12/2025 23:58',
-        size: '4,0 MB',
-        downloadUrl: '/imagens/pendrive/IMG_PD_08.jpg',
-        content:
-          'Fotografia mostrando Victória e Larissa sorrindo, registrada na noite de ano novo.',
-      },
-    ],
-    documentos: [
-      {
-        id: 'leiame',
-        name: 'LEIA-ME.txt',
-        type: 'text',
-        modified: '28/02/2026 21:54',
-        size: '1 KB',
-        content: `se você está lendo isto, então ou aconteceu alguma coisa comigo
-ou eu finalmente tomei coragem e entreguei tudo.
-
-de qualquer jeito: o que está aqui não é fofoca. não é teoria.
-é o que eu consegui fotografar antes que percebessem.
-
-o Instituto Quintella não é o que dizem que é.
-o que eles mostram por fora não é o que está nos papéis.
-eu não consigo provar isso sozinha — então deixei tudo aqui.
-
-confere com calma. principalmente as datas.
-
-a parte que pesa de verdade eu tranquei.
-a chave eu deixei onde só quem me conhece vai procurar.
-
-— V.`,
-      },
-      {
-        id: 'anotacoes',
-        name: 'anotacoes.txt',
-        type: 'text',
-        modified: '27/02/2026 23:54',
-        size: '2 KB',
-        content: `anotações — NÃO é pra ninguém ler ainda
-
-. comecei conferindo as datas só por teimosia. agora não consigo
-  parar de ver: cada post bonitinho deles tem um papel que diz o contrário.
-
-. 14/08/2022 — escritura do terreno (zona sul). bem antes de tudo.
-. 18/01/2023 — eles postam "INAUGURAMOS a sede". mas o terreno é de 2022.
-. 03/11/2023 — convênio com a prefeitura assinado.
-. jan/2024 — só AGORA anunciam o convênio. por que segurar dois meses?
-
-. a planilha do PC do L. é a chave. "titular anterior" +
-  "valor" + as áreas — se eu cruzar isso com os nomes certos, fecha.
-  eu só tive uns segundos pra fotografar.
-
-. não dá pra publicar isso solto. precisa do conjunto.
-  por isso o resto foi pro arquivo trancado.
-
-. se eu sumir e alguém abrir isto: olha as DATAS. é tudo nas datas.`,
-      },
-      {
-        id: 'datas_x_posts',
-        name: 'datas_x_posts.xlsx',
-        type: 'sheet',
-        modified: '27/02/2026 23:51',
-        size: '24 KB',
-        columns: [
-          'O que foi divulgado',
-          'Data no Instagram',
-          'Data no documento',
-          'Não fecha porque...',
-        ],
-        rows: [
-          [
-            'Inauguração da sede própria',
-            '18/01/2023',
-            'escritura do terreno 14/08/2022',
-            'terreno comprado meses antes da "inauguração" comemorada',
-          ],
-          [
-            'Convênio com a prefeitura',
-            'anunciado jan/2024',
-            'assinado 03/11/2023',
-            'dois meses de silêncio entre assinar e divulgar',
-          ],
-          [
-            '100 famílias atendidas no ano',
-            '27/02/2026',
-            'sem balanço público',
-            'número alardeado sem nenhum relatório que comprove',
-          ],
-          [
-            'Evento beneficente — zona sul',
-            '22/05/2025',
-            'área em processo de desapropriação',
-            '"beneficiando" um bairro que estava sendo esvaziado',
-          ],
-        ],
-      },
-    ],
-  },
-  'box-5': { arquivos: [], documentos: [] },
-  'box-6': { arquivos: [], documentos: [] },
-}
 
 export default function CasosPage() {
   const router = useRouter()
@@ -197,7 +58,9 @@ export default function CasosPage() {
   const [selectedCategory, setSelectedCategory] = useState<
     'arquivos' | 'documentos'
   >('arquivos')
-  const [selectedFile, setSelectedFile] = useState<CasoFile | null>(null)
+  const [selectedFile, setSelectedFile] = useState<InvestigationFile | null>(
+    null,
+  )
 
   // Modal visualizer states
   const [isImageZoomed, setIsImageZoomed] = useState(false)
@@ -221,7 +84,12 @@ export default function CasosPage() {
 
   const audioRefs = useRef<Record<string, HTMLAudioElement | null>>({})
 
-  // Auth check on mount
+  const [filesByBox, setFilesByBox] = useState<
+    Record<string, Record<'arquivos' | 'documentos', InvestigationFile[]>>
+  >({})
+  const [loadingFiles, setLoadingFiles] = useState(true)
+
+  // Auth check and load files on mount
   useEffect(() => {
     apiClient.auth
       .me()
@@ -229,6 +97,25 @@ export default function CasosPage() {
         if (customer) {
           setIsAuthenticated(true)
           localStorage.setItem('isLoggedIn', 'true')
+          apiClient.cases
+            .listFiles()
+            .then((data) => {
+              const mapped: Record<
+                string,
+                Record<'arquivos' | 'documentos', InvestigationFile[]>
+              > = {}
+              data.forEach((box) => {
+                mapped[box.id] = {
+                  arquivos: box.arquivos,
+                  documentos: box.documentos,
+                }
+              })
+              setFilesByBox(mapped)
+            })
+            .catch((e) =>
+              console.error('Erro ao carregar arquivos da investigação:', e),
+            )
+            .finally(() => setLoadingFiles(false))
         } else {
           router.push('/login')
         }
@@ -360,7 +247,7 @@ export default function CasosPage() {
     return null
   }
 
-  const currentFiles = mockFilesByBox[selectedBox]?.[selectedCategory] || []
+  const currentFiles = filesByBox[selectedBox]?.[selectedCategory] ?? []
   const allBoxes = Array.from({ length: 12 }, (_, i) => i + 1)
 
   return (
@@ -880,7 +767,11 @@ export default function CasosPage() {
                           </div>
 
                           {/* Files List */}
-                          {currentFiles.length === 0 ? (
+                          {loadingFiles ? (
+                            <div className="flex min-h-[200px] flex-1 animate-pulse items-center justify-center text-sm text-[#33ff33]/70 uppercase">
+                              CONECTANDO AO ARQUIVO...
+                            </div>
+                          ) : currentFiles.length === 0 ? (
                             <div className="flex min-h-[200px] flex-1 items-center justify-center text-sm text-[#33ff33]/50 italic">
                               Pasta vazia ou contêiner bloqueado.
                             </div>

@@ -1,8 +1,12 @@
+import { getApiBaseUrl } from '@/src/lib/api-mode'
 import type {
   Address,
   Cart,
   CartItem,
   Customer,
+  InvestigationFile,
+  InvestigationFilesByBox,
+  InvestigationFileType,
   PaymentMethod,
   SubscriberPreferences,
 } from '@/src/lib/domain/types'
@@ -43,8 +47,19 @@ function asOptionalNumber(value: JsonValue | undefined): number | undefined {
   return typeof value === 'number' ? value : undefined
 }
 
+function toInvestigationFileType(
+  value: JsonValue | undefined,
+): InvestigationFileType {
+  return value === 'audio' ||
+    value === 'image' ||
+    value === 'text' ||
+    value === 'sheet'
+    ? value
+    : 'text'
+}
+
 async function fetcher(endpoint: string, options: RequestInit = {}) {
-  const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || '/api'
+  const apiBaseUrl = getApiBaseUrl()
   const url = `${apiBaseUrl.replace(/\/$/, '')}${endpoint}`
   const headers = new Headers(options.headers || {})
 
@@ -109,6 +124,32 @@ function toPaymentMethod(data: JsonObject): PaymentMethod {
     lastFour: asOptionalString(data.ultimosQuatro),
     brand: asOptionalString(data.bandeira),
     isDefault: data.padrao === true,
+  }
+}
+
+function toInvestigationFile(data: JsonObject): InvestigationFile {
+  return {
+    id: asString(data.id),
+    name: asString(data.nome),
+    type: toInvestigationFileType(data.tipo),
+    modified: asString(data.modificadoEm),
+    size: asString(data.tamanho),
+    downloadUrl: asOptionalString(data.urlDownload),
+    content: asOptionalString(data.conteudo),
+    corrupted: data.corrompido === true,
+    columns: Array.isArray(data.colunas) ? data.colunas.map(String) : undefined,
+    rows: Array.isArray(data.linhas)
+      ? data.linhas.map((row) => (Array.isArray(row) ? row.map(String) : []))
+      : undefined,
+    fragment: asOptionalString(data.fragmento),
+  }
+}
+
+function toInvestigationFilesByBox(data: JsonObject): InvestigationFilesByBox {
+  return {
+    id: asString(data.id),
+    arquivos: asArray(data.arquivos).map(toInvestigationFile),
+    documentos: asArray(data.documentos).map(toInvestigationFile),
   }
 }
 
@@ -340,6 +381,7 @@ export const apiClient = {
       holderName: string
       lastFour: string
       brand: string
+      token?: string
     }) =>
       fetcher('/cliente/cartao', {
         method: 'POST',
@@ -347,8 +389,32 @@ export const apiClient = {
           nomeImpresso: body.holderName,
           ultimosQuatro: body.lastFour,
           bandeira: body.brand,
+          token: body.token,
         }),
       }).then(toPaymentMethod),
+    listCards: () =>
+      fetcher('/cliente/cartoes').then((items) =>
+        asArray(items).map(toPaymentMethod),
+      ),
+    addCard: (body: {
+      token: string
+      holderName: string
+      lastFour: string
+      brand: string
+    }) =>
+      fetcher('/cliente/cartoes', {
+        method: 'POST',
+        body: JSON.stringify({
+          token: body.token,
+          nomeImpresso: body.holderName,
+          ultimosQuatro: body.lastFour,
+          bandeira: body.brand,
+        }),
+      }).then(toPaymentMethod),
+    deleteCard: (id: string) =>
+      fetcher(`/cliente/cartoes/${id}`, {
+        method: 'DELETE',
+      }),
   },
   exclusiveContent: {
     list: () => fetcher('/conteudos-exclusivos'),
@@ -356,5 +422,9 @@ export const apiClient = {
   },
   cases: {
     getData: () => fetcher('/casos'),
+    listFiles: (): Promise<InvestigationFilesByBox[]> =>
+      fetcher('/casos/arquivos').then((res) =>
+        asArray(res.boxes).map(toInvestigationFilesByBox),
+      ),
   },
 }

@@ -35,17 +35,20 @@ export default function AtualizarCartaoPage() {
         Atualizar cartão
       </h1>
       <p className="mt-2 text-sm/6 text-(--ink-mute)">
-        Formulário mockado — dados não são enviados a nenhum gateway.
+        Atualize os dados de cobrança do cartão de crédito padrão para sua
+        assinatura.
       </p>
 
       <form
         className="mt-6 max-w-md space-y-5"
         action={async (formData) => {
           'use server'
+          const lastFour = String(formData.get('lastFour') ?? '0000').slice(-4)
           await updateCard({
             holderName: String(formData.get('holder') ?? ''),
-            lastFour: String(formData.get('lastFour') ?? '0000').slice(-4),
+            lastFour,
             brand: String(formData.get('brand') ?? 'Visa'),
+            token: `tok_mock_${Date.now()}_${lastFour}`,
           })
         }}
       >
@@ -71,7 +74,7 @@ export default function AtualizarCartaoPage() {
           type="submit"
           className="rounded-[9px] bg-(--red) text-[#fbf9f6] shadow-[0_9px_22px_-8px_rgba(33,28,24,0.13)] hover:bg-(--red-deep)"
         >
-          Salvar cartão (mock)
+          Salvar cartão
         </Button>
       </form>
     </div>

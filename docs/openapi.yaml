@@ -803,6 +803,7 @@ paths:
                 - nomeImpresso
                 - ultimosQuatro
                 - bandeira
+                - token
               properties:
                 nomeImpresso:
                   type: string
@@ -824,6 +825,83 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MetodoPagamento'
+
+  /cliente/cartoes:
+    get:
+      tags:
+        - Cliente & Painel
+      summary: Listar cartões de crédito do cliente
+      description: Retorna a lista de cartões de crédito cadastrados para o cliente logado.
+      responses:
+        '200':
+          description: Lista de cartões de crédito.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MetodoPagamento'
+    post:
+      tags:
+        - Cliente & Painel
+      summary: Adicionar novo cartão de crédito
+      description: Adiciona um novo cartão de crédito usando um token gerado pelo gateway.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - token
+                - nomeImpresso
+                - ultimosQuatro
+                - bandeira
+              properties:
+                token:
+                  type: string
+                  example: tok_visa_1234
+                nomeImpresso:
+                  type: string
+                  example: Mariana Silva
+                ultimosQuatro:
+                  type: string
+                  example: "1234"
+                bandeira:
+                  type: string
+                  example: Visa
+      responses:
+        '201':
+          description: Cartão adicionado com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetodoPagamento'
+
+  /cliente/cartoes/{id}:
+    delete:
+      tags:
+        - Cliente & Painel
+      summary: Remover cartão de crédito
+      description: Remove um cartão de crédito cadastrado pelo ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: pm-001
+      responses:
+        '200':
+          description: Cartão removido com sucesso.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sucesso:
+                    type: boolean
+                    example: true
 
   # --- CONTEÚDO & INVESTIGAÇÃO ---
   /conteudos-exclusivos:
@@ -884,6 +962,29 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Pista'
+
+  /casos/arquivos:
+    get:
+      tags:
+        - Conteúdo & Investigação
+      summary: Listar arquivos/documentos da experiência investigativa por box
+      description: |
+        Retorna os arquivos e documentos agrupados por box.
+        Usado na tela de investigação (/casos).
+      responses:
+        '200':
+          description: Lista de boxes com seus respectivos arquivos e documentos.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - boxes
+                properties:
+                  boxes:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ArquivosCasoPorBox'
 
   # --- CONTEUDO DINAMICO E SEO ---
   /conteudo-dinamico:
@@ -1801,3 +1902,62 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ItemMenuCms'
+
+    ArquivoCasoInvestigativo:
+      type: object
+      properties:
+        id:
+          type: string
+          example: audio_larissa
+        nome:
+          type: string
+          example: Audio_Larissa.mp3
+        tipo:
+          type: string
+          enum: [audio, image, text, sheet]
+          example: audio
+        modificadoEm:
+          type: string
+          example: 22/02/2026 23:17
+        tamanho:
+          type: string
+          example: 412 KB
+        urlDownload:
+          type: string
+          example: /audio/AUD_PD_01.m4a
+        conteudo:
+          type: string
+          example: '…achei melhor gravar do que escrever. o que eu descobri sobre as datas do—'
+        corrompido:
+          type: boolean
+          example: true
+        colunas:
+          type: array
+          items:
+            type: string
+          example: ["O que foi divulgado", "Data no Instagram"]
+        linhas:
+          type: array
+          items:
+            type: array
+            items:
+              type: string
+          example: [["Inauguração da sede própria", "18/01/2023"]]
+        fragmento:
+          type: string
+          example: '…achei melhor gravar do que escrever.'
+
+    ArquivosCasoPorBox:
+      type: object
+      properties:
+        id:
+          type: string
+          example: box-4
+        arquivos:
+          type: array
+          items:
+            $ref: '#/components/schemas/ArquivoCasoInvestigativo'
+        documentos:
+          type: array
+          items:
+            $ref: '#/components/schemas/ArquivoCasoInvestigativo'

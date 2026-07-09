@@ -1,6 +1,6 @@
 # Planos de Implementação
 
-Gerado com o skill improve em 2026-06-24. Reconcile completo em 2026-07-08 @ `94cc25f`. Plano 011 adicionado em 2026-07-08.
+Gerado com o skill improve em 2026-06-24. Reconcile completo em 2026-07-08 @ `94cc25f`. Plano 011 adicionado em 2026-07-08. Plano 012 adicionado em 2026-07-08 (migrado de `advisor-plans/001`).
 
 ## Ordem de Execução e Status
 
@@ -17,18 +17,20 @@ Gerado com o skill improve em 2026-06-24. Reconcile completo em 2026-07-08 @ `94
 | 009 | Integração pública de Checkout | P1 | M | 008 | **DONE** — reverificado @ `94cc25f`; typecheck/build exit 0 |
 | 010 | Integração pública da Área do Cliente | P1 | L | 009 | **DONE** — `26db9e3` + financeiro `94cc25f`; typecheck/build exit 0 |
 | 011 | Suprimir warnings ENOTFOUND no fallback do build | P2 | S | 007 | **DONE** — verificado @ `d2bcbfd`; build silencioso offline |
+| 012 | Conectar endpoints API restantes e tornar mocks locais explícitos | P1 | L | 007, 010, 011 | TODO |
 
 Valores de status: TODO | IN PROGRESS | DONE | BLOCKED (com motivo em uma linha) | REJECTED (com justificativa em uma linha)
 
 ## Ordem recomendada agora
 
-1. Executar Plano 011 (`execute 011`) — fecha drift do 007 para hosts inacessíveis.
+1. Executar Plano 012 (`execute 012`) — fecha gaps de `/casos`, cartões e FAQ; remove fallback implícito.
 2. Remover worktree stale `plan010-382b44c7` se ainda existir.
 
 ## Notas de Dependência
 
 - Plano 011 é follow-up do 007: estende `isConnectionRefused` para cobrir `ENOTFOUND` e outros erros offline.
 - Plano 010 entregue em dois commits: área do cliente `26db9e3`, financeiro `94cc25f`.
+- Plano 012 é o próximo passo da integração API: conecta telas ainda mockadas (`/casos`, cartões, FAQ) e inverte o modelo de fallback — mock passa a ser opt-in explícito (`NEXT_PUBLIC_LOCAL_MOCK=true`) em vez de default silencioso.
 
 ## Reconcile 2026-07-08 (noite) @ `94cc25f`
 
