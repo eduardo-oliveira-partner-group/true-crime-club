@@ -234,6 +234,20 @@ function isNotFoundError(error: unknown): boolean {
   )
 }
 
+function isUnauthorizedError(error: unknown): boolean {
+  const msg = error instanceof Error ? error.message.toLowerCase() : ''
+  return (
+    msg.includes('401') ||
+    msg.includes('não autenticado') ||
+    msg.includes('nao autenticado') ||
+    msg.includes('unauthorized')
+  )
+}
+
+function emptyCart(): Cart {
+  return { id: 'cart-anonymous', items: [] }
+}
+
 function throwIfError(): void {
   if (isScenario('error')) {
     throw new Error(getScenarioErrorMessage())
@@ -400,7 +414,16 @@ export async function getCart(): Promise<Cart> {
   throwIfError()
 
   if (!isLocalMockMode()) {
-    return await apiClient.cart.get()
+    try {
+      return await apiClient.cart.get()
+    } catch (error) {
+      // Build/SSR sem cookie de sessão: a API responde 401.
+      // Carrinho vazio evita quebrar prerender do header e páginas públicas.
+      if (isUnauthorizedError(error)) {
+        return emptyCart()
+      }
+      throw error
+    }
   }
 
   return structuredClone(cartState)
@@ -769,13 +792,20 @@ async function fetchCasesBundle(): Promise<{
     return null
   }
 
-  const data = await apiClient.cases.getData()
-  return {
-    activeCase: data.casoAtivo ? mapApiCaseToDomain(data.casoAtivo) : null,
-    progress: data.progresso ? mapApiProgressToDomain(data.progresso) : null,
-    clues: Array.isArray(data.pistas)
-      ? data.pistas.map(mapApiClueToDomain)
-      : [],
+  try {
+    const data = await apiClient.cases.getData()
+    return {
+      activeCase: data.casoAtivo ? mapApiCaseToDomain(data.casoAtivo) : null,
+      progress: data.progresso ? mapApiProgressToDomain(data.progresso) : null,
+      clues: Array.isArray(data.pistas)
+        ? data.pistas.map(mapApiClueToDomain)
+        : [],
+    }
+  } catch (error) {
+    if (isUnauthorizedError(error)) {
+      return { activeCase: null, progress: null, clues: [] }
+    }
+    throw error
   }
 }
 
@@ -1007,9 +1037,15 @@ export async function listOrders(): Promise<Order[]> {
   throwIfError()
 
   if (!isLocalMockMode()) {
-    const apiOrders = await apiClient.customer.listOrders()
-    const mapped = apiOrders.map(mapApiOrderToDomain)
-    return mapped
+    try {
+      const apiOrders = await apiClient.customer.listOrders()
+      return apiOrders.map(mapApiOrderToDomain)
+    } catch (error) {
+      if (isUnauthorizedError(error)) {
+        return []
+      }
+      throw error
+    }
   }
 
   return listOrdersMock()
@@ -1051,7 +1087,7 @@ export async function getSubscription(): Promise<Subscription | null> {
       const apiSub = await apiClient.customer.getSubscription()
       return mapApiSubscriptionToDomain(apiSub)
     } catch (error) {
-      if (isNotFoundError(error)) {
+      if (isNotFoundError(error) || isUnauthorizedError(error)) {
         return null
       }
       throw error
@@ -1136,8 +1172,15 @@ export async function listPayments(): Promise<Payment[]> {
   throwIfError()
 
   if (!isLocalMockMode()) {
-    const apiPayments = await apiClient.customer.listPayments()
-    return apiPayments.map(mapApiPaymentToDomain)
+    try {
+      const apiPayments = await apiClient.customer.listPayments()
+      return apiPayments.map(mapApiPaymentToDomain)
+    } catch (error) {
+      if (isUnauthorizedError(error)) {
+        return []
+      }
+      throw error
+    }
   }
 
   return listPaymentsMock()
@@ -1174,8 +1217,15 @@ export async function listInvoices(): Promise<Invoice[]> {
   throwIfError()
 
   if (!isLocalMockMode()) {
-    const apiInvoices = await apiClient.customer.listInvoices()
-    return apiInvoices.map(mapApiInvoiceToDomain)
+    try {
+      const apiInvoices = await apiClient.customer.listInvoices()
+      return apiInvoices.map(mapApiInvoiceToDomain)
+    } catch (error) {
+      if (isUnauthorizedError(error)) {
+        return []
+      }
+      throw error
+    }
   }
 
   return listInvoicesMock()
