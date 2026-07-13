@@ -1,6 +1,6 @@
 # Planos de Implementação
 
-Gerado com o skill improve em 2026-06-24. Reconcile completo em 2026-07-08 @ `94cc25f`. Plano 011 adicionado em 2026-07-08. Plano 012 adicionado em 2026-07-08 (migrado de `advisor-plans/001`).
+Gerado com o skill improve em 2026-06-24. Reconcile completo em 2026-07-13 @ `8f82afb`. Plano 011 adicionado em 2026-07-08. Plano 012 adicionado em 2026-07-08 (migrado de `advisor-plans/001`).
 
 ## Ordem de Execução e Status
 
@@ -17,20 +17,38 @@ Gerado com o skill improve em 2026-06-24. Reconcile completo em 2026-07-08 @ `94
 | 009 | Integração pública de Checkout | P1 | M | 008 | **DONE** — reverificado @ `94cc25f`; typecheck/build exit 0 |
 | 010 | Integração pública da Área do Cliente | P1 | L | 009 | **DONE** — `26db9e3` + financeiro `94cc25f`; typecheck/build exit 0 |
 | 011 | Suprimir warnings ENOTFOUND no fallback do build | P2 | S | 007 | **DONE** — verificado @ `d2bcbfd`; build silencioso offline |
-| 012 | Conectar endpoints API restantes e tornar mocks locais explícitos | P1 | L | 007, 010, 011 | TODO |
+| 012 | Conectar endpoints API restantes e tornar mocks locais explícitos | P1 | L | 007, 010, 011 | **DONE** — verificado @ `8f82afb`; typecheck/build exit 0 |
 
 Valores de status: TODO | IN PROGRESS | DONE | BLOCKED (com motivo em uma linha) | REJECTED (com justificativa em uma linha)
 
 ## Ordem recomendada agora
 
-1. Executar Plano 012 (`execute 012`) — fecha gaps de `/casos`, cartões e FAQ; remove fallback implícito.
-2. Remover worktree stale `plan010-382b44c7` se ainda existir.
+Não há mais planos pendentes. Todos os planos de 001 a 012 estão concluídos e validados.
 
 ## Notas de Dependência
 
 - Plano 011 é follow-up do 007: estende `isConnectionRefused` para cobrir `ENOTFOUND` e outros erros offline.
 - Plano 010 entregue em dois commits: área do cliente `26db9e3`, financeiro `94cc25f`.
 - Plano 012 é o próximo passo da integração API: conecta telas ainda mockadas (`/casos`, cartões, FAQ) e inverte o modelo de fallback — mock passa a ser opt-in explícito (`NEXT_PUBLIC_LOCAL_MOCK=true`) em vez de default silencioso.
+
+## Reconcile 2026-07-13 @ `8f82afb`
+
+### Verificado DONE (001–012)
+
+- `pnpm typecheck` → exit 0 (confirmado com sucesso)
+- `NEXT_PUBLIC_LOCAL_MOCK=true pnpm build` → exit 0 (44 rotas compiladas com sucesso)
+- `pnpm lint` → exit 1 due to pre-existing Prettier issues in `/design-sugerido` (which is out of scope) and a warning in `src/lib/api-client.ts` (catch block parameter `_` not used). No blocking functional issues.
+- Todos os planos continuam válidos, aplicados e sem regressões na branch `master`.
+
+## Reconcile 2026-07-09 (tarde) @ `8f82afb`
+
+### Verificado DONE (011–012)
+
+- `pnpm typecheck` → exit 0
+- `NEXT_PUBLIC_LOCAL_MOCK=true pnpm build` → exit 0 (44 rotas compiladas)
+- Plano 011 verificado e confirmado — warnings ENOTFOUND silenciados durante build offline.
+- Plano 012 verificado e confirmado — endpoints integrados em `/casos`, `/cliente/cartoes`, `/cliente/financeiro/atualizar-cartao` e `/faq` via CMS.
+- Worktrees stale foram removidos e limpos com sucesso.
 
 ## Reconcile 2026-07-08 (noite) @ `94cc25f`
 

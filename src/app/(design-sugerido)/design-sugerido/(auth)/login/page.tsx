@@ -1,6 +1,11 @@
 'use client'
 
-import { IconArrowRight, IconFingerprint, IconLock, IconUser } from '@tabler/icons-react'
+import {
+  IconArrowRight,
+  IconFingerprint,
+  IconLock,
+  IconUser,
+} from '@tabler/icons-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { FormEvent, useEffect, useState } from 'react'
@@ -65,14 +70,14 @@ export default function LoginPage() {
         Use seu e-mail e senha para acessar o seu dossiê pessoal.
       </p>
 
-      <div className="mt-4 flex flex-col sm:flex-row gap-2">
+      <div className="mt-4 flex flex-col gap-2 sm:flex-row">
         <button
           type="button"
           onClick={() => {
             setEmailValue('carlos.souza@email.com')
             setPasswordValue('senha-falsa-123')
           }}
-          className="flex flex-1 items-center justify-center gap-1.5 border border-[#fffaf0]/14 bg-[#0c0a09] px-3 py-2 text-xs font-semibold text-[#d7b56d] transition hover:bg-[#fffaf0]/10 focus:border-[#d7b56d]/70 focus:bg-[#0b0908] cursor-pointer"
+          className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 border border-[#fffaf0]/14 bg-[#0c0a09] px-3 py-2 text-xs font-semibold text-[#d7b56d] transition hover:bg-[#fffaf0]/10 focus:border-[#d7b56d]/70 focus:bg-[#0b0908]"
         >
           <IconUser className="size-3.5" />
           Usuário 1
@@ -83,7 +88,7 @@ export default function LoginPage() {
             setEmailValue('mariana.silva@email.com')
             setPasswordValue('senha-falsa-123')
           }}
-          className="flex flex-1 items-center justify-center gap-1.5 border border-[#fffaf0]/14 bg-[#0c0a09] px-3 py-2 text-xs font-semibold text-[#d7b56d] transition hover:bg-[#fffaf0]/10 focus:border-[#d7b56d]/70 focus:bg-[#0b0908] cursor-pointer"
+          className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 border border-[#fffaf0]/14 bg-[#0c0a09] px-3 py-2 text-xs font-semibold text-[#d7b56d] transition hover:bg-[#fffaf0]/10 focus:border-[#d7b56d]/70 focus:bg-[#0b0908]"
         >
           <IconUser className="size-3.5" />
           Usuário 2

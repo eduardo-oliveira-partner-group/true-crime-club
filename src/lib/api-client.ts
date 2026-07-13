@@ -251,7 +251,20 @@ export const apiClient = {
         body: JSON.stringify({ email: body.email }),
       }),
     logout: () => fetcher('/autenticacao/sair', { method: 'POST' }),
-    me: () => fetcher('/autenticacao/cliente-atual').then(toCustomer),
+    me: () =>
+      fetcher('/autenticacao/cliente-atual')
+        .then(toCustomer)
+        .catch(async () => {
+          // Em desenvolvimento ou cross-origin, o cookie tcc_session pode não ser enviado.
+          // Como contingência para carregar o nome/dados do usuário logado, tentamos o perfil.
+          try {
+            const profileData = await fetcher('/cliente/perfil')
+            if (profileData && profileData.cliente) {
+              return toCustomer(profileData.cliente)
+            }
+          } catch (_) {}
+          throw new Error('Não autenticado')
+        }),
   },
   products: {
     list: (params?: { featured?: boolean; category?: string }) => {
