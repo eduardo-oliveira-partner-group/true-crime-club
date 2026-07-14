@@ -72,7 +72,16 @@ async function fetcher(endpoint: string, options: RequestInit = {}) {
     headers.set('Content-Type', 'application/json')
   }
 
-  const token = getAccessToken()
+  let token = getAccessToken()
+  if (typeof window === 'undefined') {
+    try {
+      const { getCookieToken } = await eval("import('./server/cookie-helper')")
+      token = await getCookieToken()
+    } catch {
+      // Ignore
+    }
+  }
+
   if (token && !headers.has('Authorization')) {
     headers.set('Authorization', `Bearer ${token}`)
   }
@@ -91,6 +100,45 @@ async function fetcher(endpoint: string, options: RequestInit = {}) {
   }
 
   return response.json()
+}
+
+async function getCustomerId(): Promise<string> {
+  let token: string | null = null
+  if (typeof window === 'undefined') {
+    try {
+      const { getCookieToken } = await eval("import('./server/cookie-helper')")
+      token = await getCookieToken()
+    } catch {
+      // Ignore
+    }
+  } else {
+    token = getAccessToken()
+  }
+
+  if (token) {
+    try {
+      const parts = token.split('.')
+      if (parts.length === 3) {
+        const base64Url = parts[1]
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+        const payload = JSON.parse(
+          decodeURIComponent(
+            atob(base64)
+              .split('')
+              .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+              .join(''),
+          ),
+        )
+        if (payload.sub) {
+          return payload.sub
+        }
+      }
+    } catch (e) {
+      // Ignore
+    }
+  }
+
+  return 'cliente-001'
 }
 
 function persistAuthToken(data: { token?: unknown }) {
@@ -364,13 +412,14 @@ export const apiClient = {
         paymentMethods: asArray(data.metodosPagamento).map(toPaymentMethod),
       }
     },
-    updateProfile: (body: {
+    updateProfile: async (body: {
       name?: string
       email?: string
       phone?: string
       preferences?: Partial<SubscriberPreferences>
-    }) =>
-      fetcher('/clientes/cliente-001', {
+    }) => {
+      const customerId = await getCustomerId()
+      return fetcher(`/clientes/${customerId}`, {
         method: 'PATCH',
         body: JSON.stringify({
           nome: body.name,
@@ -378,8 +427,9 @@ export const apiClient = {
           telefone: body.phone,
           preferencias: fromPreferences(body.preferences),
         }),
-      }).then(toCustomer),
-    addAddress: (body: {
+      }).then(toCustomer)
+    },
+    addAddress: async (body: {
       label: string
       street: string
       number: string
@@ -388,19 +438,23 @@ export const apiClient = {
       city: string
       state: string
       zipCode: string
-    }) =>
-      fetcher('/clientes/cliente-001/enderecos', {
+    }) => {
+      const customerId = await getCustomerId()
+      return fetcher(`/clientes/${customerId}/enderecos`, {
         method: 'POST',
         body: JSON.stringify(fromAddress(body)),
-      }).then((items) => items.map(toAddress)),
-    deleteAddress: (id: string) =>
-      fetcher(`/clientes/cliente-001/enderecos/${id}`, {
+      }).then((items) => items.map(toAddress))
+    },
+    deleteAddress: async (id: string) => {
+      const customerId = await getCustomerId()
+      return fetcher(`/clientes/${customerId}/enderecos/${id}`, {
         method: 'DELETE',
       }).then(() =>
-        fetcher('/clientes/cliente-001/enderecos').then((items) =>
+        fetcher(`/clientes/${customerId}/enderecos`).then((items) =>
           items.map(toAddress),
         ),
-      ),
+      )
+    },
     listOrders: () => fetcher('/cliente/pedidos'),
     getOrder: (id: string) => fetcher(`/cliente/pedidos/${id}`),
     getSubscription: () => fetcher('/cliente/assinatura'),
