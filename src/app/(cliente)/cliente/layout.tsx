@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 
+import { RequireAuth } from '@/src/components/auth/require-auth'
 import { ClientShell } from '@/src/components/layout/client-shell'
 
 // Área autenticada: depende de cookie/sessão por request.
@@ -15,5 +16,9 @@ export default function ClienteLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  return <ClientShell>{children}</ClientShell>
+  return (
+    <RequireAuth>
+      <ClientShell>{children}</ClientShell>
+    </RequireAuth>
+  )
 }

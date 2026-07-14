@@ -69,7 +69,6 @@ export default function CadastroPage() {
         email: emailValue,
         password: passwordValue,
       })
-      localStorage.setItem('isLoggedIn', 'true')
 
       setIsSuccess(true)
 

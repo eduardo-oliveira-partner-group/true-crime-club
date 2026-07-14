@@ -1,4 +1,9 @@
 import { getApiBaseUrl } from '@/src/lib/api-mode'
+import {
+  clearAccessToken,
+  getAccessToken,
+  setAccessToken,
+} from '@/src/lib/auth-token'
 import type {
   Address,
   Cart,
@@ -67,6 +72,11 @@ async function fetcher(endpoint: string, options: RequestInit = {}) {
     headers.set('Content-Type', 'application/json')
   }
 
+  const token = getAccessToken()
+  if (token && !headers.has('Authorization')) {
+    headers.set('Authorization', `Bearer ${token}`)
+  }
+
   const response = await fetch(url, {
     ...options,
     headers,
@@ -81,6 +91,12 @@ async function fetcher(endpoint: string, options: RequestInit = {}) {
   }
 
   return response.json()
+}
+
+function persistAuthToken(data: { token?: unknown }) {
+  if (typeof data.token === 'string' && data.token.length > 0) {
+    setAccessToken(data.token)
+  }
 }
 
 function toCustomer(data: JsonObject): Customer {
@@ -233,36 +249,51 @@ export const apiClient = {
           senha: body.password,
           telefone: body.phone,
         }),
-      }).then((data) => ({
-        ...data,
-        cliente: data.cliente ? toCustomer(data.cliente) : undefined,
-      })),
+      }).then((data) => {
+        persistAuthToken(data)
+        return {
+          ...data,
+          cliente: data.cliente ? toCustomer(data.cliente) : undefined,
+        }
+      }),
     login: async (body: { email: string; password: string }) =>
       fetcher('/autenticacao/entrar', {
         method: 'POST',
         body: JSON.stringify({ email: body.email, senha: body.password }),
-      }).then((data) => ({
-        ...data,
-        cliente: data.cliente ? toCustomer(data.cliente) : undefined,
-      })),
+      }).then((data) => {
+        persistAuthToken(data)
+        return {
+          ...data,
+          cliente: data.cliente ? toCustomer(data.cliente) : undefined,
+        }
+      }),
     recoverPassword: (body: { email: string }) =>
       fetcher('/clientes/recuperar-senha', {
         method: 'POST',
         body: JSON.stringify({ email: body.email }),
       }),
-    logout: () => fetcher('/autenticacao/sair', { method: 'POST' }),
+    logout: async () => {
+      try {
+        await fetcher('/autenticacao/sair', { method: 'POST' })
+      } finally {
+        clearAccessToken()
+      }
+      return { sucesso: true }
+    },
     me: () =>
       fetcher('/autenticacao/cliente-atual')
         .then(toCustomer)
         .catch(async () => {
           // Em desenvolvimento ou cross-origin, o cookie tcc_session pode não ser enviado.
-          // Como contingência para carregar o nome/dados do usuário logado, tentamos o perfil.
+          // Com Bearer em localStorage o caminho principal já autentica; perfil é fallback.
           try {
             const profileData = await fetcher('/cliente/perfil')
             if (profileData && profileData.cliente) {
               return toCustomer(profileData.cliente)
             }
-          } catch (_) {}
+          } catch {
+            /* ignore */
+          }
           throw new Error('Não autenticado')
         }),
   },

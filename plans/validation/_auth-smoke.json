@@ -1,0 +1,117 @@
+{
+  "users": {
+    "user1": {
+      "login_status": 200,
+      "cliente": "carlos.souza@email.com",
+      "id": "2",
+      "checks": {
+        "/autenticacao/cliente-atual": {
+          "status": 200,
+          "keys": [
+            "id",
+            "nome",
+            "email",
+            "telefone",
+            "preferencias"
+          ],
+          "email": "carlos.souza@email.com"
+        },
+        "/cliente/perfil": {
+          "status": 400,
+          "keys": [
+            "mensagem"
+          ]
+        },
+        "/cliente/assinatura": {
+          "status": 200,
+          "keys": [
+            "id",
+            "idCliente",
+            "idPlano",
+            "nomePlano",
+            "status",
+            "iniciadaEm",
+            "proximaCobrancaEm",
+            "valorProximaCobranca"
+          ]
+        },
+        "/cliente/pedidos": {
+          "status": 200,
+          "count": 1
+        },
+        "/cliente/cartoes": {
+          "status": 200,
+          "count": 0
+        },
+        "/planos": {
+          "status": 200,
+          "count": 2
+        },
+        "/autenticacao/sair": {
+          "status": 200
+        },
+        "cliente-atual_after_logout_with_bearer": {
+          "status": 200,
+          "note": "Bearer JWT permanece válido até expirar"
+        }
+      }
+    },
+    "user2": {
+      "login_status": 200,
+      "cliente": "mariana.silva@email.com",
+      "id": "1",
+      "checks": {
+        "/autenticacao/cliente-atual": {
+          "status": 200,
+          "keys": [
+            "id",
+            "nome",
+            "email",
+            "telefone",
+            "preferencias"
+          ],
+          "email": "mariana.silva@email.com"
+        },
+        "/cliente/perfil": {
+          "status": 400,
+          "keys": [
+            "mensagem"
+          ]
+        },
+        "/cliente/assinatura": {
+          "status": 200,
+          "keys": [
+            "id",
+            "idCliente",
+            "idPlano",
+            "nomePlano",
+            "status",
+            "iniciadaEm",
+            "proximaCobrancaEm",
+            "valorProximaCobranca"
+          ]
+        },
+        "/cliente/pedidos": {
+          "status": 200,
+          "count": 0
+        },
+        "/cliente/cartoes": {
+          "status": 200,
+          "count": 1
+        },
+        "/planos": {
+          "status": 200,
+          "count": 2
+        },
+        "/autenticacao/sair": {
+          "status": 200
+        },
+        "cliente-atual_after_logout_with_bearer": {
+          "status": 200,
+          "note": "Bearer JWT permanece válido até expirar"
+        }
+      }
+    }
+  },
+  "unauth_perfil": 401
+}

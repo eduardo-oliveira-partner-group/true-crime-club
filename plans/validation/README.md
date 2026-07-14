@@ -14,15 +14,15 @@ Validar na UI as jornadas de cadastro, autenticação, compra, pagamento e área
 | ID | Plano | Status | Tipo |
 |----|-------|--------|------|
 | FO-001 | [Contratação de Assinatura](./FO-001-contratacao-assinatura.md) | **NÃO EXECUTADO** | E2E UI |
-| FO-002 | [Login](./FO-002-login.md) | **PASS parcial** | Auth UI |
+| FO-002 | [Login](./FO-002-login.md) | **PASS** | Auth UI |
 | FO-003 | [Recuperação de Senha](./FO-003-recuperacao-senha.md) | **PASS parcial** | Auth UI |
 | FO-004 | [Pagamento com Cartão](./FO-004-pagamento-cartao.md) | **INCONCLUSIVO** | Checkout UI |
 | FO-005 | [Pagamento com Pix](./FO-005-pagamento-pix.md) | **INCONCLUSIVO** | Checkout UI |
-| FO-006 | [Área do Cliente](./FO-006-area-do-cliente.md) | **FAIL parcial** | Painel UI |
-| FO-007 | [Assinaturas](./FO-007-assinaturas.md) | **PASS smoke** | Painel UI |
-| FO-008 | [Pedidos](./FO-008-pedidos.md) | **PASS smoke** | Painel UI |
-| FO-009 | [Cartões](./FO-009-cartoes.md) | **PASS smoke** | Painel UI |
-| FO-010 | [Logout](./FO-010-logout.md) | **PASS parcial** | Auth UI |
+| FO-006 | [Área do Cliente](./FO-006-area-do-cliente.md) | **PASS parcial** | Painel UI |
+| FO-007 | [Assinaturas](./FO-007-assinaturas.md) | **PASS** | Painel UI |
+| FO-008 | [Pedidos](./FO-008-pedidos.md) | **PASS** | Painel UI |
+| FO-009 | [Cartões](./FO-009-cartoes.md) | **PASS** | Painel UI |
+| FO-010 | [Logout](./FO-010-logout.md) | **PASS** | Auth UI |
 
 ## Pré-requisitos comuns
 

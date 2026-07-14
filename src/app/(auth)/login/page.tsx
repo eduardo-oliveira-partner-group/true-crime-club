@@ -2,8 +2,8 @@
 
 import { IconArrowRight, IconLock, IconUser } from '@tabler/icons-react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { FormEvent, useEffect, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { FormEvent, Suspense, useEffect, useState } from 'react'
 
 import {
   AuthFormCard,
@@ -16,7 +16,27 @@ import { DesignFormButton } from '@/src/components/public-design/design-button'
 import { apiClient } from '@/src/lib/api-client'
 import { arrowIconClass, formLinkClass } from '@/src/lib/design/classes'
 
-export default function LoginPage() {
+const MOCK_USERS = [
+  {
+    label: 'Usuário 1',
+    email: 'carlos.souza@email.com',
+    password: 'senha-falsa-123',
+  },
+  {
+    label: 'Usuário 2',
+    email: 'mariana.silva@email.com',
+    password: 'senha-falsa-123',
+  },
+] as const
+
+function safeNextPath(raw: string | null): string {
+  if (!raw || !raw.startsWith('/') || raw.startsWith('//')) {
+    return '/cliente/pedidos'
+  }
+  return raw
+}
+
+function LoginForm() {
   const [emailValue, setEmailValue] = useState('')
   const [passwordValue, setPasswordValue] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -26,33 +46,34 @@ export default function LoginPage() {
     general?: string
   }>({})
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const nextPath = safeNextPath(searchParams.get('next'))
 
   useEffect(() => {
     apiClient.auth
       .me()
       .then((customer) => {
         if (customer && customer.email) {
-          setEmailValue(customer.email)
+          router.replace(nextPath)
         }
       })
       .catch(() => {})
-  }, [])
+  }, [nextPath, router])
 
-  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const authenticate = async (email: string, password: string) => {
     setErrors({})
 
     let hasErrors = false
     const currentErrors: typeof errors = {}
 
-    if (!emailValue) {
+    if (!email) {
       currentErrors.email = 'E-mail é obrigatório.'
       hasErrors = true
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue)) {
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       currentErrors.email = 'E-mail inválido.'
       hasErrors = true
     }
-    if (!passwordValue) {
+    if (!password) {
       currentErrors.password = 'Senha é obrigatória.'
       hasErrors = true
     }
@@ -65,11 +86,8 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
-      // Simulate slight network latency to let user feel the interaction
-      await new Promise((resolve) => setTimeout(resolve, 800))
-      await apiClient.auth.login({ email: emailValue, password: passwordValue })
-      localStorage.setItem('isLoggedIn', 'true')
-      router.push('/cliente/pedidos')
+      await apiClient.auth.login({ email, password })
+      router.push(nextPath)
     } catch (err) {
       console.error(err)
       const message =
@@ -80,6 +98,17 @@ export default function LoginPage() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    await authenticate(emailValue, passwordValue)
+  }
+
+  const fillAndLogin = async (email: string, password: string) => {
+    setEmailValue(email)
+    setPasswordValue(password)
+    await authenticate(email, password)
   }
 
   return (
@@ -105,30 +134,18 @@ export default function LoginPage() {
       ) : null}
 
       <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-        <button
-          type="button"
-          disabled={isLoading}
-          onClick={() => {
-            setEmailValue('carlos.souza@email.com')
-            setPasswordValue('senha-falsa-123')
-          }}
-          className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-[9px] border border-[rgba(33,28,24,0.15)] bg-(--paper-soft) px-3 py-2 [font-family:var(--design-font-mono)] text-xs font-bold tracking-wider text-(--ink) uppercase transition-colors hover:bg-(--ink) hover:text-[#fbf9f6] disabled:opacity-50"
-        >
-          <IconUser className="size-3.5" stroke={1.75} />
-          Usuário 1
-        </button>
-        <button
-          type="button"
-          disabled={isLoading}
-          onClick={() => {
-            setEmailValue('mariana.silva@email.com')
-            setPasswordValue('senha-falsa-123')
-          }}
-          className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-[9px] border border-[rgba(33,28,24,0.15)] bg-(--paper-soft) px-3 py-2 [font-family:var(--design-font-mono)] text-xs font-bold tracking-wider text-(--ink) uppercase transition-colors hover:bg-(--ink) hover:text-[#fbf9f6] disabled:opacity-50"
-        >
-          <IconUser className="size-3.5" stroke={1.75} />
-          Usuário 2
-        </button>
+        {MOCK_USERS.map((user) => (
+          <button
+            key={user.email}
+            type="button"
+            disabled={isLoading}
+            onClick={() => fillAndLogin(user.email, user.password)}
+            className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-[9px] border border-[rgba(33,28,24,0.15)] bg-(--paper-soft) px-3 py-2 [font-family:var(--design-font-mono)] text-xs font-bold tracking-wider text-(--ink) uppercase transition-colors hover:bg-(--ink) hover:text-[#fbf9f6] disabled:opacity-50"
+          >
+            <IconUser className="size-3.5" stroke={1.75} />
+            {user.label}
+          </button>
+        ))}
       </div>
 
       <form className="mt-6 space-y-5" onSubmit={handleLogin} noValidate>
@@ -177,5 +194,17 @@ export default function LoginPage() {
         </Link>
       </AuthFormFooter>
     </AuthFormCard>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="text-sm text-(--ink-mute)">Carregando login…</div>
+      }
+    >
+      <LoginForm />
+    </Suspense>
   )
 }

@@ -16,6 +16,7 @@ import { useEffect, useState } from 'react'
 
 import { BrandLogo } from '@/src/components/layout/brand-logo'
 import { apiClient } from '@/src/lib/api-client'
+import { clearAccessToken } from '@/src/lib/auth-token'
 import {
   fontHeading,
   fontMono,
@@ -186,8 +187,8 @@ export function ClientShell({ children }: { children: React.ReactNode }) {
                   await apiClient.auth.logout()
                 } catch (e) {
                   console.error(e)
+                  clearAccessToken()
                 }
-                localStorage.removeItem('isLoggedIn')
                 window.location.href = '/'
               }}
               className={`group flex w-full cursor-pointer items-center gap-2.5 rounded-[9px] border border-transparent px-3 py-2.5 text-left text-sm text-(--red) ${transitionBgColor} hover:border-(--red)/15 hover:bg-(--red)/6`}
@@ -251,8 +252,8 @@ export function ClientShell({ children }: { children: React.ReactNode }) {
                   await apiClient.auth.logout()
                 } catch (e) {
                   console.error(e)
+                  clearAccessToken()
                 }
-                localStorage.removeItem('isLoggedIn')
                 window.location.href = '/'
               }}
               className={`group flex shrink-0 cursor-pointer items-center gap-2.5 rounded-[9px] border border-transparent px-3 py-2.5 text-left text-sm text-(--red) ${transitionBgColor} hover:border-(--red)/15 hover:bg-(--red)/6 lg:mt-6`}

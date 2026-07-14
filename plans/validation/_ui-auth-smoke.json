@@ -1,0 +1,24 @@
+{
+  "steps": [
+    {
+      "name": "login_user1",
+      "ok": true,
+      "href": "http://127.0.0.1:3000/cliente/pedidos"
+    },
+    {
+      "name": "logout",
+      "href": "http://127.0.0.1:3000/",
+      "token_cleared": true
+    },
+    {
+      "name": "guard_after_logout",
+      "href": "http://127.0.0.1:3000/login?next=%2Fcliente%2Fperfil",
+      "redirected": true
+    },
+    {
+      "name": "login_user2",
+      "href": "http://127.0.0.1:3000/cliente/pedidos",
+      "mariana": false
+    }
+  ]
+}
