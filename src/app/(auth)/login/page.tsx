@@ -1,6 +1,6 @@
 'use client'
 
-import { IconArrowRight, IconLock, IconUser } from '@tabler/icons-react'
+import { IconArrowRight, IconLock } from '@tabler/icons-react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { FormEvent, Suspense, useEffect, useState } from 'react'
@@ -15,19 +15,6 @@ import {
 import { DesignFormButton } from '@/src/components/public-design/design-button'
 import { apiClient } from '@/src/lib/api-client'
 import { arrowIconClass, formLinkClass } from '@/src/lib/design/classes'
-
-const MOCK_USERS = [
-  {
-    label: 'Usuário 1',
-    email: 'carlos.souza@email.com',
-    password: 'senha-falsa-123',
-  },
-  {
-    label: 'Usuário 2',
-    email: 'mariana.silva@email.com',
-    password: 'senha-falsa-123',
-  },
-] as const
 
 function safeNextPath(raw: string | null): string {
   if (!raw || !raw.startsWith('/') || raw.startsWith('//')) {
@@ -105,12 +92,6 @@ function LoginForm() {
     await authenticate(emailValue, passwordValue)
   }
 
-  const fillAndLogin = async (email: string, password: string) => {
-    setEmailValue(email)
-    setPasswordValue(password)
-    await authenticate(email, password)
-  }
-
   return (
     <AuthFormCard
       tabCode="LOGIN"
@@ -132,21 +113,6 @@ function LoginForm() {
           {errors.general}
         </div>
       ) : null}
-
-      <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-        {MOCK_USERS.map((user) => (
-          <button
-            key={user.email}
-            type="button"
-            disabled={isLoading}
-            onClick={() => fillAndLogin(user.email, user.password)}
-            className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-[9px] border border-[rgba(33,28,24,0.15)] bg-(--paper-soft) px-3 py-2 [font-family:var(--design-font-mono)] text-xs font-bold tracking-wider text-(--ink) uppercase transition-colors hover:bg-(--ink) hover:text-[#fbf9f6] disabled:opacity-50"
-          >
-            <IconUser className="size-3.5" stroke={1.75} />
-            {user.label}
-          </button>
-        ))}
-      </div>
 
       <form className="mt-6 space-y-5" onSubmit={handleLogin} noValidate>
         <AuthFormField
