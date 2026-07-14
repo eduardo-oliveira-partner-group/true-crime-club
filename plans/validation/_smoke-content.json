@@ -1,0 +1,202 @@
+{
+  "executed_at": "2026-07-14",
+  "mode": "local_dev :3000 + public planos",
+  "typecheck": "pass",
+  "front_checks": [
+    {
+      "path": "/",
+      "status": 200,
+      "bytes": 135473,
+      "found": [
+        "True Crime",
+        "Assinatura",
+        "assinatura"
+      ],
+      "missing": [],
+      "shows_visitante": false,
+      "has_sair": false
+    },
+    {
+      "path": "/login",
+      "status": 200,
+      "bytes": 34419,
+      "found": [
+        "Entrar no arquivo",
+        "Esqueci a senha",
+        "/recuperar-senha",
+        "/cadastro",
+        "E-mail",
+        "Senha"
+      ],
+      "missing": [],
+      "shows_visitante": false,
+      "has_sair": false
+    },
+    {
+      "path": "/cadastro",
+      "status": 200,
+      "bytes": 32977,
+      "found": [
+        "/login",
+        "E-mail",
+        "Senha"
+      ],
+      "missing": [],
+      "shows_visitante": false,
+      "has_sair": false
+    },
+    {
+      "path": "/recuperar-senha",
+      "status": 200,
+      "bytes": 31686,
+      "found": [
+        "Recuperar senha",
+        "/login",
+        "E-mail",
+        "simular"
+      ],
+      "missing": [],
+      "shows_visitante": false,
+      "has_sair": false
+    },
+    {
+      "path": "/assinatura",
+      "status": 200,
+      "bytes": 96468,
+      "found": [
+        "assinatura",
+        "mensal",
+        "anual"
+      ],
+      "missing": [],
+      "shows_visitante": false,
+      "has_sair": false
+    },
+    {
+      "path": "/carrinho",
+      "status": 200,
+      "bytes": 81115,
+      "found": [
+        "carrinho",
+        "Carrinho"
+      ],
+      "missing": [],
+      "shows_visitante": false,
+      "has_sair": false
+    },
+    {
+      "path": "/checkout",
+      "status": 200,
+      "bytes": 80019,
+      "found": [
+        "pagamento",
+        "Checkout"
+      ],
+      "missing": [
+        "Pix",
+        "Cartão",
+        "cartão"
+      ],
+      "shows_visitante": false,
+      "has_sair": false
+    },
+    {
+      "path": "/checkout/confirmacao",
+      "status": 200,
+      "bytes": 76323,
+      "found": [
+        "confirma",
+        "pedido",
+        "Confirma"
+      ],
+      "missing": [
+        "sucesso"
+      ],
+      "shows_visitante": false,
+      "has_sair": false
+    },
+    {
+      "path": "/cliente/perfil",
+      "status": 200,
+      "bytes": 43652,
+      "found": [
+        "Minha conta",
+        "Sair",
+        "perfil",
+        "Visitante"
+      ],
+      "missing": [
+        "Salvar",
+        "Endereço",
+        "endereço"
+      ],
+      "shows_visitante": true,
+      "has_sair": true
+    },
+    {
+      "path": "/cliente/assinatura",
+      "status": 200,
+      "bytes": 48130,
+      "found": [
+        "assinatura",
+        "Sair",
+        "Minhas assinaturas",
+        "Visitante"
+      ],
+      "missing": [],
+      "shows_visitante": true,
+      "has_sair": true
+    },
+    {
+      "path": "/cliente/pedidos",
+      "status": 200,
+      "bytes": 45462,
+      "found": [
+        "pedido",
+        "Sair",
+        "Meus pedidos",
+        "Visitante"
+      ],
+      "missing": [],
+      "shows_visitante": true,
+      "has_sair": true
+    },
+    {
+      "path": "/cliente/cartoes",
+      "status": 200,
+      "bytes": 43658,
+      "found": [
+        "cart",
+        "Sair",
+        "Meus cartões",
+        "Visitante"
+      ],
+      "missing": [
+        "Cartão"
+      ],
+      "shows_visitante": true,
+      "has_sair": true
+    },
+    {
+      "path": "/cliente/financeiro",
+      "status": 200,
+      "bytes": 46624,
+      "found": [
+        "financeiro",
+        "Sair",
+        "Visitante"
+      ],
+      "missing": [
+        "pagamento"
+      ],
+      "shows_visitante": true,
+      "has_sair": true
+    }
+  ],
+  "api_public": {
+    "/planos": {
+      "status": 200,
+      "count": 2
+    }
+  }
+}

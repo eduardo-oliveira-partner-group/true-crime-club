@@ -21,9 +21,36 @@ Gerado com o skill improve em 2026-06-24. Reconcile completo em 2026-07-13 @ `8f
 
 Valores de status: TODO | IN PROGRESS | DONE | BLOCKED (com motivo em uma linha) | REJECTED (com justificativa em uma linha)
 
+## Validação de jornadas (FO-001…FO-010)
+
+Suíte criada em 2026-07-14 a partir dos cenários de jornada do Front Office (cadastro, auth, compra, pagamento, área logada). Complementa os planos de implementação 001–012.
+
+→ Índice: [`plans/validation/README.md`](./validation/README.md)
+
+| ID | Cenário | Status |
+|----|---------|--------|
+| FO-001 | Contratação de Assinatura | TODO |
+| FO-002 | Login | TODO |
+| FO-003 | Recuperação de Senha | TODO |
+| FO-004 | Pagamento com Cartão | TODO |
+| FO-005 | Pagamento com Pix | TODO |
+| FO-006 | Área do Cliente | TODO |
+| FO-007 | Assinaturas | TODO |
+| FO-008 | Pedidos | TODO |
+| FO-009 | Cartões | TODO |
+| FO-010 | Logout | TODO |
+
+Pareamento API: `tcc-front-office-api/plans/validation/`.
+
+## Última execução do checklist (2026-07-14)
+
+Smoke local em `:3000` + `pnpm typecheck` (exit 0). Detalhes: [`validation/EXECUCAO-2026-07-14.md`](./validation/EXECUCAO-2026-07-14.md).
+
+Achados principais: sem guard em `/cliente/*`; `cliente-001` hardcoded; FO-001/004/005 incompletos sem sessão.
+
 ## Ordem recomendada agora
 
-Não há mais planos pendentes. Todos os planos de 001 a 012 estão concluídos e validados.
+Planos de implementação 001–012 concluídos. Próximo ciclo sugerido: executar a suíte [`validation/`](./validation/README.md) (FO-002 → FO-010 → FO-004/005 → FO-001).
 
 ## Notas de Dependência
 
