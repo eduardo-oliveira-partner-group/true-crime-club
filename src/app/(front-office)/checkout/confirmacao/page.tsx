@@ -20,7 +20,8 @@ import {
   sectionFrame,
   warmShadowClass,
 } from '@/src/lib/design/classes'
-import { getSeoEntry, listOrders } from '@/src/lib/domain/repositories'
+import { getSeoEntry } from '@/src/lib/domain/repositories'
+import { listOrders } from '@/src/lib/server/customer'
 import type { CartItem } from '@/src/lib/domain/types'
 import {
   formatCurrency,

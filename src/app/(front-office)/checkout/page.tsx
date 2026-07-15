@@ -118,6 +118,20 @@ export default async function CheckoutPage({
   //   }
   // }
 
+  async function submitOrder(input: {
+    enderecoId: string
+    pagamentoMetodoId: string
+  }) {
+    'use server'
+    await createOrder({
+      ...input,
+      subscription:
+        isSubscriptionFlow && plan
+          ? { id: plan.id, name: plan.name, price: plan.price }
+          : undefined,
+    })
+  }
+
   return (
     <DesignPageShell className="overflow-hidden">
       <div className={cn(sectionFrame, 'relative z-10 py-12 lg:py-16')}>
@@ -251,9 +265,4 @@ export default async function CheckoutPage({
 async function savePreferences(preferences: SubscriberPreferencesValue) {
   'use server'
   await updateCustomerProfile({ preferences })
-}
-
-async function submitOrder() {
-  'use server'
-  await createOrder()
 }

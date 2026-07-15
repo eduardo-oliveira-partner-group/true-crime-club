@@ -83,7 +83,10 @@ interface CheckoutStepperProps {
   /** Salva preferências do assinante (server action). */
   onSavePreferences: (preferences: SubscriberPreferencesValue) => Promise<void>
   /** Cria o pedido (server action). */
-  onCreateOrder: () => Promise<void>
+  onCreateOrder: (input: {
+    enderecoId: string
+    pagamentoMetodoId: string
+  }) => Promise<void>
 }
 
 const shirtSizes = ['PP', 'P', 'M', 'G', 'GG', 'XGG']
@@ -151,7 +154,10 @@ export function CheckoutStepper({
       if (isSubscriptionFlow) {
         await onSavePreferences(preferences)
       }
-      await onCreateOrder()
+      await onCreateOrder({
+        enderecoId: selectedAddressId,
+        pagamentoMetodoId: selectedPaymentId,
+      })
       const prefix =
         typeof window !== 'undefined' &&
         window.location.pathname.startsWith('/design-sugerido')
