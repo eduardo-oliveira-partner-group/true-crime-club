@@ -163,6 +163,38 @@
   * {
     @apply border-border outline-ring/50;
   }
+
+  /* Keep browser autofill aligned with the paper-first form surfaces. */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  textarea:-webkit-autofill,
+  textarea:-webkit-autofill:hover,
+  textarea:-webkit-autofill:focus,
+  select:-webkit-autofill,
+  select:-webkit-autofill:hover,
+  select:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--ink);
+    caret-color: var(--ink);
+    -webkit-box-shadow: 0 0 0 1000px var(--paper-soft) inset;
+    box-shadow: 0 0 0 1000px var(--paper-soft) inset;
+  }
+
+  .dark input:-webkit-autofill,
+  .dark input:-webkit-autofill:hover,
+  .dark input:-webkit-autofill:focus,
+  .dark textarea:-webkit-autofill,
+  .dark textarea:-webkit-autofill:hover,
+  .dark textarea:-webkit-autofill:focus,
+  .dark select:-webkit-autofill,
+  .dark select:-webkit-autofill:hover,
+  .dark select:-webkit-autofill:focus {
+    -webkit-text-fill-color: #fffaf0;
+    caret-color: #fffaf0;
+    -webkit-box-shadow: 0 0 0 1000px #171211 inset;
+    box-shadow: 0 0 0 1000px #171211 inset;
+  }
+
   html,
   body {
     max-width: 100%;
