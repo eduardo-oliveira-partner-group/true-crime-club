@@ -74,6 +74,7 @@ export default function PerfilPage() {
     setName(customer.name)
     setPhone(customer.phone || '')
     setEmail(customer.email)
+    setCpf(customer.document || '')
     setShirtSize(preferences?.shirtSize || 'M')
     setShoeSize(preferences?.shoeSize || '')
     setNotes(preferences?.notes || '')
@@ -106,9 +107,9 @@ export default function PerfilPage() {
       setSaveError(null)
       const customer = await apiClient.customer.updateProfile({
         name: tempName,
+        document: tempCpf,
       })
       applyCustomer(customer)
-      setCpf(tempCpf)
       setEditBasics(false)
     } catch (error) {
       setSaveError(

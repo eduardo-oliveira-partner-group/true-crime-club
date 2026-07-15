@@ -155,6 +155,7 @@ function toCustomer(data: JsonObject): Customer {
     name: asString(data.nome),
     email: asString(data.email),
     phone: asOptionalString(data.telefone),
+    document: asOptionalString(data.documento),
     preferences: Object.keys(preferencias).length
       ? {
           shirtSize: asOptionalString(preferencias.tamanhoCamiseta),
@@ -416,6 +417,7 @@ export const apiClient = {
       name?: string
       email?: string
       phone?: string
+      document?: string
       preferences?: Partial<SubscriberPreferences>
     }) => {
       const customerId = await getCustomerId()
@@ -425,6 +427,7 @@ export const apiClient = {
           nome: body.name,
           email: body.email,
           telefone: body.phone,
+          documento: body.document,
           preferencias: fromPreferences(body.preferences),
         }),
       }).then(toCustomer)

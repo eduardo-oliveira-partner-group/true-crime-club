@@ -917,6 +917,7 @@ export async function updateCustomerProfile(body: {
   name?: string
   email?: string
   phone?: string
+  document?: string
   preferences?: Partial<SubscriberPreferences>
 }): Promise<Customer> {
   throwIfError()
@@ -932,11 +933,13 @@ export function updateCustomerProfileMock(body: {
   name?: string
   email?: string
   phone?: string
+  document?: string
   preferences?: Partial<SubscriberPreferences>
 }): Customer {
   if (body.name !== undefined) mockCustomer.name = body.name
   if (body.email !== undefined) mockCustomer.email = body.email
   if (body.phone !== undefined) mockCustomer.phone = body.phone
+  if (body.document !== undefined) mockCustomer.document = body.document
   if (body.preferences !== undefined) {
     mockCustomer.preferences = {
       ...mockCustomer.preferences,

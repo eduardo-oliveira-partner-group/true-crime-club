@@ -32,6 +32,7 @@ type ProfilePayload = {
     nome?: string
     email?: string
     telefone?: string
+    documento?: string
     preferencias?: {
       tamanhoCamiseta?: string
       tamanhoCalcado?: string
@@ -203,6 +204,7 @@ export async function getCustomerProfile(): Promise<{
           name: customer.nome ?? '',
           email: customer.email ?? '',
           phone: customer.telefone,
+          document: customer.documento,
           preferences: customer.preferencias
             ? {
                 shirtSize: customer.preferencias.tamanhoCamiseta,
@@ -239,6 +241,7 @@ export async function updateCustomerProfile(input: {
   name?: string
   email?: string
   phone?: string
+  document?: string
   preferences?: Partial<SubscriberPreferences>
 }): Promise<void> {
   if (isExplicitLocalMockMode()) {
@@ -277,6 +280,7 @@ export async function updateCustomerProfile(input: {
       nome: input.name,
       email: input.email,
       telefone: input.phone,
+      documento: input.document,
       preferencias: input.preferences
         ? {
             tamanhoCamiseta: input.preferences.shirtSize,
