@@ -12,7 +12,7 @@ import {
 } from '@tabler/icons-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 import logo from '@/src/assets/images/brand/logo.png'
@@ -30,6 +30,7 @@ const navItems = [
 
 export function ClientShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
+  const router = useRouter()
   const isSuggested = true
   const [customer, setCustomer] = useState<Customer | null>(null)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -180,7 +181,7 @@ export function ClientShell({ children }: { children: React.ReactNode }) {
                   console.error(e)
                 }
                 localStorage.removeItem('isLoggedIn')
-                window.location.href = isSuggested ? '/design-sugerido' : '/'
+                router.replace(isSuggested ? '/design-sugerido' : '/')
               }}
               className="group flex w-full cursor-pointer items-center gap-2.5 border border-transparent px-3 py-2.5 text-left text-sm text-[#ffb0a5] transition-colors hover:border-[#d84132]/25 hover:bg-[#d84132]/8"
             >
@@ -243,7 +244,7 @@ export function ClientShell({ children }: { children: React.ReactNode }) {
                   console.error(e)
                 }
                 localStorage.removeItem('isLoggedIn')
-                window.location.href = isSuggested ? '/design-sugerido' : '/'
+                router.replace(isSuggested ? '/design-sugerido' : '/')
               }}
               className="group flex shrink-0 cursor-pointer items-center gap-2.5 border border-transparent px-3 py-2.5 text-left text-sm text-[#ffb0a5] transition-colors hover:border-[#d84132]/25 hover:bg-[#d84132]/8 lg:mt-6"
             >

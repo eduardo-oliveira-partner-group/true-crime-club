@@ -11,7 +11,7 @@ import {
   IconX,
 } from '@tabler/icons-react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 import { BrandLogo } from '@/src/components/layout/brand-logo'
@@ -36,6 +36,7 @@ const navItems = [
 
 export function ClientShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
+  const router = useRouter()
   const [customer, setCustomer] = useState<Customer | null>(null)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
@@ -189,7 +190,7 @@ export function ClientShell({ children }: { children: React.ReactNode }) {
                   console.error(e)
                   clearAccessToken()
                 }
-                window.location.href = '/'
+                router.replace('/')
               }}
               className={`group flex w-full cursor-pointer items-center gap-2.5 rounded-[9px] border border-transparent px-3 py-2.5 text-left text-sm text-(--red) ${transitionBgColor} hover:border-(--red)/15 hover:bg-(--red)/6`}
             >
@@ -254,7 +255,7 @@ export function ClientShell({ children }: { children: React.ReactNode }) {
                   console.error(e)
                   clearAccessToken()
                 }
-                window.location.href = '/'
+                router.replace('/')
               }}
               className={`group flex shrink-0 cursor-pointer items-center gap-2.5 rounded-[9px] border border-transparent px-3 py-2.5 text-left text-sm text-(--red) ${transitionBgColor} hover:border-(--red)/15 hover:bg-(--red)/6 lg:mt-6`}
             >

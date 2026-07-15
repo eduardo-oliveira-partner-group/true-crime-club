@@ -117,12 +117,12 @@ export default function CasosPage() {
             )
             .finally(() => setLoadingFiles(false))
         } else {
-          router.push('/login')
+          router.replace('/login')
         }
       })
       .catch(() => {
         localStorage.removeItem('isLoggedIn')
-        router.push('/login')
+        router.replace('/login')
       })
       .finally(() => {
         setLoadingAuth(false)

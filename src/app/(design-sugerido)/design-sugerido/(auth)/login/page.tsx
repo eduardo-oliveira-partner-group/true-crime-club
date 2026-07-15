@@ -36,7 +36,7 @@ export default function LoginPage() {
     try {
       await apiClient.auth.login({ email, password })
       localStorage.setItem('isLoggedIn', 'true')
-      router.push('/design-sugerido/cliente/pedidos')
+      router.replace('/design-sugerido/cliente/pedidos')
     } catch (err) {
       console.error(err)
     }

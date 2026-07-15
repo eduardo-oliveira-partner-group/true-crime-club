@@ -73,7 +73,7 @@ export default function CadastroPage() {
       setIsSuccess(true)
 
       setTimeout(() => {
-        router.push('/cliente/pedidos')
+        router.replace('/cliente/pedidos')
       }, 800)
     } catch (err) {
       console.error(err)
