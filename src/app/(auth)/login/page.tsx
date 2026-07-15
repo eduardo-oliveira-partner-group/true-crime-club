@@ -74,7 +74,9 @@ function LoginForm() {
 
     try {
       await apiClient.auth.login({ email, password })
-      router.push(nextPath)
+      // A sessão acaba de ser gravada no cookie. Uma navegação completa evita
+      // reutilizar o payload RSC do checkout que foi carregado antes do login.
+      window.location.assign(nextPath)
     } catch (err) {
       console.error(err)
       const message =

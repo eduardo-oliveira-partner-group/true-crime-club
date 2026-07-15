@@ -881,7 +881,17 @@ export async function getCustomerProfile(): Promise<{
   throwIfError()
 
   if (!isLocalMockMode()) {
-    return await apiClient.customer.getProfile()
+    try {
+      return await apiClient.customer.getProfile()
+    } catch (error) {
+      // O checkout também é acessível antes do login. Sem cookie de sessão,
+      // a API devolve 401; renderize o fluxo com dados vazios em vez de
+      // acionar o error boundary da página.
+      if (isUnauthorizedError(error)) {
+        return { customer: null, addresses: [], paymentMethods: [] }
+      }
+      throw error
+    }
   }
 
   return {
@@ -1130,7 +1140,9 @@ export async function cancelSubscription(): Promise<Subscription> {
   throwIfError()
 
   if (!isLocalMockMode()) {
-    return await apiClient.customer.cancelSubscription()
+    return mapApiSubscriptionToDomain(
+      await apiClient.customer.cancelSubscription(),
+    )
   }
 
   return cancelSubscriptionMock()
@@ -1151,7 +1163,9 @@ export async function reactivateSubscription(): Promise<Subscription> {
   throwIfError()
 
   if (!isLocalMockMode()) {
-    return await apiClient.customer.reactivateSubscription()
+    return mapApiSubscriptionToDomain(
+      await apiClient.customer.reactivateSubscription(),
+    )
   }
 
   return reactivateSubscriptionMock()

@@ -11,8 +11,11 @@ export function setAccessToken(token: string): void {
   window.localStorage.setItem(ACCESS_TOKEN_KEY, token)
   window.localStorage.setItem(LOGGED_IN_KEY, 'true')
 
-  // Persiste no cookie para que o servidor consiga ler nas chamadas de SSR
-  document.cookie = `tcc_session=${token}; path=/; max-age=604800; SameSite=Lax; secure`
+  // O SSR lê a sessão pelo cookie. `Secure` é obrigatório em HTTPS, mas
+  // impediria o envio do cookie para o servidor durante testes em localhost.
+  const secureAttribute =
+    window.location.protocol === 'https:' ? '; Secure' : ''
+  document.cookie = `tcc_session=${token}; path=/; max-age=604800; SameSite=Lax${secureAttribute}`
 }
 
 export function clearAccessToken(): void {
