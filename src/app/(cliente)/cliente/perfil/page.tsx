@@ -7,8 +7,7 @@ import {
   IconTrash,
   IconX,
 } from '@tabler/icons-react'
-import { useState } from 'react'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 import { Button } from '@/src/components/ui/button'
 import { apiClient } from '@/src/lib/api-client'
@@ -21,7 +20,7 @@ import {
   formLabelClass,
   transitionBgColor,
 } from '@/src/lib/design/classes'
-import type { Address } from '@/src/lib/domain/types'
+import type { Address, Customer } from '@/src/lib/domain/types'
 
 /** Shared class for inline edit/close action buttons. */
 const editBtnClass = `inline-flex cursor-pointer items-center gap-1.5 rounded-[9px] px-2 py-1 text-xs text-(--red) ${transitionBgColor} hover:bg-(--red)/8 hover:text-(--red-deep)`
@@ -30,15 +29,13 @@ const cancelBtnClass = `cursor-pointer rounded-[9px] p-1.5 text-(--red) ${transi
 
 export default function PerfilPage() {
   // State for Customer Info
-  const [name, setName] = useState('Mariana Silva')
-  const [phone, setPhone] = useState('(11) 98765-4321')
-  const [email, setEmail] = useState('mariana.silva@email.com')
-  const [cpf, setCpf] = useState('321.654.987-00')
+  const [name, setName] = useState('')
+  const [phone, setPhone] = useState('')
+  const [email, setEmail] = useState('')
+  const [cpf, setCpf] = useState('')
   const [shirtSize, setShirtSize] = useState('M')
-  const [shoeSize, setShoeSize] = useState('38')
-  const [notes, setNotes] = useState(
-    'Prefere tons escuros nas peças de vestuário.',
-  )
+  const [shoeSize, setShoeSize] = useState('')
+  const [notes, setNotes] = useState('')
 
   // Edit Modes
   const [editBasics, setEditBasics] = useState(false)
@@ -67,25 +64,33 @@ export default function PerfilPage() {
   const [newAddrZip, setNewAddrZip] = useState('')
 
   const [loading, setLoading] = useState(true)
+  const [savingSection, setSavingSection] = useState<
+    'basics' | 'contact' | 'preferences' | null
+  >(null)
+  const [saveError, setSaveError] = useState<string | null>(null)
+
+  const applyCustomer = (customer: Customer) => {
+    const preferences = customer.preferences
+    setName(customer.name)
+    setPhone(customer.phone || '')
+    setEmail(customer.email)
+    setShirtSize(preferences?.shirtSize || 'M')
+    setShoeSize(preferences?.shoeSize || '')
+    setNotes(preferences?.notes || '')
+    setTempName(customer.name)
+    setTempEmail(customer.email)
+    setTempPhone(customer.phone || '')
+    setTempShirt(preferences?.shirtSize || 'M')
+    setTempShoe(preferences?.shoeSize || '')
+    setTempNotes(preferences?.notes || '')
+  }
 
   useEffect(() => {
     apiClient.customer
       .getProfile()
       .then((data) => {
         if (data.customer) {
-          setName(data.customer.name || '')
-          setPhone(data.customer.phone || '')
-          setEmail(data.customer.email || '')
-          setShirtSize(data.customer.preferences?.shirtSize || 'M')
-          setShoeSize(data.customer.preferences?.shoeSize || '38')
-          setNotes(data.customer.preferences?.notes || '')
-
-          setTempName(data.customer.name || '')
-          setTempEmail(data.customer.email || '')
-          setTempPhone(data.customer.phone || '')
-          setTempShirt(data.customer.preferences?.shirtSize || 'M')
-          setTempShoe(data.customer.preferences?.shoeSize || '38')
-          setTempNotes(data.customer.preferences?.notes || '')
+          applyCustomer(data.customer)
         }
         if (data.addresses) {
           setAddresses(data.addresses)
@@ -97,44 +102,67 @@ export default function PerfilPage() {
 
   const handleSaveBasics = async () => {
     try {
-      await apiClient.customer.updateProfile({ name: tempName })
-      setName(tempName)
+      setSavingSection('basics')
+      setSaveError(null)
+      const customer = await apiClient.customer.updateProfile({
+        name: tempName,
+      })
+      applyCustomer(customer)
       setCpf(tempCpf)
       setEditBasics(false)
-    } catch (e) {
-      console.error(e)
+    } catch (error) {
+      setSaveError(
+        error instanceof Error
+          ? error.message
+          : 'Não foi possível salvar os dados.',
+      )
+    } finally {
+      setSavingSection(null)
     }
   }
 
   const handleSaveContact = async () => {
     try {
-      await apiClient.customer.updateProfile({
+      setSavingSection('contact')
+      setSaveError(null)
+      const customer = await apiClient.customer.updateProfile({
         email: tempEmail,
         phone: tempPhone,
       })
-      setEmail(tempEmail)
-      setPhone(tempPhone)
+      applyCustomer(customer)
       setEditContact(false)
-    } catch (e) {
-      console.error(e)
+    } catch (error) {
+      setSaveError(
+        error instanceof Error
+          ? error.message
+          : 'Não foi possível salvar os dados.',
+      )
+    } finally {
+      setSavingSection(null)
     }
   }
 
   const handleSavePrefs = async () => {
     try {
-      await apiClient.customer.updateProfile({
+      setSavingSection('preferences')
+      setSaveError(null)
+      const customer = await apiClient.customer.updateProfile({
         preferences: {
           shirtSize: tempShirt,
           shoeSize: tempShoe,
           notes: tempNotes,
         },
       })
-      setShirtSize(tempShirt)
-      setShoeSize(tempShoe)
-      setNotes(tempNotes)
+      applyCustomer(customer)
       setEditPrefs(false)
-    } catch (e) {
-      console.error(e)
+    } catch (error) {
+      setSaveError(
+        error instanceof Error
+          ? error.message
+          : 'Não foi possível salvar os dados.',
+      )
+    } finally {
+      setSavingSection(null)
     }
   }
 
@@ -206,6 +234,11 @@ export default function PerfilPage() {
         Gerencie suas informações cadastrais, de contato, preferências do clube
         e endereços de entrega das suas caixas.
       </p>
+      {saveError ? (
+        <p className="mt-3 text-sm text-(--red)" role="alert">
+          {saveError}
+        </p>
+      ) : null}
 
       <div className="mt-8 grid gap-6 md:grid-cols-2">
         {/* Card 1: Informações Básicas */}
@@ -229,7 +262,12 @@ export default function PerfilPage() {
               </button>
             ) : (
               <div className="flex gap-2">
-                <button onClick={handleSaveBasics} className={saveBtnClass}>
+                <button
+                  onClick={handleSaveBasics}
+                  className={saveBtnClass}
+                  disabled={savingSection === 'basics'}
+                  aria-label="Salvar informações básicas"
+                >
                   <IconCheck className="size-4" />
                 </button>
                 <button
@@ -311,7 +349,12 @@ export default function PerfilPage() {
               </button>
             ) : (
               <div className="flex gap-2">
-                <button onClick={handleSaveContact} className={saveBtnClass}>
+                <button
+                  onClick={handleSaveContact}
+                  className={saveBtnClass}
+                  disabled={savingSection === 'contact'}
+                  aria-label="Salvar contato"
+                >
                   <IconCheck className="size-4" />
                 </button>
                 <button
@@ -386,7 +429,12 @@ export default function PerfilPage() {
               </button>
             ) : (
               <div className="flex gap-2">
-                <button onClick={handleSavePrefs} className={saveBtnClass}>
+                <button
+                  onClick={handleSavePrefs}
+                  className={saveBtnClass}
+                  disabled={savingSection === 'preferences'}
+                  aria-label="Salvar preferências"
+                >
                   <IconCheck className="size-4" />
                 </button>
                 <button

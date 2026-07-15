@@ -138,7 +138,7 @@ async function getCustomerId(): Promise<string> {
     }
   }
 
-  return 'cliente-001'
+  throw new Error('Sessão inválida: não foi possível identificar o cliente')
 }
 
 function persistAuthToken(data: { token?: unknown }) {
