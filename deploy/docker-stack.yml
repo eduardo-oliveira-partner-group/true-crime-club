@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+  web:
+    image: ${REGISTRY}/tcc-front-office-web:${WEB_TAG}
+    environment:
+      HOST: 0.0.0.0
+      PORT: 3000
+      HOSTNAME: 0.0.0.0
+      API_BASE_URL: ${API_BASE_URL}
+      NEXT_PUBLIC_API_BASE_URL: /api
+    labels:
+      - "traefik.enable=true"
+      - "traefik.mode=swarm"
+      - "traefik.docker.network=web_swarm"
+      - "traefik.http.routers.tcc-web-${STACK_NAME}.rule=Host(`${TCC_WEB_HOST}`) && && !PathPrefix(`/api`)"
+      - "traefik.http.routers.tcc-web-${STACK_NAME}.entrypoints=websecure"
+      - "traefik.http.routers.tcc-web-${STACK_NAME}.tls=true"
+      - "traefik.http.services.tcc-web-${STACK_NAME}.loadbalancer.server.port=3000"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    networks:
+      - tcc_network
+      - traefik_public
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  tcc_network:
+    name: tcc_network
+    external: true
+  traefik_public:
+    name: web_swarm
+    external: true
