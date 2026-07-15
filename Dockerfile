@@ -25,6 +25,7 @@ COPY . .
 # In the server side (SSR), we will use API_BASE_URL runtime env var.
 ENV NEXT_PUBLIC_API_BASE_URL=/api
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_OPTIONS=--max-old-space-size=4096
 # Force server-side prerendering calls during build to use local sychronous mocks.
 # This prevents network timeouts and connection errors on build environments.
 ENV LOCAL_MOCK_MODE=true

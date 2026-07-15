@@ -30,12 +30,17 @@ stages:
 
           - task: Docker@2
             displayName: Build & Push frontend
+            env:
+              DOCKER_BUILDKIT: 1
             inputs:
               containerRegistry: $(dockerRegistryServiceConnection)
               repository: $(imageRepositoryWeb)
               command: buildAndPush
               Dockerfile: Dockerfile
               buildContext: .
+              arguments: >-
+                --build-arg BUILDKIT_INLINE_CACHE=1
+                --cache-from $(containerRegistry)/$(imageRepositoryWeb):latest
               tags: |
                 $(imageTag)
                 latest
