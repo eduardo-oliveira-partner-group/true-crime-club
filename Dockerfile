@@ -9,9 +9,9 @@ FROM base AS deps
 WORKDIR /app
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-# Cache do store do pnpm entre builds no mesmo agente CI (BuildKit).
-RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
-    pnpm install --frozen-lockfile --store-dir /pnpm/store
+# fetch + install offline: reutiliza camada Docker quando lockfile nao muda
+RUN pnpm fetch --frozen-lockfile
+RUN pnpm install --frozen-lockfile --offline
 
 # Stage 2: Rebuild the source code only when needed
 FROM base AS builder
