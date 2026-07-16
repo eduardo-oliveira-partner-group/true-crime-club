@@ -13,7 +13,7 @@ services:
       - "traefik.enable=true"
       - "traefik.mode=swarm"
       - "traefik.docker.network=web_swarm"
-      - "traefik.http.routers.tcc-web-${STACK_NAME}.rule=Host(`${TCC_WEB_HOST}`) && && !PathPrefix(`/api`)"
+      - "traefik.http.routers.tcc-web-${STACK_NAME}.rule=Host(`${TCC_WEB_HOST}`) && !PathPrefix(`/api`)"
       - "traefik.http.routers.tcc-web-${STACK_NAME}.entrypoints=websecure"
       - "traefik.http.routers.tcc-web-${STACK_NAME}.tls=true"
       - "traefik.http.services.tcc-web-${STACK_NAME}.loadbalancer.server.port=3000"
