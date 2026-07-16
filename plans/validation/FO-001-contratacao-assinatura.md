@@ -9,7 +9,7 @@
 - **Category**: validation / e2e-ui
 - **Pareado com**: `tcc-front-office-api/plans/validation/FO-001-contratacao-assinatura.md`
 - **Planned at**: 2026-07-14
-- **Última execução**: 2026-07-14 → NÃO EXECUTADO
+- **Última execução**: 2026-07-16 → EM RETESTE
 
 ## Objetivo
 
@@ -53,8 +53,7 @@ pnpm typecheck
 
 | Campo | Valor |
 |-------|-------|
-| Executado em | 2026-07-14 |
-| Modo | API remota (`tcc-front-office-api.vercel.app`) via front local `:3000` |
-| Passou? | NÃO EXECUTADO |
-| Evidências / issues | E2E bloqueado sem sessão autenticada interativa. Rotas /assinatura, /checkout, /checkout/confirmacao respondem 200. Ver `EXECUCAO-2026-07-14.md`. |
-
+| Executado em | 2026-07-16 |
+| Modo | Front local `:3000` → API local `:8001` → Supabase RPC de homologação |
+| Passou? | EM RETESTE |
+| Evidências / issues | Fixtures anuais de checkout, confirmação, assinatura e pedidos foram alinhadas no Supabase. Smoke HTTP confirmou o mesmo pedido `ord-e2e-annual-card-001` e plano `plan-annual` nas quatro superfícies. Falta repetir o aceite visual integral após a correção. |
