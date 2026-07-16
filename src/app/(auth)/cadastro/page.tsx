@@ -61,12 +61,46 @@ export default function CadastroPage() {
       !/[A-Z]/.test(passwordValue) ||
       !/\d/.test(passwordValue)
     ) {
-      currentErrors.password = 'Use 12 caracteres, com maiúscula, minúscula e número.'
+      currentErrors.password =
+        'Use 12 caracteres, com maiúscula, minúscula e número.'
       hasErrors = true
     }
     const cpfDigits = documentValue.replace(/\D/g, '')
-    if (cpfDigits.length !== 11) {
-      currentErrors.document = 'CPF deve ter 11 dígitos.'
+    const cpfHasValidLength = cpfDigits.length === 11
+    const cpfHasRepeatedDigits = /^(\d)\1{10}$/.test(cpfDigits)
+    const firstDigit = cpfHasValidLength
+      ? ((cpfDigits
+          .slice(0, 9)
+          .split('')
+          .reduce(
+            (total, digit, index) => total + Number(digit) * (10 - index),
+            0,
+          ) *
+          10) %
+          11) %
+        10
+      : -1
+    const secondDigit = cpfHasValidLength
+      ? ((cpfDigits
+          .slice(0, 10)
+          .split('')
+          .reduce(
+            (total, digit, index) => total + Number(digit) * (11 - index),
+            0,
+          ) *
+          10) %
+          11) %
+        10
+      : -1
+    const cpfIsValid =
+      cpfHasValidLength &&
+      !cpfHasRepeatedDigits &&
+      cpfDigits.endsWith(`${firstDigit}${secondDigit}`)
+
+    if (!cpfIsValid) {
+      currentErrors.document = cpfHasValidLength
+        ? 'CPF inválido.'
+        : 'CPF deve ter 11 dígitos.'
       hasErrors = true
     }
     const phoneDigits = phoneValue.replace(/\D/g, '')
@@ -121,7 +155,8 @@ export default function CadastroPage() {
       <AuthFormMeta left="CLUB · CADASTRO" right="Novo dossiê" />
 
       <p className="mt-4 text-sm/6 text-(--ink-soft)">
-        Informe seus dados para criar seu cadastro. Você entrará após confirmar o login.
+        Informe seus dados para criar seu cadastro. Você entrará após confirmar
+        o login.
       </p>
 
       {isSuccess ? (
