@@ -8,7 +8,7 @@ import {
   deleteCustomerAddress,
   getCustomerProfile as getCustomerProfileFromRepository,
   getOrderById,
-  getSubscription,
+  getSubscription as getSubscriptionFromRepository,
   listOrders as listOrdersFromRepository,
   updateCustomerProfile as updateCustomerProfileFromRepository,
 } from '@/src/lib/domain/repositories'
@@ -17,14 +17,10 @@ import type {
   Customer,
   PaymentMethod,
   SubscriberPreferences,
+  Subscription,
 } from '@/src/lib/domain/types'
 
-export {
-  addCustomerAddress,
-  deleteCustomerAddress,
-  getOrderById,
-  getSubscription,
-}
+export { addCustomerAddress, deleteCustomerAddress, getOrderById }
 
 type ProfilePayload = {
   cliente?: {
@@ -85,6 +81,22 @@ type ApiOrderPayload = {
   }>
 }
 
+type ApiSubscriptionPayload = {
+  id: string
+  idCliente: string
+  idPlano: string
+  nomePlano: string
+  status: string
+  iniciadaEm: string
+  proximaCobrancaEm: string
+  valorProximaCobranca: number
+  idCaixaCicloAtual?: string
+  nomeCaixaCicloAtual?: string
+  podeCancelar: boolean
+  podeReativar: boolean
+  canceladaEm?: string
+}
+
 function mapApiOrder(
   order: ApiOrderPayload,
 ): import('@/src/lib/domain/types').Order {
@@ -131,6 +143,56 @@ function mapApiOrder(
     billingCycleNote: order.observacaoCicloCobranca,
     shippingCycleNote: order.observacaoCicloEnvio,
   }
+}
+
+function mapApiSubscription(
+  subscription: ApiSubscriptionPayload,
+): Subscription {
+  const statusMap: Record<string, Subscription['status']> = {
+    ativa: 'active',
+    pagamento_pendente: 'pending_payment',
+    cancelada: 'cancelled',
+    pausada: 'paused',
+    vencida: 'past_due',
+  }
+
+  return {
+    id: subscription.id,
+    customerId: subscription.idCliente,
+    planId: subscription.idPlano,
+    planName: subscription.nomePlano,
+    status: statusMap[subscription.status] ?? 'active',
+    startedAt: subscription.iniciadaEm,
+    nextBillingDate: subscription.proximaCobrancaEm,
+    nextBillingAmount: subscription.valorProximaCobranca,
+    currentCycleBoxId: subscription.idCaixaCicloAtual,
+    currentCycleBoxName: subscription.nomeCaixaCicloAtual,
+    canCancel: subscription.podeCancelar,
+    canReactivate: subscription.podeReativar,
+    cancelledAt: subscription.canceladaEm,
+  }
+}
+
+export async function getSubscription(): Promise<Subscription | null> {
+  if (isExplicitLocalMockMode()) return getSubscriptionFromRepository()
+
+  const token = (await cookies()).get('tcc_session')?.value
+  if (!token) return null
+
+  const response = await fetch(
+    `${getApiBaseUrl().replace(/\/$/, '')}/cliente/assinatura`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+      cache: 'no-store',
+    },
+  )
+
+  if (response.status === 404) return null
+  if (!response.ok) {
+    throw new Error('Não foi possível carregar a assinatura.')
+  }
+
+  return mapApiSubscription((await response.json()) as ApiSubscriptionPayload)
 }
 
 export async function listOrders(): Promise<

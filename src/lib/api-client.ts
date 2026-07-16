@@ -133,6 +133,7 @@ async function getCustomerId(): Promise<string> {
           return payload.sub
         }
       }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e) {
       // Ignore
     }

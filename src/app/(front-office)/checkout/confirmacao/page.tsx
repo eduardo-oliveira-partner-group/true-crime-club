@@ -21,7 +21,6 @@ import {
   warmShadowClass,
 } from '@/src/lib/design/classes'
 import { getSeoEntry } from '@/src/lib/domain/repositories'
-import { listOrders } from '@/src/lib/server/customer'
 import type { CartItem } from '@/src/lib/domain/types'
 import {
   formatCurrency,
@@ -31,6 +30,7 @@ import {
 } from '@/src/lib/formatters'
 import { getProductImage } from '@/src/lib/product-images'
 import { buildMetadata } from '@/src/lib/seo'
+import { listOrders } from '@/src/lib/server/customer'
 import { cn } from '@/src/lib/utils'
 
 export const metadata = buildMetadata({
