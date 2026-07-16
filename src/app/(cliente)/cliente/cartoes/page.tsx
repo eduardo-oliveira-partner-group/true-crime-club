@@ -53,13 +53,14 @@ export default function CartoesPage() {
     setSubmitting(true)
     setError(null)
     try {
-      const newCard = await addCard({
+      await addCard({
         token,
         holderName,
         lastFour,
         brand,
       })
-      setCards([...cards, newCard])
+      // CARTAO_* devolve payload estático; a releitura é a fonte de verdade.
+      setCards(await listCards())
       setShowAddForm(false)
 
       // Reset form fields
@@ -81,7 +82,8 @@ export default function CartoesPage() {
     setError(null)
     try {
       await deleteCard(id)
-      setCards(cards.filter((card) => card.id !== id))
+      // Não simular persistência local após uma mutação mockada.
+      setCards(await listCards())
     } catch (e: unknown) {
       console.error(e)
       setError(getErrorMessage(e, 'Erro ao remover cartão.'))
