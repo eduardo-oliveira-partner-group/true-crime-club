@@ -10,6 +10,8 @@ import {
 } from '@tabler/icons-react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { cookies } from 'next/headers'
+import { toDataURL } from 'qrcode'
 
 import { DesignPageShell } from '@/src/components/public-design/design-page-shell'
 import { Button } from '@/src/components/ui/button'
@@ -21,7 +23,7 @@ import {
   warmShadowClass,
 } from '@/src/lib/design/classes'
 import { getSeoEntry } from '@/src/lib/domain/repositories'
-import type { CartItem } from '@/src/lib/domain/types'
+import type { CartItem, Order, Payment } from '@/src/lib/domain/types'
 import {
   formatCurrency,
   formatDateTime,
@@ -30,6 +32,7 @@ import {
 } from '@/src/lib/formatters'
 import { getProductImage } from '@/src/lib/product-images'
 import { buildMetadata } from '@/src/lib/seo'
+import type { CheckoutConfirmation } from '@/src/lib/server/cart'
 import { listOrders } from '@/src/lib/server/customer'
 import { cn } from '@/src/lib/utils'
 
@@ -40,14 +43,27 @@ export const metadata = buildMetadata({
 })
 
 export default async function ConfirmacaoPage() {
-  const orders = await listOrders()
-  const order = orders[0]
+  const confirmation = await getCheckoutConfirmation()
+  const orders = confirmation ? [] : await listOrders()
+  const order = confirmation?.order ?? orders[0]
 
   if (!order) {
     return <EmptyConfirmation />
   }
 
   const itemCount = order.items.reduce((sum, item) => sum + item.quantity, 0)
+  const pixPayment =
+    confirmation?.payment.method === 'pix' &&
+    confirmation.payment.status === 'pending'
+      ? confirmation.payment
+      : null
+  const pixQrImage = pixPayment?.pixQrCode
+    ? await toDataURL(pixPayment.pixQrCode, {
+        color: { dark: '#241f1b', light: '#fbf9f6' },
+        margin: 1,
+        width: 360,
+      })
+    : null
 
   return (
     <DesignPageShell className="overflow-hidden">
@@ -133,7 +149,12 @@ export default async function ConfirmacaoPage() {
               orderStatus={formatOrderStatus(order.status)}
               paymentStatus={formatPaymentStatus(order.paymentStatus)}
               createdAt={formatDateTime(order.createdAt)}
+              pixPending={Boolean(pixPayment)}
             />
+
+            {pixPayment && pixQrImage ? (
+              <PixPaymentPanel payment={pixPayment} qrImage={pixQrImage} />
+            ) : null}
 
             <section
               className={cn(dossierCardSurface, warmShadowClass, 'p-5 sm:p-6')}
@@ -352,11 +373,13 @@ function StatusPanel({
   orderStatus,
   paymentStatus,
   createdAt,
+  pixPending,
 }: {
   orderNumber: string
   orderStatus: string
   paymentStatus: string
   createdAt: string
+  pixPending: boolean
 }) {
   const statuses = [
     ['Pedido', orderNumber],
@@ -385,7 +408,7 @@ function StatusPanel({
                 'text-xs font-semibold tracking-[0.16em] text-(--red) uppercase',
               )}
             >
-              Confirmação emitida
+              {pixPending ? 'Cobrança aguardando ação' : 'Confirmação emitida'}
             </p>
             <h2
               className={cn(
@@ -393,11 +416,12 @@ function StatusPanel({
                 'mt-2 text-2xl font-semibold text-(--ink)',
               )}
             >
-              Pagamento validado
+              {pixPending ? 'Aguardando pagamento Pix' : 'Pagamento validado'}
             </h2>
             <p className="mt-2 max-w-xl text-sm/6 text-(--ink-soft)">
-              Seu pedido entrou na fila de preparação. A equipe do clube vai
-              acompanhar cobrança, separação e envio pelo mesmo registro.
+              {pixPending
+                ? 'Escaneie o QR Code ou copie o código Pix para confirmar a cobrança. O pedido será preparado após a compensação.'
+                : 'Seu pedido entrou na fila de preparação. A equipe do clube vai acompanhar cobrança, separação e envio pelo mesmo registro.'}
             </p>
           </div>
         </div>
@@ -423,6 +447,109 @@ function StatusPanel({
       </dl>
     </section>
   )
+}
+
+function PixPaymentPanel({
+  payment,
+  qrImage,
+}: {
+  payment: Pick<Payment, 'pixQrCode' | 'pixExpiresAt'>
+  qrImage: string
+}) {
+  return (
+    <section
+      className={cn(
+        dossierCardSurface,
+        warmShadowClass,
+        'overflow-hidden border-[#d7b56d]/40 p-5 sm:p-6',
+      )}
+    >
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#d7b56d]/30 pb-4">
+        <div>
+          <p
+            className={cn(
+              fontMono,
+              'text-xs font-semibold tracking-[0.16em] text-(--red) uppercase',
+            )}
+          >
+            Evidência de cobrança
+          </p>
+          <h2
+            className={cn(
+              fontHeading,
+              'mt-1 text-xl font-semibold text-(--ink)',
+            )}
+          >
+            Pague via Pix para concluir
+          </h2>
+        </div>
+        <span
+          className={cn(
+            fontMono,
+            'rounded-full bg-[#d7b56d]/15 px-3 py-1 text-[0.62rem] font-semibold tracking-[0.13em] text-(--ink) uppercase',
+          )}
+        >
+          Pendente
+        </span>
+      </div>
+
+      <div className="mt-5 grid gap-5 sm:grid-cols-[10rem_1fr] sm:items-center">
+        <div className="rounded-[12px] border border-[rgba(33,28,24,0.15)] bg-[#fbf9f6] p-3 shadow-[0_10px_24px_-16px_rgba(33,28,24,0.5)]">
+          <Image
+            alt="QR Code para pagamento Pix"
+            height={160}
+            src={qrImage}
+            unoptimized
+            width={160}
+          />
+        </div>
+        <div className="space-y-3 text-sm/6 text-(--ink-soft)">
+          <p>
+            Use o app do seu banco para escanear o QR Code e concluir a
+            cobrança.
+          </p>
+          {payment.pixExpiresAt ? (
+            <p className="rounded-[9px] border border-[rgba(33,28,24,0.12)] bg-(--paper-soft) px-3 py-2 text-xs/5">
+              Expira em {formatDateTime(payment.pixExpiresAt)}.
+            </p>
+          ) : null}
+        </div>
+      </div>
+
+      <div className="mt-5 border-t border-[rgba(33,28,24,0.12)] pt-4">
+        <p
+          className={cn(
+            fontMono,
+            'text-[0.62rem] font-semibold tracking-[0.14em] text-(--ink-mute) uppercase',
+          )}
+        >
+          Código Pix copia e cola
+        </p>
+        <code className="mt-2 block max-h-20 overflow-auto rounded-[9px] bg-[#241f1b] px-3 py-3 text-xs/5 break-all text-[#fbf9f6]/85">
+          {payment.pixQrCode}
+        </code>
+      </div>
+    </section>
+  )
+}
+
+async function getCheckoutConfirmation(): Promise<CheckoutConfirmation | null> {
+  const raw = (await cookies()).get('tcc_checkout_confirmation')?.value
+  if (!raw) return null
+
+  try {
+    const parsed = JSON.parse(raw) as CheckoutConfirmation
+    if (
+      !parsed.order?.id ||
+      !parsed.order?.orderNumber ||
+      !parsed.payment?.method
+    ) {
+      return null
+    }
+    return parsed
+  } catch {
+    return null
+  }
 }
 
 function OrderItemCard({ item }: { item: CartItem }) {

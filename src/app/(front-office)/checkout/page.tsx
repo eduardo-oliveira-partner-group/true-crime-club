@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { cookies } from 'next/headers'
 
 import {
   CheckoutStepper,
@@ -123,12 +124,20 @@ export default async function CheckoutPage({
     pagamentoMetodoId: string
   }) {
     'use server'
-    await createOrder({
+    const confirmation = await createOrder({
       ...input,
       subscription:
         isSubscriptionFlow && plan
           ? { id: plan.id, name: plan.name, price: plan.price }
           : undefined,
+    })
+    const cookieStore = await cookies()
+    cookieStore.set('tcc_checkout_confirmation', JSON.stringify(confirmation), {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 10 * 60,
+      path: '/checkout/confirmacao',
     })
   }
 

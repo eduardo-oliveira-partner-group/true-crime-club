@@ -146,6 +146,10 @@ export function CheckoutStepper({
   const [installments, setInstallments] = useState(isAnnualPlan ? 12 : 1)
 
   const isLastStep = currentStep === steps.length
+  const processingMessage =
+    selectedPayment?.type === 'pix'
+      ? 'Gerando cobrança Pix e preparando o QR Code…'
+      : 'Validando cartão e lacrando o pedido…'
 
   async function handleFinalStepCompleted() {
     setError(null)
@@ -183,7 +187,34 @@ export function CheckoutStepper({
   )
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-10">
+    <div className="relative grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-10">
+      {submitting ? (
+        <div
+          aria-live="assertive"
+          className="absolute inset-0 z-20 flex items-center justify-center rounded-[16px] bg-[rgba(34,29,25,0.72)] p-5 backdrop-blur-[2px]"
+          role="status"
+        >
+          <div className="w-full max-w-sm rounded-[14px] border border-[#d7b56d]/40 bg-[#241f1b] p-6 text-center text-[#fbf9f6] shadow-2xl">
+            <span className="mx-auto flex size-12 animate-pulse items-center justify-center rounded-full border border-[#d7b56d]/70 text-[#d7b56d]">
+              <IconPackage className="size-5" />
+            </span>
+            <p
+              className={cn(
+                fontMono,
+                'mt-4 text-xs font-semibold tracking-[0.16em] text-[#d7b56d] uppercase',
+              )}
+            >
+              Processamento em curso
+            </p>
+            <p className="mt-3 text-sm/6 text-[#fbf9f6]/80">
+              {processingMessage}
+            </p>
+            <div className="mx-auto mt-5 h-px w-24 overflow-hidden bg-[#fbf9f6]/20">
+              <span className="block h-full w-1/2 animate-[pulse_1s_ease-in-out_infinite] bg-[#d7b56d]" />
+            </div>
+          </div>
+        </div>
+      ) : null}
       <div className="order-2 space-y-7 lg:order-1">
         <div className={cn(dossierCardSurface, warmShadowClass)}>
           <div className="flex items-center justify-between gap-4 border-b border-[rgba(33,28,24,0.12)] px-5 py-4 sm:px-6">
