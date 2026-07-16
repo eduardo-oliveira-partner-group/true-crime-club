@@ -20,12 +20,16 @@ export default function CadastroPage() {
   const [nameValue, setNameValue] = useState('')
   const [emailValue, setEmailValue] = useState('')
   const [passwordValue, setPasswordValue] = useState('')
+  const [documentValue, setDocumentValue] = useState('')
+  const [phoneValue, setPhoneValue] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [errors, setErrors] = useState<{
     name?: string
     email?: string
     password?: string
+    document?: string
+    phone?: string
     general?: string
   }>({})
   const router = useRouter()
@@ -51,8 +55,23 @@ export default function CadastroPage() {
     if (!passwordValue) {
       currentErrors.password = 'Senha é obrigatória.'
       hasErrors = true
-    } else if (passwordValue.length < 6) {
-      currentErrors.password = 'A senha deve ter no mínimo 6 caracteres.'
+    } else if (
+      passwordValue.length < 12 ||
+      !/[a-z]/.test(passwordValue) ||
+      !/[A-Z]/.test(passwordValue) ||
+      !/\d/.test(passwordValue)
+    ) {
+      currentErrors.password = 'Use 12 caracteres, com maiúscula, minúscula e número.'
+      hasErrors = true
+    }
+    const cpfDigits = documentValue.replace(/\D/g, '')
+    if (cpfDigits.length !== 11) {
+      currentErrors.document = 'CPF deve ter 11 dígitos.'
+      hasErrors = true
+    }
+    const phoneDigits = phoneValue.replace(/\D/g, '')
+    if (phoneDigits.length < 10 || phoneDigits.length > 11) {
+      currentErrors.phone = 'Telefone deve ter 10 ou 11 dígitos.'
       hasErrors = true
     }
 
@@ -68,12 +87,14 @@ export default function CadastroPage() {
         name: nameValue,
         email: emailValue,
         password: passwordValue,
+        document: documentValue,
+        phone: phoneValue,
       })
 
       setIsSuccess(true)
 
       setTimeout(() => {
-        router.replace('/cliente/pedidos')
+        router.replace('/login')
       }, 800)
     } catch (err) {
       console.error(err)
@@ -100,12 +121,12 @@ export default function CadastroPage() {
       <AuthFormMeta left="CLUB · CADASTRO" right="Novo dossiê" />
 
       <p className="mt-4 text-sm/6 text-(--ink-soft)">
-        Cadastro simulado para validação da jornada e criação de dossiê pessoal.
+        Informe seus dados para criar seu cadastro. Você entrará após confirmar o login.
       </p>
 
       {isSuccess ? (
         <div className="mt-4 rounded-lg border border-(--teal)/20 bg-(--teal)/10 p-3 [font-family:var(--design-font-body)] text-xs font-medium text-(--teal)">
-          Conta criada com sucesso! Redirecionando para o painel...
+          Conta criada com sucesso! Redirecionando para o login...
         </div>
       ) : null}
 
@@ -123,6 +144,27 @@ export default function CadastroPage() {
           onChange={(e) => setNameValue(e.target.value)}
           autoComplete="name"
           error={errors.name}
+          required
+          disabled={isLoading || isSuccess}
+        />
+        <AuthFormField
+          id="document"
+          label="CPF"
+          value={documentValue}
+          onChange={(e) => setDocumentValue(e.target.value)}
+          autoComplete="off"
+          error={errors.document}
+          required
+          disabled={isLoading || isSuccess}
+        />
+        <AuthFormField
+          id="phone"
+          label="Telefone"
+          type="tel"
+          value={phoneValue}
+          onChange={(e) => setPhoneValue(e.target.value)}
+          autoComplete="tel"
+          error={errors.phone}
           required
           disabled={isLoading || isSuccess}
         />

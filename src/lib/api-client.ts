@@ -289,7 +289,8 @@ export const apiClient = {
       name: string
       email: string
       password: string
-      phone?: string
+      document: string
+      phone: string
     }) =>
       fetcher('/clientes', {
         method: 'POST',
@@ -297,10 +298,10 @@ export const apiClient = {
           nome: body.name,
           email: body.email,
           senha: body.password,
+          documento: body.document,
           telefone: body.phone,
         }),
       }).then((data) => {
-        persistAuthToken(data)
         return {
           ...data,
           cliente: data.cliente ? toCustomer(data.cliente) : undefined,
