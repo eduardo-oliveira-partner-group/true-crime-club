@@ -15,6 +15,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 import { BrandLogo } from '@/src/components/layout/brand-logo'
+import { Skeleton } from '@/src/components/ui/skeleton'
 import { apiClient } from '@/src/lib/api-client'
 import { clearAccessToken } from '@/src/lib/auth-token'
 import {
@@ -38,6 +39,7 @@ export function ClientShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
   const [customer, setCustomer] = useState<Customer | null>(null)
+  const [isCustomerLoading, setIsCustomerLoading] = useState(true)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   useEffect(() => {
@@ -45,6 +47,7 @@ export function ClientShell({ children }: { children: React.ReactNode }) {
       .me()
       .then(setCustomer)
       .catch(() => {})
+      .finally(() => setIsCustomerLoading(false))
   }, [])
 
   useEffect(() => {
@@ -75,17 +78,30 @@ export function ClientShell({ children }: { children: React.ReactNode }) {
             <BrandLogo className="h-7 w-auto" />
           </Link>
           <div className="flex items-center gap-4">
-            <div className="text-right">
-              <p
-                className={`text-sm font-semibold tracking-wide text-(--ink) ${fontHeading}`}
-              >
-                {customer?.name ?? 'Visitante'}
-              </p>
-              <p
-                className={`text-[10px] tracking-[0.12em] text-(--ink-mute) uppercase ${fontMono}`}
-              >
-                {customer?.email}
-              </p>
+            <div className="min-w-36 text-right">
+              {isCustomerLoading ? (
+                <div
+                  className="flex flex-col items-end gap-1.5"
+                  aria-label="Carregando dados do assinante"
+                  role="status"
+                >
+                  <Skeleton className="h-4 w-28 rounded-[5px] bg-(--ink)/10" />
+                  <Skeleton className="h-2.5 w-36 rounded-[4px] bg-(--ink)/8" />
+                </div>
+              ) : (
+                <>
+                  <p
+                    className={`text-sm font-semibold tracking-wide text-(--ink) ${fontHeading}`}
+                  >
+                    {customer?.name}
+                  </p>
+                  <p
+                    className={`text-[10px] tracking-[0.12em] text-(--ink-mute) uppercase ${fontMono}`}
+                  >
+                    {customer?.email}
+                  </p>
+                </>
+              )}
             </div>
             <button
               onClick={() => setIsMenuOpen(true)}
