@@ -146,6 +146,7 @@ export function CheckoutStepper({
   const [installments, setInstallments] = useState(isAnnualPlan ? 12 : 1)
 
   const isLastStep = currentStep === steps.length
+  const hasCustomer = Boolean(customer)
   const processingMessage =
     selectedPayment?.type === 'pix'
       ? 'Gerando cobrança Pix e preparando o QR Code…'
@@ -191,11 +192,12 @@ export function CheckoutStepper({
       {submitting ? (
         <div
           aria-live="assertive"
-          className="absolute inset-0 z-20 flex items-center justify-center rounded-[16px] bg-[rgba(34,29,25,0.72)] p-5 backdrop-blur-[2px]"
+          aria-label="Processamento do pedido em curso"
+          className="fixed inset-0 z-50 grid place-items-center bg-[rgba(33,28,24,0.62)] p-4 backdrop-blur-[1px] sm:p-6"
           role="status"
         >
-          <div className="w-full max-w-sm rounded-[14px] border border-[#d7b56d]/40 bg-[#241f1b] p-6 text-center text-[#fbf9f6] shadow-2xl">
-            <span className="mx-auto flex size-12 animate-pulse items-center justify-center rounded-full border border-[#d7b56d]/70 text-[#d7b56d]">
+          <div className="w-full max-w-sm rounded-[14px] border border-[#d7b56d]/40 bg-[#241f1b] p-6 text-center text-[#fbf9f6] shadow-[0_8px_14px_-8px_rgba(33,28,24,0.45)] sm:p-7">
+            <span className="mx-auto flex size-12 animate-pulse items-center justify-center rounded-full border border-[#d7b56d]/70 text-[#d7b56d] motion-reduce:animate-none">
               <IconPackage className="size-5" />
             </span>
             <p
@@ -210,7 +212,7 @@ export function CheckoutStepper({
               {processingMessage}
             </p>
             <div className="mx-auto mt-5 h-px w-24 overflow-hidden bg-[#fbf9f6]/20">
-              <span className="block h-full w-1/2 animate-[pulse_1s_ease-in-out_infinite] bg-[#d7b56d]" />
+              <span className="block h-full w-1/2 animate-[pulse_1s_ease-in-out_infinite] bg-[#d7b56d] motion-reduce:animate-none" />
             </div>
           </div>
         </div>
@@ -291,7 +293,7 @@ export function CheckoutStepper({
               }
               backButtonProps={{ disabled: submitting }}
               nextButtonProps={{
-                disabled: submitting,
+                disabled: submitting || !hasCustomer,
                 className: isLastStep ? 'is-complete' : undefined,
               }}
               renderStepIndicator={(props) => (

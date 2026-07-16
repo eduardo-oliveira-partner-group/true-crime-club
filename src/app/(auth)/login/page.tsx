@@ -74,7 +74,7 @@ function LoginForm() {
 
     try {
       await apiClient.auth.login({ email, password })
-      router.replace(nextPath)
+      window.location.assign(nextPath)
     } catch (err) {
       console.error(err)
       const message =

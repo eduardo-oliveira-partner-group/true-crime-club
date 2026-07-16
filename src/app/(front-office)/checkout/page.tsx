@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
 
 import {
@@ -45,6 +46,9 @@ export default async function CheckoutPage({
   searchParams,
 }: CheckoutPageProps) {
   const { plano } = await searchParams
+  const checkoutPath = plano
+    ? `/checkout?${new URLSearchParams({ plano }).toString()}`
+    : '/checkout'
   const plan = plano ? await getPlanBySlug(plano) : null
   const isSubscriptionFlow = Boolean(plan)
 
@@ -54,6 +58,10 @@ export default async function CheckoutPage({
   const profile = await getCustomerProfile()
 
   const customer = profile.customer
+  if (!customer) {
+    redirect(`/login?next=${encodeURIComponent(checkoutPath)}`)
+  }
+
   const addresses = profile.addresses || []
   const paymentMethods = profile.paymentMethods || []
 

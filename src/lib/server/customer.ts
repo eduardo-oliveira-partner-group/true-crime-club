@@ -310,8 +310,12 @@ export async function getCustomerProfile(): Promise<{
     },
   )
 
-  if (!response.ok) {
+  if (response.status === 401 || response.status === 403) {
     return { customer: null, addresses: [], paymentMethods: [] }
+  }
+
+  if (!response.ok) {
+    throw new Error('Não foi possível carregar os dados do cliente.')
   }
 
   const profile = (await response.json()) as ProfilePayload
