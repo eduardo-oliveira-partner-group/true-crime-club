@@ -9,6 +9,7 @@ import {
   getCustomerProfile as getCustomerProfileFromRepository,
   getOrderById as getOrderByIdFromRepository,
   getSubscription as getSubscriptionFromRepository,
+  listCards as listCardsFromRepository,
   listOrders as listOrdersFromRepository,
   updateCustomerProfile as updateCustomerProfileFromRepository,
 } from '@/src/lib/domain/repositories'
@@ -79,6 +80,15 @@ type ApiOrderPayload = {
     precoUnitario: number
     imagem?: string
   }>
+}
+
+type ApiCardPayload = {
+  id?: string
+  tipo?: string
+  rotulo?: string
+  ultimosQuatro?: string | null
+  bandeira?: string | null
+  padrao?: boolean
 }
 
 type ApiSubscriptionPayload = {
@@ -250,6 +260,32 @@ export async function listOrders(): Promise<
       )
     }),
   )
+}
+
+export async function listCards(): Promise<PaymentMethod[]> {
+  if (isExplicitLocalMockMode()) return listCardsFromRepository()
+
+  const token = (await cookies()).get('tcc_session')?.value
+  if (!token) return []
+
+  const response = await fetch(
+    `${getApiBaseUrl().replace(/\/$/, '')}/cliente/cartoes`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+      cache: 'no-store',
+    },
+  )
+
+  if (!response.ok) return []
+
+  return ((await response.json()) as ApiCardPayload[]).map((card) => ({
+    id: card.id ?? '',
+    type: card.tipo === 'pix' ? 'pix' : 'credit_card',
+    label: card.rotulo ?? '',
+    lastFour: card.ultimosQuatro ?? undefined,
+    brand: card.bandeira ?? undefined,
+    isDefault: card.padrao ?? false,
+  }))
 }
 
 export async function getCustomerProfile(): Promise<{
