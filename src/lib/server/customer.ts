@@ -7,7 +7,7 @@ import {
   addCustomerAddress,
   deleteCustomerAddress,
   getCustomerProfile as getCustomerProfileFromRepository,
-  getOrderById,
+  getOrderById as getOrderByIdFromRepository,
   getSubscription as getSubscriptionFromRepository,
   listOrders as listOrdersFromRepository,
   updateCustomerProfile as updateCustomerProfileFromRepository,
@@ -20,7 +20,7 @@ import type {
   Subscription,
 } from '@/src/lib/domain/types'
 
-export { addCustomerAddress, deleteCustomerAddress, getOrderById }
+export { addCustomerAddress, deleteCustomerAddress }
 
 type ProfilePayload = {
   cliente?: {
@@ -143,6 +143,28 @@ function mapApiOrder(
     billingCycleNote: order.observacaoCicloCobranca,
     shippingCycleNote: order.observacaoCicloEnvio,
   }
+}
+
+export async function getOrderById(
+  id: string,
+): Promise<import('@/src/lib/domain/types').Order | null> {
+  if (isExplicitLocalMockMode()) return getOrderByIdFromRepository(id)
+
+  const token = (await cookies()).get('tcc_session')?.value
+  if (!token) return null
+
+  const response = await fetch(
+    `${getApiBaseUrl().replace(/\/$/, '')}/cliente/pedidos/${encodeURIComponent(id)}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+      cache: 'no-store',
+    },
+  )
+
+  if (response.status === 404) return null
+  if (!response.ok) throw new Error('Não foi possível carregar o pedido.')
+
+  return mapApiOrder((await response.json()) as ApiOrderPayload)
 }
 
 function mapApiSubscription(
