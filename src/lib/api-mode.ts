@@ -7,7 +7,11 @@ export function isExplicitLocalMockMode(): boolean {
 }
 
 export function getApiBaseUrl(): string {
-  const url = process.env.NEXT_PUBLIC_API_BASE_URL
+  const url =
+    typeof window === 'undefined'
+      ? (process.env.API_BASE_URL ?? process.env.NEXT_PUBLIC_API_BASE_URL)
+      : process.env.NEXT_PUBLIC_API_BASE_URL
+
   if (url) {
     return url
   }
