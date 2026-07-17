@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 import { Button } from '@/src/components/ui/button'
+import { CustomerDetailSkeleton } from '@/src/components/ui/page-loading-skeletons'
 import { fontHeading, fontMono } from '@/src/lib/design/classes'
 import {
   cancelSubscription,
@@ -43,8 +44,7 @@ export default function CancelarAssinaturaPage() {
     }
   }
 
-  if (loading)
-    return <p className="text-sm text-(--ink-mute)">Carregando assinatura…</p>
+  if (loading) return <CustomerDetailSkeleton />
 
   return (
     <div>

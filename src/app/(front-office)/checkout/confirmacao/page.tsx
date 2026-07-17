@@ -17,6 +17,7 @@ import { useEffect, useState } from 'react'
 
 import { DesignPageShell } from '@/src/components/public-design/design-page-shell'
 import { Button } from '@/src/components/ui/button'
+import { ConfirmationSkeleton } from '@/src/components/ui/page-loading-skeletons'
 import {
   dossierCardSurface,
   fontHeading,
@@ -51,10 +52,7 @@ export default function ConfirmacaoPage() {
       .finally(() => setLoading(false))
   }, [searchParams])
 
-  if (loading)
-    return (
-      <p className="p-8 text-sm text-(--ink-mute)">Carregando confirmação…</p>
-    )
+  if (loading) return <ConfirmationSkeleton />
 
   if (!order) {
     return <EmptyConfirmation />

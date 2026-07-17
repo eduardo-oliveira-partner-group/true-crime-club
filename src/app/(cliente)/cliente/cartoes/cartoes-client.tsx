@@ -4,6 +4,7 @@ import { IconCreditCard, IconPlus, IconTrash } from '@tabler/icons-react'
 import { useEffect, useState } from 'react'
 
 import { Button } from '@/src/components/ui/button'
+import { CustomerListSkeleton } from '@/src/components/ui/page-loading-skeletons'
 import {
   cardShadowBase,
   dossierCardSurface,
@@ -227,9 +228,7 @@ export default function CartoesClient() {
       )}
 
       <div className="mt-8 max-w-xl space-y-4">
-        {isLoading ? (
-          <p className="text-sm text-(--ink-mute)">Carregando cartões…</p>
-        ) : null}
+        {isLoading ? <CustomerListSkeleton rows={2} /> : null}
         {!isLoading && cards.length === 0 ? (
           <div className="rounded-[14px] border border-dashed border-(--ink)/15 bg-(--paper-soft) p-8 text-center">
             <p

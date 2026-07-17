@@ -6,6 +6,7 @@ import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 import { Button } from '@/src/components/ui/button'
+import { CustomerDetailSkeleton } from '@/src/components/ui/page-loading-skeletons'
 import {
   cardShadowBase,
   dossierCardSurface,
@@ -37,7 +38,7 @@ export default function PedidoDetailPage() {
   }, [params.id])
 
   if (loading) {
-    return <p className="text-sm text-(--ink-mute)">Carregando pedido…</p>
+    return <CustomerDetailSkeleton />
   }
 
   if (!order) {

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 import { Button } from '@/src/components/ui/button'
+import { CustomerDetailSkeleton } from '@/src/components/ui/page-loading-skeletons'
 import {
   cardShadowBase,
   dossierCardSurface,
@@ -32,7 +33,7 @@ export default function AssinaturaClientePage() {
   }, [])
 
   if (loading) {
-    return <p className="text-sm text-(--ink-mute)">Carregando assinatura…</p>
+    return <CustomerDetailSkeleton />
   }
 
   if (!subscription) {

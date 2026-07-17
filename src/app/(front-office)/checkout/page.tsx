@@ -11,6 +11,7 @@ import {
 import { DesignPageShell } from '@/src/components/public-design/design-page-shell'
 import { SectionEyebrow } from '@/src/components/public-design/section-eyebrow'
 import { Button } from '@/src/components/ui/button'
+import { CheckoutSkeleton } from '@/src/components/ui/page-loading-skeletons'
 import { apiClient } from '@/src/lib/api-client'
 import {
   dossierCardSurface,
@@ -72,8 +73,7 @@ export default function CheckoutPage() {
       .catch(() => router.replace('/login'))
   }, [plano, router])
 
-  if (!state)
-    return <p className="p-8 text-sm text-(--ink-mute)">Carregando checkout…</p>
+  if (!state) return <CheckoutSkeleton />
 
   const { cart, profile, plan, monthlyPlan, shipping } = state
   // const checkoutPath = plano

@@ -18,6 +18,7 @@ import { useEffect, useState } from 'react'
 import { DesignPageShell } from '@/src/components/public-design/design-page-shell'
 import { SectionEyebrow } from '@/src/components/public-design/section-eyebrow'
 import { Button } from '@/src/components/ui/button'
+import { CartSkeleton } from '@/src/components/ui/page-loading-skeletons'
 import {
   arrowIconClass,
   buttonLiftShadow,
@@ -61,8 +62,7 @@ export default function CarrinhoPage() {
       .catch(() => setCart(null))
   }, [])
 
-  if (!cart)
-    return <p className="p-8 text-sm text-(--ink-mute)">Carregando carrinho…</p>
+  if (!cart) return <CartSkeleton />
 
   const totals = { ...cart, ...getCartTotals(cart) }
   const grandTotal = totals.total + shipping.price
