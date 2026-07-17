@@ -9,7 +9,6 @@ import { useEffect, useRef, useState } from 'react'
 import { landingNavLinks } from '@/src/app/(front-office)/_landing/content'
 import logo from '@/src/assets/images/brand/logo.png'
 import { apiClient } from '@/src/lib/api-client'
-import { clearAccessToken, markLoggedIn } from '@/src/lib/auth-token'
 import {
   fontMono,
   fontType,
@@ -37,19 +36,15 @@ export function PublicHeaderContent({ itemCount }: PublicHeaderContentProps) {
   const headerRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
-    const localLoggedIn = localStorage.getItem('isLoggedIn') === 'true'
-    setIsLoggedIn(localLoggedIn)
     apiClient.auth
       .me()
       .then((customer) => {
         if (customer) {
           setIsLoggedIn(true)
-          markLoggedIn()
         }
       })
       .catch(() => {
         setIsLoggedIn(false)
-        clearAccessToken()
       })
   }, [])
 

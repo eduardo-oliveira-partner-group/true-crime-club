@@ -172,7 +172,7 @@ export async function createOrder(
     {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${token}`,
+        Cookie: `tcc_session=${encodeURIComponent(token)}`,
         'Content-Type': 'application/json',
       },
       cache: 'no-store',

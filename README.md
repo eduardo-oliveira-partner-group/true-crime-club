@@ -93,6 +93,16 @@ import { Button } from "@/components/ui/button";
 
 Por padrão, a aplicação exige que a variável `NEXT_PUBLIC_API_BASE_URL` esteja configurada apontando para um backend de API ativo.
 
+A sessão é emitida exclusivamente pela FastAPI como cookie `HttpOnly`; o
+frontend não armazena ou interpreta tokens. Em desenvolvimento, use o mesmo
+hostname para front e API em uma execução — por exemplo,
+`http://127.0.0.1:3000` com `http://127.0.0.1:8001/api`, ou `localhost` nos
+dois. Não misture `localhost` e `127.0.0.1`, pois isso impede o envio do cookie
+com `SameSite=Lax`.
+
+Uma topologia de produção com front e API em sites diferentes exige decisão de
+cookie cross-site (`SameSite=None; Secure`) e proteção CSRF antes do rollout.
+
 Caso deseje executar o projeto em modo de desenvolvimento utilizando dados mockados locais, habilite o modo mock explicitamente em seu arquivo `.env.local`:
 
 ```dotenv

@@ -1,9 +1,4 @@
 import { getApiBaseUrl } from '@/src/lib/api-mode'
-import {
-  clearAccessToken,
-  getAccessToken,
-  setAccessToken,
-} from '@/src/lib/auth-token'
 import type {
   Address,
   Cart,
@@ -25,6 +20,16 @@ type JsonValue =
   | { [key: string]: JsonValue }
 
 type JsonObject = Record<string, JsonValue | undefined>
+
+export class ApiClientError extends Error {
+  constructor(
+    message: string,
+    public readonly status: number,
+  ) {
+    super(message)
+    this.name = 'ApiClientError'
+  }
+}
 
 function asObject(value: JsonValue | undefined): JsonObject {
   return value && typeof value === 'object' && !Array.isArray(value)
@@ -72,20 +77,6 @@ async function fetcher(endpoint: string, options: RequestInit = {}) {
     headers.set('Content-Type', 'application/json')
   }
 
-  let token = getAccessToken()
-  if (typeof window === 'undefined') {
-    try {
-      const { getCookieToken } = await eval("import('./server/cookie-helper')")
-      token = await getCookieToken()
-    } catch {
-      // Ignore
-    }
-  }
-
-  if (token && !headers.has('Authorization')) {
-    headers.set('Authorization', `Bearer ${token}`)
-  }
-
   const response = await fetch(url, {
     ...options,
     headers,
@@ -94,8 +85,9 @@ async function fetcher(endpoint: string, options: RequestInit = {}) {
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}))
-    throw new Error(
+    throw new ApiClientError(
       errorData.mensagem || `Erro na requisição: ${response.status}`,
+      response.status,
     )
   }
 
@@ -103,49 +95,11 @@ async function fetcher(endpoint: string, options: RequestInit = {}) {
 }
 
 async function getCustomerId(): Promise<string> {
-  let token: string | null = null
-  if (typeof window === 'undefined') {
-    try {
-      const { getCookieToken } = await eval("import('./server/cookie-helper')")
-      token = await getCookieToken()
-    } catch {
-      // Ignore
-    }
-  } else {
-    token = getAccessToken()
+  const customer = toCustomer(await fetcher('/autenticacao/cliente-atual'))
+  if (!customer.id) {
+    throw new Error('Sessão inválida: não foi possível identificar o cliente')
   }
-
-  if (token) {
-    try {
-      const parts = token.split('.')
-      if (parts.length === 3) {
-        const base64Url = parts[1]
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
-        const payload = JSON.parse(
-          decodeURIComponent(
-            atob(base64)
-              .split('')
-              .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-              .join(''),
-          ),
-        )
-        if (payload.sub) {
-          return payload.sub
-        }
-      }
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (e) {
-      // Ignore
-    }
-  }
-
-  throw new Error('Sessão inválida: não foi possível identificar o cliente')
-}
-
-function persistAuthToken(data: { token?: unknown }) {
-  if (typeof data.token === 'string' && data.token.length > 0) {
-    setAccessToken(data.token)
-  }
+  return customer.id
 }
 
 function toCustomer(data: JsonObject): Customer {
@@ -312,7 +266,6 @@ export const apiClient = {
         method: 'POST',
         body: JSON.stringify({ email: body.email, senha: body.password }),
       }).then((data) => {
-        persistAuthToken(data)
         return {
           ...data,
           cliente: data.cliente ? toCustomer(data.cliente) : undefined,
@@ -324,28 +277,30 @@ export const apiClient = {
         body: JSON.stringify({ email: body.email }),
       }),
     logout: async () => {
-      try {
-        await fetcher('/autenticacao/sair', { method: 'POST' })
-      } finally {
-        clearAccessToken()
-      }
+      await fetcher('/autenticacao/sair', { method: 'POST' })
       return { sucesso: true }
     },
     me: () =>
       fetcher('/autenticacao/cliente-atual')
         .then(toCustomer)
-        .catch(async () => {
-          // Em desenvolvimento ou cross-origin, o cookie tcc_session pode não ser enviado.
-          // Com Bearer em localStorage o caminho principal já autentica; perfil é fallback.
+        .catch(async (error: unknown) => {
+          // Perfil é fallback de compatibilidade para a API pública.
+          // Não trate uma sessão expirada, erro de rede ou falha do servidor
+          // como se a rota de cliente-atual não existisse.
+          if (!(error instanceof ApiClientError) || error.status !== 404) {
+            throw error
+          }
+
           try {
             const profileData = await fetcher('/cliente/perfil')
             if (profileData && profileData.cliente) {
               return toCustomer(profileData.cliente)
             }
-          } catch {
-            /* ignore */
+          } catch (fallbackError) {
+            throw fallbackError
           }
-          throw new Error('Não autenticado')
+
+          throw new ApiClientError('Não autenticado', 401)
         }),
   },
   products: {

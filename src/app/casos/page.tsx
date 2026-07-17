@@ -96,7 +96,6 @@ export default function CasosPage() {
       .then((customer) => {
         if (customer) {
           setIsAuthenticated(true)
-          localStorage.setItem('isLoggedIn', 'true')
           apiClient.cases
             .listFiles()
             .then((data) => {
@@ -121,7 +120,6 @@ export default function CasosPage() {
         }
       })
       .catch(() => {
-        localStorage.removeItem('isLoggedIn')
         router.replace('/login')
       })
       .finally(() => {

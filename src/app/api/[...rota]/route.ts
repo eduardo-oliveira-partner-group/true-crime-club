@@ -548,7 +548,6 @@ async function handlePtBrApi(
       })
 
       return json({
-        token: 'jwt_exemplo',
         cliente: toCustomer({
           ...customer,
           email: (body.email as string | undefined) || customer.email,
@@ -616,7 +615,6 @@ async function handlePtBrApi(
 
       return json(
         {
-          token: 'jwt_exemplo',
           cliente: toCustomer(customer),
         },
         201,

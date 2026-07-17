@@ -17,7 +17,6 @@ import { useEffect, useState } from 'react'
 import { BrandLogo } from '@/src/components/layout/brand-logo'
 import { Skeleton } from '@/src/components/ui/skeleton'
 import { apiClient } from '@/src/lib/api-client'
-import { clearAccessToken } from '@/src/lib/auth-token'
 import {
   fontHeading,
   fontMono,
@@ -204,7 +203,6 @@ export function ClientShell({ children }: { children: React.ReactNode }) {
                   await apiClient.auth.logout()
                 } catch (e) {
                   console.error(e)
-                  clearAccessToken()
                 }
                 router.replace('/')
               }}
@@ -269,7 +267,6 @@ export function ClientShell({ children }: { children: React.ReactNode }) {
                   await apiClient.auth.logout()
                 } catch (e) {
                   console.error(e)
-                  clearAccessToken()
                 }
                 router.replace('/')
               }}

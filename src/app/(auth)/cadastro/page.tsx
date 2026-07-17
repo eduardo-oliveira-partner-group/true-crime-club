@@ -20,6 +20,7 @@ export default function CadastroPage() {
   const [nameValue, setNameValue] = useState('')
   const [emailValue, setEmailValue] = useState('')
   const [passwordValue, setPasswordValue] = useState('')
+  const [confirmPasswordValue, setConfirmPasswordValue] = useState('')
   const [documentValue, setDocumentValue] = useState('')
   const [phoneValue, setPhoneValue] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -28,6 +29,7 @@ export default function CadastroPage() {
     name?: string
     email?: string
     password?: string
+    confirmPassword?: string
     document?: string
     phone?: string
     general?: string
@@ -63,6 +65,10 @@ export default function CadastroPage() {
     ) {
       currentErrors.password =
         'Use 12 caracteres, com maiúscula, minúscula e número.'
+      hasErrors = true
+    }
+    if (confirmPasswordValue !== passwordValue) {
+      currentErrors.confirmPassword = 'As senhas precisam ser iguais.'
       hasErrors = true
     }
     const cpfDigits = documentValue.replace(/\D/g, '')
@@ -179,6 +185,17 @@ export default function CadastroPage() {
           onChange={(e) => setNameValue(e.target.value)}
           autoComplete="name"
           error={errors.name}
+          required
+          disabled={isLoading || isSuccess}
+        />
+        <AuthFormField
+          id="confirm-password"
+          label="Confirmar senha"
+          type="password"
+          value={confirmPasswordValue}
+          onChange={(e) => setConfirmPasswordValue(e.target.value)}
+          autoComplete="new-password"
+          error={errors.confirmPassword}
           required
           disabled={isLoading || isSuccess}
         />

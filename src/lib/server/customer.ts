@@ -23,6 +23,10 @@ import type {
 
 export { addCustomerAddress, deleteCustomerAddress }
 
+function sessionCookieHeader(token: string) {
+  return { Cookie: `tcc_session=${encodeURIComponent(token)}` }
+}
+
 type ProfilePayload = {
   cliente?: {
     id?: string
@@ -166,7 +170,7 @@ export async function getOrderById(
   const response = await fetch(
     `${getApiBaseUrl().replace(/\/$/, '')}/cliente/pedidos/${encodeURIComponent(id)}`,
     {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: sessionCookieHeader(token),
       cache: 'no-store',
     },
   )
@@ -214,7 +218,7 @@ export async function getSubscription(): Promise<Subscription | null> {
   const response = await fetch(
     `${getApiBaseUrl().replace(/\/$/, '')}/cliente/assinatura`,
     {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: sessionCookieHeader(token),
       cache: 'no-store',
     },
   )
@@ -236,7 +240,7 @@ export async function listOrders(): Promise<
   if (!token) return []
 
   const apiBaseUrl = getApiBaseUrl().replace(/\/$/, '')
-  const headers = { Authorization: `Bearer ${token}` }
+  const headers = sessionCookieHeader(token)
   const listResponse = await fetch(`${apiBaseUrl}/cliente/pedidos`, {
     headers,
     cache: 'no-store',
@@ -271,7 +275,7 @@ export async function listCards(): Promise<PaymentMethod[]> {
   const response = await fetch(
     `${getApiBaseUrl().replace(/\/$/, '')}/cliente/cartoes`,
     {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: sessionCookieHeader(token),
       cache: 'no-store',
     },
   )
@@ -305,7 +309,7 @@ export async function getCustomerProfile(): Promise<{
   const response = await fetch(
     `${getApiBaseUrl().replace(/\/$/, '')}/cliente/perfil`,
     {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: sessionCookieHeader(token),
       cache: 'no-store',
     },
   )
@@ -378,7 +382,7 @@ export async function updateCustomerProfile(input: {
 
   const apiBaseUrl = getApiBaseUrl().replace(/\/$/, '')
   const headers = {
-    Authorization: `Bearer ${token}`,
+    ...sessionCookieHeader(token),
     'Content-Type': 'application/json',
   }
   const currentCustomer = await fetch(

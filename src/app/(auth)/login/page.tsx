@@ -74,6 +74,7 @@ function LoginForm() {
 
     try {
       await apiClient.auth.login({ email, password })
+      await apiClient.auth.me()
       window.location.assign(nextPath)
     } catch (err) {
       console.error(err)
