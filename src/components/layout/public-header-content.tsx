@@ -23,16 +23,13 @@ const routeNavLinks = [
   { href: '/faq', label: 'Dúvidas' },
 ]
 
-type PublicHeaderContentProps = {
-  itemCount: number
-}
-
-export function PublicHeaderContent({ itemCount }: PublicHeaderContentProps) {
+export function PublicHeaderContent() {
   const pathname = usePathname()
   const isHome = pathname === '/'
   const navLinks = isHome ? landingNavLinks : routeNavLinks
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [itemCount, setItemCount] = useState(0)
   const headerRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
@@ -45,6 +42,19 @@ export function PublicHeaderContent({ itemCount }: PublicHeaderContentProps) {
       })
       .catch(() => {
         setIsLoggedIn(false)
+      })
+  }, [])
+
+  useEffect(() => {
+    apiClient.cart
+      .get()
+      .then((cart) => {
+        setItemCount(
+          cart.items.reduce((total, item) => total + item.quantity, 0),
+        )
+      })
+      .catch(() => {
+        setItemCount(0)
       })
   }, [])
 
