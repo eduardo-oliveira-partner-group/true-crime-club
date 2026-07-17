@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://tcc-front-office-api.vercel.app/api/$1"
+    }
+  ]
+}
