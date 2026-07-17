@@ -163,13 +163,8 @@ export function CheckoutStepper({
         enderecoId: selectedAddressId,
         pagamentoMetodoId: selectedPaymentId,
       })
-      const prefix =
-        typeof window !== 'undefined' &&
-        window.location.pathname.startsWith('/design-sugerido')
-          ? '/design-sugerido'
-          : ''
       router.push(
-        `${prefix}/checkout/confirmacao${orderId ? `?pedido=${encodeURIComponent(orderId)}` : ''}`,
+        `/checkout/confirmacao${orderId ? `?pedido=${encodeURIComponent(orderId)}` : ''}`,
       )
     } catch (err) {
       setError(
