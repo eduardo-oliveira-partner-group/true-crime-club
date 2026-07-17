@@ -1,7 +1,8 @@
-import type { Metadata } from 'next'
+'use client'
+
 import Link from 'next/link'
-import { redirect } from 'next/navigation'
-import { cookies } from 'next/headers'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useEffect, useState } from 'react'
 
 import {
   CheckoutStepper,
@@ -10,6 +11,7 @@ import {
 import { DesignPageShell } from '@/src/components/public-design/design-page-shell'
 import { SectionEyebrow } from '@/src/components/public-design/section-eyebrow'
 import { Button } from '@/src/components/ui/button'
+import { apiClient } from '@/src/lib/api-client'
 import {
   dossierCardSurface,
   fontHeading,
@@ -17,58 +19,73 @@ import {
   sectionFrame,
   warmShadowClass,
 } from '@/src/lib/design/classes'
-import { getPlanBySlug, getSeoEntry } from '@/src/lib/domain/repositories'
-import type { CartItem } from '@/src/lib/domain/types'
-import { formatCurrency } from '@/src/lib/formatters'
-import { buildMetadata } from '@/src/lib/seo'
 import {
   calculateShipping,
-  createOrder,
-  getCartWithTotals,
-} from '@/src/lib/server/cart'
-import {
-  getCustomerProfile,
+  getCart,
+  getCartTotals,
+  getPlanBySlug,
   updateCustomerProfile,
-} from '@/src/lib/server/customer'
+} from '@/src/lib/domain/repositories'
+import type { CartItem } from '@/src/lib/domain/types'
+import { formatCurrency } from '@/src/lib/formatters'
 import { cn } from '@/src/lib/utils'
 
-export const metadata: Metadata = buildMetadata({
-  path: '/checkout',
-  entry: getSeoEntry('/checkout'),
-  noindex: true,
-})
+export default function CheckoutPage() {
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const plano = searchParams.get('plano') ?? undefined
+  const [state, setState] = useState<{
+    cart: Awaited<ReturnType<typeof getCart>>
+    profile: Awaited<ReturnType<typeof apiClient.customer.getProfile>>
+    plan: Awaited<ReturnType<typeof getPlanBySlug>>
+    monthlyPlan: Awaited<ReturnType<typeof getPlanBySlug>>
+    shipping: { price: number; estimatedDays: string; region: string }
+  } | null>(null)
 
-interface CheckoutPageProps {
-  searchParams: Promise<{ plano?: string }>
-}
+  useEffect(() => {
+    Promise.all([
+      getCart(),
+      apiClient.customer.getProfile(),
+      plano ? getPlanBySlug(plano) : Promise.resolve(null),
+    ])
+      .then(async ([cart, profile, plan]) => {
+        if (!profile.customer) {
+          router.replace(
+            `/login?next=${encodeURIComponent(window.location.pathname + window.location.search)}`,
+          )
+          return
+        }
+        const [shipping, monthlyPlan] = await Promise.all([
+          profile.addresses[0]?.zipCode
+            ? calculateShipping(profile.addresses[0].zipCode)
+            : Promise.resolve({
+                price: 0,
+                estimatedDays: '5-8 dias úteis',
+                region: '',
+              }),
+          plan?.slug === 'anual'
+            ? getPlanBySlug('mensal')
+            : Promise.resolve(null),
+        ])
+        setState({ cart, profile, plan, monthlyPlan, shipping })
+      })
+      .catch(() => router.replace('/login'))
+  }, [plano, router])
 
-export default async function CheckoutPage({
-  searchParams,
-}: CheckoutPageProps) {
-  const { plano } = await searchParams
-  const checkoutPath = plano
-    ? `/checkout?${new URLSearchParams({ plano }).toString()}`
-    : '/checkout'
-  const plan = plano ? await getPlanBySlug(plano) : null
+  if (!state)
+    return <p className="p-8 text-sm text-(--ink-mute)">Carregando checkout…</p>
+
+  const { cart, profile, plan, monthlyPlan, shipping } = state
+  // const checkoutPath = plano
+  //   ? `/checkout?${new URLSearchParams({ plano }).toString()}`
+  //   : '/checkout'
   const isSubscriptionFlow = Boolean(plan)
-
-  const cart = await getCartWithTotals()
-  const totals = cart
-
-  const profile = await getCustomerProfile()
+  const totals = { ...cart, ...getCartTotals(cart) }
 
   const customer = profile.customer
-  if (!customer) {
-    redirect(`/login?next=${encodeURIComponent(checkoutPath)}`)
-  }
 
   const addresses = profile.addresses || []
   const paymentMethods = profile.paymentMethods || []
-
-  let shipping = { price: 0, estimatedDays: '5-8 dias úteis', region: '' }
-  if (addresses[0]?.zipCode) {
-    shipping = await calculateShipping(addresses[0].zipCode)
-  }
 
   const shippingOptions = [
     {
@@ -90,7 +107,6 @@ export default async function CheckoutPage({
 
   if (isSubscriptionFlow && plan) {
     if (plan.slug === 'anual') {
-      const monthlyPlan = await getPlanBySlug('mensal')
       const monthlyPrice = monthlyPlan ? monthlyPlan.price : 14990
       const commitment = plan.commitmentMonths || 12
       subtotalAmount = monthlyPrice * commitment
@@ -131,22 +147,8 @@ export default async function CheckoutPage({
     enderecoId: string
     pagamentoMetodoId: string
   }) {
-    'use server'
-    const confirmation = await createOrder({
-      ...input,
-      subscription:
-        isSubscriptionFlow && plan
-          ? { id: plan.id, name: plan.name, price: plan.price }
-          : undefined,
-    })
-    const cookieStore = await cookies()
-    cookieStore.set('tcc_checkout_confirmation', JSON.stringify(confirmation), {
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 10 * 60,
-      path: '/checkout/confirmacao',
-    })
+    const confirmation = await apiClient.checkout.createOrder(input)
+    return typeof confirmation.id === 'string' ? confirmation.id : undefined
   }
 
   return (
@@ -280,6 +282,5 @@ export default async function CheckoutPage({
 }
 
 async function savePreferences(preferences: SubscriberPreferencesValue) {
-  'use server'
   await updateCustomerProfile({ preferences })
 }

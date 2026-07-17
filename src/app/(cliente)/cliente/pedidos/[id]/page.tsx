@@ -1,6 +1,9 @@
+'use client'
+
 import { IconArrowLeft } from '@tabler/icons-react'
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
+import { useParams } from 'next/navigation'
+import { useEffect, useState } from 'react'
 
 import { Button } from '@/src/components/ui/button'
 import {
@@ -9,6 +12,7 @@ import {
   fontHeading,
   fontMono,
 } from '@/src/lib/design/classes'
+import { getOrderById } from '@/src/lib/domain/repositories'
 import type { CartItem } from '@/src/lib/domain/types'
 import {
   formatCurrency,
@@ -16,20 +20,28 @@ import {
   formatOrderStatus,
   formatPaymentStatus,
 } from '@/src/lib/formatters'
-import { getOrderById } from '@/src/lib/server/customer'
 
-interface PedidoDetailPageProps {
-  params: Promise<{ id: string }>
-}
+export default function PedidoDetailPage() {
+  const params = useParams<{ id: string }>()
+  const [order, setOrder] = useState<
+    import('@/src/lib/domain/types').Order | null
+  >(null)
+  const [loading, setLoading] = useState(true)
 
-export default async function PedidoDetailPage({
-  params,
-}: PedidoDetailPageProps) {
-  const { id } = await params
-  const order = await getOrderById(id)
+  useEffect(() => {
+    if (!params.id) return
+    getOrderById(params.id)
+      .then(setOrder)
+      .catch(() => setOrder(null))
+      .finally(() => setLoading(false))
+  }, [params.id])
+
+  if (loading) {
+    return <p className="text-sm text-(--ink-mute)">Carregando pedido…</p>
+  }
 
   if (!order) {
-    notFound()
+    return <p className="text-sm text-(--ink-mute)">Pedido não encontrado.</p>
   }
 
   return (

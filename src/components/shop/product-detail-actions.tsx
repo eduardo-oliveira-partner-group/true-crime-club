@@ -4,9 +4,9 @@ import { IconShoppingBag } from '@tabler/icons-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
-import { handleAddToCart } from '@/src/app/actions'
 import { Button } from '@/src/components/ui/button'
 import { fontMono } from '@/src/lib/design/classes'
+import { addCartItem } from '@/src/lib/domain/repositories'
 
 interface ProductDetailActionsProps {
   productId: string
@@ -24,7 +24,7 @@ export function ProductDetailActions({
 
     setIsAdding(true)
     try {
-      await handleAddToCart(productId)
+      await addCartItem({ productId })
     } catch (error) {
       console.error(error)
     } finally {

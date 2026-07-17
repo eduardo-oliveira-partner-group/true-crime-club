@@ -1,3 +1,5 @@
+'use client'
+
 import {
   IconArrowRight,
   IconClipboardText,
@@ -9,9 +11,9 @@ import {
   IconTrash,
   IconTruck,
 } from '@tabler/icons-react'
-import { revalidatePath } from 'next/cache'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 
 import { DesignPageShell } from '@/src/components/public-design/design-page-shell'
 import { SectionEyebrow } from '@/src/components/public-design/section-eyebrow'
@@ -27,32 +29,42 @@ import {
   transitionCardHover,
   transitionColors,
 } from '@/src/lib/design/classes'
-import { getSeoEntry } from '@/src/lib/domain/repositories'
-import type { CartItem } from '@/src/lib/domain/types'
-import { formatCurrency } from '@/src/lib/formatters'
-import { getProductImage } from '@/src/lib/product-images'
-import { buildMetadata } from '@/src/lib/seo'
 import {
   applyCoupon,
   calculateShipping,
-  getCartWithTotals,
-  removeCartItemWithTotals,
-  updateCartItemQuantityWithTotals,
-} from '@/src/lib/server/cart'
+  getCart,
+  getCartTotals,
+  removeCartItem,
+  updateCartItemQuantity,
+} from '@/src/lib/domain/repositories'
+import type { Cart, CartItem } from '@/src/lib/domain/types'
+import { formatCurrency } from '@/src/lib/formatters'
+import { getProductImage } from '@/src/lib/product-images'
 import { cn } from '@/src/lib/utils'
 
 const sampleZipCode = '05435-020'
 
-export const metadata = buildMetadata({
-  path: '/carrinho',
-  entry: getSeoEntry('/carrinho'),
-  noindex: true,
-})
+export default function CarrinhoPage() {
+  const [cart, setCart] = useState<Cart | null>(null)
+  const [shipping, setShipping] = useState({
+    price: 0,
+    region: '',
+    estimatedDays: '',
+  })
 
-export default async function CarrinhoPage() {
-  const cart = await getCartWithTotals()
-  const totals = cart
-  const shipping = await calculateShipping(sampleZipCode)
+  useEffect(() => {
+    Promise.all([getCart(), calculateShipping(sampleZipCode)])
+      .then(([nextCart, nextShipping]) => {
+        setCart(nextCart)
+        setShipping(nextShipping)
+      })
+      .catch(() => setCart(null))
+  }, [])
+
+  if (!cart)
+    return <p className="p-8 text-sm text-(--ink-mute)">Carregando carrinho…</p>
+
+  const totals = { ...cart, ...getCartTotals(cart) }
   const grandTotal = totals.total + shipping.price
   const itemCount = cart.items.reduce(
     (sum: number, item: CartItem) => sum + item.quantity,
@@ -275,15 +287,12 @@ function CartLineItem({
 
           <div className="mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-dashed border-[rgba(33,28,24,0.18)] pt-4">
             <QuantityControls itemId={item.id} quantity={item.quantity} />
-            <form
-              action={async () => {
-                'use server'
-                await removeCartItemWithTotals(item.id)
-                revalidatePath('/carrinho')
-              }}
-            >
+            <div>
               <Button
-                type="submit"
+                type="button"
+                onClick={() =>
+                  removeCartItem(item.id).then(() => window.location.reload())
+                }
                 variant="ghost"
                 size="sm"
                 className="h-8 gap-1.5 rounded-[9px] px-3 text-xs font-medium text-(--red) hover:bg-(--red)/10 hover:text-(--red-deep)"
@@ -291,7 +300,7 @@ function CartLineItem({
                 <IconTrash className="size-4" />
                 Remover
               </Button>
-            </form>
+            </div>
           </div>
         </div>
       </div>
@@ -320,25 +329,21 @@ function QuantityControls({
         Qtde
       </span>
       <div className="inline-flex items-center gap-2 rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-(--paper-soft) px-2 py-1.5">
-        <form
-          action={async () => {
-            'use server'
-            await updateCartItemQuantityWithTotals(
-              itemId,
-              Math.max(quantity - 1, 1),
-            )
-            revalidatePath('/carrinho')
-          }}
-        >
+        <div>
           <button
-            type="submit"
+            type="button"
+            onClick={() =>
+              updateCartItemQuantity(itemId, Math.max(quantity - 1, 1)).then(
+                () => window.location.reload(),
+              )
+            }
             aria-label="Diminuir quantidade"
             className={baseButton}
             disabled={quantity <= 1}
           >
             <IconMinus className="size-3.5" />
           </button>
-        </form>
+        </div>
         <span
           key={quantity}
           className={cn(
@@ -348,21 +353,20 @@ function QuantityControls({
         >
           {quantity}
         </span>
-        <form
-          action={async () => {
-            'use server'
-            await updateCartItemQuantityWithTotals(itemId, quantity + 1)
-            revalidatePath('/carrinho')
-          }}
-        >
+        <div>
           <button
-            type="submit"
+            type="button"
+            onClick={() =>
+              updateCartItemQuantity(itemId, quantity + 1).then(() =>
+                window.location.reload(),
+              )
+            }
             aria-label="Aumentar quantidade"
             className={baseButton}
           >
             <IconPlus className="size-3.5" />
           </button>
-        </form>
+        </div>
       </div>
     </div>
   )
@@ -513,10 +517,12 @@ function SummaryRow({
 function CouponForm() {
   return (
     <form
-      action={async (formData) => {
-        'use server'
-        await applyCoupon(String(formData.get('coupon') ?? ''))
-        revalidatePath('/carrinho')
+      onSubmit={(event) => {
+        event.preventDefault()
+        const formData = new FormData(event.currentTarget)
+        applyCoupon(String(formData.get('coupon') ?? '')).then(() =>
+          window.location.reload(),
+        )
       }}
       className="mt-2 space-y-2"
     >

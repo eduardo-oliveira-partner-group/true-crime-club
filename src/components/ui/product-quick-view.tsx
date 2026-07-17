@@ -13,7 +13,6 @@ import Link from 'next/link'
 import { type ReactNode, useState } from 'react'
 import { createPortal } from 'react-dom'
 
-import { handleAddToCart } from '@/src/app/actions'
 import { Button } from '@/src/components/ui/button'
 import {
   Tooltip,
@@ -28,6 +27,7 @@ import {
   fontType,
 } from '@/src/lib/design/classes'
 import { designTokens } from '@/src/lib/design/tokens'
+import { addCartItem } from '@/src/lib/domain/repositories'
 import type { Product } from '@/src/lib/domain/types'
 import {
   formatAvailability,
@@ -178,7 +178,7 @@ export function ProductQuickView({
     if (!product.inStock || isAdding) return
     setIsAdding(true)
     try {
-      await handleAddToCart(product.id)
+      await addCartItem({ productId: product.id })
     } catch (error) {
       console.error(error)
     } finally {

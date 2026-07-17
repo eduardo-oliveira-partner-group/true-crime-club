@@ -86,7 +86,7 @@ interface CheckoutStepperProps {
   onCreateOrder: (input: {
     enderecoId: string
     pagamentoMetodoId: string
-  }) => Promise<void>
+  }) => Promise<string | void>
 }
 
 const shirtSizes = ['PP', 'P', 'M', 'G', 'GG', 'XGG']
@@ -159,7 +159,7 @@ export function CheckoutStepper({
       if (isSubscriptionFlow) {
         await onSavePreferences(preferences)
       }
-      await onCreateOrder({
+      const orderId = await onCreateOrder({
         enderecoId: selectedAddressId,
         pagamentoMetodoId: selectedPaymentId,
       })
@@ -168,7 +168,9 @@ export function CheckoutStepper({
         window.location.pathname.startsWith('/design-sugerido')
           ? '/design-sugerido'
           : ''
-      router.push(`${prefix}/checkout/confirmacao`)
+      router.push(
+        `${prefix}/checkout/confirmacao${orderId ? `?pedido=${encodeURIComponent(orderId)}` : ''}`,
+      )
     } catch (err) {
       setError(
         err instanceof Error

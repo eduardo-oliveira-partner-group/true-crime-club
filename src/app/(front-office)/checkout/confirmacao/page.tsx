@@ -1,3 +1,5 @@
+'use client'
+
 import {
   IconArrowRight,
   IconCheck,
@@ -10,8 +12,8 @@ import {
 } from '@tabler/icons-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { cookies } from 'next/headers'
-import { toDataURL } from 'qrcode'
+import { useSearchParams } from 'next/navigation'
+import { useEffect, useState } from 'react'
 
 import { DesignPageShell } from '@/src/components/public-design/design-page-shell'
 import { Button } from '@/src/components/ui/button'
@@ -22,7 +24,7 @@ import {
   sectionFrame,
   warmShadowClass,
 } from '@/src/lib/design/classes'
-import { getSeoEntry } from '@/src/lib/domain/repositories'
+import { getOrderById, listOrders } from '@/src/lib/domain/repositories'
 import type { CartItem, Order, Payment } from '@/src/lib/domain/types'
 import {
   formatCurrency,
@@ -31,39 +33,36 @@ import {
   formatPaymentStatus,
 } from '@/src/lib/formatters'
 import { getProductImage } from '@/src/lib/product-images'
-import { buildMetadata } from '@/src/lib/seo'
-import type { CheckoutConfirmation } from '@/src/lib/server/cart'
-import { listOrders } from '@/src/lib/server/customer'
 import { cn } from '@/src/lib/utils'
 
-export const metadata = buildMetadata({
-  path: '/checkout/confirmacao',
-  entry: getSeoEntry('/checkout/confirmacao'),
-  noindex: true,
-})
+export default function ConfirmacaoPage() {
+  const searchParams = useSearchParams()
+  const [order, setOrder] = useState<Order | null>(null)
+  const [loading, setLoading] = useState(true)
 
-export default async function ConfirmacaoPage() {
-  const confirmation = await getCheckoutConfirmation()
-  const orders = confirmation ? [] : await listOrders()
-  const order = confirmation?.order ?? orders[0]
+  useEffect(() => {
+    const id = searchParams.get('pedido')
+    const request = id
+      ? getOrderById(id)
+      : listOrders().then((orders) => orders[0] ?? null)
+    request
+      .then(setOrder)
+      .catch(() => setOrder(null))
+      .finally(() => setLoading(false))
+  }, [searchParams])
+
+  if (loading)
+    return (
+      <p className="p-8 text-sm text-(--ink-mute)">Carregando confirmação…</p>
+    )
 
   if (!order) {
     return <EmptyConfirmation />
   }
 
   const itemCount = order.items.reduce((sum, item) => sum + item.quantity, 0)
-  const pixPayment =
-    confirmation?.payment.method === 'pix' &&
-    confirmation.payment.status === 'pending'
-      ? confirmation.payment
-      : null
-  const pixQrImage = pixPayment?.pixQrCode
-    ? await toDataURL(pixPayment.pixQrCode, {
-        color: { dark: '#241f1b', light: '#fbf9f6' },
-        margin: 1,
-        width: 360,
-      })
-    : null
+  const pixPayment = null
+  const pixQrImage = null
 
   return (
     <DesignPageShell className="overflow-hidden">
@@ -525,31 +524,12 @@ function PixPaymentPanel({
         >
           Código Pix copia e cola
         </p>
-        <code className="mt-2 block max-h-20 overflow-auto rounded-[9px] bg-[#241f1b] px-3 py-3 text-xs/5 break-all text-[#fbf9f6]/85">
+        <code className="mt-2 block max-h-20 overflow-auto rounded-[9px] bg-[#241f1b] p-3 text-xs/5 break-all text-[#fbf9f6]/85">
           {payment.pixQrCode}
         </code>
       </div>
     </section>
   )
-}
-
-async function getCheckoutConfirmation(): Promise<CheckoutConfirmation | null> {
-  const raw = (await cookies()).get('tcc_checkout_confirmation')?.value
-  if (!raw) return null
-
-  try {
-    const parsed = JSON.parse(raw) as CheckoutConfirmation
-    if (
-      !parsed.order?.id ||
-      !parsed.order?.orderNumber ||
-      !parsed.payment?.method
-    ) {
-      return null
-    }
-    return parsed
-  } catch {
-    return null
-  }
 }
 
 function OrderItemCard({ item }: { item: CartItem }) {

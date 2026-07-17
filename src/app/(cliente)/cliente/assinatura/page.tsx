@@ -1,5 +1,8 @@
+'use client'
+
 import { IconArrowRight } from '@tabler/icons-react'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 
 import { Button } from '@/src/components/ui/button'
 import {
@@ -9,15 +12,28 @@ import {
   fontMono,
   transitionBgColor,
 } from '@/src/lib/design/classes'
+import { getSubscription } from '@/src/lib/domain/repositories'
+import type { Subscription } from '@/src/lib/domain/types'
 import {
   formatCurrency,
   formatDate,
   formatSubscriptionStatus,
 } from '@/src/lib/formatters'
-import { getSubscription } from '@/src/lib/server/customer'
 
-export default async function AssinaturaClientePage() {
-  const subscription = await getSubscription()
+export default function AssinaturaClientePage() {
+  const [subscription, setSubscription] = useState<Subscription | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    getSubscription()
+      .then(setSubscription)
+      .catch(() => setSubscription(null))
+      .finally(() => setLoading(false))
+  }, [])
+
+  if (loading) {
+    return <p className="text-sm text-(--ink-mute)">Carregando assinatura…</p>
+  }
 
   if (!subscription) {
     return (

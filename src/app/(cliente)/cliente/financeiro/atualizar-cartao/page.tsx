@@ -1,5 +1,8 @@
+'use client'
+
 import { IconArrowLeft } from '@tabler/icons-react'
 import Link from 'next/link'
+import { useState } from 'react'
 
 import { Button } from '@/src/components/ui/button'
 import {
@@ -11,6 +14,32 @@ import {
 import { updateCard } from '@/src/lib/domain/repositories'
 
 export default function AtualizarCartaoPage() {
+  const [submitting, setSubmitting] = useState(false)
+  const [message, setMessage] = useState<string | null>(null)
+
+  const submit = async (formData: FormData) => {
+    const lastFour = String(formData.get('lastFour') ?? '0000').slice(-4)
+    setSubmitting(true)
+    setMessage(null)
+    try {
+      await updateCard({
+        holderName: String(formData.get('holder') ?? ''),
+        lastFour,
+        brand: String(formData.get('brand') ?? 'Visa'),
+        token: `tok_mock_${Date.now()}_${lastFour}`,
+      })
+      setMessage('Cartão atualizado.')
+    } catch (error) {
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : 'Não foi possível atualizar o cartão.',
+      )
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
   return (
     <div>
       <Button
@@ -39,19 +68,7 @@ export default function AtualizarCartaoPage() {
         assinatura.
       </p>
 
-      <form
-        className="mt-6 max-w-md space-y-5"
-        action={async (formData) => {
-          'use server'
-          const lastFour = String(formData.get('lastFour') ?? '0000').slice(-4)
-          await updateCard({
-            holderName: String(formData.get('holder') ?? ''),
-            lastFour,
-            brand: String(formData.get('brand') ?? 'Visa'),
-            token: `tok_mock_${Date.now()}_${lastFour}`,
-          })
-        }}
-      >
+      <form className="mt-6 max-w-md space-y-5" action={submit}>
         <div>
           <label className={formLabelClass} htmlFor="holder">
             Nome no cartão
@@ -72,10 +89,14 @@ export default function AtualizarCartaoPage() {
         <input type="hidden" name="brand" value="Visa" />
         <Button
           type="submit"
+          disabled={submitting}
           className="rounded-[9px] bg-(--red) text-[#fbf9f6] shadow-[0_9px_22px_-8px_rgba(33,28,24,0.13)] hover:bg-(--red-deep)"
         >
-          Salvar cartão
+          {submitting ? 'Salvando…' : 'Salvar cartão'}
         </Button>
+        {message ? (
+          <p className="text-sm text-(--ink-mute)">{message}</p>
+        ) : null}
       </form>
     </div>
   )

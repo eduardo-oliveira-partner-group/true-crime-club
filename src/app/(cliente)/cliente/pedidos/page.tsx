@@ -1,5 +1,8 @@
+'use client'
+
 import { IconArrowRight } from '@tabler/icons-react'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 
 import {
   cardShadowBase,
@@ -9,13 +12,13 @@ import {
   transitionBgColor,
   transitionCardHover,
 } from '@/src/lib/design/classes'
+import { listOrders } from '@/src/lib/domain/repositories'
 import type { Order } from '@/src/lib/domain/types'
 import {
   formatCurrency,
   formatOrderStatus,
   formatPaymentStatus,
 } from '@/src/lib/formatters'
-import { listOrders } from '@/src/lib/server/customer'
 import { cn } from '@/src/lib/utils'
 
 const statusTone: Record<string, string> = {
@@ -26,8 +29,16 @@ const statusTone: Record<string, string> = {
   cancelado: 'text-(--ink-mute) border-(--ink)/15 bg-(--ink)/5',
 }
 
-export default async function PedidosPage() {
-  const orders: Order[] = await listOrders()
+export default function PedidosPage() {
+  const [orders, setOrders] = useState<Order[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    listOrders()
+      .then(setOrders)
+      .catch(() => setOrders([]))
+      .finally(() => setLoading(false))
+  }, [])
 
   return (
     <div>
@@ -46,7 +57,10 @@ export default async function PedidosPage() {
         seguem ciclos distintos.
       </p>
 
-      <div className="mt-8 space-y-4">
+      <div className="mt-8 space-y-4" aria-busy={loading}>
+        {loading ? (
+          <p className="text-sm text-(--ink-mute)">Carregando pedidos…</p>
+        ) : null}
         {orders.map((order: Order) => {
           const tone =
             statusTone[order.status] ??

@@ -1,5 +1,8 @@
+'use client'
+
 import { IconArrowLeft } from '@tabler/icons-react'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 
 import { Button } from '@/src/components/ui/button'
 import { fontHeading, fontMono } from '@/src/lib/design/classes'
@@ -9,8 +12,39 @@ import {
 } from '@/src/lib/domain/repositories'
 import { formatSubscriptionStatus } from '@/src/lib/formatters'
 
-export default async function CancelarAssinaturaPage() {
-  const subscription = await getSubscription()
+export default function CancelarAssinaturaPage() {
+  const [subscription, setSubscription] =
+    useState<Awaited<ReturnType<typeof getSubscription>>>(null)
+  const [loading, setLoading] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    getSubscription()
+      .then(setSubscription)
+      .catch(() => setSubscription(null))
+      .finally(() => setLoading(false))
+  }, [])
+
+  const cancel = async () => {
+    setSubmitting(true)
+    setError(null)
+    try {
+      await cancelSubscription()
+      setSubscription(await getSubscription())
+    } catch (cause) {
+      setError(
+        cause instanceof Error
+          ? cause.message
+          : 'Não foi possível cancelar a assinatura.',
+      )
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  if (loading)
+    return <p className="text-sm text-(--ink-mute)">Carregando assinatura…</p>
 
   return (
     <div>
@@ -51,20 +85,17 @@ export default async function CancelarAssinaturaPage() {
         </div>
       ) : null}
 
-      <form
-        className="mt-6"
-        action={async () => {
-          'use server'
-          await cancelSubscription()
-        }}
-      >
+      <div className="mt-6">
+        {error ? <p className="mb-3 text-sm text-(--red)">{error}</p> : null}
         <Button
-          type="submit"
+          type="button"
+          disabled={submitting}
+          onClick={cancel}
           className="rounded-[9px] bg-(--red) text-[#fbf9f6] shadow-[0_9px_22px_-8px_rgba(33,28,24,0.13)] hover:bg-(--red-deep)"
         >
-          Confirmar cancelamento
+          {submitting ? 'Cancelando…' : 'Confirmar cancelamento'}
         </Button>
-      </form>
+      </div>
     </div>
   )
 }

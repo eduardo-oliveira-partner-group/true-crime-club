@@ -1,5 +1,8 @@
+'use client'
+
 import { IconArrowRight } from '@tabler/icons-react'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 
 import { Button } from '@/src/components/ui/button'
 import {
@@ -28,9 +31,29 @@ const paymentTone: Record<string, string> = {
   expired: 'text-(--ink-mute)',
 }
 
-export default async function FinanceiroPage() {
-  const payments = await listPayments()
-  const invoices = await listInvoices()
+export default function FinanceiroPage() {
+  const [payments, setPayments] = useState<
+    Awaited<ReturnType<typeof listPayments>>
+  >([])
+  const [invoices, setInvoices] = useState<
+    Awaited<ReturnType<typeof listInvoices>>
+  >([])
+  const [loading, setLoading] = useState(true)
+
+  const reload = async () => {
+    const [nextPayments, nextInvoices] = await Promise.all([
+      listPayments(),
+      listInvoices(),
+    ])
+    setPayments(nextPayments)
+    setInvoices(nextInvoices)
+  }
+
+  useEffect(() => {
+    reload()
+      .catch(() => undefined)
+      .finally(() => setLoading(false))
+  }, [])
   const pendingPix = payments.find(
     (p) => p.method === 'pix' && p.status === 'pending',
   )
@@ -94,26 +117,26 @@ export default async function FinanceiroPage() {
                 {formatDate(pendingPix.dueDate)}
               </span>
             </p>
-            <form
-              className="mt-4"
-              action={async () => {
-                'use server'
-                await renewPixPayment(pendingPix.id)
-              }}
-            >
+            <div className="mt-4">
               <Button
-                type="submit"
+                type="button"
+                onClick={() => renewPixPayment(pendingPix.id).then(reload)}
                 size="sm"
                 className="rounded-[9px] bg-(--red) text-[#fbf9f6] hover:bg-(--red-deep)"
               >
                 Renovar Pix
               </Button>
-            </form>
+            </div>
           </div>
         </div>
       ) : null}
 
       <section className="mt-8">
+        {loading ? (
+          <p className="mb-4 text-sm text-(--ink-mute)">
+            Carregando dados financeiros…
+          </p>
+        ) : null}
         <h2
           className={`text-xs font-semibold tracking-[0.2em] text-(--red) uppercase ${fontMono}`}
         >
