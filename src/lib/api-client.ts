@@ -224,6 +224,7 @@ function fromAddress(address: {
   city: string
   state: string
   zipCode: string
+  isDefault?: boolean
 }) {
   return {
     rotulo: address.label,
@@ -234,6 +235,7 @@ function fromAddress(address: {
     cidade: address.city,
     estado: address.state,
     cep: address.zipCode,
+    padrao: address.isDefault ?? false,
   }
 }
 
@@ -398,10 +400,31 @@ export const apiClient = {
       city: string
       state: string
       zipCode: string
+      isDefault?: boolean
     }) => {
       const customerId = await getCustomerId()
       return fetcher(`/clientes/${customerId}/enderecos`, {
         method: 'POST',
+        body: JSON.stringify(fromAddress(body)),
+      }).then((items) => items.map(toAddress))
+    },
+    updateAddress: async (
+      id: string,
+      body: {
+        label: string
+        street: string
+        number: string
+        complement?: string
+        neighborhood: string
+        city: string
+        state: string
+        zipCode: string
+        isDefault?: boolean
+      },
+    ) => {
+      const customerId = await getCustomerId()
+      return fetcher(`/clientes/${customerId}/enderecos/${id}`, {
+        method: 'PATCH',
         body: JSON.stringify(fromAddress(body)),
       }).then((items) => items.map(toAddress))
     },

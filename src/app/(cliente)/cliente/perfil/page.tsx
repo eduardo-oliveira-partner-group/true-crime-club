@@ -62,12 +62,15 @@ export default function PerfilPage() {
   const [newAddrCity, setNewAddrCity] = useState('')
   const [newAddrState, setNewAddrState] = useState('')
   const [newAddrZip, setNewAddrZip] = useState('')
+  const [newAddrIsDefault, setNewAddrIsDefault] = useState(false)
+  const [editingAddressId, setEditingAddressId] = useState<string | null>(null)
 
   const [loading, setLoading] = useState(true)
   const [savingSection, setSavingSection] = useState<
     'basics' | 'contact' | 'preferences' | null
   >(null)
   const [saveError, setSaveError] = useState<string | null>(null)
+  const [savingAddress, setSavingAddress] = useState(false)
 
   const applyCustomer = (customer: Customer) => {
     const preferences = customer.preferences
@@ -169,11 +172,45 @@ export default function PerfilPage() {
 
   const handleDeleteAddress = async (id: string) => {
     try {
+      setSaveError(null)
       const updatedList = await apiClient.customer.deleteAddress(id)
       setAddresses(updatedList)
-    } catch (e) {
-      console.error(e)
+    } catch (error) {
+      setSaveError(
+        error instanceof Error
+          ? error.message
+          : 'Não foi possível excluir o endereço.',
+      )
     }
+  }
+
+  const resetAddressForm = () => {
+    setShowAddAddress(false)
+    setEditingAddressId(null)
+    setNewAddrLabel('')
+    setNewAddrStreet('')
+    setNewAddrNumber('')
+    setNewAddrComplement('')
+    setNewAddrNeighborhood('')
+    setNewAddrCity('')
+    setNewAddrState('')
+    setNewAddrZip('')
+    setNewAddrIsDefault(false)
+  }
+
+  const handleEditAddress = (address: Address) => {
+    setEditingAddressId(address.id)
+    setShowAddAddress(false)
+    setNewAddrLabel(address.label)
+    setNewAddrStreet(address.street)
+    setNewAddrNumber(address.number)
+    setNewAddrComplement(address.complement || '')
+    setNewAddrNeighborhood(address.neighborhood)
+    setNewAddrCity(address.city)
+    setNewAddrState(address.state)
+    setNewAddrZip(address.zipCode)
+    setNewAddrIsDefault(address.isDefault)
+    setSaveError(null)
   }
 
   const handleAddAddress = async (e: React.FormEvent) => {
@@ -181,7 +218,9 @@ export default function PerfilPage() {
     if (!newAddrLabel || !newAddrStreet || !newAddrNumber || !newAddrZip) return
 
     try {
-      const updatedList = await apiClient.customer.addAddress({
+      setSavingAddress(true)
+      setSaveError(null)
+      const addressPayload = {
         label: newAddrLabel,
         street: newAddrStreet,
         number: newAddrNumber,
@@ -190,22 +229,25 @@ export default function PerfilPage() {
         city: newAddrCity,
         state: newAddrState,
         zipCode: newAddrZip,
-      })
+        isDefault: newAddrIsDefault,
+      }
+      const updatedList = editingAddressId
+        ? await apiClient.customer.updateAddress(
+            editingAddressId,
+            addressPayload,
+          )
+        : await apiClient.customer.addAddress(addressPayload)
 
       setAddresses(updatedList)
-      setShowAddAddress(false)
-
-      // Reset fields
-      setNewAddrLabel('')
-      setNewAddrStreet('')
-      setNewAddrNumber('')
-      setNewAddrComplement('')
-      setNewAddrNeighborhood('')
-      setNewAddrCity('')
-      setNewAddrState('')
-      setNewAddrZip('')
-    } catch (e) {
-      console.error(e)
+      resetAddressForm()
+    } catch (error) {
+      setSaveError(
+        error instanceof Error
+          ? error.message
+          : 'Não foi possível salvar o endereço.',
+      )
+    } finally {
+      setSavingAddress(false)
     }
   }
 
@@ -518,9 +560,12 @@ export default function PerfilPage() {
             >
               Endereços de Entrega
             </h3>
-            {!showAddAddress && (
+            {!showAddAddress && !editingAddressId && (
               <button
-                onClick={() => setShowAddAddress(true)}
+                onClick={() => {
+                  resetAddressForm()
+                  setShowAddAddress(true)
+                }}
                 className={editBtnClass}
               >
                 <IconPlus className="size-3.5" /> Adicionar Endereço
@@ -529,7 +574,7 @@ export default function PerfilPage() {
           </div>
 
           {/* Form para Adicionar Endereço */}
-          {showAddAddress && (
+          {(showAddAddress || editingAddressId) && (
             <form
               onSubmit={handleAddAddress}
               className="mt-4 space-y-4 rounded-[14px] border border-(--ink)/10 bg-(--paper-soft) p-4"
@@ -537,7 +582,9 @@ export default function PerfilPage() {
               <p
                 className={`text-xs font-semibold tracking-wide text-(--red) uppercase ${fontMono}`}
               >
-                Novo Endereço de Entrega
+                {editingAddressId
+                  ? 'Editar Endereço de Entrega'
+                  : 'Novo Endereço de Entrega'}
               </p>
               <div className="grid gap-4 md:grid-cols-3">
                 <div className="md:col-span-2">
@@ -621,6 +668,17 @@ export default function PerfilPage() {
                     className={formInputClass}
                   />
                 </div>
+                <div className="flex items-center md:col-span-3">
+                  <label className="flex cursor-pointer items-center gap-2.5 text-sm leading-none text-(--ink-soft)">
+                    <input
+                      type="checkbox"
+                      checked={newAddrIsDefault}
+                      onChange={(e) => setNewAddrIsDefault(e.target.checked)}
+                      className="size-4 shrink-0 rounded border border-[rgba(33,28,24,0.15)] accent-(--red)"
+                    />
+                    Definir como endereço principal
+                  </label>
+                </div>
               </div>
               <div className="flex justify-end gap-2 pt-2">
                 <Button
@@ -628,7 +686,7 @@ export default function PerfilPage() {
                   variant="outline"
                   size="sm"
                   className="rounded-[9px]"
-                  onClick={() => setShowAddAddress(false)}
+                  onClick={resetAddressForm}
                 >
                   Cancelar
                 </Button>
@@ -636,8 +694,13 @@ export default function PerfilPage() {
                   type="submit"
                   size="sm"
                   className="rounded-[9px] bg-(--red) text-[#fbf9f6] hover:bg-(--red-deep)"
+                  disabled={savingAddress}
                 >
-                  Salvar Endereço
+                  {savingAddress
+                    ? 'Salvando...'
+                    : editingAddressId
+                      ? 'Salvar Alterações'
+                      : 'Salvar Endereço'}
                 </Button>
               </div>
             </form>
@@ -677,12 +740,22 @@ export default function PerfilPage() {
                       {addr.zipCode}
                     </p>
                   </div>
-                  <button
-                    onClick={() => handleDeleteAddress(addr.id)}
-                    className={`rounded-[9px] p-1 text-(--red) ${transitionBgColor} hover:bg-(--red)/10 hover:text-(--red-deep)`}
-                  >
-                    <IconTrash className="size-4" />
-                  </button>
+                  <div className="flex gap-1">
+                    <button
+                      onClick={() => handleEditAddress(addr)}
+                      className={`rounded-[9px] p-1 text-(--red) ${transitionBgColor} hover:bg-(--red)/10 hover:text-(--red-deep)`}
+                      aria-label={`Editar endereço ${addr.label}`}
+                    >
+                      <IconEdit className="size-4" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteAddress(addr.id)}
+                      className={`rounded-[9px] p-1 text-(--red) ${transitionBgColor} hover:bg-(--red)/10 hover:text-(--red-deep)`}
+                      aria-label={`Excluir endereço ${addr.label}`}
+                    >
+                      <IconTrash className="size-4" />
+                    </button>
+                  </div>
                 </div>
               ))
             )}
