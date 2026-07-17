@@ -189,17 +189,6 @@ export default function CadastroPage() {
           disabled={isLoading || isSuccess}
         />
         <AuthFormField
-          id="confirm-password"
-          label="Confirmar senha"
-          type="password"
-          value={confirmPasswordValue}
-          onChange={(e) => setConfirmPasswordValue(e.target.value)}
-          autoComplete="new-password"
-          error={errors.confirmPassword}
-          required
-          disabled={isLoading || isSuccess}
-        />
-        <AuthFormField
           id="document"
           label="CPF"
           value={documentValue}
@@ -239,6 +228,17 @@ export default function CadastroPage() {
           onChange={(e) => setPasswordValue(e.target.value)}
           autoComplete="new-password"
           error={errors.password}
+          required
+          disabled={isLoading || isSuccess}
+        />
+        <AuthFormField
+          id="confirm-password"
+          label="Confirmar senha"
+          type="password"
+          value={confirmPasswordValue}
+          onChange={(e) => setConfirmPasswordValue(e.target.value)}
+          autoComplete="new-password"
+          error={errors.confirmPassword}
           required
           disabled={isLoading || isSuccess}
         />
