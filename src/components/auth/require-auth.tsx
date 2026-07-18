@@ -52,7 +52,7 @@ export function RequireAuth({ children }: { children: React.ReactNode }) {
 
         if (
           error instanceof ApiClientError &&
-          (error.status === 401 || error.status === 403)
+          (error.status === 401 || error.status === 403 || error.status === 404)
         ) {
           redirectToLogin()
           return
