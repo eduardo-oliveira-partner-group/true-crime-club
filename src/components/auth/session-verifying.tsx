@@ -91,57 +91,59 @@ function SessionLoader({ tone = 'verify' }: { tone?: 'verify' | 'denied' }) {
         </div>
       ) : null}
 
-      <div className="absolute inset-[18%] flex items-center justify-center overflow-hidden rounded-full border border-[rgba(33,28,24,0.1)] bg-(--card) bg-[linear-gradient(160deg,var(--card)_0%,var(--paper-soft)_100%)] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.5),0_10px_24px_-14px_rgba(33,28,24,0.25)]">
-        <div
-          className={cn(
-            'size-16',
-            !isDenied && 'session-loupe-search',
-            isDenied && '-rotate-6',
-          )}
-        >
-          <svg
-            width="64"
-            height="64"
-            viewBox="-32 -32 64 64"
-            fill="none"
-            className="size-full overflow-visible"
+      <div className="absolute inset-[18%] overflow-hidden rounded-full border border-[rgba(33,28,24,0.1)] bg-(--card) bg-[linear-gradient(160deg,var(--card)_0%,var(--paper-soft)_100%)] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.5),0_10px_24px_-14px_rgba(33,28,24,0.25)]">
+        {/* Centragem estática — separada da animação para não conflitar com transform */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+          <div
+            className={cn(
+              !isDenied && 'session-loupe-search',
+              isDenied && '-rotate-6',
+            )}
           >
-            <circle
-              cx="0"
-              cy="0"
-              r="15"
-              fill="rgba(251,249,246,0.55)"
-              stroke={stroke}
-              strokeWidth="3"
-            />
-            <circle
-              cx="0"
-              cy="0"
-              r="9"
+            <svg
+              width="52"
+              height="52"
+              viewBox="0 0 52 52"
               fill="none"
-              stroke={accent}
-              strokeWidth="1"
-              strokeOpacity="0.5"
-            />
-            <path
-              d="M-6 -7c2-2 5.5-2.5 8-1"
-              stroke="rgba(255,255,255,0.9)"
-              strokeWidth="1.75"
-              strokeLinecap="round"
-            />
-            <path
-              d="M11 11 L26 26"
-              stroke={stroke}
-              strokeWidth="5"
-              strokeLinecap="round"
-            />
-            <path
-              d="M11 11 L26 26"
-              stroke={accent}
-              strokeWidth="1.75"
-              strokeLinecap="round"
-            />
-          </svg>
+              aria-hidden="true"
+            >
+              <circle
+                cx="26"
+                cy="26"
+                r="13"
+                fill="rgba(251,249,246,0.55)"
+                stroke={stroke}
+                strokeWidth="3"
+              />
+              <circle
+                cx="26"
+                cy="26"
+                r="8"
+                fill="none"
+                stroke={accent}
+                strokeWidth="1"
+                strokeOpacity="0.5"
+              />
+              <path
+                d="M20 19c2-2 5-2.5 7.5-1"
+                stroke="rgba(255,255,255,0.9)"
+                strokeWidth="1.75"
+                strokeLinecap="round"
+              />
+              <path
+                d="M36 36 L47 47"
+                stroke={stroke}
+                strokeWidth="5"
+                strokeLinecap="round"
+              />
+              <path
+                d="M36 36 L47 47"
+                stroke={accent}
+                strokeWidth="1.75"
+                strokeLinecap="round"
+              />
+            </svg>
+          </div>
         </div>
       </div>
     </div>
