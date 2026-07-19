@@ -1,4 +1,5 @@
 import { getApiBaseUrl } from '@/src/lib/api-mode'
+import { normalizeDigits } from '@/src/lib/formatters'
 import type {
   Address,
   Cart,
@@ -234,7 +235,7 @@ function fromAddress(address: {
     bairro: address.neighborhood,
     cidade: address.city,
     estado: address.state,
-    cep: address.zipCode,
+    cep: normalizeDigits(address.zipCode),
     padrao: address.isDefault ?? false,
   }
 }
@@ -254,8 +255,8 @@ export const apiClient = {
           nome: body.name,
           email: body.email,
           senha: body.password,
-          documento: body.document,
-          telefone: body.phone,
+          documento: normalizeDigits(body.document),
+          telefone: normalizeDigits(body.phone),
         }),
       }).then((data) => {
         return {
@@ -385,8 +386,8 @@ export const apiClient = {
         body: JSON.stringify({
           nome: body.name,
           email: body.email,
-          telefone: body.phone,
-          documento: body.document,
+          telefone: body.phone ? normalizeDigits(body.phone) : undefined,
+          documento: body.document ? normalizeDigits(body.document) : undefined,
           preferencias: fromPreferences(body.preferences),
         }),
       }).then(toCustomer)

@@ -21,6 +21,15 @@ import {
   transitionBgColor,
 } from '@/src/lib/design/classes'
 import type { Address, Customer } from '@/src/lib/domain/types'
+import {
+  formatCep,
+  formatCpf,
+  formatPhone,
+  isValidCep,
+  isValidCpf,
+  isValidPhone,
+  normalizeDigits,
+} from '@/src/lib/formatters'
 
 /** Shared class for inline edit/close action buttons. */
 const editBtnClass = `inline-flex cursor-pointer items-center gap-1.5 rounded-[9px] px-2 py-1 text-xs text-(--red) ${transitionBgColor} hover:bg-(--red)/8 hover:text-(--red-deep)`
@@ -75,15 +84,15 @@ export default function PerfilPage() {
   const applyCustomer = (customer: Customer) => {
     const preferences = customer.preferences
     setName(customer.name)
-    setPhone(customer.phone || '')
+    setPhone(formatPhone(customer.phone || ''))
     setEmail(customer.email)
-    setCpf(customer.document || '')
+    setCpf(formatCpf(customer.document || ''))
     setShirtSize(preferences?.shirtSize || 'M')
     setShoeSize(preferences?.shoeSize || '')
     setNotes(preferences?.notes || '')
     setTempName(customer.name)
     setTempEmail(customer.email)
-    setTempPhone(customer.phone || '')
+    setTempPhone(formatPhone(customer.phone || ''))
     setTempShirt(preferences?.shirtSize || 'M')
     setTempShoe(preferences?.shoeSize || '')
     setTempNotes(preferences?.notes || '')
@@ -105,12 +114,17 @@ export default function PerfilPage() {
   }, [])
 
   const handleSaveBasics = async () => {
+    if (!isValidCpf(tempCpf)) {
+      setSaveError('Informe um CPF válido.')
+      return
+    }
+
     try {
       setSavingSection('basics')
       setSaveError(null)
       const customer = await apiClient.customer.updateProfile({
         name: tempName,
-        document: tempCpf,
+        document: normalizeDigits(tempCpf),
       })
       applyCustomer(customer)
       setEditBasics(false)
@@ -126,12 +140,17 @@ export default function PerfilPage() {
   }
 
   const handleSaveContact = async () => {
+    if (!isValidPhone(tempPhone)) {
+      setSaveError('Telefone deve ter 10 ou 11 dígitos.')
+      return
+    }
+
     try {
       setSavingSection('contact')
       setSaveError(null)
       const customer = await apiClient.customer.updateProfile({
         email: tempEmail,
-        phone: tempPhone,
+        phone: normalizeDigits(tempPhone),
       })
       applyCustomer(customer)
       setEditContact(false)
@@ -208,7 +227,7 @@ export default function PerfilPage() {
     setNewAddrNeighborhood(address.neighborhood)
     setNewAddrCity(address.city)
     setNewAddrState(address.state)
-    setNewAddrZip(address.zipCode)
+    setNewAddrZip(formatCep(address.zipCode))
     setNewAddrIsDefault(address.isDefault)
     setSaveError(null)
   }
@@ -216,6 +235,10 @@ export default function PerfilPage() {
   const handleAddAddress = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!newAddrLabel || !newAddrStreet || !newAddrNumber || !newAddrZip) return
+    if (!isValidCep(newAddrZip)) {
+      setSaveError('CEP deve ter 8 dígitos.')
+      return
+    }
 
     try {
       setSavingAddress(true)
@@ -228,7 +251,7 @@ export default function PerfilPage() {
         neighborhood: newAddrNeighborhood,
         city: newAddrCity,
         state: newAddrState,
-        zipCode: newAddrZip,
+        zipCode: normalizeDigits(newAddrZip),
         isDefault: newAddrIsDefault,
       }
       const updatedList = editingAddressId
@@ -351,7 +374,9 @@ export default function PerfilPage() {
                 <input
                   type="text"
                   value={tempCpf}
-                  onChange={(e) => setTempCpf(e.target.value)}
+                  onChange={(e) => setTempCpf(formatCpf(e.target.value))}
+                  inputMode="numeric"
+                  maxLength={14}
                   className={formInputClass}
                 />
               ) : (
@@ -436,9 +461,11 @@ export default function PerfilPage() {
               </p>
               {editContact ? (
                 <input
-                  type="text"
+                  type="tel"
                   value={tempPhone}
-                  onChange={(e) => setTempPhone(e.target.value)}
+                  onChange={(e) => setTempPhone(formatPhone(e.target.value))}
+                  inputMode="numeric"
+                  maxLength={15}
                   className={formInputClass}
                 />
               ) : (
@@ -605,7 +632,9 @@ export default function PerfilPage() {
                     type="text"
                     required
                     value={newAddrZip}
-                    onChange={(e) => setNewAddrZip(e.target.value)}
+                    onChange={(e) => setNewAddrZip(formatCep(e.target.value))}
+                    inputMode="numeric"
+                    maxLength={9}
                     className={formInputClass}
                   />
                 </div>
@@ -737,7 +766,7 @@ export default function PerfilPage() {
                     </p>
                     <p className="text-xs text-(--ink-mute)">
                       {addr.neighborhood} — {addr.city}/{addr.state} — CEP{' '}
-                      {addr.zipCode}
+                      {formatCep(addr.zipCode)}
                     </p>
                   </div>
                   <div className="flex gap-1">

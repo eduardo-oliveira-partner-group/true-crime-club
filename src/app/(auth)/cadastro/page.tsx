@@ -15,6 +15,13 @@ import {
 import { DesignFormButton } from '@/src/components/public-design/design-button'
 import { apiClient } from '@/src/lib/api-client'
 import { arrowIconClass, formLinkClass } from '@/src/lib/design/classes'
+import {
+  formatCpf,
+  formatPhone,
+  isValidCpf,
+  isValidPhone,
+  normalizeDigits,
+} from '@/src/lib/formatters'
 
 export default function CadastroPage() {
   const [nameValue, setNameValue] = useState('')
@@ -58,59 +65,26 @@ export default function CadastroPage() {
       currentErrors.password = 'Senha é obrigatória.'
       hasErrors = true
     } else if (
-      passwordValue.length < 12 ||
+      passwordValue.length < 8 ||
       !/[a-z]/.test(passwordValue) ||
       !/[A-Z]/.test(passwordValue) ||
       !/\d/.test(passwordValue)
     ) {
       currentErrors.password =
-        'Use 12 caracteres, com maiúscula, minúscula e número.'
+        'Use 8 caracteres, com maiúscula, minúscula e número.'
       hasErrors = true
     }
     if (confirmPasswordValue !== passwordValue) {
       currentErrors.confirmPassword = 'As senhas precisam ser iguais.'
       hasErrors = true
     }
-    const cpfDigits = documentValue.replace(/\D/g, '')
-    const cpfHasValidLength = cpfDigits.length === 11
-    const cpfHasRepeatedDigits = /^(\d)\1{10}$/.test(cpfDigits)
-    const firstDigit = cpfHasValidLength
-      ? ((cpfDigits
-          .slice(0, 9)
-          .split('')
-          .reduce(
-            (total, digit, index) => total + Number(digit) * (10 - index),
-            0,
-          ) *
-          10) %
-          11) %
-        10
-      : -1
-    const secondDigit = cpfHasValidLength
-      ? ((cpfDigits
-          .slice(0, 10)
-          .split('')
-          .reduce(
-            (total, digit, index) => total + Number(digit) * (11 - index),
-            0,
-          ) *
-          10) %
-          11) %
-        10
-      : -1
-    const cpfIsValid =
-      cpfHasValidLength &&
-      !cpfHasRepeatedDigits &&
-      cpfDigits.endsWith(`${firstDigit}${secondDigit}`)
-
-    if (!cpfIsValid) {
-      currentErrors.document = cpfHasValidLength
-        ? 'CPF inválido.'
-        : 'CPF deve ter 11 dígitos.'
+    const cpfDigits = normalizeDigits(documentValue)
+    if (!isValidCpf(documentValue)) {
+      currentErrors.document =
+        cpfDigits.length === 11 ? 'CPF inválido.' : 'CPF deve ter 11 dígitos.'
       hasErrors = true
     }
-    const phoneDigits = phoneValue.replace(/\D/g, '')
-    if (phoneDigits.length < 10 || phoneDigits.length > 11) {
+    if (!isValidPhone(phoneValue)) {
       currentErrors.phone = 'Telefone deve ter 10 ou 11 dígitos.'
       hasErrors = true
     }
@@ -127,8 +101,8 @@ export default function CadastroPage() {
         name: nameValue,
         email: emailValue,
         password: passwordValue,
-        document: documentValue,
-        phone: phoneValue,
+        document: cpfDigits,
+        phone: normalizeDigits(phoneValue),
       })
 
       setIsSuccess(true)
@@ -192,8 +166,10 @@ export default function CadastroPage() {
           id="document"
           label="CPF"
           value={documentValue}
-          onChange={(e) => setDocumentValue(e.target.value)}
+          onChange={(e) => setDocumentValue(formatCpf(e.target.value))}
           autoComplete="off"
+          inputMode="numeric"
+          maxLength={14}
           error={errors.document}
           required
           disabled={isLoading || isSuccess}
@@ -203,8 +179,10 @@ export default function CadastroPage() {
           label="Telefone"
           type="tel"
           value={phoneValue}
-          onChange={(e) => setPhoneValue(e.target.value)}
+          onChange={(e) => setPhoneValue(formatPhone(e.target.value))}
           autoComplete="tel"
+          inputMode="numeric"
+          maxLength={15}
           error={errors.phone}
           required
           disabled={isLoading || isSuccess}

@@ -29,6 +29,63 @@ export function formatCurrency(cents: number): string {
   return currencyFormatter.format(cents / 100)
 }
 
+export function normalizeDigits(value: string): string {
+  return value.replace(/\D/g, '')
+}
+
+export function formatCpf(value: string): string {
+  const digits = normalizeDigits(value).slice(0, 11)
+  if (digits.length <= 3) return digits
+  if (digits.length <= 6) return `${digits.slice(0, 3)}.${digits.slice(3)}`
+  if (digits.length <= 9) {
+    return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6)}`
+  }
+  return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9)}`
+}
+
+export function isValidCpf(value: string): boolean {
+  const digits = normalizeDigits(value)
+  if (digits.length !== 11 || /^(\d)\1{10}$/.test(digits)) return false
+
+  const calculateDigit = (base: string, factor: number) => {
+    const total = base
+      .split('')
+      .reduce((sum, digit, index) => sum + Number(digit) * (factor - index), 0)
+    return ((total * 10) % 11) % 10
+  }
+
+  return (
+    calculateDigit(digits.slice(0, 9), 10) === Number(digits[9]) &&
+    calculateDigit(digits.slice(0, 10), 11) === Number(digits[10])
+  )
+}
+
+export function formatPhone(value: string): string {
+  const digits = normalizeDigits(value).slice(0, 11)
+  if (digits.length <= 2) return digits
+  if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`
+  if (digits.length <= 10) {
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`
+  }
+  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`
+}
+
+export function isValidPhone(value: string): boolean {
+  const digits = normalizeDigits(value)
+  return digits.length === 10 || digits.length === 11
+}
+
+export function formatCep(value: string): string {
+  const digits = normalizeDigits(value).slice(0, 8)
+  return digits.length <= 5
+    ? digits
+    : `${digits.slice(0, 5)}-${digits.slice(5)}`
+}
+
+export function isValidCep(value: string): boolean {
+  return normalizeDigits(value).length === 8
+}
+
 export function formatDate(isoDate: string): string {
   return dateFormatter.format(new Date(isoDate))
 }
