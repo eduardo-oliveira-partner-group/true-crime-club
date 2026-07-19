@@ -1,8 +1,8 @@
-import { PlanDossierCard } from '@/src/components/home/plan-dossier-card'
+import { SubscriptionPlansGrid } from '@/src/components/home/plan-dossier-card'
 import { DesignPageShell } from '@/src/components/public-design/design-page-shell'
 import { DossierCard } from '@/src/components/public-design/dossier-card'
 import { SectionEyebrow } from '@/src/components/public-design/section-eyebrow'
-import { fontHeading } from '@/src/lib/design/classes'
+import { fontHeading, sectionFrame } from '@/src/lib/design/classes'
 import {
   getDynamicContent,
   getSeoEntry,
@@ -21,33 +21,24 @@ export default async function AssinaturaPage() {
 
   return (
     <DesignPageShell showOverlays={false}>
-      <section className="relative z-10 mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-20">
-        <div className="mb-10 max-w-2xl space-y-4 text-center md:text-left">
+      <section className={`${sectionFrame} relative z-10 py-14 lg:py-20`}>
+        <div className="mb-12 text-center">
           <SectionEyebrow>Clube de Investigação</SectionEyebrow>
           <h1
-            className={`text-3xl font-bold tracking-tight text-(--ink) sm:text-4xl ${fontHeading}`}
+            className={`m-0 mx-auto max-w-[580px] text-[clamp(30px,3.8vw,48px)] leading-[1.02] font-semibold tracking-[-0.015em] text-(--ink) ${fontHeading}`}
           >
             Planos de assinatura
           </h1>
-          <p className="mx-auto max-w-2xl text-sm/6 text-(--ink-soft) sm:text-base md:mx-0">
+          <p className="mx-auto mt-4 max-w-[580px] text-sm/6 text-(--ink-soft) sm:text-base">
             Escolha entre mensal, anual ou box avulsa. Cobrança no mês da
             compra; envio no mês seguinte.
           </p>
         </div>
 
-        <div className="-mx-4 flex snap-x snap-mandatory scrollbar-none gap-5 overflow-x-auto px-4 pb-2 [-ms-overflow-style:none] sm:mx-0 sm:px-0 lg:grid lg:grid-cols-3 lg:overflow-x-visible lg:pb-0 [&::-webkit-scrollbar]:hidden">
-          {plans.map((plan) => (
-            <div
-              key={plan.id}
-              className="w-[85vw] max-w-[360px] shrink-0 snap-center lg:w-auto lg:max-w-none lg:shrink"
-            >
-              <PlanDossierCard plan={plan} />
-            </div>
-          ))}
-        </div>
+        <SubscriptionPlansGrid plans={plans} />
       </section>
 
-      <section className="relative z-10 mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-16">
+      <section className={`${sectionFrame} relative z-10 py-14 lg:py-16`}>
         <DossierCard
           tabCode="REGRAS"
           tabLabel="DO ARQUIVO"
