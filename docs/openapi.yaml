@@ -1137,12 +1137,15 @@ components:
       properties:
         tamanhoCamiseta:
           type: string
+          maxLength: 30
           example: M
         tamanhoCalcado:
           type: string
+          maxLength: 30
           example: 38
         observacoes:
           type: string
+          maxLength: 2000
           example: Prefere tons escuros nas peças.
 
     Endereco:
