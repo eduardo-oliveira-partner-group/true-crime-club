@@ -715,3 +715,88 @@
     animation: none;
   }
 }
+
+/* Session gate — lupa + loader */
+@keyframes sessionGateEnter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes sessionMessageIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes sessionRingSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes sessionLoupeSearch {
+  0% {
+    transform: translate(-5px, -5px) rotate(-6deg);
+  }
+  25% {
+    transform: translate(5px, -5px) rotate(2deg);
+  }
+  50% {
+    transform: translate(5px, 5px) rotate(6deg);
+  }
+  75% {
+    transform: translate(-5px, 5px) rotate(-2deg);
+  }
+  100% {
+    transform: translate(-5px, -5px) rotate(-6deg);
+  }
+}
+
+.session-gate-enter {
+  animation: sessionGateEnter 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.session-message-in {
+  animation: sessionMessageIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.session-ring-spin {
+  transform-origin: center;
+  animation: sessionRingSpin 1.8s linear infinite;
+}
+
+.session-loupe-search {
+  transform-origin: center center;
+  will-change: transform;
+  animation: sessionLoupeSearch 3s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .session-gate-enter,
+  .session-message-in,
+  .session-ring-spin,
+  .session-loupe-search {
+    animation: none;
+  }
+
+  .session-gate-enter,
+  .session-message-in {
+    opacity: 1;
+    transform: none;
+  }
+
+  .session-loupe-search {
+    transform: rotate(-6deg);
+  }
+}
