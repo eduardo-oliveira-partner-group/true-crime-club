@@ -138,7 +138,7 @@ function MonthlyPlanCard({ plan }: { plan: SubscriptionPlan }) {
       <div className="mb-[22px] h-[1.5px] [background:repeating-linear-gradient(90deg,rgba(33,28,24,0.18)_0,rgba(33,28,24,0.18)_5px,transparent_5px,transparent_9px)]" />
       <FeatureList color="#1AA587" items={plan.features} />
       <Link
-        href={`/assinatura?plano=${plan.slug}`}
+        href={`/checkout?plano=${plan.slug}`}
         className={`flex w-full items-center justify-center rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-transparent px-4 py-[15px] text-[14px] leading-none font-bold tracking-[0.04em] text-(--ink) uppercase no-underline ${transitionBgColor} hover:bg-(--ink) hover:text-[#fbf9f6] ${fontMono}`}
       >
         Assinar mensal
@@ -190,7 +190,7 @@ function AnnualPlanCard({ plan }: { plan: SubscriptionPlan }) {
         <div className="mb-[22px] h-[1.5px] [background:repeating-linear-gradient(90deg,rgba(255,255,255,0.28)_0,rgba(255,255,255,0.28)_5px,transparent_5px,transparent_9px)]" />
         <FeatureList color="#F4CF5A" items={plan.features} />
         <Link
-          href={`/assinatura?plano=${plan.slug}`}
+          href={`/checkout?plano=${plan.slug}`}
           className={`group flex w-full items-center justify-center rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-(--yellow) px-4 py-[15px] text-[14px] leading-none font-bold tracking-[0.04em] text-(--ink) uppercase no-underline ${transitionBgColor} hover:bg-[#fbf4e3] hover:text-(--purple) ${fontMono}`}
         >
           Escolher plano{' '}
