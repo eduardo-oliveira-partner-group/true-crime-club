@@ -106,42 +106,42 @@ function SessionLoader({ tone = 'verify' }: { tone?: 'verify' | 'denied' }) {
             fill="none"
             className="size-full overflow-visible"
           >
-              <circle
-                cx="0"
-                cy="0"
-                r="15"
-                fill="rgba(251,249,246,0.55)"
-                stroke={stroke}
-                strokeWidth="3"
-              />
-              <circle
-                cx="0"
-                cy="0"
-                r="9"
-                fill="none"
-                stroke={accent}
-                strokeWidth="1"
-                strokeOpacity="0.5"
-              />
-              <path
-                d="M-6 -7c2-2 5.5-2.5 8-1"
-                stroke="rgba(255,255,255,0.9)"
-                strokeWidth="1.75"
-                strokeLinecap="round"
-              />
-              <path
-                d="M11 11 L26 26"
-                stroke={stroke}
-                strokeWidth="5"
-                strokeLinecap="round"
-              />
-              <path
-                d="M11 11 L26 26"
-                stroke={accent}
-                strokeWidth="1.75"
-                strokeLinecap="round"
-              />
-            </svg>
+            <circle
+              cx="0"
+              cy="0"
+              r="15"
+              fill="rgba(251,249,246,0.55)"
+              stroke={stroke}
+              strokeWidth="3"
+            />
+            <circle
+              cx="0"
+              cy="0"
+              r="9"
+              fill="none"
+              stroke={accent}
+              strokeWidth="1"
+              strokeOpacity="0.5"
+            />
+            <path
+              d="M-6 -7c2-2 5.5-2.5 8-1"
+              stroke="rgba(255,255,255,0.9)"
+              strokeWidth="1.75"
+              strokeLinecap="round"
+            />
+            <path
+              d="M11 11 L26 26"
+              stroke={stroke}
+              strokeWidth="5"
+              strokeLinecap="round"
+            />
+            <path
+              d="M11 11 L26 26"
+              stroke={accent}
+              strokeWidth="1.75"
+              strokeLinecap="round"
+            />
+          </svg>
         </div>
       </div>
     </div>

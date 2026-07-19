@@ -1,5 +1,4 @@
 import { getApiBaseUrl } from '@/src/lib/api-mode'
-import { normalizeDigits } from '@/src/lib/formatters'
 import type {
   Address,
   Cart,
@@ -11,6 +10,7 @@ import type {
   PaymentMethod,
   SubscriberPreferences,
 } from '@/src/lib/domain/types'
+import { normalizeDigits } from '@/src/lib/formatters'
 
 type JsonValue =
   | string

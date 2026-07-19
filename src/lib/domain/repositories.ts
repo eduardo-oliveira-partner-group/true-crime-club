@@ -1052,7 +1052,20 @@ export async function listOrders(): Promise<Order[]> {
   if (!isLocalMockMode()) {
     try {
       const apiOrders = await apiClient.customer.listOrders()
-      return apiOrders.map(mapApiOrderToDomain)
+      return Promise.all(
+        apiOrders.map(async (apiOrder: ApiOrder) => {
+          const listedOrder = mapApiOrderToDomain(apiOrder)
+          if (listedOrder.items.length > 0) return listedOrder
+
+          try {
+            return mapApiOrderToDomain(
+              await apiClient.customer.getOrder(apiOrder.id),
+            )
+          } catch {
+            return listedOrder
+          }
+        }),
+      )
     } catch (error) {
       if (isUnauthorizedError(error)) {
         return []
