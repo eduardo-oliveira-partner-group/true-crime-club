@@ -18,7 +18,7 @@ import { arrowIconClass, formLinkClass } from '@/src/lib/design/classes'
 
 function safeNextPath(raw: string | null): string {
   if (!raw || !raw.startsWith('/') || raw.startsWith('//')) {
-    return '/cliente/pedidos'
+    return '/cliente/perfil'
   }
 
   // Evita loop login ↔ destino quando `next` aponta de volta para auth.
@@ -28,7 +28,7 @@ function safeNextPath(raw: string | null): string {
     pathname === '/cadastro' ||
     pathname === '/recuperar-senha'
   ) {
-    return '/cliente/pedidos'
+    return '/cliente/perfil'
   }
 
   return raw
@@ -168,7 +168,7 @@ function LoginForm() {
         </Link>
         <Link
           href={
-            nextPath === '/cliente/pedidos'
+            nextPath === '/cliente/perfil'
               ? '/cadastro'
               : `/cadastro?next=${encodeURIComponent(nextPath)}`
           }
