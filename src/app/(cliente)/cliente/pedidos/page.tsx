@@ -53,32 +53,21 @@ export default function PedidosPage() {
   }, [])
 
   return (
-    <div className="pb-4">
-      <header className="max-w-2xl">
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-          <p
-            className={`text-[11px] leading-none font-bold tracking-[0.16em] text-(--red) uppercase ${fontMono}`}
-          >
-            Arquivo do assinante
-          </p>
-          {!loading ? (
-            <span
-              className={`rounded-[2px] border border-(--ink)/12 bg-(--paper-soft) px-2 py-1 text-[10px] leading-none tracking-[0.12em] text-(--ink-mute) uppercase ${fontMono}`}
-            >
-              {orders.length} {orders.length === 1 ? 'registro' : 'registros'}
-            </span>
-          ) : null}
-        </div>
-        <h1
-          className={`mt-3 text-[clamp(2rem,5vw,3.25rem)] leading-[0.95] font-black tracking-[-0.035em] text-(--ink) ${fontHeading}`}
-        >
-          Meus pedidos
-        </h1>
-        <p className="mt-3 max-w-xl text-sm/6 text-(--ink-mute) sm:text-base/7">
-          Cada pedido é tratado como um dossiê: consulte o pagamento, o ciclo de
-          envio e o rastreio no mesmo lugar.
-        </p>
-      </header>
+    <div>
+      <p
+        className={`text-[13px] leading-none font-bold tracking-[0.12em] text-(--red) uppercase ${fontMono}`}
+      >
+        Arquivo do assinante
+      </p>
+      <h1
+        className={`mt-2 text-2xl font-black tracking-tight text-(--ink) uppercase ${fontHeading}`}
+      >
+        Meus pedidos
+      </h1>
+      <p className="mt-2 text-sm/6 text-(--ink-mute)">
+        Cada pedido é tratado como um dossiê: consulte o pagamento, o ciclo de
+        envio e o rastreio no mesmo lugar.
+      </p>
 
       {loading ? (
         <OrdersListSkeleton />
@@ -109,7 +98,7 @@ export default function PedidosPage() {
           </div>
         </section>
       ) : (
-        <section className="mt-11" aria-label="Lista de pedidos">
+        <section className="mt-8" aria-label="Lista de pedidos">
           <div className="space-y-4" aria-busy="false">
             {orders.map((order) => {
               const summary = orderSummary(order.items)

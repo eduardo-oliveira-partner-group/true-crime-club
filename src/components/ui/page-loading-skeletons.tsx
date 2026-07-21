@@ -9,7 +9,7 @@ function Block({ className }: { className: string }) {
 export function OrdersListSkeleton({ rows = 3 }: { rows?: number }) {
   return (
     <div
-      className="mt-11 space-y-4"
+      className="mt-8 space-y-4"
       aria-busy="true"
       aria-label="Carregando pedidos"
     >
