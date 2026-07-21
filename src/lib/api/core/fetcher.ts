@@ -1,5 +1,10 @@
 import { getApiBaseUrl } from '@/src/lib/api-mode'
 
+import {
+  isApiEnvelope,
+  isApiFailureEnvelope,
+  unwrapApiPayload,
+} from './envelope'
 import { ApiClientError } from './error'
 
 function readStatusCode(value: unknown, fallback: number): number {
@@ -56,19 +61,6 @@ function extractApiErrorMessage(errorData: unknown, status: number): string {
   return `Erro na requisição: ${status}`
 }
 
-function isApiFailureEnvelope(payload: unknown): boolean {
-  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
-    return false
-  }
-
-  const data = payload as Record<string, unknown>
-  if (data.sucesso === false) return true
-  if (Array.isArray(data.erros) && data.erros.length > 0 && data.data == null) {
-    return true
-  }
-  return false
-}
-
 export async function fetcher(endpoint: string, options: RequestInit = {}) {
   const apiBaseUrl = getApiBaseUrl()
   const url = `${apiBaseUrl.replace(/\/$/, '')}${endpoint}`
@@ -88,13 +80,12 @@ export async function fetcher(endpoint: string, options: RequestInit = {}) {
 
   if (!response.ok || isApiFailureEnvelope(payload)) {
     const status = readStatusCode(
-      payload && typeof payload === 'object' && !Array.isArray(payload)
-        ? (payload as Record<string, unknown>).codigo
-        : undefined,
+      isApiEnvelope(payload) ? payload.codigo : undefined,
       response.status,
     )
     throw new ApiClientError(extractApiErrorMessage(payload, status), status)
   }
 
-  return payload
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- preserva o contrato any do response.json()
+  return unwrapApiPayload<any>(payload)
 }

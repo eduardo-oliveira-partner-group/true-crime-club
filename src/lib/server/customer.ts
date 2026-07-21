@@ -2,6 +2,7 @@ import 'server-only'
 
 import { cookies } from 'next/headers'
 
+import { unwrapApiPayload } from '@/src/lib/api/core/envelope'
 import { getApiBaseUrl, isExplicitLocalMockMode } from '@/src/lib/api-mode'
 import {
   addCustomerAddress,
@@ -178,7 +179,7 @@ export async function getOrderById(
   if (response.status === 404) return null
   if (!response.ok) throw new Error('Não foi possível carregar o pedido.')
 
-  return mapApiOrder((await response.json()) as ApiOrderPayload)
+  return mapApiOrder(unwrapApiPayload<ApiOrderPayload>(await response.json()))
 }
 
 function mapApiSubscription(
@@ -228,7 +229,9 @@ export async function getSubscription(): Promise<Subscription | null> {
     throw new Error('Não foi possível carregar a assinatura.')
   }
 
-  return mapApiSubscription((await response.json()) as ApiSubscriptionPayload)
+  return mapApiSubscription(
+    unwrapApiPayload<ApiSubscriptionPayload>(await response.json()),
+  )
 }
 
 export async function listOrders(): Promise<
@@ -247,7 +250,7 @@ export async function listOrders(): Promise<
   })
   if (!listResponse.ok) return []
 
-  const orders = (await listResponse.json()) as ApiOrderPayload[]
+  const orders = unwrapApiPayload<ApiOrderPayload[]>(await listResponse.json())
   return Promise.all(
     orders.map(async (order) => {
       const detailResponse = await fetch(
@@ -259,7 +262,7 @@ export async function listOrders(): Promise<
       )
       return mapApiOrder(
         detailResponse.ok
-          ? ((await detailResponse.json()) as ApiOrderPayload)
+          ? unwrapApiPayload<ApiOrderPayload>(await detailResponse.json())
           : order,
       )
     }),
@@ -282,14 +285,16 @@ export async function listCards(): Promise<PaymentMethod[]> {
 
   if (!response.ok) return []
 
-  return ((await response.json()) as ApiCardPayload[]).map((card) => ({
-    id: card.id ?? '',
-    type: card.tipo === 'pix' ? 'pix' : 'credit_card',
-    label: card.rotulo ?? '',
-    lastFour: card.ultimosQuatro ?? undefined,
-    brand: card.bandeira ?? undefined,
-    isDefault: card.padrao ?? false,
-  }))
+  return unwrapApiPayload<ApiCardPayload[]>(await response.json()).map(
+    (card) => ({
+      id: card.id ?? '',
+      type: card.tipo === 'pix' ? 'pix' : 'credit_card',
+      label: card.rotulo ?? '',
+      lastFour: card.ultimosQuatro ?? undefined,
+      brand: card.bandeira ?? undefined,
+      isDefault: card.padrao ?? false,
+    }),
+  )
 }
 
 export async function getCustomerProfile(): Promise<{
@@ -322,7 +327,7 @@ export async function getCustomerProfile(): Promise<{
     throw new Error('Não foi possível carregar os dados do cliente.')
   }
 
-  const profile = (await response.json()) as ProfilePayload
+  const profile = unwrapApiPayload<ProfilePayload>(await response.json())
   const customer = profile.cliente
 
   return {
@@ -397,7 +402,7 @@ export async function updateCustomerProfile(input: {
     throw new Error('Sessão inválida. Faça login novamente.')
   }
 
-  const { id } = (await currentCustomer.json()) as { id?: string }
+  const { id } = unwrapApiPayload<{ id?: string }>(await currentCustomer.json())
   if (!id) throw new Error('Não foi possível identificar a cliente da sessão.')
 
   const response = await fetch(`${apiBaseUrl}/clientes/${id}`, {

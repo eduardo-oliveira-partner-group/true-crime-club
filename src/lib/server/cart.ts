@@ -1,3 +1,4 @@
+import { unwrapApiPayload } from '@/src/lib/api/core/envelope'
 import {
   addCartItem,
   applyCoupon,
@@ -194,7 +195,9 @@ export async function createOrder(
     throw new Error(data.mensagem ?? 'Não foi possível simular o pedido.')
   }
 
-  return toCheckoutConfirmation((await response.json()) as CheckoutApiResponse)
+  return toCheckoutConfirmation(
+    unwrapApiPayload<CheckoutApiResponse>(await response.json()),
+  )
 }
 
 export { applyCoupon }
