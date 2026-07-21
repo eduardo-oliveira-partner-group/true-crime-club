@@ -93,7 +93,7 @@ function SessionLoader({ tone = 'verify' }: { tone?: 'verify' | 'denied' }) {
 
       <div className="absolute inset-[18%] overflow-hidden rounded-full border border-[rgba(33,28,24,0.1)] bg-(--card) bg-[linear-gradient(160deg,var(--card)_0%,var(--paper-soft)_100%)] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.5),0_10px_24px_-14px_rgba(33,28,24,0.25)]">
         {/* Centragem estática — separada da animação para não conflitar com transform */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+        <div className="absolute top-1/2 left-1/2 -translate-1/2">
           <div
             className={cn(
               !isDenied && 'session-loupe-search',
