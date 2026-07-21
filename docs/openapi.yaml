@@ -1,47 +1,52 @@
 openapi: 3.0.3
 info:
   title: True Crime Club API
-  description: |
-    Especificação OpenAPI para a API do True Crime Club. Esta API conecta todas as partes dinâmicas da aplicação (entrada, loja, finalização de compra, área do cliente) e servirá tanto para a simulação interna quanto para o serviço externo definitivo.
-    
+  description: 'Especificação OpenAPI para a API do True Crime Club. Esta API conecta
+    todas as partes dinâmicas da aplicação (entrada, loja, finalização de compra,
+    área do cliente) e servirá tanto para a simulação interna quanto para o serviço
+    externo definitivo.
+
+
     Convenções gerais:
+
     * Valores monetários são expressos em centavos (ex: `14990` equivale a `R$ 149,90`).
+
     * Datas seguem o formato ISO 8601 (`YYYY-MM-DDTHH:mm:ss.sssZ`).
+
+    '
   version: 1.0.0
 servers:
-  - url: http://localhost:8000/api
-    description: API FastAPI local (tcc-front-office-api)
-  - url: http://localhost:3000/api
-    description: Servidor local de simulação (proxy Next)
-  - url: https://api.truecrimeclub.com.br/v1
-    description: Servidor de produção futuro
-
+- url: http://localhost:8000/api
+  description: API FastAPI local (tcc-front-office-api)
+- url: http://localhost:3000/api
+  description: Servidor local de simulação (proxy Next)
+- url: https://api.truecrimeclub.com.br/v1
+  description: Servidor de produção futuro
 tags:
-  - name: Autenticação
-    description: Registro, Entrada e Sessão do Cliente
-  - name: Catálogo
-    description: Consulta de Produtos, Caixas e Planos de Assinatura
-  - name: Carrinho
-    description: Manipulação do Carrinho de Compras e Cupons
-  - name: Finalização & Frete
-    description: Cálculo de Frete e Fechamento de Pedidos
-  - name: Cliente & Painel
-    description: Informações Pessoais, Endereços, Assinatura, Pagamentos e Faturas do Cliente
-  - name: Conteúdo & Investigação
-    description: Casos, Pistas, Progresso e Arquivos Liberados
-  - name: Conteúdo Dinâmico & SEO
-    description: Textos de Páginas, Banners Editáveis e Tags de SEO
-  - name: CMS Delivery
-    description: Entrega de páginas e estruturas públicas gerenciadas pelo CMS.
-
+- name: Autenticação
+  description: Registro, Entrada e Sessão do Cliente
+- name: Catálogo
+  description: Consulta de Produtos, Caixas e Planos de Assinatura
+- name: Carrinho
+  description: Manipulação do Carrinho de Compras e Cupons
+- name: Finalização & Frete
+  description: Cálculo de Frete e Fechamento de Pedidos
+- name: Cliente & Painel
+  description: Informações Pessoais, Endereços, Assinatura, Pagamentos e Faturas do
+    Cliente
+- name: Conteúdo & Investigação
+  description: Casos, Pistas, Progresso e Arquivos Liberados
+- name: Conteúdo Dinâmico & SEO
+  description: Textos de Páginas, Banners Editáveis e Tags de SEO
+- name: CMS Delivery
+  description: Entrega de páginas e estruturas públicas gerenciadas pelo CMS.
 paths:
-  # --- AUTENTICAÇÃO ---
   /autenticacao/entrar:
     post:
       tags:
-        - Autenticação
+      - Autenticação
       summary: Autenticar cliente
-      description: Autentica o cliente e emite um cookie de sessão ou JWT.
+      description: Autentica o cliente e emite uma sessão opaca em cookie HttpOnly.
       requestBody:
         required: true
         content:
@@ -49,17 +54,21 @@ paths:
             schema:
               type: object
               required:
-                - email
-                - senha
+              - senha
               properties:
+                user:
+                  type: string
+                  description: Login ou e-mail do cliente (alternativa a email).
+                  example: mariana.silva@email.com
                 email:
                   type: string
-                  format: email
+                  description: E-mail do cliente (alternativa a user).
                   example: mariana.silva@email.com
                 senha:
                   type: string
                   format: password
                   example: segredoforte
+              description: Informe senha e user ou email.
       responses:
         '200':
           description: Autenticação realizada com sucesso.
@@ -68,9 +77,6 @@ paths:
               schema:
                 type: object
                 properties:
-                  token:
-                    type: string
-                    example: jwt_exemplo
                   cliente:
                     $ref: '#/components/schemas/Cliente'
         '401':
@@ -79,13 +85,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Erro'
-
   /autenticacao/sair:
     post:
       tags:
-        - Autenticação
+      - Autenticação
       summary: Encerrar sessão do cliente
-      description: Remove o cookie de sessão do cliente.
+      description: Revoga a sessão persistida e remove o cookie do cliente.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token_sessao:
+                  type: string
+                  nullable: true
       responses:
         '200':
           description: Sessão encerrada com sucesso.
@@ -97,13 +112,13 @@ paths:
                   sucesso:
                     type: boolean
                     example: true
-
   /autenticacao/cliente-atual:
     get:
       tags:
-        - Autenticação
+      - Autenticação
       summary: Obter dados do cliente autenticado
-      description: Retorna as informações do cliente logado com base no cookie de sessão.
+      description: Retorna as informações do cliente logado com base no cookie de
+        sessão.
       responses:
         '200':
           description: Cliente retornado com sucesso.
@@ -117,11 +132,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Erro'
-
   /clientes/recuperar-senha:
     post:
       tags:
-        - Autenticação
+      - Autenticação
       summary: Disparar fluxo de recuperação de senha
       requestBody:
         required: true
@@ -130,7 +144,7 @@ paths:
             schema:
               type: object
               required:
-                - email
+              - email
               properties:
                 email:
                   type: string
@@ -147,14 +161,20 @@ paths:
                   status:
                     type: string
                     example: email_enviado
-
-  # --- CLIENTES ENDEREÇOS E ATUALIZAÇÕES ---
+        '401':
+          description: Não autenticado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+      security:
+      - cookieAuth: []
   /clientes:
     post:
       tags:
-        - Autenticação
+      - Autenticação
       summary: Cadastrar novo cliente
-      description: Cria uma nova conta de cliente e inicia a sessão.
+      description: Cria uma nova conta de cliente. A sessão é criada somente no login.
       requestBody:
         required: true
         content:
@@ -162,9 +182,11 @@ paths:
             schema:
               type: object
               required:
-                - nome
-                - email
-                - senha
+              - nome
+              - email
+              - senha
+              - documento
+              - telefone
               properties:
                 nome:
                   type: string
@@ -176,10 +198,15 @@ paths:
                 senha:
                   type: string
                   format: password
-                  example: segredoforte
+                  minLength: 12
+                  example: SenhaForte123
+                documento:
+                  type: string
+                  description: CPF do cliente, com ou sem pontuação.
+                  example: '529.982.247-25'
                 telefone:
                   type: string
-                  example: (11) 98765-4321
+                  example: '11987654321'
       responses:
         '201':
           description: Cliente cadastrado com sucesso.
@@ -188,9 +215,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  token:
+                  status:
                     type: string
-                    example: jwt_exemplo
+                    example: cadastro_criado
                   cliente:
                     $ref: '#/components/schemas/Cliente'
         '400':
@@ -205,19 +232,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Erro'
-
   /clientes/{id}:
     patch:
       tags:
-        - Cliente & Painel
+      - Cliente & Painel
       summary: Atualizar dados cadastrais e preferências
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            example: cliente-001
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          example: cliente-001
       requestBody:
         required: true
         content:
@@ -238,18 +264,31 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Cliente'
-
+        '401':
+          description: Não autenticado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+        '403':
+          description: Sem permissão.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+      security:
+      - cookieAuth: []
   /clientes/{id}/enderecos:
     get:
       tags:
-        - Cliente & Painel
+      - Cliente & Painel
       summary: Listar endereços do cliente
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: Lista de endereços.
@@ -259,16 +298,30 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Endereco'
+        '401':
+          description: Não autenticado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+        '403':
+          description: Sem permissão.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+      security:
+      - cookieAuth: []
     post:
       tags:
-        - Cliente & Painel
+      - Cliente & Painel
       summary: Criar novo endereço
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       requestBody:
         required: true
         content:
@@ -282,23 +335,36 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Endereco'
-
+        '401':
+          description: Não autenticado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+        '403':
+          description: Sem permissão.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+      security:
+      - cookieAuth: []
   /clientes/{id}/enderecos/{idEndereco}:
     delete:
       tags:
-        - Cliente & Painel
+      - Cliente & Painel
       summary: Remover endereço
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: idEndereco
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: idEndereco
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: Endereço removido.
@@ -310,26 +376,38 @@ paths:
                   sucesso:
                     type: boolean
                     example: true
-
-  # --- CATALOGO ---
+        '401':
+          description: Não autenticado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+        '403':
+          description: Sem permissão.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+      security:
+      - cookieAuth: []
   /produtos:
     get:
       tags:
-        - Catálogo
+      - Catálogo
       summary: Listar produtos e caixas
       parameters:
-        - name: destaque
-          in: query
-          required: false
-          schema:
-            type: boolean
-          description: Filtrar apenas itens em destaque
-        - name: categoria
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Filtrar por categoria (ex. 'caixa', 'avulsa')
+      - name: destaque
+        in: query
+        required: false
+        schema:
+          type: boolean
+        description: Filtrar apenas itens em destaque
+      - name: categoria
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Filtrar por categoria (ex. 'caixa', 'avulsa')
       responses:
         '200':
           description: Lista de produtos obtida com sucesso.
@@ -339,19 +417,18 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Produto'
-
   /produtos/{identificador}:
     get:
       tags:
-        - Catálogo
+      - Catálogo
       summary: Obter detalhes do produto pelo identificador
       parameters:
-        - name: identificador
-          in: path
-          required: true
-          schema:
-            type: string
-            example: tcc-caixa-03-avulsa
+      - name: identificador
+        in: path
+        required: true
+        schema:
+          type: string
+          example: tcc-caixa-03-avulsa
       responses:
         '200':
           description: Produto encontrado.
@@ -365,11 +442,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Erro'
-
   /planos:
     get:
       tags:
-        - Catálogo
+      - Catálogo
       summary: Listar planos de assinatura
       responses:
         '200':
@@ -380,19 +456,18 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PlanoAssinatura'
-
   /planos/{identificador}:
     get:
       tags:
-        - Catálogo
+      - Catálogo
       summary: Obter detalhes do plano pelo identificador
       parameters:
-        - name: identificador
-          in: path
-          required: true
-          schema:
-            type: string
-            example: anual
+      - name: identificador
+        in: path
+        required: true
+        schema:
+          type: string
+          example: anual
       responses:
         '200':
           description: Plano encontrado.
@@ -406,12 +481,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Erro'
-
-  # --- CARRINHO ---
   /carrinho:
     get:
       tags:
-        - Carrinho
+      - Carrinho
       summary: Obter o carrinho atual
       responses:
         '200':
@@ -420,11 +493,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Carrinho'
-
+        '401':
+          description: Não autenticado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+      security:
+      - cookieAuth: []
   /carrinho/itens:
     post:
       tags:
-        - Carrinho
+      - Carrinho
       summary: Adicionar item ao carrinho
       requestBody:
         required: true
@@ -433,7 +513,7 @@ paths:
             schema:
               type: object
               required:
-                - idProduto
+              - idProduto
               properties:
                 idProduto:
                   type: string
@@ -452,18 +532,25 @@ paths:
                 $ref: '#/components/schemas/Carrinho'
         '400':
           description: Produto inválido ou esgotado.
-
+        '401':
+          description: Não autenticado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+      security:
+      - cookieAuth: []
   /carrinho/itens/{idItem}:
     put:
       tags:
-        - Carrinho
+      - Carrinho
       summary: Atualizar quantidade de um item
       parameters:
-        - name: idItem
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: idItem
+        in: path
+        required: true
+        schema:
+          type: string
       requestBody:
         required: true
         content:
@@ -471,7 +558,7 @@ paths:
             schema:
               type: object
               required:
-                - quantidade
+              - quantidade
               properties:
                 quantidade:
                   type: integer
@@ -484,16 +571,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Carrinho'
+        '401':
+          description: Não autenticado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+        '403':
+          description: Sem permissão.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+      security:
+      - cookieAuth: []
     delete:
       tags:
-        - Carrinho
+      - Carrinho
       summary: Remover item do carrinho
       parameters:
-        - name: idItem
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: idItem
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: Item removido. Retorna o carrinho.
@@ -505,11 +606,24 @@ paths:
                   sucesso:
                     type: boolean
                     example: true
-
+        '401':
+          description: Não autenticado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+        '403':
+          description: Sem permissão.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+      security:
+      - cookieAuth: []
   /carrinho/cupom:
     post:
       tags:
-        - Carrinho
+      - Carrinho
       summary: Aplicar cupom de desconto ao carrinho
       requestBody:
         required: true
@@ -518,7 +632,7 @@ paths:
             schema:
               type: object
               required:
-                - codigo
+              - codigo
               properties:
                 codigo:
                   type: string
@@ -530,12 +644,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResultadoCupom'
-
-  # --- CHECKOUT & FRETE ---
+        '401':
+          description: Não autenticado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+      security:
+      - cookieAuth: []
   /finalizacao/frete:
     post:
       tags:
-        - Finalização & Frete
+      - Finalização & Frete
       summary: Calcular frete para um CEP
       requestBody:
         required: true
@@ -544,7 +664,7 @@ paths:
             schema:
               type: object
               required:
-                - cep
+              - cep
               properties:
                 cep:
                   type: string
@@ -556,13 +676,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FreteEstimado'
-
+        '401':
+          description: Não autenticado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+      security:
+      - cookieAuth: []
   /finalizacao/pedido:
     post:
       tags:
-        - Finalização & Frete
+      - Finalização & Frete
       summary: Finalizar compra e criar pedido
-      description: Cria um pedido a partir dos itens do carrinho e limpa o carrinho.
+      description: Finaliza o checkout via functions PostgreSQL. Em homologação, devolve um cenário estático de cartão ou Pix e não altera o carrinho local.
       requestBody:
         required: true
         content:
@@ -570,8 +697,8 @@ paths:
             schema:
               type: object
               required:
-                - idEndereco
-                - idMetodoPagamento
+              - idEndereco
+              - idMetodoPagamento
               properties:
                 idEndereco:
                   type: string
@@ -579,25 +706,48 @@ paths:
                 idMetodoPagamento:
                   type: string
                   example: metodo-pagamento-001
-                idPlano:
+                simulacaoAssinatura:
+                  type: boolean
+                  description: Indica que o checkout também deve contratar a assinatura via RPC.
+                planoId:
                   type: string
-                  description: Opcional, para fluxos de assinatura.
+                  description: Obrigatório quando simulacaoAssinatura for true.
                   example: plano-anual
+                planoNome:
+                  type: string
+                  example: Plano Anual
+                planoPreco:
+                  type: integer
+                  example: 149900
       responses:
         '201':
           description: Pedido criado com sucesso.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Pedido'
-
-  # --- CLIENTE PAINEL (PEDIDOS E ASSINATURA) ---
+                allOf:
+                - $ref: '#/components/schemas/PedidoDetalhado'
+                - type: object
+                  properties:
+                    pagamento:
+                      $ref: '#/components/schemas/Pagamento'
+                    assinatura:
+                      $ref: '#/components/schemas/Assinatura'
+        '401':
+          description: Não autenticado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+      security:
+      - cookieAuth: []
   /cliente/perfil:
     get:
       tags:
-        - Cliente & Painel
+      - Cliente & Painel
       summary: Obter perfil consolidado do cliente
-      description: Retorna dados cadastrais, endereços e métodos de pagamento do cliente autenticado.
+      description: Retorna dados cadastrais, endereços e métodos de pagamento do cliente
+        autenticado.
       responses:
         '200':
           description: Perfil retornado com sucesso.
@@ -622,11 +772,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Erro'
-
+      security:
+      - cookieAuth: []
   /cliente/pedidos:
     get:
       tags:
-        - Cliente & Painel
+      - Cliente & Painel
       summary: Listar histórico de pedidos do cliente
       responses:
         '200':
@@ -637,18 +788,25 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Pedido'
-
+        '401':
+          description: Não autenticado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+      security:
+      - cookieAuth: []
   /cliente/pedidos/{id}:
     get:
       tags:
-        - Cliente & Painel
+      - Cliente & Painel
       summary: Detalhar pedido do cliente
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: Detalhes do pedido.
@@ -658,11 +816,24 @@ paths:
                 $ref: '#/components/schemas/PedidoDetalhado'
         '404':
           description: Pedido não encontrado.
-
+        '401':
+          description: Não autenticado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+        '403':
+          description: Sem permissão.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+      security:
+      - cookieAuth: []
   /cliente/assinatura:
     get:
       tags:
-        - Cliente & Painel
+      - Cliente & Painel
       summary: Obter a assinatura ativa do cliente
       responses:
         '200':
@@ -673,9 +844,17 @@ paths:
                 $ref: '#/components/schemas/Assinatura'
         '404':
           description: Nenhuma assinatura ativa.
+        '401':
+          description: Não autenticado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+      security:
+      - cookieAuth: []
     post:
       tags:
-        - Cliente & Painel
+      - Cliente & Painel
       summary: Cancelar ou reativar assinatura
       requestBody:
         required: true
@@ -684,11 +863,13 @@ paths:
             schema:
               type: object
               required:
-                - acao
+              - acao
               properties:
                 acao:
                   type: string
-                  enum: [cancelar, reativar]
+                  enum:
+                  - cancelar
+                  - reativar
                   example: cancelar
       responses:
         '200':
@@ -697,15 +878,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Assinatura'
-
+        '401':
+          description: Não autenticado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+      security:
+      - cookieAuth: []
   /cliente/pagamentos:
     get:
       tags:
-        - Cliente & Painel
+      - Cliente & Painel
       summary: Listar cobranças e pagamentos do cliente
-      description: |
-        Histórico de cobranças da assinatura e de pedidos avulsos.
+      description: 'Histórico de cobranças da assinatura e de pedidos avulsos.
+
         Usado em `/cliente/financeiro` (`listPayments`).
+
+        '
       responses:
         '200':
           description: Lista de pagamentos/cobranças.
@@ -715,19 +905,26 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Pagamento'
-
+        '401':
+          description: Não autenticado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+      security:
+      - cookieAuth: []
   /cliente/pagamentos/{id}:
     get:
       tags:
-        - Cliente & Painel
+      - Cliente & Painel
       summary: Detalhar cobrança/pagamento
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            example: pagamento-001
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          example: pagamento-001
       responses:
         '200':
           description: Detalhes do pagamento.
@@ -737,22 +934,37 @@ paths:
                 $ref: '#/components/schemas/Pagamento'
         '404':
           description: Pagamento não encontrado.
-
+        '401':
+          description: Não autenticado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+        '403':
+          description: Sem permissão.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+      security:
+      - cookieAuth: []
   /cliente/pagamentos/{id}/renovar-pix:
     post:
       tags:
-        - Cliente & Painel
+      - Cliente & Painel
       summary: Renovar QR Code Pix de um pagamento pendente
-      description: |
-        Gera novo QR Code e nova expiração para pagamento Pix pendente.
+      description: 'Gera novo QR Code e nova expiração para pagamento Pix pendente.
+
         Usado em `/cliente/financeiro` (`renewPixPayment`).
+
+        '
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            example: pagamento-004
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          example: pagamento-004
       responses:
         '200':
           description: Pagamento Pix renovado.
@@ -766,15 +978,30 @@ paths:
           description: Pagamento já pago ou não elegível para renovação.
         '410':
           description: Pagamento expirado definitivamente.
-
+        '401':
+          description: Não autenticado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+        '403':
+          description: Sem permissão.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+      security:
+      - cookieAuth: []
   /cliente/faturas:
     get:
       tags:
-        - Cliente & Painel
+      - Cliente & Painel
       summary: Listar faturas e recibos do cliente
-      description: |
-        Histórico de faturas/recibos associados às cobranças.
+      description: 'Histórico de faturas/recibos associados às cobranças.
+
         Usado em `/cliente/financeiro` (`listInvoices`).
+
+        '
       responses:
         '200':
           description: Lista de faturas.
@@ -784,15 +1011,24 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Fatura'
-
+        '401':
+          description: Não autenticado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+      security:
+      - cookieAuth: []
   /cliente/cartao:
     post:
       tags:
-        - Cliente & Painel
+      - Cliente & Painel
       summary: Atualizar cartão padrão do cliente
-      description: |
-        Atualiza o meio de pagamento cartão padrão.
+      description: 'Atualiza o meio de pagamento cartão padrão.
+
         Usado em `/cliente/financeiro/atualizar-cartao` (`updateCard`).
+
+        '
       requestBody:
         required: true
         content:
@@ -800,17 +1036,17 @@ paths:
             schema:
               type: object
               required:
-                - nomeImpresso
-                - ultimosQuatro
-                - bandeira
-                - token
+              - nomeImpresso
+              - ultimosQuatro
+              - bandeira
+              - token
               properties:
                 nomeImpresso:
                   type: string
                   example: Mariana Silva
                 ultimosQuatro:
                   type: string
-                  example: "4242"
+                  example: '4242'
                 bandeira:
                   type: string
                   example: Visa
@@ -825,13 +1061,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MetodoPagamento'
-
+        '401':
+          description: Não autenticado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+      security:
+      - cookieAuth: []
   /cliente/cartoes:
     get:
       tags:
-        - Cliente & Painel
+      - Cliente & Painel
       summary: Listar cartões de crédito do cliente
-      description: Retorna a lista de cartões de crédito cadastrados para o cliente logado.
+      description: Retorna a lista de cartões de crédito cadastrados para o cliente
+        logado.
       responses:
         '200':
           description: Lista de cartões de crédito.
@@ -841,11 +1085,20 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MetodoPagamento'
+        '401':
+          description: Não autenticado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+      security:
+      - cookieAuth: []
     post:
       tags:
-        - Cliente & Painel
+      - Cliente & Painel
       summary: Adicionar novo cartão de crédito
-      description: Adiciona um novo cartão de crédito usando um token gerado pelo gateway.
+      description: Adiciona um novo cartão de crédito usando um token gerado pelo
+        gateway.
       requestBody:
         required: true
         content:
@@ -853,10 +1106,10 @@ paths:
             schema:
               type: object
               required:
-                - token
-                - nomeImpresso
-                - ultimosQuatro
-                - bandeira
+              - token
+              - nomeImpresso
+              - ultimosQuatro
+              - bandeira
               properties:
                 token:
                   type: string
@@ -866,7 +1119,7 @@ paths:
                   example: Mariana Silva
                 ultimosQuatro:
                   type: string
-                  example: "1234"
+                  example: '1234'
                 bandeira:
                   type: string
                   example: Visa
@@ -877,20 +1130,27 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MetodoPagamento'
-
+        '401':
+          description: Não autenticado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+      security:
+      - cookieAuth: []
   /cliente/cartoes/{id}:
     delete:
       tags:
-        - Cliente & Painel
+      - Cliente & Painel
       summary: Remover cartão de crédito
       description: Remove um cartão de crédito cadastrado pelo ID.
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            example: pm-001
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          example: pm-001
       responses:
         '200':
           description: Cartão removido com sucesso.
@@ -902,12 +1162,24 @@ paths:
                   sucesso:
                     type: boolean
                     example: true
-
-  # --- CONTEÚDO & INVESTIGAÇÃO ---
+        '401':
+          description: Não autenticado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+        '403':
+          description: Sem permissão.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+      security:
+      - cookieAuth: []
   /conteudos-exclusivos:
     get:
       tags:
-        - Conteúdo & Investigação
+      - Conteúdo & Investigação
       summary: Listar conteúdos exclusivos / pistas liberadas
       responses:
         '200':
@@ -918,19 +1190,18 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ConteudoExclusivo'
-
   /conteudos-exclusivos/{identificador}:
     get:
       tags:
-        - Conteúdo & Investigação
+      - Conteúdo & Investigação
       summary: Obter detalhes de um conteúdo exclusivo pelo identificador
       parameters:
-        - name: identificador
-          in: path
-          required: true
-          schema:
-            type: string
-            example: pista-ciclo-3
+      - name: identificador
+        in: path
+        required: true
+        schema:
+          type: string
+          example: pista-ciclo-3
       responses:
         '200':
           description: Detalhes do conteúdo.
@@ -940,11 +1211,10 @@ paths:
                 $ref: '#/components/schemas/ConteudoExclusivo'
         '403':
           description: Conteúdo bloqueado para o ciclo atual do assinante.
-
   /casos:
     get:
       tags:
-        - Conteúdo & Investigação
+      - Conteúdo & Investigação
       summary: Obter dados gerais dos casos e progresso
       responses:
         '200':
@@ -962,15 +1232,16 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Pista'
-
   /casos/arquivos:
     get:
       tags:
-        - Conteúdo & Investigação
+      - Conteúdo & Investigação
       summary: Listar arquivos/documentos da experiência investigativa por box
-      description: |
-        Retorna os arquivos e documentos agrupados por box.
+      description: 'Retorna os arquivos e documentos agrupados por box.
+
         Usado na tela de investigação (/casos).
+
+        '
       responses:
         '200':
           description: Lista de boxes com seus respectivos arquivos e documentos.
@@ -979,28 +1250,26 @@ paths:
               schema:
                 type: object
                 required:
-                  - boxes
+                - boxes
                 properties:
                   boxes:
                     type: array
                     items:
                       $ref: '#/components/schemas/ArquivosCasoPorBox'
-
-  # --- CONTEUDO DINAMICO E SEO ---
   /conteudo-dinamico:
     get:
       deprecated: true
       tags:
-        - Conteúdo Dinâmico & SEO
+      - Conteúdo Dinâmico & SEO
       summary: Listar blocos de conteúdo dinâmico
       parameters:
-        - name: rota
-          in: query
-          required: false
-          schema:
-            type: string
-            example: /
-          description: Filtrar blocos por rota de página
+      - name: rota
+        in: query
+        required: false
+        schema:
+          type: string
+          example: /
+        description: Filtrar blocos por rota de página
       responses:
         '200':
           description: Lista de blocos.
@@ -1010,21 +1279,20 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/BlocoDinamico'
-
   /conteudo-dinamico/{chave}:
     get:
       deprecated: true
       tags:
-        - Conteúdo Dinâmico & SEO
+      - Conteúdo Dinâmico & SEO
       summary: Obter bloco específico por chave
       parameters:
-        - name: chave
-          in: path
-          required: true
-          schema:
-            type: string
-            example: home.hero.title
-          description: Chave única do bloco
+      - name: chave
+        in: path
+        required: true
+        schema:
+          type: string
+          example: home.hero.title
+        description: Chave única do bloco
       responses:
         '200':
           description: Bloco retornado.
@@ -1034,21 +1302,20 @@ paths:
                 $ref: '#/components/schemas/BlocoDinamico'
         '404':
           description: Bloco não encontrado.
-
   /seo:
     get:
       deprecated: true
       tags:
-        - Conteúdo Dinâmico & SEO
+      - Conteúdo Dinâmico & SEO
       summary: Obter entradas de SEO
       parameters:
-        - name: rota
-          in: query
-          required: true
-          schema:
-            type: string
-            example: /loja
-          description: Rota da página pública
+      - name: rota
+        in: query
+        required: true
+        schema:
+          type: string
+          example: /loja
+        description: Rota da página pública
       responses:
         '200':
           description: Metadados de SEO para a página.
@@ -1056,22 +1323,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EntradaSeo'
-
-  # --- CMS DELIVERY ---
   /paginas:
     get:
       tags:
-        - CMS Delivery
+      - CMS Delivery
       summary: Obter páginas publicadas
-      description: Retorna uma única página publicada se o parâmetro rota for especificado, ou uma lista de páginas publicadas.
+      description: Retorna uma única página publicada se o parâmetro rota for especificado,
+        ou uma lista de páginas publicadas.
       parameters:
-        - name: rota
-          in: query
-          required: false
-          schema:
-            type: string
-            example: /sobre-o-clube
-          description: Rota da página para obter a árvore completa de seções.
+      - name: rota
+        in: query
+        required: false
+        schema:
+          type: string
+          example: /sobre-o-clube
+        description: Rota da página para obter a árvore completa de seções.
       responses:
         '200':
           description: Página ou lista de páginas retornadas com sucesso.
@@ -1079,27 +1345,27 @@ paths:
             application/json:
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/PaginaCms'
-                  - type: array
-                    items:
-                      $ref: '#/components/schemas/PaginaCms'
+                - $ref: '#/components/schemas/PaginaCms'
+                - type: array
+                  items:
+                    $ref: '#/components/schemas/PaginaCms'
         '404':
           description: Página não encontrada.
-
   /menus/{chave}:
     get:
       tags:
-        - CMS Delivery
+      - CMS Delivery
       summary: Obter navegação pública por chave
-      description: Retorna a estrutura de navegação do menu solicitado (ex. header-principal, footer-principal).
+      description: Retorna a estrutura de navegação do menu solicitado (ex. header-principal,
+        footer-principal).
       parameters:
-        - name: chave
-          in: path
-          required: true
-          schema:
-            type: string
-            example: header-principal
-          description: Chave única do menu.
+      - name: chave
+        in: path
+        required: true
+        schema:
+          type: string
+          example: header-principal
+        description: Chave única do menu.
       responses:
         '200':
           description: Estrutura do menu.
@@ -1109,9 +1375,12 @@ paths:
                 $ref: '#/components/schemas/MenuCms'
         '404':
           description: Menu não encontrado.
-
-
 components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: tcc_session
   schemas:
     Cliente:
       type: object
@@ -1131,7 +1400,6 @@ components:
           example: (11) 98765-4321
         preferencias:
           $ref: '#/components/schemas/PreferenciasAssinante'
-
     PreferenciasAssinante:
       type: object
       properties:
@@ -1147,7 +1415,6 @@ components:
           type: string
           maxLength: 2000
           example: Prefere tons escuros nas peças.
-
     Endereco:
       type: object
       properties:
@@ -1181,17 +1448,16 @@ components:
         padrao:
           type: boolean
           example: true
-
     EntradaEndereco:
       type: object
       required:
-        - rotulo
-        - logradouro
-        - numero
-        - bairro
-        - cidade
-        - estado
-        - cep
+      - rotulo
+      - logradouro
+      - numero
+      - bairro
+      - cidade
+      - estado
+      - cep
       properties:
         rotulo:
           type: string
@@ -1216,7 +1482,6 @@ components:
         cep:
           type: string
           example: 01310-100
-
     Produto:
       type: object
       properties:
@@ -1231,7 +1496,9 @@ components:
           example: TCC - CAIXA 03 (AVULSA)
         tipo:
           type: string
-          enum: [produto, caixa]
+          enum:
+          - produto
+          - caixa
           example: caixa
         preco:
           type: integer
@@ -1243,48 +1510,58 @@ components:
           type: array
           items:
             type: string
-          example: ["/imagens/caixa-03.jpg"]
+          example:
+          - /imagens/caixa-03.jpg
         categorias:
           type: array
           items:
             type: string
-          example: ["caixa", "avulsa"]
+          example:
+          - caixa
+          - avulsa
         emEstoque:
           type: boolean
           example: true
         disponibilidade:
           type: string
-          enum: [disponivel, limitado, esgotado, em_breve]
+          enum:
+          - disponivel
+          - limitado
+          - esgotado
+          - em_breve
           example: limitado
-
     ProdutoDetalhado:
       allOf:
-        - $ref: '#/components/schemas/Produto'
-        - type: object
-          properties:
-            descricao:
+      - $ref: '#/components/schemas/Produto'
+      - type: object
+        properties:
+          descricao:
+            type: string
+            example: Detalhes completos da terceira caixa...
+          descricaoCurta:
+            type: string
+            example: Caixa temática avulsa 03.
+          itensInclusos:
+            type: array
+            items:
               type: string
-              example: Detalhes completos da terceira caixa...
-            descricaoCurta:
+            example:
+            - Fascículo
+            - Pista Física
+            - Acessório
+          mesEdicao:
+            type: string
+            example: 2026-03
+          ciclo:
+            type: integer
+            example: 3
+          relacionados:
+            type: array
+            items:
               type: string
-              example: Caixa temática avulsa 03.
-            itensInclusos:
-              type: array
-              items:
-                type: string
-              example: ["Fascículo", "Pista Física", "Acessório"]
-            mesEdicao:
-              type: string
-              example: "2026-03"
-            ciclo:
-              type: integer
-              example: 3
-            relacionados:
-              type: array
-              items:
-                type: string
-              example: ["produto-002", "produto-006"]
-
+            example:
+            - produto-002
+            - produto-006
     PlanoAssinatura:
       type: object
       properties:
@@ -1302,7 +1579,10 @@ components:
           example: Melhor custo-benefício anual
         intervaloCobranca:
           type: string
-          enum: [mensal, anual, avulso]
+          enum:
+          - mensal
+          - anual
+          - avulso
           example: anual
         preco:
           type: integer
@@ -1317,11 +1597,12 @@ components:
           type: array
           items:
             type: string
-          example: ["Receba 12 caixas", "Acesso aos arquivos on-line"]
+          example:
+          - Receba 12 caixas
+          - Acesso aos arquivos on-line
         mesesCompromisso:
           type: integer
           example: 12
-
     CarrinhoItem:
       type: object
       properties:
@@ -1349,7 +1630,6 @@ components:
         imagem:
           type: string
           example: /imagens/caixa-03.jpg
-
     Carrinho:
       type: object
       properties:
@@ -1372,7 +1652,6 @@ components:
         regiaoFrete:
           type: string
           example: SP
-
         subtotal:
           type: integer
           example: 14990
@@ -1382,7 +1661,6 @@ components:
         total:
           type: integer
           example: 13990
-
     ResultadoCupom:
       type: object
       properties:
@@ -1398,7 +1676,6 @@ components:
         mensagem:
           type: string
           example: Cupom aplicado com sucesso.
-
     FreteEstimado:
       type: object
       properties:
@@ -1411,7 +1688,6 @@ components:
         prazoEstimado:
           type: string
           example: 5–8 dias úteis
-
     Pedido:
       type: object
       properties:
@@ -1423,11 +1699,23 @@ components:
           example: TCC-202604-1052
         status:
           type: string
-          enum: [pagamento_pendente, pago, em_processamento, aguardando_envio, enviado, entregue, cancelado]
+          enum:
+          - pagamento_pendente
+          - pago
+          - em_processamento
+          - aguardando_envio
+          - enviado
+          - entregue
+          - cancelado
           example: pago
         statusPagamento:
           type: string
-          enum: [pendente, pago, recusado, expirado, estornado]
+          enum:
+          - pendente
+          - pago
+          - recusado
+          - expirado
+          - estornado
           example: pago
         subtotal:
           type: integer
@@ -1444,24 +1732,22 @@ components:
         criadoEm:
           type: string
           format: date-time
-          example: "2026-04-27T14:50:00.000Z"
+          example: '2026-04-27T14:50:00.000Z'
         observacaoCicloCobranca:
           type: string
           example: Cobrança processada no mês da compra.
         observacaoCicloEnvio:
           type: string
           example: Envio previsto para o mês seguinte.
-
     PedidoDetalhado:
       allOf:
-        - $ref: '#/components/schemas/Pedido'
-        - type: object
-          properties:
-            itens:
-              type: array
-              items:
-                $ref: '#/components/schemas/CarrinhoItem'
-
+      - $ref: '#/components/schemas/Pedido'
+      - type: object
+        properties:
+          itens:
+            type: array
+            items:
+              $ref: '#/components/schemas/CarrinhoItem'
     Assinatura:
       type: object
       properties:
@@ -1479,7 +1765,12 @@ components:
           example: Plano Mensal
         status:
           type: string
-          enum: [ativa, pagamento_pendente, cancelada, pausada, vencida]
+          enum:
+          - ativa
+          - pagamento_pendente
+          - cancelada
+          - pausada
+          - vencida
           example: ativa
         iniciadaEm:
           type: string
@@ -1500,7 +1791,6 @@ components:
         podeReativar:
           type: boolean
           example: false
-
     MetodoPagamento:
       type: object
       properties:
@@ -1509,29 +1799,30 @@ components:
           example: metodo-pagamento-001
         tipo:
           type: string
-          enum: [cartao_credito, pix]
+          enum:
+          - cartao_credito
+          - pix
           example: cartao_credito
         rotulo:
           type: string
           example: Visa terminando em 4242
         ultimosQuatro:
           type: string
-          example: "4242"
+          example: '4242'
         bandeira:
           type: string
           example: Visa
         padrao:
           type: boolean
           example: true
-
     Pagamento:
       type: object
       required:
-        - id
-        - valor
-        - status
-        - metodo
-        - vencimento
+      - id
+      - valor
+      - status
+      - metodo
+      - vencimento
       properties:
         id:
           type: string
@@ -1550,20 +1841,27 @@ components:
           example: 14990
         status:
           type: string
-          enum: [pendente, pago, recusado, expirado, estornado]
+          enum:
+          - pendente
+          - pago
+          - recusado
+          - expirado
+          - estornado
           example: pago
         metodo:
           type: string
-          enum: [cartao_credito, pix]
+          enum:
+          - cartao_credito
+          - pix
           example: cartao_credito
         vencimento:
           type: string
           format: date-time
-          example: "2026-03-01T00:00:00.000Z"
+          example: '2026-03-01T00:00:00.000Z'
         pagoEm:
           type: string
           format: date-time
-          example: "2026-03-01T08:12:00.000Z"
+          example: '2026-03-01T08:12:00.000Z'
         pixQrCode:
           type: string
           description: Payload EMV do QR Code Pix, quando metodo=pix e status=pendente.
@@ -1571,20 +1869,19 @@ components:
         pixExpiraEm:
           type: string
           format: date-time
-          example: "2026-04-01T23:59:00.000Z"
+          example: '2026-04-01T23:59:00.000Z'
         motivoRecusa:
           type: string
           description: Motivo legível quando status=recusado.
           example: Cartão recusado pelo emissor. Tente outro meio.
-
     Fatura:
       type: object
       required:
-        - id
-        - numero
-        - idPagamento
-        - valor
-        - emitidoEm
+      - id
+      - numero
+      - idPagamento
+      - valor
+      - emitidoEm
       properties:
         id:
           type: string
@@ -1602,14 +1899,13 @@ components:
         emitidoEm:
           type: string
           format: date-time
-          example: "2026-03-01T08:15:00.000Z"
+          example: '2026-03-01T08:15:00.000Z'
         urlRecibo:
           type: string
           example: /simulacao/recibos/rec-202603-0042.pdf
         urlDownload:
           type: string
           example: /simulacao/recibos/rec-202603-0042.pdf
-
     ConteudoExclusivo:
       type: object
       properties:
@@ -1627,20 +1923,25 @@ components:
           example: Extrato parcial das contas...
         status:
           type: string
-          enum: [liberado, bloqueado]
+          enum:
+          - liberado
+          - bloqueado
           example: liberado
         numeroCiclo:
           type: integer
           example: 3
         tipo:
           type: string
-          enum: [pista, video, documento, artigo]
+          enum:
+          - pista
+          - video
+          - documento
+          - artigo
           example: pista
         arquivos:
           type: array
           items:
             $ref: '#/components/schemas/ArquivoCaso'
-
     ArquivoCaso:
       type: object
       properties:
@@ -1652,7 +1953,11 @@ components:
           example: extrato-parcial.pdf
         tipo:
           type: string
-          enum: [pdf, imagem, audio, video]
+          enum:
+          - pdf
+          - imagem
+          - audio
+          - video
           example: pdf
         urlDownload:
           type: string
@@ -1660,7 +1965,6 @@ components:
         tamanho:
           type: string
           example: 180 KB
-
     Caso:
       type: object
       properties:
@@ -1686,7 +1990,6 @@ components:
           format: date-time
         tituloEventoAoVivo:
           type: string
-
     Pista:
       type: object
       properties:
@@ -1708,7 +2011,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ArquivoCaso'
-
     ProgressoAssinante:
       type: object
       properties:
@@ -1732,7 +2034,6 @@ components:
         percentualCompleto:
           type: number
           example: 25
-
     BlocoDinamico:
       type: object
       properties:
@@ -1741,7 +2042,11 @@ components:
           example: home.hero.title
         tipo:
           type: string
-          enum: [texto, banner, imagem, html]
+          enum:
+          - texto
+          - banner
+          - imagem
+          - html
           example: texto
         valor:
           type: string
@@ -1749,7 +2054,6 @@ components:
         rota:
           type: string
           example: /
-
     EntradaSeo:
       type: object
       properties:
@@ -1765,26 +2069,24 @@ components:
         naoIndexar:
           type: boolean
           example: false
-
     Erro:
       type: object
       properties:
         mensagem:
           type: string
           example: Credenciais inválidas.
-
     PaginaCms:
       type: object
       required:
-        - id
-        - rota
-        - slug
-        - titulo
-        - status
-        - locale
-        - seo
-        - sections
-        - updatedAt
+      - id
+      - rota
+      - slug
+      - titulo
+      - status
+      - locale
+      - seo
+      - sections
+      - updatedAt
       properties:
         id:
           type: string
@@ -1800,7 +2102,9 @@ components:
           example: Sobre o Clube
         status:
           type: string
-          enum: [publicada, rascunho]
+          enum:
+          - publicada
+          - rascunho
           example: publicada
         locale:
           type: string
@@ -1814,13 +2118,12 @@ components:
         updatedAt:
           type: string
           example: '2026-07-06T16:21:32-03:00'
-
     SeoPagina:
       type: object
       required:
-        - titulo
-        - descricao
-        - naoIndexar
+      - titulo
+      - descricao
+      - naoIndexar
       properties:
         titulo:
           type: string
@@ -1837,13 +2140,12 @@ components:
         naoIndexar:
           type: boolean
           example: false
-
     SecaoCms:
       type: object
       required:
-        - id
-        - tipo
-        - ordem
+      - id
+      - tipo
+      - ordem
       properties:
         id:
           type: string
@@ -1861,25 +2163,27 @@ components:
           type: object
           additionalProperties:
             $ref: '#/components/schemas/DataBinding'
-
     DataBinding:
       type: object
       required:
-        - target
+      - target
       properties:
         target:
           type: string
-          enum: [produtos, planos, casos, lista]
+          enum:
+          - produtos
+          - planos
+          - casos
+          - lista
           example: produtos
         params:
           type: object
           additionalProperties: true
-
     MenuCms:
       type: object
       required:
-        - chave
-        - itens
+      - chave
+      - itens
       properties:
         chave:
           type: string
@@ -1888,12 +2192,11 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ItemMenuCms'
-
     ItemMenuCms:
       type: object
       required:
-        - label
-        - href
+      - label
+      - href
       properties:
         label:
           type: string
@@ -1905,7 +2208,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ItemMenuCms'
-
     ArquivoCasoInvestigativo:
       type: object
       properties:
@@ -1917,7 +2219,11 @@ components:
           example: Audio_Larissa.mp3
         tipo:
           type: string
-          enum: [audio, image, text, sheet]
+          enum:
+          - audio
+          - image
+          - text
+          - sheet
           example: audio
         modificadoEm:
           type: string
@@ -1930,7 +2236,8 @@ components:
           example: /audio/AUD_PD_01.m4a
         conteudo:
           type: string
-          example: '…achei melhor gravar do que escrever. o que eu descobri sobre as datas do—'
+          example: …achei melhor gravar do que escrever. o que eu descobri sobre as
+            datas do—
         corrompido:
           type: boolean
           example: true
@@ -1938,18 +2245,21 @@ components:
           type: array
           items:
             type: string
-          example: ["O que foi divulgado", "Data no Instagram"]
+          example:
+          - O que foi divulgado
+          - Data no Instagram
         linhas:
           type: array
           items:
             type: array
             items:
               type: string
-          example: [["Inauguração da sede própria", "18/01/2023"]]
+          example:
+          - - Inauguração da sede própria
+            - 18/01/2023
         fragmento:
           type: string
-          example: '…achei melhor gravar do que escrever.'
-
+          example: …achei melhor gravar do que escrever.
     ArquivosCasoPorBox:
       type: object
       properties:
