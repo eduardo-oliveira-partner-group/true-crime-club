@@ -86,6 +86,28 @@ export function isValidCep(value: string): boolean {
   return normalizeDigits(value).length === 8
 }
 
+/** Normaliza UF para 2 letras maiúsculas (ex.: "sp" → "SP"). */
+export function formatUf(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/\p{M}/gu, '')
+    .replace(/[^a-zA-Z]/g, '')
+    .toUpperCase()
+    .slice(0, 2)
+}
+
+export function isValidUf(value: string): boolean {
+  return /^[A-Z]{2}$/.test(formatUf(value))
+}
+
+/** Limite da coluna `numero` em `tb_cliente_endereco` (varchar(4)). */
+export const ADDRESS_NUMBER_MAX_LENGTH = 4
+
+export function isValidAddressNumber(value: string): boolean {
+  const normalized = value.trim()
+  return normalized.length > 0 && normalized.length <= ADDRESS_NUMBER_MAX_LENGTH
+}
+
 export function formatDate(isoDate: string): string {
   return dateFormatter.format(new Date(isoDate))
 }

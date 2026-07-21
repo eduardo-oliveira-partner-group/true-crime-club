@@ -1,15 +1,28 @@
 import type { Address } from '@/src/lib/domain/types'
-import { normalizeDigits } from '@/src/lib/formatters'
+import { formatUf, normalizeDigits } from '@/src/lib/formatters'
 
-import type { JsonObject } from '../core/json'
+import type { JsonObject, JsonValue } from '../core/json'
 import { asOptionalString, asString } from '../core/json'
 
+/** Converte id/numero da API (number ou string) para string de domínio. */
+function asScalarString(value: JsonValue | undefined): string {
+  if (typeof value === 'string' && value.trim()) return value.trim()
+  if (typeof value === 'number' && Number.isFinite(value)) return String(value)
+  return ''
+}
+
+/**
+ * Contrato da API:
+ * - /cliente/perfil → enderecos[].id (number)
+ * - /clientes/{id}/enderecos → id_endereco (number) em algumas respostas
+ * Campos: rotulo, logradouro, numero, complemento, bairro, cidade, estado, cep, padrao
+ */
 export function toAddress(data: JsonObject): Address {
   return {
-    id: asString(data.id),
+    id: asScalarString(data.id ?? data.id_endereco),
     label: asString(data.rotulo),
     street: asString(data.logradouro),
-    number: asString(data.numero),
+    number: asScalarString(data.numero),
     complement: asOptionalString(data.complemento),
     neighborhood: asString(data.bairro),
     city: asString(data.cidade),
@@ -33,11 +46,11 @@ export function fromAddress(address: {
   return {
     rotulo: address.label,
     logradouro: address.street,
-    numero: address.number,
-    complemento: address.complement,
+    numero: address.number.trim(),
+    complemento: address.complement?.trim() || undefined,
     bairro: address.neighborhood,
     cidade: address.city,
-    estado: address.state,
+    estado: formatUf(address.state),
     cep: normalizeDigits(address.zipCode),
     padrao: address.isDefault ?? false,
   }

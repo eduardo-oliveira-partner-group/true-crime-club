@@ -226,8 +226,9 @@ function toCustomer(customer: Customer) {
 }
 
 function toAddress(address: Address) {
+  const id = Number(address.id)
   return {
-    id: address.id,
+    id: Number.isFinite(id) ? id : address.id,
     rotulo: address.label,
     logradouro: address.street,
     numero: address.number,

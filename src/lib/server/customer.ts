@@ -44,10 +44,11 @@ type ProfilePayload = {
     }
   }
   enderecos?: Array<{
-    id?: string
+    id?: number | string
+    id_endereco?: number | string
     rotulo?: string
     logradouro?: string
-    numero?: string
+    numero?: string | number
     complemento?: string
     bairro?: string
     cidade?: string
@@ -56,7 +57,7 @@ type ProfilePayload = {
     padrao?: boolean
   }>
   metodosPagamento?: Array<{
-    id?: string
+    id?: number | string
     tipo?: string
     rotulo?: string
     ultimosQuatro?: string | null
@@ -352,20 +353,26 @@ export async function getCustomerProfile(): Promise<{
             : undefined,
         }
       : null,
-    addresses: (profile.enderecos ?? []).map((address) => ({
-      id: address.id ?? '',
-      label: address.rotulo ?? '',
-      street: address.logradouro ?? '',
-      number: address.numero ?? '',
-      complement: address.complemento,
-      neighborhood: address.bairro ?? '',
-      city: address.cidade ?? '',
-      state: address.estado ?? '',
-      zipCode: address.cep ?? '',
-      isDefault: address.padrao ?? false,
-    })),
+    addresses: (profile.enderecos ?? []).map((address) => {
+      const rawId = address.id ?? address.id_endereco
+      return {
+        id: rawId != null && rawId !== '' ? String(rawId) : '',
+        label: address.rotulo ?? '',
+        street: address.logradouro ?? '',
+        number:
+          address.numero != null && address.numero !== ''
+            ? String(address.numero)
+            : '',
+        complement: address.complemento,
+        neighborhood: address.bairro ?? '',
+        city: address.cidade ?? '',
+        state: address.estado ?? '',
+        zipCode: address.cep ?? '',
+        isDefault: address.padrao ?? false,
+      }
+    }),
     paymentMethods: (profile.metodosPagamento ?? []).map((method) => ({
-      id: method.id ?? '',
+      id: method.id != null && method.id !== '' ? String(method.id) : '',
       type: method.tipo === 'pix' ? 'pix' : 'credit_card',
       label: method.rotulo ?? '',
       lastFour: method.ultimosQuatro ?? undefined,

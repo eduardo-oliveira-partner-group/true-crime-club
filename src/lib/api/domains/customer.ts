@@ -8,7 +8,7 @@ import { normalizeDigits } from '@/src/lib/formatters'
 
 import { ApiClientError } from '../core/error'
 import { fetcher } from '../core/fetcher'
-import { asArray, asObject } from '../core/json'
+import { asArray, asObject, type JsonValue } from '../core/json'
 import { fromAddress, toAddress } from '../mappers/address'
 import { fromPreferences, toCustomer } from '../mappers/customer'
 import { toPaymentMethod } from '../mappers/payment'
@@ -19,6 +19,21 @@ async function getCustomerId(): Promise<string> {
     throw new Error('Sessão inválida: não foi possível identificar o cliente')
   }
   return customer.id
+}
+
+async function listCustomerAddresses(customerId: string): Promise<Address[]> {
+  const items = await fetcher(`/clientes/${customerId}/enderecos`)
+  return asArray(items).map(toAddress)
+}
+
+/** Aceita lista ou payload sem lista — refetch quando a mutação não devolve endereços. */
+async function resolveAddressList(
+  customerId: string,
+  payload: unknown,
+): Promise<Address[]> {
+  const list = asArray(payload as JsonValue | undefined).map(toAddress)
+  if (list.length > 0) return list
+  return listCustomerAddresses(customerId)
 }
 
 export const customerApi = {
@@ -90,10 +105,11 @@ export const customerApi = {
     isDefault?: boolean
   }) => {
     const customerId = await getCustomerId()
-    return fetcher(`/clientes/${customerId}/enderecos`, {
+    const payload = await fetcher(`/clientes/${customerId}/enderecos`, {
       method: 'POST',
       body: JSON.stringify(fromAddress(body)),
-    }).then((items) => items.map(toAddress))
+    })
+    return resolveAddressList(customerId, payload)
   },
   updateAddress: async (
     id: string,
@@ -109,21 +125,25 @@ export const customerApi = {
       isDefault?: boolean
     },
   ) => {
+    if (!id.trim()) {
+      throw new Error('Endereço inválido: id ausente')
+    }
     const customerId = await getCustomerId()
-    return fetcher(`/clientes/${customerId}/enderecos/${id}`, {
+    const payload = await fetcher(`/clientes/${customerId}/enderecos/${id}`, {
       method: 'PATCH',
       body: JSON.stringify(fromAddress(body)),
-    }).then((items) => items.map(toAddress))
+    })
+    return resolveAddressList(customerId, payload)
   },
   deleteAddress: async (id: string) => {
+    if (!id.trim()) {
+      throw new Error('Endereço inválido: id ausente')
+    }
     const customerId = await getCustomerId()
-    return fetcher(`/clientes/${customerId}/enderecos/${id}`, {
+    await fetcher(`/clientes/${customerId}/enderecos/${id}`, {
       method: 'DELETE',
-    }).then(() =>
-      fetcher(`/clientes/${customerId}/enderecos`).then((items) =>
-        items.map(toAddress),
-      ),
-    )
+    })
+    return listCustomerAddresses(customerId)
   },
   listOrders: () => fetcher('/cliente/pedidos'),
   getOrder: (id: string) => fetcher(`/cliente/pedidos/${id}`),

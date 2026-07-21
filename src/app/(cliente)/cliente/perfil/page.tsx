@@ -26,12 +26,16 @@ import {
 } from '@/src/lib/design/classes'
 import type { Address, Customer } from '@/src/lib/domain/types'
 import {
+  ADDRESS_NUMBER_MAX_LENGTH,
   formatCep,
   formatCpf,
   formatPhone,
+  formatUf,
+  isValidAddressNumber,
   isValidCep,
   isValidCpf,
   isValidPhone,
+  isValidUf,
   normalizeDigits,
 } from '@/src/lib/formatters'
 
@@ -318,6 +322,16 @@ export default function PerfilPage() {
       setSaveError('CEP deve ter 8 dígitos.')
       return
     }
+    if (!isValidUf(newAddrState)) {
+      setSaveError('Informe a UF com 2 letras (ex.: SP).')
+      return
+    }
+    if (!isValidAddressNumber(newAddrNumber)) {
+      setSaveError(
+        `Número deve ter no máximo ${ADDRESS_NUMBER_MAX_LENGTH} caracteres.`,
+      )
+      return
+    }
 
     try {
       setSavingAddress(true)
@@ -325,11 +339,11 @@ export default function PerfilPage() {
       const addressPayload = {
         label: newAddrLabel,
         street: newAddrStreet,
-        number: newAddrNumber,
+        number: newAddrNumber.trim(),
         complement: newAddrComplement,
         neighborhood: newAddrNeighborhood,
         city: newAddrCity,
-        state: newAddrState,
+        state: formatUf(newAddrState),
         zipCode: normalizeDigits(newAddrZip),
         isDefault: newAddrIsDefault,
       }
@@ -776,7 +790,12 @@ export default function PerfilPage() {
                         type="text"
                         required
                         value={newAddrNumber}
-                        onChange={(e) => setNewAddrNumber(e.target.value)}
+                        onChange={(e) =>
+                          setNewAddrNumber(
+                            e.target.value.slice(0, ADDRESS_NUMBER_MAX_LENGTH),
+                          )
+                        }
+                        maxLength={ADDRESS_NUMBER_MAX_LENGTH}
                         className={formInputClass}
                       />
                     </div>
@@ -815,7 +834,12 @@ export default function PerfilPage() {
                         type="text"
                         required
                         value={newAddrState}
-                        onChange={(e) => setNewAddrState(e.target.value)}
+                        onChange={(e) =>
+                          setNewAddrState(formatUf(e.target.value))
+                        }
+                        maxLength={2}
+                        autoComplete="address-level1"
+                        placeholder="SP"
                         className={formInputClass}
                       />
                     </div>
