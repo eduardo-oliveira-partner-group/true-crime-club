@@ -38,6 +38,10 @@ const cancelBtnClass = `cursor-pointer rounded-[9px] p-1.5 text-(--red) ${transi
 const skeletonBlockClass =
   'animate-pulse rounded bg-(--ink)/8 motion-reduce:animate-none'
 
+function displayValue(value: string | null | undefined) {
+  return value?.trim() ? value : '—'
+}
+
 function ProfileLoadingSkeleton() {
   const field = (labelWidth: string, valueWidth: string) => (
     <div>
@@ -426,7 +430,9 @@ export default function PerfilPage() {
                       className={formInputClass}
                     />
                   ) : (
-                    <p className="mt-1 text-sm text-(--ink-soft)">{name}</p>
+                    <p className="mt-1 text-sm text-(--ink-soft)">
+                      {displayValue(name)}
+                    </p>
                   )}
                 </div>
                 <div>
@@ -445,7 +451,9 @@ export default function PerfilPage() {
                       className={formInputClass}
                     />
                   ) : (
-                    <p className="mt-1 text-sm text-(--ink-soft)">{cpf}</p>
+                    <p className="mt-1 text-sm text-(--ink-soft)">
+                      {displayValue(cpf)}
+                    </p>
                   )}
                 </div>
                 <div>
@@ -515,7 +523,9 @@ export default function PerfilPage() {
                       className={formInputClass}
                     />
                   ) : (
-                    <p className="mt-1 text-sm text-(--ink-soft)">{email}</p>
+                    <p className="mt-1 text-sm text-(--ink-soft)">
+                      {displayValue(email)}
+                    </p>
                   )}
                 </div>
                 <div>
@@ -536,7 +546,9 @@ export default function PerfilPage() {
                       className={formInputClass}
                     />
                   ) : (
-                    <p className="mt-1 text-sm text-(--ink-soft)">{phone}</p>
+                    <p className="mt-1 text-sm text-(--ink-soft)">
+                      {displayValue(phone)}
+                    </p>
                   )}
                 </div>
               </div>
@@ -607,7 +619,7 @@ export default function PerfilPage() {
                     </select>
                   ) : (
                     <p className="mt-1 text-sm text-(--ink-soft)">
-                      {shirtSize}
+                      {displayValue(shirtSize)}
                     </p>
                   )}
                 </div>
@@ -625,7 +637,9 @@ export default function PerfilPage() {
                       className={formInputClass}
                     />
                   ) : (
-                    <p className="mt-1 text-sm text-(--ink-soft)">{shoeSize}</p>
+                    <p className="mt-1 text-sm text-(--ink-soft)">
+                      {displayValue(shoeSize)}
+                    </p>
                   )}
                 </div>
                 <div>
@@ -641,7 +655,9 @@ export default function PerfilPage() {
                       className={`${formInputClass} h-12 resize-none`}
                     />
                   ) : (
-                    <p className="mt-1 text-sm text-(--ink-soft)">{notes}</p>
+                    <p className="mt-1 text-sm text-(--ink-soft)">
+                      {displayValue(notes)}
+                    </p>
                   )}
                 </div>
               </div>
