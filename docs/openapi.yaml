@@ -1686,8 +1686,9 @@ components:
           type: string
           example: CEP 05435-020
         preco:
-          type: integer
-          example: 1990
+          type: number
+          format: float
+          example: 19.9
         prazoEstimado:
           type: string
           example: 5–8 dias úteis
