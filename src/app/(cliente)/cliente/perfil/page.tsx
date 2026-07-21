@@ -113,7 +113,7 @@ export default function PerfilPage() {
   const [phone, setPhone] = useState('')
   const [email, setEmail] = useState('')
   const [cpf, setCpf] = useState('')
-  const [shirtSize, setShirtSize] = useState('M')
+  const [shirtSize, setShirtSize] = useState('')
   const [shoeSize, setShoeSize] = useState('')
   const [notes, setNotes] = useState('')
 
@@ -158,15 +158,15 @@ export default function PerfilPage() {
     setPhone(formatPhone(customer.phone || ''))
     setEmail(customer.email)
     setCpf(formatCpf(customer.document || ''))
-    setShirtSize(preferences?.shirtSize || 'M')
-    setShoeSize(preferences?.shoeSize || '')
-    setNotes(preferences?.notes || '')
+    setShirtSize(preferences?.shirtSize ?? '')
+    setShoeSize(preferences?.shoeSize ?? '')
+    setNotes(preferences?.notes ?? '')
     setTempName(customer.name)
     setTempEmail(customer.email)
     setTempPhone(formatPhone(customer.phone || ''))
-    setTempShirt(preferences?.shirtSize || 'M')
-    setTempShoe(preferences?.shoeSize || '')
-    setTempNotes(preferences?.notes || '')
+    setTempShirt(preferences?.shirtSize ?? '')
+    setTempShoe(preferences?.shoeSize ?? '')
+    setTempNotes(preferences?.notes ?? '')
   }
 
   useEffect(() => {
@@ -597,6 +597,7 @@ export default function PerfilPage() {
                       onChange={(e) => setTempShirt(e.target.value)}
                       className={formInputClass}
                     >
+                      <option value="">Selecione</option>
                       <option value="PP">PP</option>
                       <option value="P">P</option>
                       <option value="M">M</option>
