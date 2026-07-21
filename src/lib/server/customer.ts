@@ -30,7 +30,9 @@ function sessionCookieHeader(token: string) {
 
 type ProfilePayload = {
   cliente?: {
-    id?: string
+    id?: string | number
+    id_cliente?: string | number
+    idCliente?: string | number
     nome?: string
     email?: string
     telefone?: string
@@ -329,11 +331,14 @@ export async function getCustomerProfile(): Promise<{
 
   const profile = unwrapApiPayload<ProfilePayload>(await response.json())
   const customer = profile.cliente
+  const customerId = customer
+    ? (customer.id_cliente ?? customer.idCliente ?? customer.id)
+    : undefined
 
   return {
     customer: customer
       ? {
-          id: customer.id ?? '',
+          id: customerId != null ? String(customerId) : '',
           name: customer.nome ?? '',
           email: customer.email ?? '',
           phone: customer.telefone,
@@ -402,8 +407,15 @@ export async function updateCustomerProfile(input: {
     throw new Error('Sessão inválida. Faça login novamente.')
   }
 
-  const { id } = unwrapApiPayload<{ id?: string }>(await currentCustomer.json())
-  if (!id) throw new Error('Não foi possível identificar a cliente da sessão.')
+  const current = unwrapApiPayload<{
+    id?: string | number
+    id_cliente?: string | number
+    idCliente?: string | number
+  }>(await currentCustomer.json())
+  const id = current.id_cliente ?? current.idCliente ?? current.id
+  if (id == null || id === '') {
+    throw new Error('Não foi possível identificar a cliente da sessão.')
+  }
 
   const response = await fetch(`${apiBaseUrl}/clientes/${id}`, {
     method: 'PATCH',

@@ -1385,9 +1385,9 @@ components:
     Cliente:
       type: object
       properties:
-        id:
-          type: string
-          example: cliente-001
+        id_cliente:
+          type: integer
+          example: 34
         nome:
           type: string
           example: Mariana Silva
@@ -1398,6 +1398,9 @@ components:
         telefone:
           type: string
           example: (11) 98765-4321
+        documento:
+          type: string
+          example: '42327908884'
         preferencias:
           $ref: '#/components/schemas/PreferenciasAssinante'
     PreferenciasAssinante:

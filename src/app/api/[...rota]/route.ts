@@ -214,10 +214,13 @@ function fromPreferences(preferences: unknown) {
 
 function toCustomer(customer: Customer) {
   return {
-    id: customer.id,
+    id_cliente: Number.isFinite(Number(customer.id))
+      ? Number(customer.id)
+      : customer.id,
     nome: customer.name,
     email: customer.email,
     telefone: customer.phone,
+    documento: customer.document,
     preferencias: toPreferences(customer.preferences),
   }
 }

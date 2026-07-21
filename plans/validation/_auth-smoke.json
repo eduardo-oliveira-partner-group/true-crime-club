@@ -8,7 +8,7 @@
         "/autenticacao/cliente-atual": {
           "status": 200,
           "keys": [
-            "id",
+            "id_cliente",
             "nome",
             "email",
             "telefone",
@@ -64,7 +64,7 @@
         "/autenticacao/cliente-atual": {
           "status": 200,
           "keys": [
-            "id",
+            "id_cliente",
             "nome",
             "email",
             "telefone",
