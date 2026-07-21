@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { useState } from 'react'
 
 import { Button } from '@/src/components/ui/button'
+import { Input } from '@/src/components/ui/input'
+import { Label } from '@/src/components/ui/label'
 import {
   fontHeading,
   fontMono,
@@ -70,16 +72,16 @@ export default function AtualizarCartaoPage() {
 
       <form className="mt-6 max-w-md space-y-5" action={submit}>
         <div>
-          <label className={formLabelClass} htmlFor="holder">
+          <Label className={formLabelClass} htmlFor="holder">
             Nome no cartão
-          </label>
-          <input id="holder" name="holder" className={formInputClass} />
+          </Label>
+          <Input id="holder" name="holder" className={formInputClass} />
         </div>
         <div>
-          <label className={formLabelClass} htmlFor="lastFour">
+          <Label className={formLabelClass} htmlFor="lastFour">
             Final do cartão
-          </label>
-          <input
+          </Label>
+          <Input
             id="lastFour"
             name="lastFour"
             maxLength={4}

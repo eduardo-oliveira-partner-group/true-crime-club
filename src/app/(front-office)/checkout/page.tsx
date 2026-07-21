@@ -135,7 +135,7 @@ export default function CheckoutPage() {
               <p className="mt-2 max-w-xs text-sm/6 text-(--ink)" role="alert">
                 {loadError}
               </p>
-              <button
+              <Button
                 type="button"
                 onClick={() => window.location.reload()}
                 className={cn(
@@ -145,7 +145,7 @@ export default function CheckoutPage() {
               >
                 <IconRefresh className="size-4" stroke={1.75} />
                 Tentar novamente
-              </button>
+              </Button>
               <Link
                 href="/"
                 className={cn(

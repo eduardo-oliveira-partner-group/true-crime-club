@@ -4,6 +4,8 @@ import { IconCreditCard, IconPlus, IconTrash } from '@tabler/icons-react'
 import { useEffect, useState } from 'react'
 
 import { Button } from '@/src/components/ui/button'
+import { Input } from '@/src/components/ui/input'
+import { Label } from '@/src/components/ui/label'
 import { CustomerListSkeleton } from '@/src/components/ui/page-loading-skeletons'
 import {
   cardShadowBase,
@@ -116,10 +118,10 @@ export default function CartoesClient() {
           </div>
           <div className="mt-4 space-y-4">
             <div>
-              <label className={formLabelClass} htmlFor="cardNumber">
+              <Label className={formLabelClass} htmlFor="cardNumber">
                 Número do Cartão
-              </label>
-              <input
+              </Label>
+              <Input
                 id="cardNumber"
                 type="text"
                 required
@@ -130,10 +132,10 @@ export default function CartoesClient() {
               />
             </div>
             <div>
-              <label className={formLabelClass} htmlFor="holderName">
+              <Label className={formLabelClass} htmlFor="holderName">
                 Nome do Titular (idêntico ao cartão)
-              </label>
-              <input
+              </Label>
+              <Input
                 id="holderName"
                 type="text"
                 required
@@ -177,10 +179,10 @@ export default function CartoesClient() {
                 </select>
               </div>
               <div>
-                <label className={formLabelClass} htmlFor="cvc">
+                <Label className={formLabelClass} htmlFor="cvc">
                   CVC
-                </label>
-                <input
+                </Label>
+                <Input
                   id="cvc"
                   type="text"
                   required
@@ -270,13 +272,17 @@ export default function CartoesClient() {
                   </p>
                 </div>
               </div>
-              <button
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-sm"
                 disabled={submitting}
                 onClick={() => handleDeleteCard(card.id)}
                 className={`cursor-pointer rounded-[9px] p-1.5 text-(--red) ${transitionBgColor} hover:bg-(--red)/10 hover:text-(--red-deep) disabled:opacity-50`}
+                aria-label="Excluir cartão"
               >
                 <IconTrash className="size-4.5" />
-              </button>
+              </Button>
             </div>
           ))
         )}

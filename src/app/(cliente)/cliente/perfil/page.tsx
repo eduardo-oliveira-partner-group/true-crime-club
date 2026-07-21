@@ -10,6 +10,10 @@ import {
 import { useEffect, useState } from 'react'
 
 import { Button } from '@/src/components/ui/button'
+import { Checkbox } from '@/src/components/ui/checkbox'
+import { Input } from '@/src/components/ui/input'
+import { Label } from '@/src/components/ui/label'
+import { Textarea } from '@/src/components/ui/textarea'
 import { apiClient } from '@/src/lib/api-client'
 import {
   cardShadowBase,
@@ -385,7 +389,10 @@ export default function PerfilPage() {
                   Informações Básicas
                 </h3>
                 {!editBasics ? (
-                  <button
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
                     onClick={() => {
                       setTempName(name)
                       setTempCpf(cpf)
@@ -394,23 +401,29 @@ export default function PerfilPage() {
                     className={editBtnClass}
                   >
                     <IconEdit className="size-3.5" /> Editar
-                  </button>
+                  </Button>
                 ) : (
                   <div className="flex gap-2">
-                    <button
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon-sm"
                       onClick={handleSaveBasics}
                       className={saveBtnClass}
                       disabled={savingSection === 'basics'}
                       aria-label="Salvar informações básicas"
                     >
                       <IconCheck className="size-4" />
-                    </button>
-                    <button
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon-sm"
                       onClick={() => setEditBasics(false)}
                       className={cancelBtnClass}
                     >
                       <IconX className="size-4" />
-                    </button>
+                    </Button>
                   </div>
                 )}
               </div>
@@ -423,7 +436,7 @@ export default function PerfilPage() {
                     Nome Completo
                   </p>
                   {editBasics ? (
-                    <input
+                    <Input
                       type="text"
                       value={tempName}
                       onChange={(e) => setTempName(e.target.value)}
@@ -442,7 +455,7 @@ export default function PerfilPage() {
                     CPF
                   </p>
                   {editBasics ? (
-                    <input
+                    <Input
                       type="text"
                       value={tempCpf}
                       onChange={(e) => setTempCpf(formatCpf(e.target.value))}
@@ -478,7 +491,10 @@ export default function PerfilPage() {
                   Contato
                 </h3>
                 {!editContact ? (
-                  <button
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
                     onClick={() => {
                       setTempEmail(email)
                       setTempPhone(phone)
@@ -487,23 +503,29 @@ export default function PerfilPage() {
                     className={editBtnClass}
                   >
                     <IconEdit className="size-3.5" /> Editar
-                  </button>
+                  </Button>
                 ) : (
                   <div className="flex gap-2">
-                    <button
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon-sm"
                       onClick={handleSaveContact}
                       className={saveBtnClass}
                       disabled={savingSection === 'contact'}
                       aria-label="Salvar contato"
                     >
                       <IconCheck className="size-4" />
-                    </button>
-                    <button
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon-sm"
                       onClick={() => setEditContact(false)}
                       className={cancelBtnClass}
                     >
                       <IconX className="size-4" />
-                    </button>
+                    </Button>
                   </div>
                 )}
               </div>
@@ -516,7 +538,7 @@ export default function PerfilPage() {
                     E-mail
                   </p>
                   {editContact ? (
-                    <input
+                    <Input
                       type="email"
                       value={tempEmail}
                       onChange={(e) => setTempEmail(e.target.value)}
@@ -535,7 +557,7 @@ export default function PerfilPage() {
                     Telefone
                   </p>
                   {editContact ? (
-                    <input
+                    <Input
                       type="tel"
                       value={tempPhone}
                       onChange={(e) =>
@@ -565,7 +587,10 @@ export default function PerfilPage() {
                   Dados Adicionais & Preferências de Dossiê
                 </h3>
                 {!editPrefs ? (
-                  <button
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
                     onClick={() => {
                       setTempShirt(shirtSize)
                       setTempShoe(shoeSize)
@@ -575,23 +600,29 @@ export default function PerfilPage() {
                     className={editBtnClass}
                   >
                     <IconEdit className="size-3.5" /> Editar
-                  </button>
+                  </Button>
                 ) : (
                   <div className="flex gap-2">
-                    <button
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon-sm"
                       onClick={handleSavePrefs}
                       className={saveBtnClass}
                       disabled={savingSection === 'preferences'}
                       aria-label="Salvar preferências"
                     >
                       <IconCheck className="size-4" />
-                    </button>
-                    <button
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon-sm"
                       onClick={() => setEditPrefs(false)}
                       className={cancelBtnClass}
                     >
                       <IconX className="size-4" />
-                    </button>
+                    </Button>
                   </div>
                 )}
               </div>
@@ -630,7 +661,7 @@ export default function PerfilPage() {
                     Tamanho de Calçado
                   </p>
                   {editPrefs ? (
-                    <input
+                    <Input
                       type="text"
                       value={tempShoe}
                       onChange={(e) => setTempShoe(e.target.value)}
@@ -649,7 +680,7 @@ export default function PerfilPage() {
                     Observações de Produção
                   </p>
                   {editPrefs ? (
-                    <textarea
+                    <Textarea
                       value={tempNotes}
                       onChange={(e) => setTempNotes(e.target.value)}
                       className={`${formInputClass} h-12 resize-none`}
@@ -674,7 +705,10 @@ export default function PerfilPage() {
                   Endereços de Entrega
                 </h3>
                 {!showAddAddress && !editingAddressId && (
-                  <button
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
                     onClick={() => {
                       resetAddressForm()
                       setShowAddAddress(true)
@@ -682,7 +716,7 @@ export default function PerfilPage() {
                     className={editBtnClass}
                   >
                     <IconPlus className="size-3.5" /> Adicionar Endereço
-                  </button>
+                  </Button>
                 )}
               </div>
 
@@ -701,10 +735,10 @@ export default function PerfilPage() {
                   </p>
                   <div className="grid gap-4 md:grid-cols-3">
                     <div className="md:col-span-2">
-                      <label className={formLabelClass}>
+                      <Label className={formLabelClass}>
                         Identificação (ex: Casa, Trabalho)
-                      </label>
-                      <input
+                      </Label>
+                      <Input
                         type="text"
                         required
                         value={newAddrLabel}
@@ -713,8 +747,8 @@ export default function PerfilPage() {
                       />
                     </div>
                     <div>
-                      <label className={formLabelClass}>CEP</label>
-                      <input
+                      <Label className={formLabelClass}>CEP</Label>
+                      <Input
                         type="text"
                         required
                         value={newAddrZip}
@@ -727,8 +761,8 @@ export default function PerfilPage() {
                       />
                     </div>
                     <div className="md:col-span-2">
-                      <label className={formLabelClass}>Logradouro / Rua</label>
-                      <input
+                      <Label className={formLabelClass}>Logradouro / Rua</Label>
+                      <Input
                         type="text"
                         required
                         value={newAddrStreet}
@@ -737,8 +771,8 @@ export default function PerfilPage() {
                       />
                     </div>
                     <div>
-                      <label className={formLabelClass}>Número</label>
-                      <input
+                      <Label className={formLabelClass}>Número</Label>
+                      <Input
                         type="text"
                         required
                         value={newAddrNumber}
@@ -747,8 +781,8 @@ export default function PerfilPage() {
                       />
                     </div>
                     <div>
-                      <label className={formLabelClass}>Complemento</label>
-                      <input
+                      <Label className={formLabelClass}>Complemento</Label>
+                      <Input
                         type="text"
                         value={newAddrComplement}
                         onChange={(e) => setNewAddrComplement(e.target.value)}
@@ -756,8 +790,8 @@ export default function PerfilPage() {
                       />
                     </div>
                     <div>
-                      <label className={formLabelClass}>Bairro</label>
-                      <input
+                      <Label className={formLabelClass}>Bairro</Label>
+                      <Input
                         type="text"
                         required
                         value={newAddrNeighborhood}
@@ -766,8 +800,8 @@ export default function PerfilPage() {
                       />
                     </div>
                     <div>
-                      <label className={formLabelClass}>Cidade</label>
-                      <input
+                      <Label className={formLabelClass}>Cidade</Label>
+                      <Input
                         type="text"
                         required
                         value={newAddrCity}
@@ -776,8 +810,8 @@ export default function PerfilPage() {
                       />
                     </div>
                     <div>
-                      <label className={formLabelClass}>Estado (UF)</label>
-                      <input
+                      <Label className={formLabelClass}>Estado (UF)</Label>
+                      <Input
                         type="text"
                         required
                         value={newAddrState}
@@ -786,17 +820,16 @@ export default function PerfilPage() {
                       />
                     </div>
                     <div className="flex items-center md:col-span-3">
-                      <label className="flex cursor-pointer items-center gap-2.5 text-sm leading-none text-(--ink-soft)">
-                        <input
-                          type="checkbox"
+                      <Label className="flex cursor-pointer items-center gap-2.5 text-sm leading-none font-normal text-(--ink-soft)">
+                        <Checkbox
                           checked={newAddrIsDefault}
-                          onChange={(e) =>
-                            setNewAddrIsDefault(e.target.checked)
+                          onCheckedChange={(checked) =>
+                            setNewAddrIsDefault(checked === true)
                           }
-                          className="size-4 shrink-0 rounded border border-[rgba(33,28,24,0.15)] accent-(--red)"
+                          className="size-4 shrink-0 rounded border border-[rgba(33,28,24,0.15)] bg-transparent data-checked:border-(--red) data-checked:bg-(--red) data-checked:text-[#fbf9f6]"
                         />
                         Definir como endereço principal
-                      </label>
+                      </Label>
                     </div>
                   </div>
                   <div className="flex justify-end gap-2 pt-2">
@@ -860,20 +893,26 @@ export default function PerfilPage() {
                         </p>
                       </div>
                       <div className="flex gap-1">
-                        <button
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon-sm"
                           onClick={() => handleEditAddress(addr)}
                           className={`rounded-[9px] p-1 text-(--red) ${transitionBgColor} hover:bg-(--red)/10 hover:text-(--red-deep)`}
                           aria-label={`Editar endereço ${addr.label}`}
                         >
                           <IconEdit className="size-4" />
-                        </button>
-                        <button
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon-sm"
                           onClick={() => handleDeleteAddress(addr.id)}
                           className={`rounded-[9px] p-1 text-(--red) ${transitionBgColor} hover:bg-(--red)/10 hover:text-(--red-deep)`}
                           aria-label={`Excluir endereço ${addr.label}`}
                         >
                           <IconTrash className="size-4" />
-                        </button>
+                        </Button>
                       </div>
                     </div>
                   ))

@@ -22,6 +22,7 @@ import {
   Stepper,
   type StepperStepIndicatorProps,
 } from '@/src/components/ui/stepper'
+import { Textarea } from '@/src/components/ui/textarea'
 import {
   Tooltip,
   TooltipContent,
@@ -490,7 +491,7 @@ export function CheckoutStepper({
                         </Field>
                       </div>
                       <Field label="Notas para curadoria">
-                        <textarea
+                        <Textarea
                           value={preferences.notes}
                           onChange={(e) =>
                             setPreferences((prev) => ({

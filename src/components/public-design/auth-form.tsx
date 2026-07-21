@@ -2,6 +2,8 @@ import type { ComponentPropsWithoutRef, ReactNode } from 'react'
 
 import { DossierCard } from '@/src/components/public-design/dossier-card'
 import { SectionEyebrow } from '@/src/components/public-design/section-eyebrow'
+import { Input } from '@/src/components/ui/input'
+import { Label } from '@/src/components/ui/label'
 import {
   fontHeading,
   fontType,
@@ -99,17 +101,17 @@ export function AuthFormField({
   return (
     <div className="flex flex-col gap-1.5">
       <div className="flex items-center justify-between">
-        <label className={formLabelClass} htmlFor={id}>
+        <Label className={formLabelClass} htmlFor={id}>
           {label}
           {props.required && <span className="ml-0.5 text-(--red)">*</span>}
-        </label>
+        </Label>
         {error ? (
           <span className="[font-family:var(--design-font-body)] text-[11px] font-medium text-(--red)">
             {error}
           </span>
         ) : null}
       </div>
-      <input
+      <Input
         id={id}
         className={cn(
           formInputClass,
@@ -117,6 +119,7 @@ export function AuthFormField({
           error && 'border-(--red)',
           className,
         )}
+        aria-invalid={error ? true : undefined}
         {...props}
       />
     </div>

@@ -18,6 +18,7 @@ import { useEffect, useState } from 'react'
 import { DesignPageShell } from '@/src/components/public-design/design-page-shell'
 import { SectionEyebrow } from '@/src/components/public-design/section-eyebrow'
 import { Button } from '@/src/components/ui/button'
+import { Input } from '@/src/components/ui/input'
 import { CartSkeleton } from '@/src/components/ui/page-loading-skeletons'
 import {
   arrowIconClass,
@@ -330,8 +331,10 @@ function QuantityControls({
       </span>
       <div className="inline-flex items-center gap-2 rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-(--paper-soft) px-2 py-1.5">
         <div>
-          <button
+          <Button
             type="button"
+            variant="outline"
+            size="icon-sm"
             onClick={() =>
               updateCartItemQuantity(itemId, Math.max(quantity - 1, 1)).then(
                 () => window.location.reload(),
@@ -342,7 +345,7 @@ function QuantityControls({
             disabled={quantity <= 1}
           >
             <IconMinus className="size-3.5" />
-          </button>
+          </Button>
         </div>
         <span
           key={quantity}
@@ -354,8 +357,10 @@ function QuantityControls({
           {quantity}
         </span>
         <div>
-          <button
+          <Button
             type="button"
+            variant="outline"
+            size="icon-sm"
             onClick={() =>
               updateCartItemQuantity(itemId, quantity + 1).then(() =>
                 window.location.reload(),
@@ -365,7 +370,7 @@ function QuantityControls({
             className={baseButton}
           >
             <IconPlus className="size-3.5" />
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -538,7 +543,7 @@ function CouponForm() {
       <div className="flex gap-2">
         <div className="relative flex-1">
           <IconTag className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-(--ink-soft)/60" />
-          <input
+          <Input
             id="coupon"
             name="coupon"
             placeholder="Informe o código"

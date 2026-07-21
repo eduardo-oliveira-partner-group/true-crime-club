@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from 'react'
 
 import { landingNavLinks } from '@/src/app/(front-office)/_landing/content'
 import logo from '@/src/assets/images/brand/logo.png'
+import { Button } from '@/src/components/ui/button'
 import { apiClient } from '@/src/lib/api-client'
 import {
   fontMono,
@@ -187,15 +188,17 @@ export function PublicHeaderContent() {
           >
             Assinar
           </Link>
-          <button
+          <Button
             type="button"
-            className="hidden size-[42px] items-center justify-center rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-(--ink) p-0 text-[#fbf9f6] max-[860px]:inline-flex"
+            variant="ghost"
+            size="icon"
+            className="hidden size-[42px] items-center justify-center rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-(--ink) p-0 text-[#fbf9f6] hover:bg-(--ink) hover:text-[#fbf9f6] max-[860px]:inline-flex"
             onClick={() => setIsMenuOpen((current) => !current)}
             aria-label={isMenuOpen ? 'Fechar menu' : 'Abrir menu'}
             aria-expanded={isMenuOpen}
           >
             <IconMenu2 size={19} stroke={2.2} aria-hidden />
-          </button>
+          </Button>
         </div>
       </div>
 
