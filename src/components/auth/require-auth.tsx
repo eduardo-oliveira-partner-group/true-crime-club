@@ -1,7 +1,7 @@
 'use client'
 
-import { usePathname, useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { Suspense, useEffect, useState } from 'react'
 
 import {
   SessionVerificationError,
@@ -18,9 +18,10 @@ class AuthCheckTimeoutError extends Error {
   }
 }
 
-export function RequireAuth({ children }: { children: React.ReactNode }) {
+function RequireAuthInner({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
+  const searchParams = useSearchParams()
   const [ready, setReady] = useState(false)
   const [verificationError, setVerificationError] = useState<string | null>(
     null,
@@ -29,7 +30,9 @@ export function RequireAuth({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let cancelled = false
-    const next = encodeURIComponent(pathname || '/cliente/perfil')
+    const search = searchParams.toString()
+    const returnPath = `${pathname || '/cliente/perfil'}${search ? `?${search}` : ''}`
+    const next = encodeURIComponent(returnPath)
 
     const redirectToLogin = () => {
       if (!cancelled) {
@@ -55,7 +58,7 @@ export function RequireAuth({ children }: { children: React.ReactNode }) {
 
         if (
           error instanceof ApiClientError &&
-          (error.status === 401 || error.status === 403 || error.status === 404)
+          (error.status === 401 || error.status === 403)
         ) {
           redirectToLogin()
           return
@@ -75,7 +78,7 @@ export function RequireAuth({ children }: { children: React.ReactNode }) {
       cancelled = true
       if (timeoutId !== undefined) window.clearTimeout(timeoutId)
     }
-  }, [attempt, pathname, router])
+  }, [attempt, pathname, router, searchParams])
 
   if (verificationError) {
     return (
@@ -94,4 +97,12 @@ export function RequireAuth({ children }: { children: React.ReactNode }) {
   }
 
   return children
+}
+
+export function RequireAuth({ children }: { children: React.ReactNode }) {
+  return (
+    <Suspense fallback={<SessionVerifying />}>
+      <RequireAuthInner>{children}</RequireAuthInner>
+    </Suspense>
+  )
 }

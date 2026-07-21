@@ -1,5 +1,6 @@
 'use client'
 
+import { IconAlertTriangle, IconRefresh } from '@tabler/icons-react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -12,7 +13,7 @@ import { DesignPageShell } from '@/src/components/public-design/design-page-shel
 import { SectionEyebrow } from '@/src/components/public-design/section-eyebrow'
 import { Button } from '@/src/components/ui/button'
 import { CheckoutSkeleton } from '@/src/components/ui/page-loading-skeletons'
-import { apiClient } from '@/src/lib/api-client'
+import { apiClient, ApiClientError } from '@/src/lib/api-client'
 import {
   dossierCardSurface,
   fontHeading,
@@ -31,10 +32,18 @@ import type { CartItem } from '@/src/lib/domain/types'
 import { formatCurrency } from '@/src/lib/formatters'
 import { cn } from '@/src/lib/utils'
 
+function isAuthError(error: unknown): boolean {
+  return (
+    error instanceof ApiClientError &&
+    (error.status === 401 || error.status === 403)
+  )
+}
+
 export default function CheckoutPage() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const plano = searchParams.get('plano') ?? undefined
+  const [loadError, setLoadError] = useState<string | null>(null)
   const [state, setState] = useState<{
     cart: Awaited<ReturnType<typeof getCart>>
     profile: Awaited<ReturnType<typeof apiClient.customer.getProfile>>
@@ -44,16 +53,26 @@ export default function CheckoutPage() {
   } | null>(null)
 
   useEffect(() => {
+    let cancelled = false
+
+    const redirectToLogin = () => {
+      const next = encodeURIComponent(
+        window.location.pathname + window.location.search,
+      )
+      router.replace(`/login?next=${next}`)
+    }
+
+    setLoadError(null)
+
     Promise.all([
       getCart(),
       apiClient.customer.getProfile(),
       plano ? getPlanBySlug(plano) : Promise.resolve(null),
     ])
       .then(async ([cart, profile, plan]) => {
-        if (!profile.customer) {
-          router.replace(
-            `/login?next=${encodeURIComponent(window.location.pathname + window.location.search)}`,
-          )
+        if (cancelled) return
+        if (!profile.customer?.id) {
+          redirectToLogin()
           return
         }
         const [shipping, monthlyPlan] = await Promise.all([
@@ -68,10 +87,80 @@ export default function CheckoutPage() {
             ? getPlanBySlug('mensal')
             : Promise.resolve(null),
         ])
+        if (cancelled) return
         setState({ cart, profile, plan, monthlyPlan, shipping })
       })
-      .catch(() => router.replace('/login'))
+      .catch((error: unknown) => {
+        if (cancelled) return
+        if (isAuthError(error)) {
+          redirectToLogin()
+          return
+        }
+
+        const apiMessage =
+          error instanceof ApiClientError
+            ? error.message.trim()
+            : error instanceof Error
+              ? error.message.trim()
+              : ''
+
+        setLoadError(
+          apiMessage ||
+            'Não foi possível carregar o checkout. Tente novamente.',
+        )
+      })
+
+    return () => {
+      cancelled = true
+    }
   }, [plano, router])
+
+  if (loadError) {
+    return (
+      <DesignPageShell className="overflow-hidden">
+        <div className="relative z-10 flex min-h-[calc(100svh-8rem)] items-center justify-center px-4 py-16 sm:px-6">
+          <section className="w-full max-w-xl rounded-[14px] border border-dashed border-(--ink)/15 bg-(--paper-soft) p-7 text-center sm:p-10">
+            <div className="mx-auto flex max-w-sm flex-col items-center">
+              <span className="flex size-12 items-center justify-center rounded-[12px] bg-(--amber)/15 text-(--amber)">
+                <IconAlertTriangle className="size-6" stroke={1.75} />
+              </span>
+              <h2
+                className={cn(
+                  fontHeading,
+                  'mt-5 text-xl font-semibold tracking-tight text-(--ink)',
+                )}
+              >
+                Não foi possível abrir o checkout
+              </h2>
+              <p className="mt-2 max-w-xs text-sm/6 text-(--ink)" role="alert">
+                {loadError}
+              </p>
+              <button
+                type="button"
+                onClick={() => window.location.reload()}
+                className={cn(
+                  fontMono,
+                  'group mt-6 inline-flex items-center gap-2 rounded-[9px] bg-(--red) px-4 py-3 text-xs font-bold tracking-[0.04em] text-[#fbf9f6] uppercase shadow-[0_9px_22px_-8px_rgba(33,28,24,0.13)] [transition:background-color_0.2s_ease,translate_0.24s_cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:bg-(--red-deep) motion-reduce:transition-none motion-reduce:hover:translate-y-0',
+                )}
+              >
+                <IconRefresh className="size-4" stroke={1.75} />
+                Tentar novamente
+              </button>
+              <Link
+                href="/"
+                className={cn(
+                  fontMono,
+                  'mt-4 text-xs font-bold tracking-[0.04em] text-(--ink-mute) uppercase underline-offset-4 hover:text-(--ink) hover:underline',
+                )}
+              >
+                Voltar à home
+              </Link>
+            </div>
+          </section>
+        </div>
+      </DesignPageShell>
+    )
+  }
 
   if (!state) return <CheckoutSkeleton />
 

@@ -20,6 +20,17 @@ function safeNextPath(raw: string | null): string {
   if (!raw || !raw.startsWith('/') || raw.startsWith('//')) {
     return '/cliente/pedidos'
   }
+
+  // Evita loop login ↔ destino quando `next` aponta de volta para auth.
+  const pathname = raw.split(/[?#]/, 1)[0] ?? raw
+  if (
+    pathname === '/login' ||
+    pathname === '/cadastro' ||
+    pathname === '/recuperar-senha'
+  ) {
+    return '/cliente/pedidos'
+  }
+
   return raw
 }
 
@@ -155,7 +166,14 @@ function LoginForm() {
         <Link href="/recuperar-senha" className={formLinkClass}>
           Esqueci a senha
         </Link>
-        <Link href="/cadastro" className={formLinkClass}>
+        <Link
+          href={
+            nextPath === '/cliente/pedidos'
+              ? '/cadastro'
+              : `/cadastro?next=${encodeURIComponent(nextPath)}`
+          }
+          className={formLinkClass}
+        >
           Criar conta
           <IconArrowRight className="ml-1 inline size-3.5" stroke={1.75} />
         </Link>

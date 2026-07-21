@@ -2,8 +2,8 @@
 
 import { IconArrowRight } from '@tabler/icons-react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { FormEvent, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { FormEvent, Suspense, useState } from 'react'
 
 import {
   AuthFormCard,
@@ -23,7 +23,24 @@ import {
   normalizeDigits,
 } from '@/src/lib/formatters'
 
-export default function CadastroPage() {
+function safeNextPath(raw: string | null): string | null {
+  if (!raw || !raw.startsWith('/') || raw.startsWith('//')) {
+    return null
+  }
+
+  const pathname = raw.split(/[?#]/, 1)[0] ?? raw
+  if (
+    pathname === '/login' ||
+    pathname === '/cadastro' ||
+    pathname === '/recuperar-senha'
+  ) {
+    return null
+  }
+
+  return raw
+}
+
+function CadastroForm() {
   const [nameValue, setNameValue] = useState('')
   const [emailValue, setEmailValue] = useState('')
   const [passwordValue, setPasswordValue] = useState('')
@@ -42,6 +59,11 @@ export default function CadastroPage() {
     general?: string
   }>({})
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const nextPath = safeNextPath(searchParams.get('next'))
+  const loginHref = nextPath
+    ? `/login?next=${encodeURIComponent(nextPath)}`
+    : '/login'
 
   const handleRegister = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -108,7 +130,7 @@ export default function CadastroPage() {
       setIsSuccess(true)
 
       setTimeout(() => {
-        router.replace('/login')
+        router.replace(loginHref)
       }, 800)
     } catch (err) {
       console.error(err)
@@ -236,11 +258,23 @@ export default function CadastroPage() {
 
       <AuthFormFooter className="text-center">
         Já tem conta?{' '}
-        <Link href="/login" className={formLinkClass}>
+        <Link href={loginHref} className={formLinkClass}>
           Entrar
           <IconArrowRight className="ml-1 inline size-3.5" stroke={1.75} />
         </Link>
       </AuthFormFooter>
     </AuthFormCard>
+  )
+}
+
+export default function CadastroPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="text-sm text-(--ink-mute)">Carregando cadastro…</div>
+      }
+    >
+      <CadastroForm />
+    </Suspense>
   )
 }

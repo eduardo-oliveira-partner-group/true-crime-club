@@ -32,6 +32,73 @@ export class ApiClientError extends Error {
   }
 }
 
+function readStatusCode(value: unknown, fallback: number): number {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value
+  }
+  if (typeof value === 'string' && value.trim()) {
+    const parsed = Number.parseInt(value, 10)
+    if (Number.isFinite(parsed)) return parsed
+  }
+  return fallback
+}
+
+function extractApiErrorMessage(errorData: unknown, status: number): string {
+  if (!errorData || typeof errorData !== 'object' || Array.isArray(errorData)) {
+    return `Erro na requisição: ${status}`
+  }
+
+  const data = errorData as Record<string, unknown>
+
+  if (typeof data.mensagem === 'string' && data.mensagem.trim()) {
+    return data.mensagem.trim()
+  }
+
+  if (Array.isArray(data.erros) && data.erros.length > 0) {
+    const messages = data.erros
+      .map((item) => {
+        if (typeof item === 'string' && item.trim()) return item.trim()
+        if (item && typeof item === 'object' && !Array.isArray(item)) {
+          const entry = item as Record<string, unknown>
+          for (const key of [
+            'mensagem',
+            'message',
+            'erro',
+            'descricao',
+          ] as const) {
+            const value = entry[key]
+            if (typeof value === 'string' && value.trim()) return value.trim()
+          }
+        }
+        return null
+      })
+      .filter((item): item is string => Boolean(item))
+
+    if (messages.length > 0) {
+      return messages.join(' · ')
+    }
+  }
+
+  if (typeof data.message === 'string' && data.message.trim()) {
+    return data.message.trim()
+  }
+
+  return `Erro na requisição: ${status}`
+}
+
+function isApiFailureEnvelope(payload: unknown): boolean {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+    return false
+  }
+
+  const data = payload as Record<string, unknown>
+  if (data.sucesso === false) return true
+  if (Array.isArray(data.erros) && data.erros.length > 0 && data.data == null) {
+    return true
+  }
+  return false
+}
+
 function asObject(value: JsonValue | undefined): JsonObject {
   return value && typeof value === 'object' && !Array.isArray(value)
     ? (value as JsonObject)
@@ -84,15 +151,19 @@ async function fetcher(endpoint: string, options: RequestInit = {}) {
     credentials: 'include',
   })
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}))
-    throw new ApiClientError(
-      errorData.mensagem || `Erro na requisição: ${response.status}`,
+  const payload = await response.json().catch(() => null)
+
+  if (!response.ok || isApiFailureEnvelope(payload)) {
+    const status = readStatusCode(
+      payload && typeof payload === 'object' && !Array.isArray(payload)
+        ? (payload as Record<string, unknown>).codigo
+        : undefined,
       response.status,
     )
+    throw new ApiClientError(extractApiErrorMessage(payload, status), status)
   }
 
-  return response.json()
+  return payload
 }
 
 async function getCustomerId(): Promise<string> {
@@ -365,12 +436,38 @@ export const apiClient = {
       addresses: Address[]
       paymentMethods: PaymentMethod[]
     }> => {
-      const data = await fetcher('/cliente/perfil')
+      try {
+        const data = await fetcher('/cliente/perfil')
 
-      return {
-        customer: toCustomer(asObject(data.cliente)),
-        addresses: asArray(data.enderecos).map(toAddress),
-        paymentMethods: asArray(data.metodosPagamento).map(toPaymentMethod),
+        return {
+          customer: toCustomer(asObject(data.cliente)),
+          addresses: asArray(data.enderecos).map(toAddress),
+          paymentMethods: asArray(data.metodosPagamento).map(toPaymentMethod),
+        }
+      } catch (error) {
+        // Algumas APIs ainda não expõem /cliente/perfil (404).
+        // Compõe o perfil a partir das rotas individuais para não tratar
+        // sessão válida como "não autenticado".
+        if (!(error instanceof ApiClientError) || error.status !== 404) {
+          throw error
+        }
+
+        const customer = toCustomer(
+          await fetcher('/autenticacao/cliente-atual'),
+        )
+
+        const [addresses, paymentMethods] = await Promise.all([
+          customer.id
+            ? fetcher(`/clientes/${customer.id}/enderecos`)
+                .then((items) => asArray(items).map(toAddress))
+                .catch(() => [] as Address[])
+            : Promise.resolve([] as Address[]),
+          fetcher('/cliente/cartoes')
+            .then((items) => asArray(items).map(toPaymentMethod))
+            .catch(() => [] as PaymentMethod[]),
+        ])
+
+        return { customer, addresses, paymentMethods }
       }
     },
     updateProfile: async (body: {
