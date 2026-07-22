@@ -1,4 +1,3 @@
-import { mockCustomer } from '../../mock-data'
 import type { Order } from '../../types'
 
 export type ApiCartItem = {
@@ -53,7 +52,7 @@ export function mapApiOrderToDomain(apiOrder: ApiOrder): Order {
   return {
     id: apiOrder.id,
     orderNumber: apiOrder.numeroPedido,
-    customerId: apiOrder.idCliente ?? mockCustomer.id,
+    customerId: apiOrder.idCliente ?? '',
     items: Array.isArray(apiOrder.itens)
       ? apiOrder.itens.map((item: ApiCartItem) => ({
           id: item.id,

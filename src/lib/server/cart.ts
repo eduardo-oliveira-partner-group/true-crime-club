@@ -1,9 +1,13 @@
+import 'server-only'
+
+import { cookies } from 'next/headers'
+
 import { unwrapApiPayload } from '@/src/lib/api/core/envelope'
+import { getApiBaseUrl } from '@/src/lib/api-mode'
 import {
   addCartItem,
   applyCoupon,
   calculateShipping as repoCalculateShipping,
-  createOrder as repoCreateOrder,
   getCart,
   getCartTotals,
   removeCartItem,
@@ -154,17 +158,6 @@ export async function calculateShipping(zipCode: string) {
 export async function createOrder(
   input?: CreateOrderInput,
 ): Promise<CheckoutConfirmation> {
-  if (isExplicitLocalMockMode()) {
-    const order = await repoCreateOrder(input)
-    return {
-      order,
-      payment: {
-        method: input?.pagamentoMetodoId === 'pm-002' ? 'pix' : 'credit_card',
-        status: order.paymentStatus,
-      },
-    }
-  }
-
   const token = (await cookies()).get('tcc_session')?.value
   if (!token) throw new Error('Faça login para finalizar o pedido.')
 
@@ -201,8 +194,3 @@ export async function createOrder(
 }
 
 export { applyCoupon }
-import 'server-only'
-
-import { cookies } from 'next/headers'
-
-import { getApiBaseUrl, isExplicitLocalMockMode } from '@/src/lib/api-mode'

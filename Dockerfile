@@ -20,15 +20,12 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Set NEXT_PUBLIC_API_BASE_URL to relative '/api' during build.
-# In the browser, this will resolve correctly to the active hostname and scheme.
-# In the server side (SSR), we will use API_BASE_URL runtime env var.
+# Set NEXT_PUBLIC_API_BASE_URL for browser calls (relative keeps the active host).
+# SSR during build/runtime should use API_BASE_URL pointing at a reachable API.
 ENV NEXT_PUBLIC_API_BASE_URL=/api
+ENV API_BASE_URL=https://tcc-front-office-api.vercel.app/api
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_OPTIONS=--max-old-space-size=4096
-# Force server-side prerendering calls during build to use local sychronous mocks.
-# This prevents network timeouts and connection errors on build environments.
-ENV LOCAL_MOCK_MODE=true
 
 RUN pnpm run build
 

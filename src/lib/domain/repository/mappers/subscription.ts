@@ -1,4 +1,3 @@
-import { mockCustomer } from '../../mock-data'
 import type { Subscription } from '../../types'
 
 export type ApiSubscription = {
@@ -30,7 +29,7 @@ export function mapApiSubscriptionToDomain(
 
   return {
     id: apiSub.id,
-    customerId: apiSub.idCliente ?? mockCustomer.id,
+    customerId: apiSub.idCliente ?? '',
     planId: apiSub.idPlano,
     planName: apiSub.nomePlano,
     status: statusMap[apiSub.status ?? ''] ?? 'active',

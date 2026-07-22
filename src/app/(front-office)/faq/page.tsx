@@ -1,6 +1,5 @@
 import { IconArrowRight, IconChevronDown } from '@tabler/icons-react'
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
 
 import { PageRenderer } from '@/src/app/(front-office)/_landing/landing'
 import { DesignPageShell } from '@/src/components/public-design/design-page-shell'
@@ -25,7 +24,6 @@ import {
   getCmsPageByRoute,
   getDynamicContent,
   getSeoEntry,
-  isLocalMockMode,
 } from '@/src/lib/domain/repositories'
 import { buildMetadata } from '@/src/lib/seo'
 import { cn } from '@/src/lib/utils'
@@ -85,12 +83,7 @@ const faqItems = [
 ]
 
 export default async function FaqPage() {
-  const isMock = isLocalMockMode()
   const page = await getCmsPageByRoute('/faq')
-
-  if (!isMock && (!page || page.status !== 'publicada')) {
-    notFound()
-  }
 
   if (page && page.status === 'publicada') {
     const faqSections = page.sections.filter((s) => s.tipo === 'faq')
@@ -121,7 +114,6 @@ export default async function FaqPage() {
     )
   }
 
-  // Fallback local mock mode
   const intro = getDynamicContent('faq.intro')
 
   const faqJsonLd = {
@@ -141,7 +133,6 @@ export default async function FaqPage() {
     <DesignPageShell showOverlays={false}>
       <JsonLd data={faqJsonLd} />
 
-      {/* Hero Section */}
       <section className="relative isolate overflow-hidden border-b border-[rgba(33,28,24,0.15)] bg-(--paper) py-16 lg:py-24">
         <div className={`${sectionFrame} relative z-10 max-w-3xl`}>
           <ScrollReveal>
@@ -165,7 +156,6 @@ export default async function FaqPage() {
         </div>
       </section>
 
-      {/* Accordion / Questions Section */}
       <section className="relative isolate overflow-hidden border-b border-[rgba(33,28,24,0.15)] bg-(--paper-soft) py-16 lg:py-24">
         <div className={`${sectionFrame} max-w-4xl`}>
           <ScrollRevealGroup className="space-y-4" staggerChildren={0.07}>
@@ -205,7 +195,6 @@ export default async function FaqPage() {
         </div>
       </section>
 
-      {/* CTA Section */}
       <section className="relative isolate overflow-hidden bg-(--card) py-16 text-(--ink) lg:py-24">
         <div className={`${sectionFrame} relative z-10 max-w-3xl text-center`}>
           <ScrollReveal>

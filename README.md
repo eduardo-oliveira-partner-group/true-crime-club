@@ -3,9 +3,9 @@
 Front Office da plataforma True Crime Club, uma evolucao do site
 [truecrime.club](https://www.truecrime.club/).
 
-O projeto tem como objetivo entregar uma experiencia navegavel, responsiva e
-totalmente mockada para validar a jornada publica de compra, assinatura, area do
-cliente, conteudos exclusivos e futuras integracoes com backend.
+O projeto tem como objetivo entregar uma experiencia navegavel e responsiva
+para a jornada publica de compra, assinatura, area do cliente, conteudos
+exclusivos e integracoes com o backend.
 
 ## O que e o site
 
@@ -56,7 +56,7 @@ Frase-guia:
 
 ## Escopo do front office
 
-O frontend deve permitir validar, com dados mockados:
+O frontend deve permitir:
 
 - Home, vitrine de produtos e boxes.
 - Detalhes de produto ou box.
@@ -66,8 +66,8 @@ O frontend deve permitir validar, com dados mockados:
 - Area do cliente com pedidos, assinatura, financeiro e conteudos exclusivos.
 - Fluxos de assinatura, pagamento, cancelamento, reativacao e conteudos
   bloqueados/liberados.
-- Estrutura preparada para SEO, APIs futuras e conteudos dinamicos gerenciados
-  via Backoffice.
+- Estrutura preparada para SEO, APIs e conteudos dinamicos gerenciados via
+  Backoffice.
 
 ## Desenvolvimento
 
@@ -103,9 +103,6 @@ com `SameSite=Lax`.
 Uma topologia de produção com front e API em sites diferentes exige decisão de
 cookie cross-site (`SameSite=None; Secure`) e proteção CSRF antes do rollout.
 
-Caso deseje executar o projeto em modo de desenvolvimento utilizando dados mockados locais, habilite o modo mock explicitamente em seu arquivo `.env.local`:
-
-```dotenv
-# Ativa o modo de simulação local com dados mockados
-NEXT_PUBLIC_LOCAL_MOCK=true
-```
+Páginas CMS (home, FAQ, rotas dinâmicas) usam `CMS_DELIVERY_BASE_URL` quando
+configurada; sem ela, o frontend cai no conteúdo CMS mock local
+(`src/lib/domain/cms-mock-data.ts`).

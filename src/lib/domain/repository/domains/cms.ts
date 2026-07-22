@@ -3,27 +3,23 @@ import {
   mockCmsPages,
   mockDynamicContent,
   mockSeoEntries,
-} from '../../mock-data'
+} from '../../cms-mock-data'
 import type {
   DynamicContentBlock,
   MenuCms,
   PaginaCms,
   SeoEntry,
 } from '../../types'
-import { throwIfError } from '../core/helpers'
 
 export function getDynamicContent(key: string): DynamicContentBlock | null {
-  throwIfError()
   return mockDynamicContent.find((block) => block.key === key) ?? null
 }
 
 export function getDynamicContentByRoute(route: string): DynamicContentBlock[] {
-  throwIfError()
   return mockDynamicContent.filter((block) => block.route === route)
 }
 
 export function getSeoEntry(path: string): SeoEntry | null {
-  throwIfError()
   const cmsPage = mockCmsPages.find((page) => page.rota === path)
   if (cmsPage) {
     return {
@@ -40,7 +36,6 @@ export function getSeoEntry(path: string): SeoEntry | null {
 export async function getCmsPageByRoute(
   route: string,
 ): Promise<PaginaCms | null> {
-  throwIfError()
   const baseUrl = process.env.CMS_DELIVERY_BASE_URL
   if (baseUrl) {
     try {
@@ -50,18 +45,19 @@ export async function getCmsPageByRoute(
           next: { revalidate: 300 },
         },
       )
-      if (!res.ok) return null
-      const data = await res.json()
-      return Array.isArray(data) ? data[0] : data
+      if (res.ok) {
+        const data = await res.json()
+        return Array.isArray(data) ? data[0] : data
+      }
     } catch (e) {
       console.error('Error fetching CMS page by route:', e)
     }
   }
+
   return mockCmsPages.find((p) => p.rota === route) ?? null
 }
 
 export async function listCmsPages(): Promise<PaginaCms[]> {
-  throwIfError()
   const baseUrl = process.env.CMS_DELIVERY_BASE_URL
   if (baseUrl) {
     try {
@@ -75,11 +71,11 @@ export async function listCmsPages(): Promise<PaginaCms[]> {
       console.error('Error listing CMS pages:', e)
     }
   }
+
   return mockCmsPages
 }
 
 export async function getCmsMenu(chave: string): Promise<MenuCms | null> {
-  throwIfError()
   const baseUrl = process.env.CMS_DELIVERY_BASE_URL
   if (baseUrl) {
     try {
@@ -93,5 +89,6 @@ export async function getCmsMenu(chave: string): Promise<MenuCms | null> {
       console.error('Error fetching CMS menu:', e)
     }
   }
+
   return mockCmsMenus[chave] ?? null
 }

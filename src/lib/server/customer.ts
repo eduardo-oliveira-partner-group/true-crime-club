@@ -3,16 +3,10 @@ import 'server-only'
 import { cookies } from 'next/headers'
 
 import { unwrapApiPayload } from '@/src/lib/api/core/envelope'
-import { getApiBaseUrl, isExplicitLocalMockMode } from '@/src/lib/api-mode'
+import { getApiBaseUrl } from '@/src/lib/api-mode'
 import {
   addCustomerAddress,
   deleteCustomerAddress,
-  getCustomerProfile as getCustomerProfileFromRepository,
-  getOrderById as getOrderByIdFromRepository,
-  getSubscription as getSubscriptionFromRepository,
-  listCards as listCardsFromRepository,
-  listOrders as listOrdersFromRepository,
-  updateCustomerProfile as updateCustomerProfileFromRepository,
 } from '@/src/lib/domain/repositories'
 import type {
   Address,
@@ -166,8 +160,6 @@ function mapApiOrder(
 export async function getOrderById(
   id: string,
 ): Promise<import('@/src/lib/domain/types').Order | null> {
-  if (isExplicitLocalMockMode()) return getOrderByIdFromRepository(id)
-
   const token = (await cookies()).get('tcc_session')?.value
   if (!token) return null
 
@@ -214,8 +206,6 @@ function mapApiSubscription(
 }
 
 export async function getSubscription(): Promise<Subscription | null> {
-  if (isExplicitLocalMockMode()) return getSubscriptionFromRepository()
-
   const token = (await cookies()).get('tcc_session')?.value
   if (!token) return null
 
@@ -240,8 +230,6 @@ export async function getSubscription(): Promise<Subscription | null> {
 export async function listOrders(): Promise<
   import('@/src/lib/domain/types').Order[]
 > {
-  if (isExplicitLocalMockMode()) return listOrdersFromRepository()
-
   const token = (await cookies()).get('tcc_session')?.value
   if (!token) return []
 
@@ -273,8 +261,6 @@ export async function listOrders(): Promise<
 }
 
 export async function listCards(): Promise<PaymentMethod[]> {
-  if (isExplicitLocalMockMode()) return listCardsFromRepository()
-
   const token = (await cookies()).get('tcc_session')?.value
   if (!token) return []
 
@@ -305,10 +291,6 @@ export async function getCustomerProfile(): Promise<{
   addresses: Address[]
   paymentMethods: PaymentMethod[]
 }> {
-  if (isExplicitLocalMockMode()) {
-    return getCustomerProfileFromRepository()
-  }
-
   const token = (await cookies()).get('tcc_session')?.value
   if (!token) {
     return { customer: null, addresses: [], paymentMethods: [] }
@@ -389,11 +371,6 @@ export async function updateCustomerProfile(input: {
   document?: string
   preferences?: Partial<SubscriberPreferences>
 }): Promise<void> {
-  if (isExplicitLocalMockMode()) {
-    await updateCustomerProfileFromRepository(input)
-    return
-  }
-
   const token = (await cookies()).get('tcc_session')?.value
   if (!token) throw new Error('Faça login para atualizar seus dados.')
 

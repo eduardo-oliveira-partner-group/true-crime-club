@@ -11,6 +11,8 @@ interface BuildMetadataOptions {
    * Continua aplicando o template do root layout.
    */
   title?: string
+  /** Descrição SEO; sobrescreve `entry.description` quando informada. */
+  description?: string
   /** Imagem OG específica (absoluta ou path público). */
   image?: string
   /** Marca a rota como não indexável (ex.: páginas privadas). */
@@ -34,12 +36,14 @@ export function buildMetadata({
   path,
   entry,
   title,
+  description: descriptionOverride,
   image,
   noindex,
   ogType = 'website',
 }: BuildMetadataOptions): Metadata {
   const resolvedTitle = title ?? entry?.title
-  const description = entry?.description ?? siteConfig.description
+  const description =
+    descriptionOverride ?? entry?.description ?? siteConfig.description
   const canonical = entry?.canonical ?? absoluteUrl(path)
   const ogImage = resolveImage(image ?? entry?.ogImage ?? siteConfig.ogImage)
   const shouldNoindex = noindex ?? entry?.noindex ?? false
