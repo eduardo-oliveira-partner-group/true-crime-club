@@ -336,15 +336,7 @@ export default function CheckoutPage() {
               customer={
                 customer ? { name: customer.name, email: customer.email } : null
               }
-              addresses={addresses.map((a) => ({
-                id: a.id,
-                label: a.label,
-                street: a.street,
-                number: a.number,
-                city: a.city,
-                state: a.state,
-                zipCode: a.zipCode,
-              }))}
+              addresses={addresses}
               paymentOptions={paymentOptions}
               shippingOptions={shippingOptions}
               isSubscriptionFlow={isSubscriptionFlow}

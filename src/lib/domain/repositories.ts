@@ -42,5 +42,6 @@ export {
   renewPixPayment,
   updateCard,
   updateCartItemQuantity,
+  updateCustomerAddress,
   updateCustomerProfile,
 } from './repository'

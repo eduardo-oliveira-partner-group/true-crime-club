@@ -9,11 +9,11 @@ import {
   IconTrash,
   IconX,
 } from '@tabler/icons-react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 
+import { AddressForm } from '@/src/components/customer/address-form'
 import { Alert, AlertDescription, AlertTitle } from '@/src/components/ui/alert'
 import { Button } from '@/src/components/ui/button'
-import { Checkbox } from '@/src/components/ui/checkbox'
 import {
   Empty,
   EmptyDescription,
@@ -21,52 +21,30 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from '@/src/components/ui/empty'
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from '@/src/components/ui/field'
 import { Input } from '@/src/components/ui/input'
 import {
   NativeSelect,
   NativeSelectOption,
 } from '@/src/components/ui/native-select'
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/src/components/ui/select'
 import { Skeleton } from '@/src/components/ui/skeleton'
 import { Textarea } from '@/src/components/ui/textarea'
 import { apiClient } from '@/src/lib/api-client'
-import { CepLookupError, lookupCep } from '@/src/lib/cep'
 import {
   cardShadowBase,
   dossierCardSurface,
   fontHeading,
   fontMono,
   formInputClass,
-  formLabelClass,
   transitionBgColor,
 } from '@/src/lib/design/classes'
+import { deleteCustomerAddress } from '@/src/lib/domain/repositories'
 import type { Address, Customer } from '@/src/lib/domain/types'
 import {
-  ADDRESS_NUMBER_MAX_LENGTH,
-  BRAZILIAN_UFS,
   formatCep,
   formatCpf,
   formatPhone,
-  formatUf,
-  isValidAddressNumber,
-  isValidCep,
   isValidCpf,
   isValidPhone,
-  isValidUf,
   normalizeDigits,
   SHIRT_SIZES,
   SHOE_SIZES,
@@ -80,249 +58,6 @@ const cancelBtnClass = `cursor-pointer rounded-[9px] p-1.5 text-(--red) ${transi
 
 function displayValue(value: string | null | undefined) {
   return value?.trim() ? value : '—'
-}
-
-type AddressFormValues = {
-  label: string
-  zip: string
-  street: string
-  number: string
-  complement: string
-  neighborhood: string
-  city: string
-  state: string
-  isDefault: boolean
-}
-
-type AddressFormProps = {
-  isEditing: boolean
-  lookingUpCep: boolean
-  cepLookupError: string | null
-  savingAddress: boolean
-  numberInputRef: React.RefObject<HTMLInputElement | null>
-  values: AddressFormValues
-  onLabelChange: (value: string) => void
-  onZipChange: (value: string) => void
-  onZipBlur: () => void
-  onStreetChange: (value: string) => void
-  onNumberChange: (value: string) => void
-  onComplementChange: (value: string) => void
-  onNeighborhoodChange: (value: string) => void
-  onCityChange: (value: string) => void
-  onStateChange: (value: string) => void
-  onIsDefaultChange: (value: boolean) => void
-  onCancel: () => void
-  onSubmit: (e: React.FormEvent) => void
-  className?: string
-  formId?: string
-}
-
-function AddressForm({
-  isEditing,
-  lookingUpCep,
-  cepLookupError,
-  savingAddress,
-  numberInputRef,
-  values,
-  onLabelChange,
-  onZipChange,
-  onZipBlur,
-  onStreetChange,
-  onNumberChange,
-  onComplementChange,
-  onNeighborhoodChange,
-  onCityChange,
-  onStateChange,
-  onIsDefaultChange,
-  onCancel,
-  onSubmit,
-  className,
-  formId,
-}: AddressFormProps) {
-  const cepFieldId = isEditing ? 'addr-cep-edit' : 'addr-cep-new'
-  const defaultFieldId = isEditing ? 'addr-default-edit' : 'addr-default-new'
-
-  return (
-    <form
-      id={formId}
-      onSubmit={onSubmit}
-      className={cn(
-        'rounded-[14px] border border-(--ink)/10 bg-(--paper-soft) p-4',
-        isEditing && 'ring-1 ring-(--red)/25',
-        className,
-      )}
-      aria-label={
-        isEditing ? 'Editar endereço de entrega' : 'Novo endereço de entrega'
-      }
-    >
-      <p
-        className={`text-xs font-semibold tracking-wide text-(--red) uppercase ${fontMono}`}
-      >
-        {isEditing ? 'Editar Endereço de Entrega' : 'Novo Endereço de Entrega'}
-      </p>
-      <FieldGroup className="mt-4 gap-4">
-        <div className="grid gap-4 md:grid-cols-3">
-          <Field className="md:col-span-2">
-            <FieldLabel className={formLabelClass}>
-              Identificação (ex: Casa, Trabalho)
-            </FieldLabel>
-            <Input
-              type="text"
-              required
-              value={values.label}
-              onChange={(e) => onLabelChange(e.target.value)}
-              className={formInputClass}
-            />
-          </Field>
-          <Field data-invalid={cepLookupError ? true : undefined}>
-            <FieldLabel className={formLabelClass} htmlFor={cepFieldId}>
-              CEP
-            </FieldLabel>
-            <Input
-              id={cepFieldId}
-              type="text"
-              required
-              value={values.zip}
-              onChange={(e) => onZipChange(e.target.value)}
-              onBlur={onZipBlur}
-              inputMode="numeric"
-              autoComplete="postal-code"
-              maxLength={9}
-              aria-busy={lookingUpCep}
-              aria-invalid={cepLookupError ? true : undefined}
-              className={formInputClass}
-            />
-            {lookingUpCep ? (
-              <FieldDescription>Buscando endereço...</FieldDescription>
-            ) : null}
-            {cepLookupError ? <FieldError>{cepLookupError}</FieldError> : null}
-          </Field>
-          <Field
-            className="md:col-span-2"
-            data-disabled={lookingUpCep ? true : undefined}
-          >
-            <FieldLabel className={formLabelClass}>Logradouro / Rua</FieldLabel>
-            <Input
-              type="text"
-              required
-              value={values.street}
-              onChange={(e) => onStreetChange(e.target.value)}
-              disabled={lookingUpCep}
-              className={formInputClass}
-            />
-          </Field>
-          <Field>
-            <FieldLabel className={formLabelClass}>Número</FieldLabel>
-            <Input
-              ref={numberInputRef}
-              type="text"
-              required
-              value={values.number}
-              onChange={(e) =>
-                onNumberChange(
-                  e.target.value.slice(0, ADDRESS_NUMBER_MAX_LENGTH),
-                )
-              }
-              maxLength={ADDRESS_NUMBER_MAX_LENGTH}
-              className={formInputClass}
-            />
-          </Field>
-          <Field>
-            <FieldLabel className={formLabelClass}>Complemento</FieldLabel>
-            <Input
-              type="text"
-              value={values.complement}
-              onChange={(e) => onComplementChange(e.target.value)}
-              className={formInputClass}
-            />
-          </Field>
-          <Field data-disabled={lookingUpCep ? true : undefined}>
-            <FieldLabel className={formLabelClass}>Bairro</FieldLabel>
-            <Input
-              type="text"
-              required
-              value={values.neighborhood}
-              onChange={(e) => onNeighborhoodChange(e.target.value)}
-              disabled={lookingUpCep}
-              className={formInputClass}
-            />
-          </Field>
-          <Field data-disabled={lookingUpCep ? true : undefined}>
-            <FieldLabel className={formLabelClass}>Cidade</FieldLabel>
-            <Input
-              type="text"
-              required
-              value={values.city}
-              onChange={(e) => onCityChange(e.target.value)}
-              disabled={lookingUpCep}
-              className={formInputClass}
-            />
-          </Field>
-          <Field data-disabled={lookingUpCep ? true : undefined}>
-            <FieldLabel className={formLabelClass}>Estado (UF)</FieldLabel>
-            <Select
-              value={values.state || undefined}
-              onValueChange={onStateChange}
-              disabled={lookingUpCep}
-            >
-              <SelectTrigger className={cn(formInputClass, 'w-full')}>
-                <SelectValue placeholder="Selecione" />
-              </SelectTrigger>
-              <SelectContent position="popper">
-                <SelectGroup>
-                  {BRAZILIAN_UFS.map((uf) => (
-                    <SelectItem key={uf} value={uf}>
-                      {uf}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </Field>
-          <Field
-            orientation="horizontal"
-            className="items-center md:col-span-3"
-          >
-            <Checkbox
-              id={defaultFieldId}
-              checked={values.isDefault}
-              onCheckedChange={(checked) => onIsDefaultChange(checked === true)}
-              className="size-4 shrink-0 rounded border border-[rgba(33,28,24,0.15)] bg-transparent data-checked:border-(--red) data-checked:bg-(--red) data-checked:text-[#fbf9f6]"
-            />
-            <FieldLabel
-              htmlFor={defaultFieldId}
-              className="cursor-pointer text-sm leading-none font-normal text-(--ink-soft)"
-            >
-              Definir como endereço principal
-            </FieldLabel>
-          </Field>
-        </div>
-      </FieldGroup>
-      <div className="flex justify-end gap-2 pt-4">
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          className="rounded-[9px]"
-          onClick={onCancel}
-        >
-          Cancelar
-        </Button>
-        <Button
-          type="submit"
-          size="sm"
-          className="rounded-[9px] bg-(--red) text-[#fbf9f6] hover:bg-(--red-deep)"
-          disabled={savingAddress || lookingUpCep}
-        >
-          {savingAddress
-            ? 'Salvando...'
-            : isEditing
-              ? 'Salvar Alterações'
-              : 'Salvar Endereço'}
-        </Button>
-      </div>
-    </form>
-  )
 }
 
 function ProfileLoadingSkeleton() {
@@ -421,28 +156,13 @@ export default function PerfilPage() {
   // Addresses State
   const [addresses, setAddresses] = useState<Address[]>([])
   const [showAddAddress, setShowAddAddress] = useState(false)
-  const [newAddrLabel, setNewAddrLabel] = useState('')
-  const [newAddrStreet, setNewAddrStreet] = useState('')
-  const [newAddrNumber, setNewAddrNumber] = useState('')
-  const [newAddrComplement, setNewAddrComplement] = useState('')
-  const [newAddrNeighborhood, setNewAddrNeighborhood] = useState('')
-  const [newAddrCity, setNewAddrCity] = useState('')
-  const [newAddrState, setNewAddrState] = useState('')
-  const [newAddrZip, setNewAddrZip] = useState('')
-  const [newAddrIsDefault, setNewAddrIsDefault] = useState(false)
   const [editingAddressId, setEditingAddressId] = useState<string | null>(null)
-  const [lookingUpCep, setLookingUpCep] = useState(false)
-  const [cepLookupError, setCepLookupError] = useState<string | null>(null)
-  const lastLookedUpCepRef = useRef('')
-  const cepLookupAbortRef = useRef<AbortController | null>(null)
-  const numberInputRef = useRef<HTMLInputElement>(null)
 
   const [loading, setLoading] = useState(true)
   const [savingSection, setSavingSection] = useState<
     'basics' | 'contact' | 'preferences' | null
   >(null)
   const [saveError, setSaveError] = useState<string | null>(null)
-  const [savingAddress, setSavingAddress] = useState(false)
 
   const applyCustomer = (customer: Customer) => {
     const preferences = customer.preferences
@@ -562,7 +282,7 @@ export default function PerfilPage() {
   const handleDeleteAddress = async (id: string) => {
     try {
       setSaveError(null)
-      const updatedList = await apiClient.customer.deleteAddress(id)
+      const updatedList = await deleteCustomerAddress(id)
       setAddresses(updatedList)
     } catch (error) {
       setSaveError(
@@ -574,185 +294,8 @@ export default function PerfilPage() {
   }
 
   const resetAddressForm = () => {
-    cepLookupAbortRef.current?.abort()
-    cepLookupAbortRef.current = null
-    lastLookedUpCepRef.current = ''
     setShowAddAddress(false)
     setEditingAddressId(null)
-    setNewAddrLabel('')
-    setNewAddrStreet('')
-    setNewAddrNumber('')
-    setNewAddrComplement('')
-    setNewAddrNeighborhood('')
-    setNewAddrCity('')
-    setNewAddrState('')
-    setNewAddrZip('')
-    setNewAddrIsDefault(false)
-    setLookingUpCep(false)
-    setCepLookupError(null)
-  }
-
-  const handleEditAddress = (address: Address) => {
-    cepLookupAbortRef.current?.abort()
-    cepLookupAbortRef.current = null
-    lastLookedUpCepRef.current = normalizeDigits(address.zipCode)
-    setEditingAddressId(address.id)
-    setShowAddAddress(false)
-    setNewAddrLabel(address.label)
-    setNewAddrStreet(address.street)
-    setNewAddrNumber(address.number)
-    setNewAddrComplement(address.complement || '')
-    setNewAddrNeighborhood(address.neighborhood)
-    setNewAddrCity(address.city)
-    setNewAddrState(address.state)
-    setNewAddrZip(formatCep(address.zipCode))
-    setNewAddrIsDefault(address.isDefault)
-    setLookingUpCep(false)
-    setCepLookupError(null)
-    setSaveError(null)
-  }
-
-  const fillAddressFromCep = async (digits: string) => {
-    if (digits === lastLookedUpCepRef.current) return
-
-    cepLookupAbortRef.current?.abort()
-    const controller = new AbortController()
-    cepLookupAbortRef.current = controller
-
-    setLookingUpCep(true)
-    setCepLookupError(null)
-
-    try {
-      const address = await lookupCep(digits, controller.signal)
-      if (controller.signal.aborted) return
-
-      lastLookedUpCepRef.current = digits
-      if (address.street) setNewAddrStreet(address.street)
-      if (address.neighborhood) setNewAddrNeighborhood(address.neighborhood)
-      if (address.city) setNewAddrCity(address.city)
-      if (address.state) setNewAddrState(formatUf(address.state))
-      numberInputRef.current?.focus()
-    } catch (error) {
-      if (controller.signal.aborted) return
-      lastLookedUpCepRef.current = ''
-      setCepLookupError(
-        error instanceof CepLookupError
-          ? error.message
-          : 'Não foi possível consultar o CEP.',
-      )
-    } finally {
-      if (cepLookupAbortRef.current === controller) {
-        cepLookupAbortRef.current = null
-        setLookingUpCep(false)
-      }
-    }
-  }
-
-  const handleZipChange = (value: string) => {
-    const formatted = formatCep(value)
-    const digits = normalizeDigits(formatted)
-    setNewAddrZip(formatted)
-    setCepLookupError(null)
-
-    if (digits.length !== 8) {
-      lastLookedUpCepRef.current = ''
-      cepLookupAbortRef.current?.abort()
-      cepLookupAbortRef.current = null
-      setLookingUpCep(false)
-      return
-    }
-
-    void fillAddressFromCep(digits)
-  }
-
-  const handleAddAddress = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!newAddrLabel || !newAddrStreet || !newAddrNumber || !newAddrZip) return
-    if (!isValidCep(newAddrZip)) {
-      setSaveError('CEP deve ter 8 dígitos.')
-      return
-    }
-    if (!isValidUf(newAddrState)) {
-      setSaveError('Selecione uma UF válida.')
-      return
-    }
-    if (!isValidAddressNumber(newAddrNumber)) {
-      setSaveError(
-        `Número deve ter no máximo ${ADDRESS_NUMBER_MAX_LENGTH} caracteres.`,
-      )
-      return
-    }
-
-    const editingId = editingAddressId
-    const addressPayload = {
-      label: newAddrLabel,
-      street: newAddrStreet,
-      number: newAddrNumber.trim(),
-      complement: newAddrComplement,
-      neighborhood: newAddrNeighborhood,
-      city: newAddrCity,
-      state: formatUf(newAddrState),
-      zipCode: normalizeDigits(newAddrZip),
-      isDefault: newAddrIsDefault,
-    }
-
-    try {
-      setSavingAddress(true)
-      setSaveError(null)
-
-      if (editingId) {
-        // Fecha o formulário na hora e reflete a edição no card
-        setAddresses((prev) =>
-          prev.map((addr) => {
-            if (addr.id !== editingId) {
-              return addressPayload.isDefault
-                ? { ...addr, isDefault: false }
-                : addr
-            }
-            return {
-              ...addr,
-              label: addressPayload.label,
-              street: addressPayload.street,
-              number: addressPayload.number,
-              complement: addressPayload.complement || undefined,
-              neighborhood: addressPayload.neighborhood,
-              city: addressPayload.city,
-              state: addressPayload.state,
-              zipCode: addressPayload.zipCode,
-              isDefault: addressPayload.isDefault,
-            }
-          }),
-        )
-        resetAddressForm()
-
-        const updatedList = await apiClient.customer.updateAddress(
-          editingId,
-          addressPayload,
-        )
-        setAddresses(updatedList)
-      } else {
-        const updatedList = await apiClient.customer.addAddress(addressPayload)
-        setAddresses(updatedList)
-        resetAddressForm()
-      }
-    } catch (error) {
-      setSaveError(
-        error instanceof Error
-          ? error.message
-          : 'Não foi possível salvar o endereço.',
-      )
-      // Se a edição falhou após fechar o form, recarrega a lista real
-      if (editingId) {
-        try {
-          const data = await apiClient.customer.getProfile()
-          if (data.addresses) setAddresses(data.addresses)
-        } catch {
-          // Mantém o estado otimista se o refetch também falhar
-        }
-      }
-    } finally {
-      setSavingAddress(false)
-    }
   }
 
   return (
@@ -1136,39 +679,13 @@ export default function PerfilPage() {
               {/* Formulário de novo endereço (acima da lista) */}
               {showAddAddress && !editingAddressId ? (
                 <AddressForm
-                  isEditing={false}
-                  lookingUpCep={lookingUpCep}
-                  cepLookupError={cepLookupError}
-                  savingAddress={savingAddress}
-                  numberInputRef={numberInputRef}
-                  values={{
-                    label: newAddrLabel,
-                    zip: newAddrZip,
-                    street: newAddrStreet,
-                    number: newAddrNumber,
-                    complement: newAddrComplement,
-                    neighborhood: newAddrNeighborhood,
-                    city: newAddrCity,
-                    state: newAddrState,
-                    isDefault: newAddrIsDefault,
-                  }}
-                  onLabelChange={setNewAddrLabel}
-                  onZipChange={handleZipChange}
-                  onZipBlur={() => {
-                    if (isValidCep(newAddrZip)) {
-                      void fillAddressFromCep(normalizeDigits(newAddrZip))
-                    }
-                  }}
-                  onStreetChange={setNewAddrStreet}
-                  onNumberChange={setNewAddrNumber}
-                  onComplementChange={setNewAddrComplement}
-                  onNeighborhoodChange={setNewAddrNeighborhood}
-                  onCityChange={setNewAddrCity}
-                  onStateChange={setNewAddrState}
-                  onIsDefaultChange={setNewAddrIsDefault}
                   onCancel={resetAddressForm}
-                  onSubmit={handleAddAddress}
+                  onSaved={(list) => {
+                    setAddresses(list)
+                    resetAddressForm()
+                  }}
                   className="mt-4"
+                  idPrefix="addr-new"
                 />
               ) : null}
 
@@ -1193,38 +710,13 @@ export default function PerfilPage() {
                       <AddressForm
                         key={addr.id}
                         formId={`address-edit-${addr.id}`}
-                        isEditing
-                        lookingUpCep={lookingUpCep}
-                        cepLookupError={cepLookupError}
-                        savingAddress={savingAddress}
-                        numberInputRef={numberInputRef}
-                        values={{
-                          label: newAddrLabel,
-                          zip: newAddrZip,
-                          street: newAddrStreet,
-                          number: newAddrNumber,
-                          complement: newAddrComplement,
-                          neighborhood: newAddrNeighborhood,
-                          city: newAddrCity,
-                          state: newAddrState,
-                          isDefault: newAddrIsDefault,
-                        }}
-                        onLabelChange={setNewAddrLabel}
-                        onZipChange={handleZipChange}
-                        onZipBlur={() => {
-                          if (isValidCep(newAddrZip)) {
-                            void fillAddressFromCep(normalizeDigits(newAddrZip))
-                          }
-                        }}
-                        onStreetChange={setNewAddrStreet}
-                        onNumberChange={setNewAddrNumber}
-                        onComplementChange={setNewAddrComplement}
-                        onNeighborhoodChange={setNewAddrNeighborhood}
-                        onCityChange={setNewAddrCity}
-                        onStateChange={setNewAddrState}
-                        onIsDefaultChange={setNewAddrIsDefault}
+                        address={addr}
+                        idPrefix={`addr-edit-${addr.id}`}
                         onCancel={resetAddressForm}
-                        onSubmit={handleAddAddress}
+                        onSaved={(list) => {
+                          setAddresses(list)
+                          resetAddressForm()
+                        }}
                       />
                     ) : (
                       <div
@@ -1258,7 +750,11 @@ export default function PerfilPage() {
                             type="button"
                             variant="ghost"
                             size="icon-sm"
-                            onClick={() => handleEditAddress(addr)}
+                            onClick={() => {
+                              setEditingAddressId(addr.id)
+                              setShowAddAddress(false)
+                              setSaveError(null)
+                            }}
                             disabled={
                               Boolean(editingAddressId) || showAddAddress
                             }

@@ -41,6 +41,7 @@ export {
   reactivateSubscription,
   renewPixPayment,
   updateCard,
+  updateCustomerAddress,
   updateCustomerProfile,
 } from './domains/customer'
 export {

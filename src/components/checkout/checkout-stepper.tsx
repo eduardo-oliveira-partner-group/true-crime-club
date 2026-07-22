@@ -6,6 +6,7 @@ import {
   IconCheck,
   IconCircleCheck,
   IconCreditCard,
+  IconEdit,
   IconMapPin,
   IconPackage,
   IconPlus,
@@ -17,8 +18,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
-import { CheckoutAddressForm } from '@/src/components/checkout/checkout-address-form'
-import { CheckoutCardForm } from '@/src/components/checkout/checkout-card-form'
+import { AddressForm } from '@/src/components/customer/address-form'
+import { CardForm } from '@/src/components/customer/card-form'
 import { Button } from '@/src/components/ui/button'
 import {
   Empty,
@@ -50,22 +51,18 @@ import {
   fontHeading,
   fontMono,
   formInputClass,
+  transitionBgColor,
   warmShadowClass,
 } from '@/src/lib/design/classes'
 import { calculateShipping } from '@/src/lib/domain/repositories'
 import type { Address, PaymentMethod } from '@/src/lib/domain/types'
-import { formatCurrency, SHIRT_SIZES, SHOE_SIZES } from '@/src/lib/formatters'
+import {
+  formatCep,
+  formatCurrency,
+  SHIRT_SIZES,
+  SHOE_SIZES,
+} from '@/src/lib/formatters'
 import { cn } from '@/src/lib/utils'
-
-export interface CheckoutAddress {
-  id: string
-  label: string
-  street: string
-  number: string
-  city: string
-  state: string
-  zipCode: string
-}
 
 export interface CheckoutPaymentOption {
   id: string
@@ -88,7 +85,7 @@ export interface SubscriberPreferencesValue {
 
 interface CheckoutStepperProps {
   customer: { name: string; email: string } | null
-  addresses: CheckoutAddress[]
+  addresses: Address[]
   paymentOptions: CheckoutPaymentOption[]
   shippingOptions: CheckoutShippingOption[]
   isSubscriptionFlow: boolean
@@ -116,18 +113,6 @@ const steps = [
   { key: 'preferencias', label: 'Preferências', code: '05', Icon: IconShirt },
   { key: 'revisao', label: 'Revisão', code: '06', Icon: IconPackage },
 ] as const
-
-function toCheckoutAddress(address: Address): CheckoutAddress {
-  return {
-    id: address.id,
-    label: address.label,
-    street: address.street,
-    number: address.number,
-    city: address.city,
-    state: address.state,
-    zipCode: address.zipCode,
-  }
-}
 
 function toCheckoutPayment(method: PaymentMethod): CheckoutPaymentOption {
   return {
@@ -175,6 +160,7 @@ export function CheckoutStepper({
   const [showAddressForm, setShowAddressForm] = useState(
     initialAddresses.length === 0,
   )
+  const [editingAddressId, setEditingAddressId] = useState<string | null>(null)
   const [showCardForm, setShowCardForm] = useState(
     initialPaymentOptions.length === 0,
   )
@@ -202,7 +188,9 @@ export function CheckoutStepper({
   const paymentStepIndex = 4
   const canAdvance =
     hasCustomer &&
-    (currentStep !== addressStepIndex || Boolean(selectedAddressId)) &&
+    !editingAddressId &&
+    (currentStep !== addressStepIndex ||
+      (Boolean(selectedAddressId) && !showAddressForm)) &&
     (currentStep !== paymentStepIndex || Boolean(selectedPaymentId)) &&
     (!isLastStep || (Boolean(selectedAddressId) && Boolean(selectedPaymentId)))
   const processingMessage =
@@ -229,18 +217,15 @@ export function CheckoutStepper({
   }
 
   async function handleAddressSaved(nextAddresses: Address[]) {
-    const mapped = nextAddresses.map(toCheckoutAddress)
-    setAddresses(mapped)
+    setAddresses(nextAddresses)
     setShowAddressForm(false)
+    setEditingAddressId(null)
     setError(null)
 
     const preferred =
-      mapped.find((address) => address.id === selectedAddressId) ??
-      mapped.find(
-        (address) =>
-          nextAddresses.find((item) => item.id === address.id)?.isDefault,
-      ) ??
-      mapped[0]
+      nextAddresses.find((address) => address.id === selectedAddressId) ??
+      nextAddresses.find((address) => address.isDefault) ??
+      nextAddresses[0]
 
     if (preferred) {
       setSelectedAddressId(preferred.id)
@@ -248,7 +233,13 @@ export function CheckoutStepper({
     }
   }
 
+  function resetAddressForm() {
+    setShowAddressForm(false)
+    setEditingAddressId(null)
+  }
+
   async function handleSelectAddress(addressId: string) {
+    if (editingAddressId) return
     setSelectedAddressId(addressId)
     const address = addresses.find((item) => item.id === addressId)
     if (address) {
@@ -473,7 +464,10 @@ export function CheckoutStepper({
                         <EmptyContent>
                           <Button
                             type="button"
-                            onClick={() => setShowAddressForm(true)}
+                            onClick={() => {
+                              resetAddressForm()
+                              setShowAddressForm(true)
+                            }}
                             className="inline-flex items-center gap-2 rounded-[9px] bg-(--red) text-[#fbf9f6] hover:bg-(--red-deep)"
                           >
                             <IconPlus className="size-4" />
@@ -483,34 +477,77 @@ export function CheckoutStepper({
                       </Empty>
                     ) : null}
 
-                    {addresses.map((address) => (
-                      <OptionCard
-                        key={address.id}
-                        selected={selectedAddressId === address.id}
-                        onSelect={() => {
-                          void handleSelectAddress(address.id)
-                        }}
-                        name="address"
-                        title={address.label}
-                        detail={`${address.street}, ${address.number} — ${address.city}/${address.state} · CEP ${address.zipCode}`}
-                      />
-                    ))}
-
-                    {showAddressForm ? (
-                      <CheckoutAddressForm
+                    {showAddressForm && !editingAddressId ? (
+                      <AddressForm
+                        idPrefix="checkout-addr-new"
                         onSaved={handleAddressSaved}
                         onCancel={
-                          addresses.length > 0
-                            ? () => setShowAddressForm(false)
-                            : undefined
+                          addresses.length > 0 ? resetAddressForm : undefined
                         }
                       />
-                    ) : addresses.length > 0 ? (
+                    ) : null}
+
+                    {addresses.map((address) =>
+                      editingAddressId === address.id ? (
+                        <AddressForm
+                          key={address.id}
+                          formId={`checkout-address-edit-${address.id}`}
+                          idPrefix={`checkout-addr-edit-${address.id}`}
+                          address={address}
+                          onSaved={handleAddressSaved}
+                          onCancel={resetAddressForm}
+                        />
+                      ) : (
+                        <OptionCard
+                          key={address.id}
+                          selected={selectedAddressId === address.id}
+                          onSelect={() => {
+                            void handleSelectAddress(address.id)
+                          }}
+                          name="address"
+                          title={address.label}
+                          detail={`${address.street}, ${address.number}${
+                            address.complement ? ` (${address.complement})` : ''
+                          } — ${address.neighborhood} · ${address.city}/${address.state} · CEP ${formatCep(address.zipCode)}`}
+                          trailing={
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon-sm"
+                              disabled={
+                                Boolean(editingAddressId) || showAddressForm
+                              }
+                              onClick={(e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                setShowAddressForm(false)
+                                setEditingAddressId(address.id)
+                              }}
+                              className={cn(
+                                'size-7 shrink-0 rounded-[9px] p-1 text-(--red)',
+                                transitionBgColor,
+                                'hover:bg-(--red)/10 hover:text-(--red-deep)',
+                              )}
+                              aria-label={`Editar endereço ${address.label}`}
+                            >
+                              <IconEdit className="size-3.5" />
+                            </Button>
+                          }
+                        />
+                      ),
+                    )}
+
+                    {!showAddressForm &&
+                    !editingAddressId &&
+                    addresses.length > 0 ? (
                       <Button
                         type="button"
                         variant="outline"
                         size="sm"
-                        onClick={() => setShowAddressForm(true)}
+                        onClick={() => {
+                          setEditingAddressId(null)
+                          setShowAddressForm(true)
+                        }}
                         className="inline-flex items-center gap-2 rounded-[9px]"
                       >
                         <IconPlus className="size-3.5" />
@@ -598,7 +635,8 @@ export function CheckoutStepper({
                     ))}
 
                     {showCardForm ? (
-                      <CheckoutCardForm
+                      <CardForm
+                        idPrefix="checkout-card"
                         onSaved={handleCardSaved}
                         onCancel={
                           paymentOptions.length > 0
@@ -635,7 +673,7 @@ export function CheckoutStepper({
                           onChange={(e) =>
                             setInstallments(Number(e.target.value))
                           }
-                          className={cn(formInputClass, 'h-10 px-3')}
+                          className={cn(formInputClass, 'px-3')}
                         >
                           {Array.from(
                             { length: maxInstallments },
@@ -690,7 +728,7 @@ export function CheckoutStepper({
                                 shirtSize: e.target.value,
                               }))
                             }
-                            className={cn(formInputClass, 'h-10 px-3')}
+                            className={cn(formInputClass, 'px-3')}
                           >
                             <NativeSelectOption value="">
                               Prefiro não informar
@@ -719,7 +757,7 @@ export function CheckoutStepper({
                                 shoeSize: e.target.value,
                               }))
                             }
-                            className={cn(formInputClass, 'h-10 px-3')}
+                            className={cn(formInputClass, 'px-3')}
                           >
                             <NativeSelectOption value="">
                               Prefiro não informar
@@ -1165,14 +1203,14 @@ function OptionCard({
         onChange={onSelect}
         className="mt-1 accent-(--teal)"
       />
-      <span className="flex flex-1 items-start justify-between gap-4">
-        <span>
+      <span className="min-w-0 flex-1">
+        <span className="flex items-start justify-between gap-4">
           <span className="font-medium text-(--ink)">{title}</span>
-          {detail ? (
-            <span className="mt-1 block text-(--ink-soft)">{detail}</span>
-          ) : null}
+          {trailing}
         </span>
-        {trailing}
+        {detail ? (
+          <span className="mt-1 block text-(--ink-soft)">{detail}</span>
+        ) : null}
       </span>
     </label>
   )

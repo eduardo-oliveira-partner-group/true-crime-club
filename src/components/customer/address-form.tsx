@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { Alert, AlertDescription, AlertTitle } from '@/src/components/ui/alert'
 import { Button } from '@/src/components/ui/button'
@@ -27,7 +27,10 @@ import {
   formInputClass,
   formLabelClass,
 } from '@/src/lib/design/classes'
-import { addCustomerAddress } from '@/src/lib/domain/repositories'
+import {
+  addCustomerAddress,
+  updateCustomerAddress,
+} from '@/src/lib/domain/repositories'
 import type { Address } from '@/src/lib/domain/types'
 import {
   ADDRESS_NUMBER_MAX_LENGTH,
@@ -41,33 +44,49 @@ import {
 } from '@/src/lib/formatters'
 import { cn } from '@/src/lib/utils'
 
-type CheckoutAddressFormProps = {
+export type AddressFormProps = {
+  /** Quando informado, o formulário entra em modo de edição. */
+  address?: Address
   onCancel?: () => void
   onSaved: (addresses: Address[]) => void
   className?: string
+  formId?: string
+  idPrefix?: string
 }
 
-export function CheckoutAddressForm({
+export function AddressForm({
+  address,
   onCancel,
   onSaved,
   className,
-}: CheckoutAddressFormProps) {
-  const [label, setLabel] = useState('')
-  const [zip, setZip] = useState('')
-  const [street, setStreet] = useState('')
-  const [number, setNumber] = useState('')
-  const [complement, setComplement] = useState('')
-  const [neighborhood, setNeighborhood] = useState('')
-  const [city, setCity] = useState('')
-  const [state, setState] = useState('')
-  const [isDefault, setIsDefault] = useState(true)
+  formId,
+  idPrefix = 'addr',
+}: AddressFormProps) {
+  const isEditing = Boolean(address)
+  const [label, setLabel] = useState(address?.label ?? '')
+  const [zip, setZip] = useState(address ? formatCep(address.zipCode) : '')
+  const [street, setStreet] = useState(address?.street ?? '')
+  const [number, setNumber] = useState(address?.number ?? '')
+  const [complement, setComplement] = useState(address?.complement ?? '')
+  const [neighborhood, setNeighborhood] = useState(address?.neighborhood ?? '')
+  const [city, setCity] = useState(address?.city ?? '')
+  const [state, setState] = useState(address?.state ?? '')
+  const [isDefault, setIsDefault] = useState(address?.isDefault ?? !address)
   const [lookingUpCep, setLookingUpCep] = useState(false)
   const [cepLookupError, setCepLookupError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const lastLookedUpCepRef = useRef('')
+  const lastLookedUpCepRef = useRef(
+    address ? normalizeDigits(address.zipCode) : '',
+  )
   const cepLookupAbortRef = useRef<AbortController | null>(null)
   const numberInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    return () => {
+      cepLookupAbortRef.current?.abort()
+    }
+  }, [])
 
   const fillAddressFromCep = async (digits: string) => {
     if (digits === lastLookedUpCepRef.current) return
@@ -80,14 +99,14 @@ export function CheckoutAddressForm({
     setCepLookupError(null)
 
     try {
-      const address = await lookupCep(digits, controller.signal)
+      const result = await lookupCep(digits, controller.signal)
       if (controller.signal.aborted) return
 
       lastLookedUpCepRef.current = digits
-      if (address.street) setStreet(address.street)
-      if (address.neighborhood) setNeighborhood(address.neighborhood)
-      if (address.city) setCity(address.city)
-      if (address.state) setState(formatUf(address.state))
+      if (result.street) setStreet(result.street)
+      if (result.neighborhood) setNeighborhood(result.neighborhood)
+      if (result.city) setCity(result.city)
+      if (result.state) setState(formatUf(result.state))
       numberInputRef.current?.focus()
     } catch (err) {
       if (controller.signal.aborted) return
@@ -141,20 +160,24 @@ export function CheckoutAddressForm({
       return
     }
 
+    const payload = {
+      label,
+      street,
+      number: number.trim(),
+      complement: complement || undefined,
+      neighborhood,
+      city,
+      state: formatUf(state),
+      zipCode: normalizeDigits(zip),
+      isDefault,
+    }
+
     try {
       setSaving(true)
       setError(null)
-      const addresses = await addCustomerAddress({
-        label,
-        street,
-        number: number.trim(),
-        complement: complement || undefined,
-        neighborhood,
-        city,
-        state: formatUf(state),
-        zipCode: normalizeDigits(zip),
-        isDefault,
-      })
+      const addresses = address
+        ? await updateCustomerAddress(address.id, payload)
+        : await addCustomerAddress(payload)
       onSaved(addresses)
     } catch (err) {
       setError(
@@ -167,14 +190,21 @@ export function CheckoutAddressForm({
     }
   }
 
+  const cepFieldId = `${idPrefix}-cep`
+  const defaultFieldId = `${idPrefix}-default`
+
   return (
     <form
+      id={formId}
       onSubmit={handleSubmit}
       className={cn(
         'rounded-[14px] border border-(--ink)/10 bg-(--paper-soft) p-4',
+        isEditing && 'ring-1 ring-(--red)/25',
         className,
       )}
-      aria-label="Novo endereço de entrega"
+      aria-label={
+        isEditing ? 'Editar endereço de entrega' : 'Novo endereço de entrega'
+      }
     >
       <p
         className={cn(
@@ -182,11 +212,11 @@ export function CheckoutAddressForm({
           'text-xs font-semibold tracking-wide text-(--red) uppercase',
         )}
       >
-        Novo endereço de entrega
+        {isEditing ? 'Editar endereço de entrega' : 'Novo endereço de entrega'}
       </p>
       <FieldGroup className="mt-4 gap-4">
-        <div className="grid gap-4 sm:grid-cols-3">
-          <Field className="sm:col-span-2">
+        <div className="grid gap-4 md:grid-cols-3">
+          <Field className="md:col-span-2">
             <FieldLabel className={formLabelClass}>
               Identificação (ex: Casa, Trabalho)
             </FieldLabel>
@@ -199,11 +229,11 @@ export function CheckoutAddressForm({
             />
           </Field>
           <Field data-invalid={cepLookupError ? true : undefined}>
-            <FieldLabel className={formLabelClass} htmlFor="checkout-addr-cep">
+            <FieldLabel className={formLabelClass} htmlFor={cepFieldId}>
               CEP
             </FieldLabel>
             <Input
-              id="checkout-addr-cep"
+              id={cepFieldId}
               type="text"
               required
               value={zip}
@@ -226,7 +256,7 @@ export function CheckoutAddressForm({
             {cepLookupError ? <FieldError>{cepLookupError}</FieldError> : null}
           </Field>
           <Field
-            className="sm:col-span-2"
+            className="md:col-span-2"
             data-disabled={lookingUpCep ? true : undefined}
           >
             <FieldLabel className={formLabelClass}>Logradouro / Rua</FieldLabel>
@@ -307,16 +337,16 @@ export function CheckoutAddressForm({
           </Field>
           <Field
             orientation="horizontal"
-            className="items-center sm:col-span-3"
+            className="items-center md:col-span-3"
           >
             <Checkbox
-              id="checkout-addr-default"
+              id={defaultFieldId}
               checked={isDefault}
               onCheckedChange={(checked) => setIsDefault(checked === true)}
               className="size-4 shrink-0 rounded border border-[rgba(33,28,24,0.15)] bg-transparent data-checked:border-(--red) data-checked:bg-(--red) data-checked:text-[#fbf9f6]"
             />
             <FieldLabel
-              htmlFor="checkout-addr-default"
+              htmlFor={defaultFieldId}
               className="cursor-pointer text-sm leading-none font-normal text-(--ink-soft)"
             >
               Definir como endereço principal
@@ -349,7 +379,11 @@ export function CheckoutAddressForm({
           className="rounded-[9px] bg-(--red) text-[#fbf9f6] hover:bg-(--red-deep)"
           disabled={saving || lookingUpCep}
         >
-          {saving ? 'Salvando...' : 'Salvar endereço'}
+          {saving
+            ? 'Salvando...'
+            : isEditing
+              ? 'Salvar alterações'
+              : 'Salvar endereço'}
         </Button>
       </div>
     </form>

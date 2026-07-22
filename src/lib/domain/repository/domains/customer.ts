@@ -65,6 +65,23 @@ export async function addCustomerAddress(body: {
   return await apiClient.customer.addAddress(body)
 }
 
+export async function updateCustomerAddress(
+  id: string,
+  body: {
+    label: string
+    street: string
+    number: string
+    complement?: string
+    neighborhood: string
+    city: string
+    state: string
+    zipCode: string
+    isDefault?: boolean
+  },
+): Promise<Address[]> {
+  return await apiClient.customer.updateAddress(id, body)
+}
+
 export async function deleteCustomerAddress(id: string): Promise<Address[]> {
   return await apiClient.customer.deleteAddress(id)
 }
@@ -188,6 +205,8 @@ export async function addCard(input: {
   lastFour: string
   brand: string
   holderDocument: string
+  expiryMonth: string
+  expiryYear: string
 }): Promise<PaymentMethod> {
   return await apiClient.customer.addCard(input)
 }

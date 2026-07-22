@@ -33,17 +33,21 @@ const EXPIRY_MONTHS = Array.from({ length: 12 }, (_, i) =>
 )
 const EXPIRY_YEARS = Array.from({ length: 10 }, (_, i) => String(2026 + i))
 
-type CheckoutCardFormProps = {
+export type CardFormProps = {
   onCancel?: () => void
   onSaved: (card: PaymentMethod) => void
   className?: string
+  idPrefix?: string
+  title?: string
 }
 
-export function CheckoutCardForm({
+export function CardForm({
   onCancel,
   onSaved,
   className,
-}: CheckoutCardFormProps) {
+  idPrefix = 'card',
+  title = 'Novo cartão de crédito',
+}: CardFormProps) {
   const [cardNumber, setCardNumber] = useState('')
   const [holderName, setHolderName] = useState('')
   const [holderDocument, setHolderDocument] = useState('')
@@ -84,6 +88,8 @@ export function CheckoutCardForm({
         lastFour,
         brand,
         holderDocument,
+        expiryMonth,
+        expiryYear,
       })
       onSaved(card)
     } catch (err) {
@@ -112,15 +118,15 @@ export function CheckoutCardForm({
           'text-xs font-semibold tracking-wide text-(--red) uppercase',
         )}
       >
-        Novo cartão de crédito
+        {title}
       </p>
       <FieldGroup className="mt-4 gap-4">
         <Field>
-          <FieldLabel className={formLabelClass} htmlFor="checkout-card-number">
+          <FieldLabel className={formLabelClass} htmlFor={`${idPrefix}-number`}>
             Número do cartão
           </FieldLabel>
           <Input
-            id="checkout-card-number"
+            id={`${idPrefix}-number`}
             type="text"
             required
             placeholder="4000 1234 5678 9010"
@@ -133,11 +139,11 @@ export function CheckoutCardForm({
           />
         </Field>
         <Field>
-          <FieldLabel className={formLabelClass} htmlFor="checkout-card-holder">
+          <FieldLabel className={formLabelClass} htmlFor={`${idPrefix}-holder`}>
             Nome do titular (idêntico ao cartão)
           </FieldLabel>
           <Input
-            id="checkout-card-holder"
+            id={`${idPrefix}-holder`}
             type="text"
             required
             placeholder="MARIANA SILVA"
@@ -153,12 +159,12 @@ export function CheckoutCardForm({
         <Field>
           <FieldLabel
             className={formLabelClass}
-            htmlFor="checkout-card-document"
+            htmlFor={`${idPrefix}-document`}
           >
             CPF do titular
           </FieldLabel>
           <Input
-            id="checkout-card-document"
+            id={`${idPrefix}-document`}
             type="text"
             required
             placeholder="000.000.000-00"
@@ -200,11 +206,11 @@ export function CheckoutCardForm({
             </NativeSelect>
           </Field>
           <Field>
-            <FieldLabel className={formLabelClass} htmlFor="checkout-card-cvc">
+            <FieldLabel className={formLabelClass} htmlFor={`${idPrefix}-cvc`}>
               CVC
             </FieldLabel>
             <Input
-              id="checkout-card-cvc"
+              id={`${idPrefix}-cvc`}
               type="text"
               required
               placeholder="123"

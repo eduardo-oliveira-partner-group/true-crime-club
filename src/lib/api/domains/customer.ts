@@ -190,6 +190,8 @@ export const customerApi = {
     lastFour: string
     brand: string
     holderDocument: string
+    expiryMonth: string
+    expiryYear: string
   }) =>
     fetcher('/cliente/cartoes', {
       method: 'POST',
@@ -199,6 +201,8 @@ export const customerApi = {
         ultimosQuatro: body.lastFour,
         bandeira: body.brand,
         cpfTitular: normalizeDigits(body.holderDocument),
+        mesValidade: body.expiryMonth,
+        anoValidade: body.expiryYear,
       }),
     }).then(toPaymentMethod),
   deleteCard: (id: string) =>

@@ -1,10 +1,18 @@
 'use client'
 
-import { IconArrowRight, IconCalendar } from '@tabler/icons-react'
+import { IconArrowRight, IconCalendar, IconTicket } from '@tabler/icons-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 import { Button } from '@/src/components/ui/button'
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@/src/components/ui/empty'
 import { Skeleton } from '@/src/components/ui/skeleton'
 import {
   cardShadowBase,
@@ -167,29 +175,30 @@ export default function AssinaturaClientePage() {
       {loading ? (
         <SubscriptionLoadingSkeleton />
       ) : !subscription ? (
-        <section
-          className={`mt-10 rounded-[14px] border border-dashed border-(--ink)/15 bg-(--paper-soft) p-7 text-center sm:p-10`}
-        >
-          <div className="mx-auto flex max-w-sm flex-col items-center">
-            <h2
-              className={`text-xl font-semibold tracking-tight text-(--ink) ${fontHeading}`}
-            >
+        <Empty className="mt-10 border border-dashed border-(--ink)/15 bg-(--paper-soft) p-7 sm:p-10">
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <IconTicket />
+            </EmptyMedia>
+            <EmptyTitle className="text-xl">
               Nenhuma assinatura encontrada
-            </h2>
-            <p className="mt-2 text-sm/6 text-(--ink-mute)">
+            </EmptyTitle>
+            <EmptyDescription>
               O arquivo desta conta ainda não foi aberto.
-            </p>
+            </EmptyDescription>
+          </EmptyHeader>
+          <EmptyContent>
             <Button
               asChild
-              className="mt-6 rounded-[9px] bg-(--red) text-[#fbf9f6] shadow-[0_9px_22px_-8px_rgba(33,28,24,0.13)] hover:bg-(--red-deep)"
+              className={`group rounded-[9px] bg-(--red) px-4 py-3 text-xs font-bold tracking-[0.04em] text-[#fbf9f6] uppercase shadow-[0_9px_22px_-8px_rgba(33,28,24,0.13)] [transition:background-color_0.2s_ease,translate_0.24s_cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:bg-(--red-deep) motion-reduce:transition-none motion-reduce:hover:translate-y-0 ${fontMono}`}
             >
               <Link href="/assinatura">
                 Conhecer planos
-                <IconArrowRight className="size-4" />
+                <IconArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5 motion-reduce:transition-none" />
               </Link>
             </Button>
-          </div>
-        </section>
+          </EmptyContent>
+        </Empty>
       ) : (
         <section className="mt-8" aria-label="Assinatura ativa">
           <SubscriptionCard subscription={subscription} />
