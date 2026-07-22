@@ -6,6 +6,7 @@ import {
   IconPlus,
   IconTrash,
 } from '@tabler/icons-react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 import { CardForm } from '@/src/components/customer/card-form'
@@ -27,7 +28,11 @@ import {
   fontMono,
   transitionBgColor,
 } from '@/src/lib/design/classes'
-import { deleteCard, listCards } from '@/src/lib/domain/repositories'
+import {
+  deleteCard,
+  listCards,
+  updateCard,
+} from '@/src/lib/domain/repositories'
 import type { PaymentMethod } from '@/src/lib/domain/types'
 
 function getErrorMessage(error: unknown, fallback: string): string {
@@ -35,11 +40,15 @@ function getErrorMessage(error: unknown, fallback: string): string {
 }
 
 export default function CartoesClient() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const [cards, setCards] = useState<PaymentMethod[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [showAddForm, setShowAddForm] = useState(false)
+  const [showAddForm, setShowAddForm] = useState(
+    () => searchParams.get('acao') === 'adicionar',
+  )
 
   const reloadCards = async () => {
     const nextCards = await listCards()
@@ -51,6 +60,27 @@ export default function CartoesClient() {
       .catch(() => setCards([]))
       .finally(() => setIsLoading(false))
   }, [])
+
+  const closeAddForm = () => {
+    setShowAddForm(false)
+    if (searchParams.get('acao') === 'adicionar') {
+      router.replace('/cliente/cartoes')
+    }
+  }
+
+  const handleSetDefaultCard = async (id: string) => {
+    setSubmitting(true)
+    setError(null)
+    try {
+      await updateCard({ id, padrao: true })
+      await reloadCards()
+    } catch (e: unknown) {
+      console.error(e)
+      setError(getErrorMessage(e, 'Erro ao definir cartão principal.'))
+    } finally {
+      setSubmitting(false)
+    }
+  }
 
   const handleDeleteCard = async (id: string) => {
     setSubmitting(true)
@@ -100,9 +130,9 @@ export default function CartoesClient() {
           className="mt-8"
           idPrefix="account-card"
           title="Adicionar cartão de crédito"
-          onCancel={() => setShowAddForm(false)}
+          onCancel={closeAddForm}
           onSaved={async () => {
-            setShowAddForm(false)
+            closeAddForm()
             setError(null)
             await reloadCards()
           }}
@@ -170,17 +200,31 @@ export default function CartoesClient() {
                     </p>
                   </div>
                 </div>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon-sm"
-                  disabled={submitting}
-                  onClick={() => handleDeleteCard(card.id)}
-                  className={`cursor-pointer rounded-[9px] p-1.5 text-(--red) ${transitionBgColor} hover:bg-(--red)/10 hover:text-(--red-deep) disabled:opacity-50`}
-                  aria-label="Excluir cartão"
-                >
-                  <IconTrash className="size-4.5" />
-                </Button>
+                <div className="flex items-center gap-2">
+                  {!card.isDefault ? (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      disabled={submitting}
+                      onClick={() => handleSetDefaultCard(card.id)}
+                      className={`rounded-[9px] border-(--ink)/15 text-(--ink-soft) ${transitionBgColor} hover:bg-(--paper-soft) hover:text-(--ink)`}
+                    >
+                      Definir como principal
+                    </Button>
+                  ) : null}
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-sm"
+                    disabled={submitting}
+                    onClick={() => handleDeleteCard(card.id)}
+                    className={`cursor-pointer rounded-[9px] p-1.5 text-(--red) ${transitionBgColor} hover:bg-(--red)/10 hover:text-(--red-deep) disabled:opacity-50`}
+                    aria-label="Excluir cartão"
+                  >
+                    <IconTrash className="size-4.5" />
+                  </Button>
+                </div>
               </div>
             ))}
           </div>

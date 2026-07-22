@@ -48,7 +48,7 @@ Todas `noindex` via `metadata` no layout `src/app/(cliente)/cliente/layout.tsx`.
 | `/cliente/assinatura` | Assinatura ativa, próxima cobrança, box do ciclo. | `getSubscription`, `listPlans` | `noindex` (layout) | private |
 | `/cliente/assinatura/cancelar` | Cancelamento/reativação. | `cancelSubscription`, `reactivateSubscription` | `noindex` (layout) | private |
 | `/cliente/financeiro` | Histórico de cobranças, faturas e status de pagamento. | `listPayments`, `listInvoices`, `renewPixPayment` | `noindex` (layout) | private |
-| `/cliente/financeiro/atualizar-cartao` | Atualização de cartão. | `updateCard`, `listPaymentMethods` | `noindex` (layout) | private |
+| `/cliente/cartoes` | Listagem, cadastro (`CardForm`) e definição do cartão principal. | `listCards`, `addCard`, `updateCard`, `deleteCard` | `noindex` (layout) | private |
 | `/cliente/conteudos` | Hub de gamificação: timeline de pistas, progresso, evento ao vivo. | `getActiveCase`, `listClues`, `getSubscriberProgress`, `listExclusiveContent` | `noindex` (layout) | private |
 | `/cliente/conteudos/[slug]` | Detalhe de conteúdo/pista com arquivos. | `getExclusiveContentBySlug`, `getClueBySlug` | `noindex` (layout) | private |
 

@@ -1095,7 +1095,7 @@ paths:
       summary: Atualizar cartão de crédito
       description: 'Define ou remove a flag de cartão padrão (`padrao`).
 
-        Usado em `/cliente/financeiro/atualizar-cartao` (`updateCard`).
+        Usado em `/cliente/cartoes` (`updateCard`).
 
         '
       parameters:

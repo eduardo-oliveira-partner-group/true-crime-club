@@ -651,17 +651,17 @@ Response `200`:
 Response `200`: igual ao item de "Listar cobranças" + `pixQrCode`/`pixExpiresAt`
 quando Pix.
 
-### Atualizar cartão
+### Definir cartão padrão
 
-- **Método:** `POST`
-- **Endpoint:** `/clientes/{id}/cartao`
-- **Usada em:** `/cliente/financeiro/atualizar-cartao`
+- **Método:** `PATCH`
+- **Endpoint:** `/cliente/cartoes/{id}`
+- **Usada em:** `/cliente/cartoes`
 - **Substitui:** `updateCard`
 
 Request:
 
 ```json
-{ "nomeImpresso": "Mariana Silva", "ultimosQuatro": "4242", "bandeira": "Visa", "token": "tok_novo" }
+{ "padrao": true }
 ```
 
 Response `200`:

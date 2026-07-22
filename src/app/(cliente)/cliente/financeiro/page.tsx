@@ -91,8 +91,8 @@ export default function FinanceiroPage() {
             size="sm"
             className={`mt-4 rounded-[9px] border-(--red)/30 text-(--red) ${transitionBgColor} hover:bg-(--red)/8 hover:text-(--red-deep)`}
           >
-            <Link href="/cliente/financeiro/atualizar-cartao">
-              Atualizar cartão
+            <Link href="/cliente/cartoes?acao=adicionar">
+              Gerenciar cartões
               <IconArrowRight className="size-3.5" />
             </Link>
           </Button>
