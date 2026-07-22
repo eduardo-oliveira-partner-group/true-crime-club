@@ -9,7 +9,8 @@
 - **Category**: validation / auth-ui
 - **Pareado com**: `tcc-front-office-api/plans/validation/FO-002-login.md`
 - **Planned at**: 2026-07-14
-- **Última execução**: 2026-07-14 → PASS parcial
+- **Última execução**: 2026-07-14 → PASS (smoke autenticado; ver EXECUCAO)
+- **Reconcile 2026-07-22 @ `3c431e5`**: PASS mantido; retest recomendado (cookie `tcc_session`, redirect default → perfil, botões mock removidos)
 
 ## Objetivo
 
@@ -47,6 +48,6 @@ pnpm typecheck
 |-------|-------|
 | Executado em | 2026-07-14 |
 | Modo | API remota (`tcc-front-office-api.vercel.app`) via front local `:3000` |
-| Passou? | PASS parcial |
-| Evidências / issues | UI /login OK (validação, links cadastro/recuperar). Área /cliente/* acessível como Visitante — sem guard de auth. Ver `EXECUCAO-2026-07-14.md`. |
+| Passou? | PASS (smoke 07-14 com guard + mock users); arquivo estava desatualizado vs EXECUCAO |
+| Evidências / issues | EXECUCAO 07-14: login Usuário 1/2 + Bearer + redirect. **Drift**: botões mock removidos (`713db82`); redirect padrão agora perfil (`f5dc205`); sessão server usa cookie `tcc_session`. Revalidar com credenciais reais do ambiente. |
 

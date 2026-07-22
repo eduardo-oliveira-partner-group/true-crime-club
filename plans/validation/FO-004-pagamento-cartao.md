@@ -10,6 +10,7 @@
 - **Pareado com**: `tcc-front-office-api/plans/validation/FO-004-pagamento-cartao.md`
 - **Planned at**: 2026-07-14
 - **Última execução**: 2026-07-14 → INCONCLUSIVO
+- **Reconcile 2026-07-22 @ `3c431e5`**: nota SSR obsoleta — `/checkout` é client-side; **retest** necessário
 
 ## Objetivo
 
@@ -49,5 +50,5 @@ pnpm typecheck
 | Executado em | 2026-07-14 |
 | Modo | API remota (`tcc-front-office-api.vercel.app`) via front local `:3000` |
 | Passou? | INCONCLUSIVO |
-| Evidências / issues | Código do CheckoutStepper trata credit_card. SSR /checkout sem labels Pix/Cartão sem paymentMethods (sem sessão). Ver `EXECUCAO-2026-07-14.md`. |
+| Evidências / issues | 07-14: CheckoutStepper trata credit_card; SSR /checkout sem paymentMethods. **Drift @ `3c431e5`**: checkout carrega perfil via `apiClient.customer.getProfile()` no client (sessão Bearer/cookie). Reexecutar com sessão válida. |
 

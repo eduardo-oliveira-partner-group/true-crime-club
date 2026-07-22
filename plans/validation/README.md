@@ -11,18 +11,20 @@ Validar na UI as jornadas de cadastro, autenticação, compra, pagamento e área
 
 ## Status
 
+Atualizado no reconcile 2026-07-22 @ `3c431e5`. Status abaixo é o **melhor julgamento atual** a partir da última execução + drift de código; itens marcados RETESTE não foram reexecutados nesta sessão.
+
 | ID | Plano | Status | Tipo |
 |----|-------|--------|------|
-| FO-001 | [Contratação de Assinatura](./FO-001-contratacao-assinatura.md) | **NÃO EXECUTADO** | E2E UI |
-| FO-002 | [Login](./FO-002-login.md) | **PASS** | Auth UI |
+| FO-001 | [Contratação de Assinatura](./FO-001-contratacao-assinatura.md) | **EM RETESTE** | E2E UI |
+| FO-002 | [Login](./FO-002-login.md) | **PASS** (retest recomendado) | Auth UI |
 | FO-003 | [Recuperação de Senha](./FO-003-recuperacao-senha.md) | **PASS parcial** | Auth UI |
-| FO-004 | [Pagamento com Cartão](./FO-004-pagamento-cartao.md) | **INCONCLUSIVO** | Checkout UI |
-| FO-005 | [Pagamento com Pix](./FO-005-pagamento-pix.md) | **INCONCLUSIVO** | Checkout UI |
-| FO-006 | [Área do Cliente](./FO-006-area-do-cliente.md) | **PASS parcial** | Painel UI |
+| FO-004 | [Pagamento com Cartão](./FO-004-pagamento-cartao.md) | **INCONCLUSIVO** (retest) | Checkout UI |
+| FO-005 | [Pagamento com Pix](./FO-005-pagamento-pix.md) | **INCONCLUSIVO** (gap confirmação) | Checkout UI |
+| FO-006 | [Área do Cliente](./FO-006-area-do-cliente.md) | **RETESTE** | Painel UI |
 | FO-007 | [Assinaturas](./FO-007-assinaturas.md) | **PASS** | Painel UI |
 | FO-008 | [Pedidos](./FO-008-pedidos.md) | **PASS** | Painel UI |
 | FO-009 | [Cartões](./FO-009-cartoes.md) | **PASS** | Painel UI |
-| FO-010 | [Logout](./FO-010-logout.md) | **PASS** | Auth UI |
+| FO-010 | [Logout](./FO-010-logout.md) | **PASS** (retest recomendado) | Auth UI |
 
 ## Pré-requisitos comuns
 
@@ -57,3 +59,5 @@ FO-001 (jornada completa)
 ## Última execução
 
 - [EXECUCAO-2026-07-14.md](./EXECUCAO-2026-07-14.md) — smoke local em `:3000` + typecheck.
+- FO-001 teve nota de reteste em 2026-07-16 (fixtures anuais alinhadas; falta aceite visual integral).
+- Reconcile 2026-07-22: gaps de guard/`cliente-001`/checkout SSR corrigidos no código; confirmação Pix ainda com `pixPayment = null` em `src/app/(front-office)/checkout/confirmacao/page.tsx`.

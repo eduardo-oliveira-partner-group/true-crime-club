@@ -9,7 +9,8 @@
 - **Category**: validation / auth-ui
 - **Pareado com**: `tcc-front-office-api/plans/validation/FO-010-logout.md`
 - **Planned at**: 2026-07-14
-- **Última execução**: 2026-07-14 → PASS parcial
+- **Última execução**: 2026-07-14 → PASS (ver EXECUCAO)
+- **Reconcile 2026-07-22 @ `3c431e5`**: PASS mantido; retest recomendado (`RequireAuth` + cookie session)
 
 ## Objetivo
 
@@ -47,6 +48,6 @@ pnpm typecheck
 |-------|-------|
 | Executado em | 2026-07-14 |
 | Modo | API remota (`tcc-front-office-api.vercel.app`) via front local `:3000` |
-| Passou? | PASS parcial |
-| Evidências / issues | Botão Sair chama auth.logout + limpa isLoggedIn + vai para /. Sem proteção que bloqueie /cliente/* após logout. Ver `EXECUCAO-2026-07-14.md`. |
+| Passou? | PASS (smoke 07-14); arquivo estava desatualizado vs EXECUCAO |
+| Evidências / issues | EXECUCAO 07-14: logout limpa token; guard bloqueia `/cliente/*`. **Drift**: confirmar limpeza de cookie `tcc_session` além de storage local. |
 

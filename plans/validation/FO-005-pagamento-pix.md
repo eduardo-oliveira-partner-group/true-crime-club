@@ -10,6 +10,7 @@
 - **Pareado com**: `tcc-front-office-api/plans/validation/FO-005-pagamento-pix.md`
 - **Planned at**: 2026-07-14
 - **Última execução**: 2026-07-14 → INCONCLUSIVO
+- **Reconcile 2026-07-22 @ `3c431e5`**: checkout Pix no stepper existe; **gap aberto** na confirmação (`pixPayment = null`)
 
 ## Objetivo
 
@@ -49,5 +50,5 @@ pnpm typecheck
 | Executado em | 2026-07-14 |
 | Modo | API remota (`tcc-front-office-api.vercel.app`) via front local `:3000` |
 | Passou? | INCONCLUSIVO |
-| Evidências / issues | Código do CheckoutStepper trata pix. Mesma limitação de SSR sem métodos de pagamento na sessão. Ver `EXECUCAO-2026-07-14.md`. |
+| Evidências / issues | 07-14: CheckoutStepper trata pix; SSR sem métodos. **Drift @ `3c431e5`**: checkout client-side ok; em `checkout/confirmacao/page.tsx` as linhas `const pixPayment = null` / `pixQrImage = null` impedem o painel QR mesmo com `PixPaymentPanel` implementado. Critério “confirmação coerente com API” segue falho até corrigir. |
 

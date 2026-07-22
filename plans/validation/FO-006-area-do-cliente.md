@@ -10,6 +10,7 @@
 - **Pareado com**: `tcc-front-office-api/plans/validation/FO-006-area-do-cliente.md`
 - **Planned at**: 2026-07-14
 - **Última execução**: 2026-07-14 → FAIL parcial
+- **Reconcile 2026-07-22 @ `3c431e5`**: **RETESTE** — gaps históricos corrigidos no código (não reexecutado)
 
 ## Objetivo
 
@@ -47,6 +48,6 @@ pnpm typecheck
 |-------|-------|
 | Executado em | 2026-07-14 |
 | Modo | API remota (`tcc-front-office-api.vercel.app`) via front local `:3000` |
-| Passou? | FAIL parcial |
-| Evidências / issues | Página 200 + Salvar via updateProfile. Gaps: defaults hardcoded; PATCH /clientes/cliente-001; sem guard. Ver `EXECUCAO-2026-07-14.md`. |
+| Passou? | FAIL parcial (histórico) → **RETESTE** no reconcile 2026-07-22 |
+| Evidências / issues | Execução 07-14: Página 200 + Salvar via updateProfile; gaps `cliente-001` + sem guard. **Drift**: `RequireAuth` em `cliente/layout.tsx`; `updateProfile` usa `getCustomerId()` (`src/lib/api/domains/customer.ts`). Reexecutar smoke autenticado antes de marcar PASS. |
 
