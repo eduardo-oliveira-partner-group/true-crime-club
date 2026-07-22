@@ -29,6 +29,7 @@ import {
   getPlanBySlug,
   updateCustomerProfile,
 } from '@/src/lib/domain/repositories'
+import { emptyCart } from '@/src/lib/domain/repository/core/helpers'
 import type { CartItem } from '@/src/lib/domain/types'
 import { formatCurrency } from '@/src/lib/formatters'
 import { cn } from '@/src/lib/utils'
@@ -66,7 +67,9 @@ export default function CheckoutPage() {
     setLoadError(null)
 
     Promise.all([
-      getCart(),
+      // Assinatura não depende do carrinho; evita GET /carrinho extra
+      // (o header já consulta o contador).
+      plano ? Promise.resolve(emptyCart()) : getCart(),
       apiClient.customer.getProfile(),
       plano ? getPlanBySlug(plano) : Promise.resolve(null),
     ])
