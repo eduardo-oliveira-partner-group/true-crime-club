@@ -7,7 +7,7 @@ import {
   IconTrash,
   IconX,
 } from '@tabler/icons-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { Button } from '@/src/components/ui/button'
 import { Checkbox } from '@/src/components/ui/checkbox'
@@ -15,6 +15,7 @@ import { Input } from '@/src/components/ui/input'
 import { Label } from '@/src/components/ui/label'
 import { Textarea } from '@/src/components/ui/textarea'
 import { apiClient } from '@/src/lib/api-client'
+import { CepLookupError, lookupCep } from '@/src/lib/cep'
 import {
   cardShadowBase,
   dossierCardSurface,
@@ -156,6 +157,11 @@ export default function PerfilPage() {
   const [newAddrZip, setNewAddrZip] = useState('')
   const [newAddrIsDefault, setNewAddrIsDefault] = useState(false)
   const [editingAddressId, setEditingAddressId] = useState<string | null>(null)
+  const [lookingUpCep, setLookingUpCep] = useState(false)
+  const [cepLookupError, setCepLookupError] = useState<string | null>(null)
+  const lastLookedUpCepRef = useRef('')
+  const cepLookupAbortRef = useRef<AbortController | null>(null)
+  const numberInputRef = useRef<HTMLInputElement>(null)
 
   const [loading, setLoading] = useState(true)
   const [savingSection, setSavingSection] = useState<
@@ -287,6 +293,9 @@ export default function PerfilPage() {
   }
 
   const resetAddressForm = () => {
+    cepLookupAbortRef.current?.abort()
+    cepLookupAbortRef.current = null
+    lastLookedUpCepRef.current = ''
     setShowAddAddress(false)
     setEditingAddressId(null)
     setNewAddrLabel('')
@@ -298,9 +307,14 @@ export default function PerfilPage() {
     setNewAddrState('')
     setNewAddrZip('')
     setNewAddrIsDefault(false)
+    setLookingUpCep(false)
+    setCepLookupError(null)
   }
 
   const handleEditAddress = (address: Address) => {
+    cepLookupAbortRef.current?.abort()
+    cepLookupAbortRef.current = null
+    lastLookedUpCepRef.current = normalizeDigits(address.zipCode)
     setEditingAddressId(address.id)
     setShowAddAddress(false)
     setNewAddrLabel(address.label)
@@ -312,7 +326,62 @@ export default function PerfilPage() {
     setNewAddrState(address.state)
     setNewAddrZip(formatCep(address.zipCode))
     setNewAddrIsDefault(address.isDefault)
+    setLookingUpCep(false)
+    setCepLookupError(null)
     setSaveError(null)
+  }
+
+  const fillAddressFromCep = async (digits: string) => {
+    if (digits === lastLookedUpCepRef.current) return
+
+    cepLookupAbortRef.current?.abort()
+    const controller = new AbortController()
+    cepLookupAbortRef.current = controller
+
+    setLookingUpCep(true)
+    setCepLookupError(null)
+
+    try {
+      const address = await lookupCep(digits, controller.signal)
+      if (controller.signal.aborted) return
+
+      lastLookedUpCepRef.current = digits
+      if (address.street) setNewAddrStreet(address.street)
+      if (address.neighborhood) setNewAddrNeighborhood(address.neighborhood)
+      if (address.city) setNewAddrCity(address.city)
+      if (address.state) setNewAddrState(formatUf(address.state))
+      numberInputRef.current?.focus()
+    } catch (error) {
+      if (controller.signal.aborted) return
+      lastLookedUpCepRef.current = ''
+      setCepLookupError(
+        error instanceof CepLookupError
+          ? error.message
+          : 'Não foi possível consultar o CEP.',
+      )
+    } finally {
+      if (cepLookupAbortRef.current === controller) {
+        cepLookupAbortRef.current = null
+        setLookingUpCep(false)
+      }
+    }
+  }
+
+  const handleZipChange = (value: string) => {
+    const formatted = formatCep(value)
+    const digits = normalizeDigits(formatted)
+    setNewAddrZip(formatted)
+    setCepLookupError(null)
+
+    if (digits.length !== 8) {
+      lastLookedUpCepRef.current = ''
+      cepLookupAbortRef.current?.abort()
+      cepLookupAbortRef.current = null
+      setLookingUpCep(false)
+      return
+    }
+
+    void fillAddressFromCep(digits)
   }
 
   const handleAddAddress = async (e: React.FormEvent) => {
@@ -761,18 +830,48 @@ export default function PerfilPage() {
                       />
                     </div>
                     <div>
-                      <Label className={formLabelClass}>CEP</Label>
+                      <Label className={formLabelClass} htmlFor="addr-cep">
+                        CEP
+                      </Label>
                       <Input
+                        id="addr-cep"
                         type="text"
                         required
                         value={newAddrZip}
-                        onChange={(e) =>
-                          setNewAddrZip(formatCep(e.target.value))
-                        }
+                        onChange={(e) => handleZipChange(e.target.value)}
+                        onBlur={() => {
+                          if (isValidCep(newAddrZip)) {
+                            void fillAddressFromCep(normalizeDigits(newAddrZip))
+                          }
+                        }}
                         inputMode="numeric"
+                        autoComplete="postal-code"
                         maxLength={9}
+                        aria-busy={lookingUpCep}
+                        aria-invalid={cepLookupError ? true : undefined}
+                        aria-describedby={
+                          lookingUpCep || cepLookupError
+                            ? 'addr-cep-status'
+                            : undefined
+                        }
                         className={formInputClass}
                       />
+                      {lookingUpCep ? (
+                        <p
+                          id="addr-cep-status"
+                          className="mt-1.5 text-xs text-(--ink-mute)"
+                        >
+                          Buscando endereço...
+                        </p>
+                      ) : cepLookupError ? (
+                        <p
+                          id="addr-cep-status"
+                          role="alert"
+                          className="mt-1.5 text-xs text-(--red)"
+                        >
+                          {cepLookupError}
+                        </p>
+                      ) : null}
                     </div>
                     <div className="md:col-span-2">
                       <Label className={formLabelClass}>Logradouro / Rua</Label>
@@ -781,12 +880,14 @@ export default function PerfilPage() {
                         required
                         value={newAddrStreet}
                         onChange={(e) => setNewAddrStreet(e.target.value)}
+                        disabled={lookingUpCep}
                         className={formInputClass}
                       />
                     </div>
                     <div>
                       <Label className={formLabelClass}>Número</Label>
                       <Input
+                        ref={numberInputRef}
                         type="text"
                         required
                         value={newAddrNumber}
@@ -815,6 +916,7 @@ export default function PerfilPage() {
                         required
                         value={newAddrNeighborhood}
                         onChange={(e) => setNewAddrNeighborhood(e.target.value)}
+                        disabled={lookingUpCep}
                         className={formInputClass}
                       />
                     </div>
@@ -825,6 +927,7 @@ export default function PerfilPage() {
                         required
                         value={newAddrCity}
                         onChange={(e) => setNewAddrCity(e.target.value)}
+                        disabled={lookingUpCep}
                         className={formInputClass}
                       />
                     </div>
@@ -840,6 +943,7 @@ export default function PerfilPage() {
                         maxLength={2}
                         autoComplete="address-level1"
                         placeholder="SP"
+                        disabled={lookingUpCep}
                         className={formInputClass}
                       />
                     </div>
@@ -870,7 +974,7 @@ export default function PerfilPage() {
                       type="submit"
                       size="sm"
                       className="rounded-[9px] bg-(--red) text-[#fbf9f6] hover:bg-(--red-deep)"
-                      disabled={savingAddress}
+                      disabled={savingAddress || lookingUpCep}
                     >
                       {savingAddress
                         ? 'Salvando...'
