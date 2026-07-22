@@ -28,6 +28,7 @@ import {
 import type { Address, Customer } from '@/src/lib/domain/types'
 import {
   ADDRESS_NUMBER_MAX_LENGTH,
+  BRAZILIAN_UFS,
   formatCep,
   formatCpf,
   formatPhone,
@@ -392,7 +393,7 @@ export default function PerfilPage() {
       return
     }
     if (!isValidUf(newAddrState)) {
-      setSaveError('Informe a UF com 2 letras (ex.: SP).')
+      setSaveError('Selecione uma UF válida.')
       return
     }
     if (!isValidAddressNumber(newAddrNumber)) {
@@ -932,20 +933,25 @@ export default function PerfilPage() {
                       />
                     </div>
                     <div>
-                      <Label className={formLabelClass}>Estado (UF)</Label>
-                      <Input
-                        type="text"
+                      <Label className={formLabelClass} htmlFor="addr-uf">
+                        Estado (UF)
+                      </Label>
+                      <select
+                        id="addr-uf"
                         required
                         value={newAddrState}
-                        onChange={(e) =>
-                          setNewAddrState(formatUf(e.target.value))
-                        }
-                        maxLength={2}
+                        onChange={(e) => setNewAddrState(e.target.value)}
                         autoComplete="address-level1"
-                        placeholder="SP"
                         disabled={lookingUpCep}
-                        className={formInputClass}
-                      />
+                        className={`${formInputClass} py-0`}
+                      >
+                        <option value="">Selecione</option>
+                        {BRAZILIAN_UFS.map((uf) => (
+                          <option key={uf} value={uf}>
+                            {uf}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                     <div className="flex items-center md:col-span-3">
                       <Label className="flex cursor-pointer items-center gap-2.5 text-sm leading-none font-normal text-(--ink-soft)">

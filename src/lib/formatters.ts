@@ -96,8 +96,42 @@ export function formatUf(value: string): string {
     .slice(0, 2)
 }
 
+/** Unidades federativas brasileiras (código IBGE / ISO 3166-2:BR). */
+export const BRAZILIAN_UFS = [
+  'AC',
+  'AL',
+  'AP',
+  'AM',
+  'BA',
+  'CE',
+  'DF',
+  'ES',
+  'GO',
+  'MA',
+  'MT',
+  'MS',
+  'MG',
+  'PA',
+  'PB',
+  'PR',
+  'PE',
+  'PI',
+  'RJ',
+  'RN',
+  'RS',
+  'RO',
+  'RR',
+  'SC',
+  'SP',
+  'SE',
+  'TO',
+] as const
+
+export type BrazilianUf = (typeof BRAZILIAN_UFS)[number]
+
 export function isValidUf(value: string): boolean {
-  return /^[A-Z]{2}$/.test(formatUf(value))
+  const uf = formatUf(value)
+  return (BRAZILIAN_UFS as readonly string[]).includes(uf)
 }
 
 /** Limite da coluna `numero` em `tb_cliente_endereco` (varchar(4)). */
