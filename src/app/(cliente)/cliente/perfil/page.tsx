@@ -82,6 +82,249 @@ function displayValue(value: string | null | undefined) {
   return value?.trim() ? value : '—'
 }
 
+type AddressFormValues = {
+  label: string
+  zip: string
+  street: string
+  number: string
+  complement: string
+  neighborhood: string
+  city: string
+  state: string
+  isDefault: boolean
+}
+
+type AddressFormProps = {
+  isEditing: boolean
+  lookingUpCep: boolean
+  cepLookupError: string | null
+  savingAddress: boolean
+  numberInputRef: React.RefObject<HTMLInputElement | null>
+  values: AddressFormValues
+  onLabelChange: (value: string) => void
+  onZipChange: (value: string) => void
+  onZipBlur: () => void
+  onStreetChange: (value: string) => void
+  onNumberChange: (value: string) => void
+  onComplementChange: (value: string) => void
+  onNeighborhoodChange: (value: string) => void
+  onCityChange: (value: string) => void
+  onStateChange: (value: string) => void
+  onIsDefaultChange: (value: boolean) => void
+  onCancel: () => void
+  onSubmit: (e: React.FormEvent) => void
+  className?: string
+  formId?: string
+}
+
+function AddressForm({
+  isEditing,
+  lookingUpCep,
+  cepLookupError,
+  savingAddress,
+  numberInputRef,
+  values,
+  onLabelChange,
+  onZipChange,
+  onZipBlur,
+  onStreetChange,
+  onNumberChange,
+  onComplementChange,
+  onNeighborhoodChange,
+  onCityChange,
+  onStateChange,
+  onIsDefaultChange,
+  onCancel,
+  onSubmit,
+  className,
+  formId,
+}: AddressFormProps) {
+  const cepFieldId = isEditing ? 'addr-cep-edit' : 'addr-cep-new'
+  const defaultFieldId = isEditing ? 'addr-default-edit' : 'addr-default-new'
+
+  return (
+    <form
+      id={formId}
+      onSubmit={onSubmit}
+      className={cn(
+        'rounded-[14px] border border-(--ink)/10 bg-(--paper-soft) p-4',
+        isEditing && 'ring-1 ring-(--red)/25',
+        className,
+      )}
+      aria-label={
+        isEditing ? 'Editar endereço de entrega' : 'Novo endereço de entrega'
+      }
+    >
+      <p
+        className={`text-xs font-semibold tracking-wide text-(--red) uppercase ${fontMono}`}
+      >
+        {isEditing ? 'Editar Endereço de Entrega' : 'Novo Endereço de Entrega'}
+      </p>
+      <FieldGroup className="mt-4 gap-4">
+        <div className="grid gap-4 md:grid-cols-3">
+          <Field className="md:col-span-2">
+            <FieldLabel className={formLabelClass}>
+              Identificação (ex: Casa, Trabalho)
+            </FieldLabel>
+            <Input
+              type="text"
+              required
+              value={values.label}
+              onChange={(e) => onLabelChange(e.target.value)}
+              className={formInputClass}
+            />
+          </Field>
+          <Field data-invalid={cepLookupError ? true : undefined}>
+            <FieldLabel className={formLabelClass} htmlFor={cepFieldId}>
+              CEP
+            </FieldLabel>
+            <Input
+              id={cepFieldId}
+              type="text"
+              required
+              value={values.zip}
+              onChange={(e) => onZipChange(e.target.value)}
+              onBlur={onZipBlur}
+              inputMode="numeric"
+              autoComplete="postal-code"
+              maxLength={9}
+              aria-busy={lookingUpCep}
+              aria-invalid={cepLookupError ? true : undefined}
+              className={formInputClass}
+            />
+            {lookingUpCep ? (
+              <FieldDescription>Buscando endereço...</FieldDescription>
+            ) : null}
+            {cepLookupError ? <FieldError>{cepLookupError}</FieldError> : null}
+          </Field>
+          <Field
+            className="md:col-span-2"
+            data-disabled={lookingUpCep ? true : undefined}
+          >
+            <FieldLabel className={formLabelClass}>Logradouro / Rua</FieldLabel>
+            <Input
+              type="text"
+              required
+              value={values.street}
+              onChange={(e) => onStreetChange(e.target.value)}
+              disabled={lookingUpCep}
+              className={formInputClass}
+            />
+          </Field>
+          <Field>
+            <FieldLabel className={formLabelClass}>Número</FieldLabel>
+            <Input
+              ref={numberInputRef}
+              type="text"
+              required
+              value={values.number}
+              onChange={(e) =>
+                onNumberChange(
+                  e.target.value.slice(0, ADDRESS_NUMBER_MAX_LENGTH),
+                )
+              }
+              maxLength={ADDRESS_NUMBER_MAX_LENGTH}
+              className={formInputClass}
+            />
+          </Field>
+          <Field>
+            <FieldLabel className={formLabelClass}>Complemento</FieldLabel>
+            <Input
+              type="text"
+              value={values.complement}
+              onChange={(e) => onComplementChange(e.target.value)}
+              className={formInputClass}
+            />
+          </Field>
+          <Field data-disabled={lookingUpCep ? true : undefined}>
+            <FieldLabel className={formLabelClass}>Bairro</FieldLabel>
+            <Input
+              type="text"
+              required
+              value={values.neighborhood}
+              onChange={(e) => onNeighborhoodChange(e.target.value)}
+              disabled={lookingUpCep}
+              className={formInputClass}
+            />
+          </Field>
+          <Field data-disabled={lookingUpCep ? true : undefined}>
+            <FieldLabel className={formLabelClass}>Cidade</FieldLabel>
+            <Input
+              type="text"
+              required
+              value={values.city}
+              onChange={(e) => onCityChange(e.target.value)}
+              disabled={lookingUpCep}
+              className={formInputClass}
+            />
+          </Field>
+          <Field data-disabled={lookingUpCep ? true : undefined}>
+            <FieldLabel className={formLabelClass}>Estado (UF)</FieldLabel>
+            <Select
+              value={values.state || undefined}
+              onValueChange={onStateChange}
+              disabled={lookingUpCep}
+            >
+              <SelectTrigger className={cn(formInputClass, 'w-full')}>
+                <SelectValue placeholder="Selecione" />
+              </SelectTrigger>
+              <SelectContent position="popper">
+                <SelectGroup>
+                  {BRAZILIAN_UFS.map((uf) => (
+                    <SelectItem key={uf} value={uf}>
+                      {uf}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </Field>
+          <Field
+            orientation="horizontal"
+            className="items-center md:col-span-3"
+          >
+            <Checkbox
+              id={defaultFieldId}
+              checked={values.isDefault}
+              onCheckedChange={(checked) => onIsDefaultChange(checked === true)}
+              className="size-4 shrink-0 rounded border border-[rgba(33,28,24,0.15)] bg-transparent data-checked:border-(--red) data-checked:bg-(--red) data-checked:text-[#fbf9f6]"
+            />
+            <FieldLabel
+              htmlFor={defaultFieldId}
+              className="cursor-pointer text-sm leading-none font-normal text-(--ink-soft)"
+            >
+              Definir como endereço principal
+            </FieldLabel>
+          </Field>
+        </div>
+      </FieldGroup>
+      <div className="flex justify-end gap-2 pt-4">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="rounded-[9px]"
+          onClick={onCancel}
+        >
+          Cancelar
+        </Button>
+        <Button
+          type="submit"
+          size="sm"
+          className="rounded-[9px] bg-(--red) text-[#fbf9f6] hover:bg-(--red-deep)"
+          disabled={savingAddress || lookingUpCep}
+        >
+          {savingAddress
+            ? 'Salvando...'
+            : isEditing
+              ? 'Salvar Alterações'
+              : 'Salvar Endereço'}
+        </Button>
+      </div>
+    </form>
+  )
+}
+
 function ProfileLoadingSkeleton() {
   const field = (labelWidth: string, valueWidth: string) => (
     <div className="flex flex-col gap-2">
@@ -232,6 +475,13 @@ export default function PerfilPage() {
       .catch((e) => console.error(e))
       .finally(() => setLoading(false))
   }, [])
+
+  useEffect(() => {
+    if (!editingAddressId) return
+    document
+      .getElementById(`address-edit-${editingAddressId}`)
+      ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+  }, [editingAddressId])
 
   const handleSaveBasics = async () => {
     if (!isValidCpf(tempCpf)) {
@@ -433,35 +683,73 @@ export default function PerfilPage() {
       return
     }
 
+    const editingId = editingAddressId
+    const addressPayload = {
+      label: newAddrLabel,
+      street: newAddrStreet,
+      number: newAddrNumber.trim(),
+      complement: newAddrComplement,
+      neighborhood: newAddrNeighborhood,
+      city: newAddrCity,
+      state: formatUf(newAddrState),
+      zipCode: normalizeDigits(newAddrZip),
+      isDefault: newAddrIsDefault,
+    }
+
     try {
       setSavingAddress(true)
       setSaveError(null)
-      const addressPayload = {
-        label: newAddrLabel,
-        street: newAddrStreet,
-        number: newAddrNumber.trim(),
-        complement: newAddrComplement,
-        neighborhood: newAddrNeighborhood,
-        city: newAddrCity,
-        state: formatUf(newAddrState),
-        zipCode: normalizeDigits(newAddrZip),
-        isDefault: newAddrIsDefault,
-      }
-      const updatedList = editingAddressId
-        ? await apiClient.customer.updateAddress(
-            editingAddressId,
-            addressPayload,
-          )
-        : await apiClient.customer.addAddress(addressPayload)
 
-      setAddresses(updatedList)
-      resetAddressForm()
+      if (editingId) {
+        // Fecha o formulário na hora e reflete a edição no card
+        setAddresses((prev) =>
+          prev.map((addr) => {
+            if (addr.id !== editingId) {
+              return addressPayload.isDefault
+                ? { ...addr, isDefault: false }
+                : addr
+            }
+            return {
+              ...addr,
+              label: addressPayload.label,
+              street: addressPayload.street,
+              number: addressPayload.number,
+              complement: addressPayload.complement || undefined,
+              neighborhood: addressPayload.neighborhood,
+              city: addressPayload.city,
+              state: addressPayload.state,
+              zipCode: addressPayload.zipCode,
+              isDefault: addressPayload.isDefault,
+            }
+          }),
+        )
+        resetAddressForm()
+
+        const updatedList = await apiClient.customer.updateAddress(
+          editingId,
+          addressPayload,
+        )
+        setAddresses(updatedList)
+      } else {
+        const updatedList = await apiClient.customer.addAddress(addressPayload)
+        setAddresses(updatedList)
+        resetAddressForm()
+      }
     } catch (error) {
       setSaveError(
         error instanceof Error
           ? error.message
           : 'Não foi possível salvar o endereço.',
       )
+      // Se a edição falhou após fechar o form, recarrega a lista real
+      if (editingId) {
+        try {
+          const data = await apiClient.customer.getProfile()
+          if (data.addresses) setAddresses(data.addresses)
+        } catch {
+          // Mantém o estado otimista se o refetch também falhar
+        }
+      }
     } finally {
       setSavingAddress(false)
     }
@@ -845,220 +1133,48 @@ export default function PerfilPage() {
                 )}
               </div>
 
-              {/* Form para Adicionar Endereço */}
-              {(showAddAddress || editingAddressId) && (
-                <form
+              {/* Formulário de novo endereço (acima da lista) */}
+              {showAddAddress && !editingAddressId ? (
+                <AddressForm
+                  isEditing={false}
+                  lookingUpCep={lookingUpCep}
+                  cepLookupError={cepLookupError}
+                  savingAddress={savingAddress}
+                  numberInputRef={numberInputRef}
+                  values={{
+                    label: newAddrLabel,
+                    zip: newAddrZip,
+                    street: newAddrStreet,
+                    number: newAddrNumber,
+                    complement: newAddrComplement,
+                    neighborhood: newAddrNeighborhood,
+                    city: newAddrCity,
+                    state: newAddrState,
+                    isDefault: newAddrIsDefault,
+                  }}
+                  onLabelChange={setNewAddrLabel}
+                  onZipChange={handleZipChange}
+                  onZipBlur={() => {
+                    if (isValidCep(newAddrZip)) {
+                      void fillAddressFromCep(normalizeDigits(newAddrZip))
+                    }
+                  }}
+                  onStreetChange={setNewAddrStreet}
+                  onNumberChange={setNewAddrNumber}
+                  onComplementChange={setNewAddrComplement}
+                  onNeighborhoodChange={setNewAddrNeighborhood}
+                  onCityChange={setNewAddrCity}
+                  onStateChange={setNewAddrState}
+                  onIsDefaultChange={setNewAddrIsDefault}
+                  onCancel={resetAddressForm}
                   onSubmit={handleAddAddress}
-                  className="mt-4 rounded-[14px] border border-(--ink)/10 bg-(--paper-soft) p-4"
-                >
-                  <p
-                    className={`text-xs font-semibold tracking-wide text-(--red) uppercase ${fontMono}`}
-                  >
-                    {editingAddressId
-                      ? 'Editar Endereço de Entrega'
-                      : 'Novo Endereço de Entrega'}
-                  </p>
-                  <FieldGroup className="mt-4 gap-4">
-                    <div className="grid gap-4 md:grid-cols-3">
-                      <Field className="md:col-span-2">
-                        <FieldLabel className={formLabelClass}>
-                          Identificação (ex: Casa, Trabalho)
-                        </FieldLabel>
-                        <Input
-                          type="text"
-                          required
-                          value={newAddrLabel}
-                          onChange={(e) => setNewAddrLabel(e.target.value)}
-                          className={formInputClass}
-                        />
-                      </Field>
-                      <Field data-invalid={cepLookupError ? true : undefined}>
-                        <FieldLabel
-                          className={formLabelClass}
-                          htmlFor="addr-cep"
-                        >
-                          CEP
-                        </FieldLabel>
-                        <Input
-                          id="addr-cep"
-                          type="text"
-                          required
-                          value={newAddrZip}
-                          onChange={(e) => handleZipChange(e.target.value)}
-                          onBlur={() => {
-                            if (isValidCep(newAddrZip)) {
-                              void fillAddressFromCep(
-                                normalizeDigits(newAddrZip),
-                              )
-                            }
-                          }}
-                          inputMode="numeric"
-                          autoComplete="postal-code"
-                          maxLength={9}
-                          aria-busy={lookingUpCep}
-                          aria-invalid={cepLookupError ? true : undefined}
-                          className={formInputClass}
-                        />
-                        {lookingUpCep ? (
-                          <FieldDescription>
-                            Buscando endereço...
-                          </FieldDescription>
-                        ) : null}
-                        {cepLookupError ? (
-                          <FieldError>{cepLookupError}</FieldError>
-                        ) : null}
-                      </Field>
-                      <Field
-                        className="md:col-span-2"
-                        data-disabled={lookingUpCep ? true : undefined}
-                      >
-                        <FieldLabel className={formLabelClass}>
-                          Logradouro / Rua
-                        </FieldLabel>
-                        <Input
-                          type="text"
-                          required
-                          value={newAddrStreet}
-                          onChange={(e) => setNewAddrStreet(e.target.value)}
-                          disabled={lookingUpCep}
-                          className={formInputClass}
-                        />
-                      </Field>
-                      <Field>
-                        <FieldLabel className={formLabelClass}>
-                          Número
-                        </FieldLabel>
-                        <Input
-                          ref={numberInputRef}
-                          type="text"
-                          required
-                          value={newAddrNumber}
-                          onChange={(e) =>
-                            setNewAddrNumber(
-                              e.target.value.slice(
-                                0,
-                                ADDRESS_NUMBER_MAX_LENGTH,
-                              ),
-                            )
-                          }
-                          maxLength={ADDRESS_NUMBER_MAX_LENGTH}
-                          className={formInputClass}
-                        />
-                      </Field>
-                      <Field>
-                        <FieldLabel className={formLabelClass}>
-                          Complemento
-                        </FieldLabel>
-                        <Input
-                          type="text"
-                          value={newAddrComplement}
-                          onChange={(e) => setNewAddrComplement(e.target.value)}
-                          className={formInputClass}
-                        />
-                      </Field>
-                      <Field data-disabled={lookingUpCep ? true : undefined}>
-                        <FieldLabel className={formLabelClass}>
-                          Bairro
-                        </FieldLabel>
-                        <Input
-                          type="text"
-                          required
-                          value={newAddrNeighborhood}
-                          onChange={(e) =>
-                            setNewAddrNeighborhood(e.target.value)
-                          }
-                          disabled={lookingUpCep}
-                          className={formInputClass}
-                        />
-                      </Field>
-                      <Field data-disabled={lookingUpCep ? true : undefined}>
-                        <FieldLabel className={formLabelClass}>
-                          Cidade
-                        </FieldLabel>
-                        <Input
-                          type="text"
-                          required
-                          value={newAddrCity}
-                          onChange={(e) => setNewAddrCity(e.target.value)}
-                          disabled={lookingUpCep}
-                          className={formInputClass}
-                        />
-                      </Field>
-                      <Field data-disabled={lookingUpCep ? true : undefined}>
-                        <FieldLabel className={formLabelClass}>
-                          Estado (UF)
-                        </FieldLabel>
-                        <Select
-                          value={newAddrState || undefined}
-                          onValueChange={setNewAddrState}
-                          disabled={lookingUpCep}
-                        >
-                          <SelectTrigger
-                            className={cn(formInputClass, 'w-full')}
-                          >
-                            <SelectValue placeholder="Selecione" />
-                          </SelectTrigger>
-                          <SelectContent position="popper">
-                            <SelectGroup>
-                              {BRAZILIAN_UFS.map((uf) => (
-                                <SelectItem key={uf} value={uf}>
-                                  {uf}
-                                </SelectItem>
-                              ))}
-                            </SelectGroup>
-                          </SelectContent>
-                        </Select>
-                      </Field>
-                      <Field
-                        orientation="horizontal"
-                        className="items-center md:col-span-3"
-                      >
-                        <Checkbox
-                          id="addr-default"
-                          checked={newAddrIsDefault}
-                          onCheckedChange={(checked) =>
-                            setNewAddrIsDefault(checked === true)
-                          }
-                          className="size-4 shrink-0 rounded border border-[rgba(33,28,24,0.15)] bg-transparent data-checked:border-(--red) data-checked:bg-(--red) data-checked:text-[#fbf9f6]"
-                        />
-                        <FieldLabel
-                          htmlFor="addr-default"
-                          className="cursor-pointer text-sm leading-none font-normal text-(--ink-soft)"
-                        >
-                          Definir como endereço principal
-                        </FieldLabel>
-                      </Field>
-                    </div>
-                  </FieldGroup>
-                  <div className="flex justify-end gap-2 pt-4">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className="rounded-[9px]"
-                      onClick={resetAddressForm}
-                    >
-                      Cancelar
-                    </Button>
-                    <Button
-                      type="submit"
-                      size="sm"
-                      className="rounded-[9px] bg-(--red) text-[#fbf9f6] hover:bg-(--red-deep)"
-                      disabled={savingAddress || lookingUpCep}
-                    >
-                      {savingAddress
-                        ? 'Salvando...'
-                        : editingAddressId
-                          ? 'Salvar Alterações'
-                          : 'Salvar Endereço'}
-                    </Button>
-                  </div>
-                </form>
-              )}
+                  className="mt-4"
+                />
+              ) : null}
 
-              {/* Listagem de Endereços */}
+              {/* Listagem de Endereços — edição acontece no lugar do card */}
               <div className="mt-4 flex flex-col gap-3">
-                {addresses.length === 0 ? (
+                {addresses.length === 0 && !showAddAddress ? (
                   <Empty className="border border-dashed border-(--ink)/15 bg-(--paper-soft) p-8">
                     <EmptyHeader>
                       <EmptyMedia variant="icon">
@@ -1072,57 +1188,102 @@ export default function PerfilPage() {
                     </EmptyHeader>
                   </Empty>
                 ) : (
-                  addresses.map((addr) => (
-                    <div
-                      key={addr.id}
-                      className="flex items-start justify-between rounded-[10px] border border-(--ink)/10 bg-(--paper-soft) p-4 text-sm"
-                    >
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span
-                            className={`text-xs font-bold text-(--red) uppercase ${fontHeading}`}
-                          >
-                            {addr.label}
-                          </span>
-                          {addr.isDefault && (
-                            <span className="rounded-[2px] border border-(--teal)/30 bg-(--teal)/10 px-1.5 py-0.5 text-[9px] text-(--teal) uppercase">
-                              Padrão
+                  addresses.map((addr) =>
+                    editingAddressId === addr.id ? (
+                      <AddressForm
+                        key={addr.id}
+                        formId={`address-edit-${addr.id}`}
+                        isEditing
+                        lookingUpCep={lookingUpCep}
+                        cepLookupError={cepLookupError}
+                        savingAddress={savingAddress}
+                        numberInputRef={numberInputRef}
+                        values={{
+                          label: newAddrLabel,
+                          zip: newAddrZip,
+                          street: newAddrStreet,
+                          number: newAddrNumber,
+                          complement: newAddrComplement,
+                          neighborhood: newAddrNeighborhood,
+                          city: newAddrCity,
+                          state: newAddrState,
+                          isDefault: newAddrIsDefault,
+                        }}
+                        onLabelChange={setNewAddrLabel}
+                        onZipChange={handleZipChange}
+                        onZipBlur={() => {
+                          if (isValidCep(newAddrZip)) {
+                            void fillAddressFromCep(normalizeDigits(newAddrZip))
+                          }
+                        }}
+                        onStreetChange={setNewAddrStreet}
+                        onNumberChange={setNewAddrNumber}
+                        onComplementChange={setNewAddrComplement}
+                        onNeighborhoodChange={setNewAddrNeighborhood}
+                        onCityChange={setNewAddrCity}
+                        onStateChange={setNewAddrState}
+                        onIsDefaultChange={setNewAddrIsDefault}
+                        onCancel={resetAddressForm}
+                        onSubmit={handleAddAddress}
+                      />
+                    ) : (
+                      <div
+                        key={addr.id}
+                        className="flex items-start justify-between rounded-[10px] border border-(--ink)/10 bg-(--paper-soft) p-4 text-sm"
+                      >
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={`text-xs font-bold text-(--red) uppercase ${fontHeading}`}
+                            >
+                              {addr.label}
                             </span>
-                          )}
+                            {addr.isDefault && (
+                              <span className="rounded-[2px] border border-(--teal)/30 bg-(--teal)/10 px-1.5 py-0.5 text-[9px] text-(--teal) uppercase">
+                                Padrão
+                              </span>
+                            )}
+                          </div>
+                          <p className="mt-1 text-(--ink-soft)">
+                            {addr.street}, nº {addr.number}{' '}
+                            {addr.complement && `(${addr.complement})`}
+                          </p>
+                          <p className="text-xs text-(--ink-mute)">
+                            {addr.neighborhood} — {addr.city}/{addr.state} — CEP{' '}
+                            {formatCep(addr.zipCode)}
+                          </p>
                         </div>
-                        <p className="mt-1 text-(--ink-soft)">
-                          {addr.street}, nº {addr.number}{' '}
-                          {addr.complement && `(${addr.complement})`}
-                        </p>
-                        <p className="text-xs text-(--ink-mute)">
-                          {addr.neighborhood} — {addr.city}/{addr.state} — CEP{' '}
-                          {formatCep(addr.zipCode)}
-                        </p>
+                        <div className="flex gap-1">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon-sm"
+                            onClick={() => handleEditAddress(addr)}
+                            disabled={
+                              Boolean(editingAddressId) || showAddAddress
+                            }
+                            className={`rounded-[9px] p-1 text-(--red) ${transitionBgColor} hover:bg-(--red)/10 hover:text-(--red-deep)`}
+                            aria-label={`Editar endereço ${addr.label}`}
+                          >
+                            <IconEdit className="size-4" />
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon-sm"
+                            onClick={() => handleDeleteAddress(addr.id)}
+                            disabled={
+                              Boolean(editingAddressId) || showAddAddress
+                            }
+                            className={`rounded-[9px] p-1 text-(--red) ${transitionBgColor} hover:bg-(--red)/10 hover:text-(--red-deep)`}
+                            aria-label={`Excluir endereço ${addr.label}`}
+                          >
+                            <IconTrash className="size-4" />
+                          </Button>
+                        </div>
                       </div>
-                      <div className="flex gap-1">
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon-sm"
-                          onClick={() => handleEditAddress(addr)}
-                          className={`rounded-[9px] p-1 text-(--red) ${transitionBgColor} hover:bg-(--red)/10 hover:text-(--red-deep)`}
-                          aria-label={`Editar endereço ${addr.label}`}
-                        >
-                          <IconEdit className="size-4" />
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon-sm"
-                          onClick={() => handleDeleteAddress(addr.id)}
-                          className={`rounded-[9px] p-1 text-(--red) ${transitionBgColor} hover:bg-(--red)/10 hover:text-(--red-deep)`}
-                          aria-label={`Excluir endereço ${addr.label}`}
-                        >
-                          <IconTrash className="size-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))
+                    ),
+                  )
                 )}
               </div>
             </div>
