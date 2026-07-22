@@ -41,7 +41,7 @@ import {
   formInputClass,
   warmShadowClass,
 } from '@/src/lib/design/classes'
-import { formatCurrency } from '@/src/lib/formatters'
+import { formatCurrency, SHIRT_SIZES, SHOE_SIZES } from '@/src/lib/formatters'
 import { cn } from '@/src/lib/utils'
 
 export interface CheckoutAddress {
@@ -94,9 +94,6 @@ interface CheckoutStepperProps {
     pagamentoMetodoId: string
   }) => Promise<string | void>
 }
-
-const shirtSizes = ['PP', 'P', 'M', 'G', 'GG', 'XGG']
-const shoeSizes = ['36', '37', '38', '39', '40', '41', '42', '43', '44']
 
 const steps = [
   { key: 'conta', label: 'Conta', code: '01', Icon: IconUser },
@@ -496,7 +493,7 @@ export function CheckoutStepper({
                             <NativeSelectOption value="">
                               Prefiro não informar
                             </NativeSelectOption>
-                            {shirtSizes.map((option) => (
+                            {SHIRT_SIZES.map((option) => (
                               <NativeSelectOption key={option} value={option}>
                                 {option}
                               </NativeSelectOption>
@@ -525,7 +522,7 @@ export function CheckoutStepper({
                             <NativeSelectOption value="">
                               Prefiro não informar
                             </NativeSelectOption>
-                            {shoeSizes.map((option) => (
+                            {SHOE_SIZES.map((option) => (
                               <NativeSelectOption key={option} value={option}>
                                 {option}
                               </NativeSelectOption>

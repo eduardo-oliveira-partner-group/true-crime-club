@@ -69,6 +69,7 @@ import {
   isValidUf,
   normalizeDigits,
   SHIRT_SIZES,
+  SHOE_SIZES,
 } from '@/src/lib/formatters'
 import { cn } from '@/src/lib/utils'
 
@@ -777,12 +778,20 @@ export default function PerfilPage() {
                     Tamanho de Calçado
                   </p>
                   {editPrefs ? (
-                    <Input
-                      type="text"
+                    <NativeSelect
                       value={tempShoe}
                       onChange={(e) => setTempShoe(e.target.value)}
                       className={formInputClass}
-                    />
+                    >
+                      <NativeSelectOption value="">
+                        Selecione
+                      </NativeSelectOption>
+                      {SHOE_SIZES.map((size) => (
+                        <NativeSelectOption key={size} value={size}>
+                          {size}
+                        </NativeSelectOption>
+                      ))}
+                    </NativeSelect>
                   ) : (
                     <p className="mt-1 text-sm text-(--ink-soft)">
                       {displayValue(shoeSize)}

@@ -99,6 +99,24 @@ export function formatUf(value: string): string {
 /** Tamanhos de camiseta aceitos nas preferências do assinante. */
 export const SHIRT_SIZES = ['PP', 'P', 'M', 'G', 'GG', 'XG'] as const
 
+/** Tamanhos de calçado (BR) aceitos nas preferências do assinante. */
+export const SHOE_SIZES = [
+  '33',
+  '34',
+  '35',
+  '36',
+  '37',
+  '38',
+  '39',
+  '40',
+  '41',
+  '42',
+  '43',
+  '44',
+  '45',
+  '46',
+] as const
+
 /** Unidades federativas brasileiras (código IBGE / ISO 3166-2:BR). */
 export const BRAZILIAN_UFS = [
   'AC',
