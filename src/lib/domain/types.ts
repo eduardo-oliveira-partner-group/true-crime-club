@@ -320,10 +320,24 @@ export interface SubscriberProgress {
   percentComplete: number
 }
 
+export interface ShippingOption {
+  id: string
+  label: string
+  carrier: string
+  price: number
+  estimatedDays: number
+  serviceCode?: string
+  carrierCode?: string
+  provider?: string
+  sessionId?: string
+}
+
 export interface ShippingEstimate {
   region: string
   price: number
   estimatedDays: string
+  options: ShippingOption[]
+  sessionId?: string
 }
 
 export interface CouponResult {

@@ -265,6 +265,14 @@ export function formatShippingRegion(zipCode: string): string {
   return 'Demais regiões do Brasil'
 }
 
+export function formatBusinessDays(days: number | string | undefined): string {
+  if (typeof days === 'string' && /dia/i.test(days)) return days
+  const value = Number(days)
+  if (!Number.isFinite(value) || value <= 0) return 'Prazo a confirmar'
+  if (value === 1) return '1 dia útil'
+  return `${value} dias úteis`
+}
+
 export function formatPercent(value: number): string {
   return `${Math.round(value)}%`
 }

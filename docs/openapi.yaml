@@ -1675,16 +1675,78 @@ components:
     FreteEstimado:
       type: object
       properties:
+        cep:
+          type: string
+          example: '02124040'
         regiao:
           type: string
-          example: CEP 05435-020
+          example: CEP 02124040
         preco:
           type: number
           format: float
-          example: 19.9
+          example: 11.01
+        prazoDias:
+          type: integer
+          example: 2
         prazoEstimado:
           type: string
           example: 5–8 dias úteis
+        sessionId:
+          type: string
+          example: frenet-02124040-JTE_INT
+        integracao:
+          type: string
+          example: frenet
+        codigoServico:
+          type: string
+          example: JTE_INT
+        transportadora:
+          type: string
+          example: J&T Express
+        descricaoServico:
+          type: string
+          example: J&T Standard
+        codigoTransportadora:
+          type: string
+          example: JTE
+        opcoes:
+          type: array
+          items:
+            $ref: '#/components/schemas/FreteOpcao'
+    FreteOpcao:
+      type: object
+      properties:
+        erro:
+          type: boolean
+          example: false
+        preco:
+          type: number
+          format: float
+          example: 11.01
+        mensagem:
+          type: string
+          nullable: true
+        provedor:
+          type: string
+          example: frenet
+        descricao:
+          type: string
+          example: J&T Standard
+        prazoDias:
+          type: integer
+          example: 2
+        sessionId:
+          type: string
+          example: frenet-02124040-JTE_INT
+        codigoServico:
+          type: string
+          example: JTE_INT
+        transportadora:
+          type: string
+          example: J&T Express
+        codigoTransportadora:
+          type: string
+          example: JTE
     Pedido:
       type: object
       properties:

@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 import {
+  type CheckoutShippingOption,
   CheckoutStepper,
   type SubscriberPreferencesValue,
 } from '@/src/components/checkout/checkout-stepper'
@@ -178,14 +179,7 @@ export default function CheckoutPage() {
   const addresses = profile.addresses || []
   const paymentMethods = profile.paymentMethods || []
 
-  const shippingOptions = [
-    {
-      id: 'standard',
-      label: 'Envio padrão',
-      price: shipping.price,
-      estimatedDays: shipping.estimatedDays,
-    },
-  ]
+  const shippingOptions: CheckoutShippingOption[] = []
 
   const paymentOptions = paymentMethods.map((method) => ({
     id: method.id,

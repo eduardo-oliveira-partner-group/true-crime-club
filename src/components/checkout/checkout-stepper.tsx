@@ -20,6 +20,7 @@ import { useEffect, useState } from 'react'
 
 import { AddressForm } from '@/src/components/customer/address-form'
 import { CardForm } from '@/src/components/customer/card-form'
+import { Badge } from '@/src/components/ui/badge'
 import { Button } from '@/src/components/ui/button'
 import {
   Empty,
@@ -29,11 +30,23 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from '@/src/components/ui/empty'
-import { Field, FieldGroup, FieldLabel } from '@/src/components/ui/field'
+import {
+  Field,
+  FieldContent,
+  FieldDescription,
+  FieldGroup,
+  FieldLabel,
+  FieldLegend,
+  FieldSet,
+  FieldTitle,
+} from '@/src/components/ui/field'
 import {
   NativeSelect,
   NativeSelectOption,
 } from '@/src/components/ui/native-select'
+import { RadioGroup, RadioGroupItem } from '@/src/components/ui/radio-group'
+import { Skeleton } from '@/src/components/ui/skeleton'
+import { Spinner } from '@/src/components/ui/spinner'
 import {
   Step,
   Stepper,
@@ -55,8 +68,13 @@ import {
   warmShadowClass,
 } from '@/src/lib/design/classes'
 import { calculateShipping } from '@/src/lib/domain/repositories'
-import type { Address, PaymentMethod } from '@/src/lib/domain/types'
+import type {
+  Address,
+  PaymentMethod,
+  ShippingOption,
+} from '@/src/lib/domain/types'
 import {
+  formatBusinessDays,
   formatCep,
   formatCurrency,
   SHIRT_SIZES,
@@ -73,8 +91,13 @@ export interface CheckoutPaymentOption {
 export interface CheckoutShippingOption {
   id: string
   label: string
+  carrier: string
   price: number
-  estimatedDays: string
+  estimatedDays: number
+  serviceCode?: string
+  carrierCode?: string
+  provider?: string
+  sessionId?: string
 }
 
 export interface SubscriberPreferencesValue {
@@ -126,6 +149,22 @@ function toCheckoutPayment(method: PaymentMethod): CheckoutPaymentOption {
   }
 }
 
+function toCheckoutShippingOption(
+  option: ShippingOption,
+): CheckoutShippingOption {
+  return {
+    id: option.id,
+    label: option.label,
+    carrier: option.carrier,
+    price: option.price,
+    estimatedDays: option.estimatedDays,
+    serviceCode: option.serviceCode,
+    carrierCode: option.carrierCode,
+    provider: option.provider,
+    sessionId: option.sessionId,
+  }
+}
+
 export function CheckoutStepper({
   customer,
   addresses: initialAddresses,
@@ -148,6 +187,8 @@ export function CheckoutStepper({
   const [paymentOptions, setPaymentOptions] = useState(initialPaymentOptions)
   const [shippingOptions, setShippingOptions] = useState(initialShippingOptions)
   const [shippingPrice, setShippingPrice] = useState(initialShippingPrice)
+  const [shippingLoading, setShippingLoading] = useState(false)
+  const [shippingError, setShippingError] = useState<string | null>(null)
   const [selectedAddressId, setSelectedAddressId] = useState(
     initialAddresses[0]?.id ?? '',
   )
@@ -192,6 +233,8 @@ export function CheckoutStepper({
     !editingAddressId &&
     (currentStep !== addressStepIndex ||
       (Boolean(selectedAddressId) && !showAddressForm)) &&
+    (currentStep !== shippingStepIndex ||
+      (!shippingLoading && Boolean(selectedShippingId))) &&
     (currentStep !== paymentStepIndex || Boolean(selectedPaymentId)) &&
     (!isLastStep || (Boolean(selectedAddressId) && Boolean(selectedPaymentId)))
   const processingMessage =
@@ -200,21 +243,35 @@ export function CheckoutStepper({
       : 'Validando cartão e lacrando o pedido…'
 
   async function refreshShipping(zipCode: string) {
+    setShippingLoading(true)
+    setShippingError(null)
     try {
       const shipping = await calculateShipping(zipCode)
+      const options = shipping.options.map(toCheckoutShippingOption)
+      setShippingOptions(options)
       setShippingPrice(shipping.price)
-      setShippingOptions([
-        {
-          id: 'standard',
-          label: 'Envio padrão',
-          price: shipping.price,
-          estimatedDays: shipping.estimatedDays,
-        },
-      ])
-      setSelectedShippingId('standard')
+      setSelectedShippingId(options[0]?.id ?? '')
+      if (options.length === 0) {
+        setShippingError(
+          'Nenhuma opção de frete disponível para este CEP. Verifique o endereço.',
+        )
+      }
     } catch {
-      // Mantém frete atual se a cotação falhar
+      setShippingOptions([])
+      setSelectedShippingId('')
+      setShippingPrice(0)
+      setShippingError(
+        'Não foi possível calcular o frete. Tente novamente em instantes.',
+      )
+    } finally {
+      setShippingLoading(false)
     }
+  }
+
+  function handleSelectShipping(optionId: string) {
+    setSelectedShippingId(optionId)
+    const option = shippingOptions.find((item) => item.id === optionId)
+    if (option) setShippingPrice(option.price)
   }
 
   const selectedZipCode = addresses.find(
@@ -294,6 +351,18 @@ export function CheckoutStepper({
   const selectedShipping = shippingOptions.find(
     (s) => s.id === selectedShippingId,
   )
+  const showShippingHighlights = shippingOptions.length > 1
+  const cheapestShippingPrice = showShippingHighlights
+    ? Math.min(...shippingOptions.map((option) => option.price))
+    : null
+  const fastestShippingDays = showShippingHighlights
+    ? (() => {
+        const deadlines = shippingOptions
+          .map((option) => option.estimatedDays)
+          .filter((days) => days > 0)
+        return deadlines.length > 0 ? Math.min(...deadlines) : null
+      })()
+    : null
 
   return (
     <div className="relative grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-10">
@@ -566,32 +635,139 @@ export function CheckoutStepper({
               {/* 03 — Frete */}
               <Step>
                 <Section title="Frete" eyebrow="Envio" code="STEP-03">
-                  <div className="space-y-3">
-                    {shippingOptions.map((option) => (
-                      <OptionCard
-                        key={option.id}
-                        selected={selectedShippingId === option.id}
-                        onSelect={() => setSelectedShippingId(option.id)}
-                        name="shipping"
-                        title={option.label}
-                        detail={option.estimatedDays}
-                        trailing={
-                          <span
-                            className={cn(
-                              cn(fontHeading, 'text-sm font-bold'),
-                              option.price === 0
-                                ? 'text-(--teal-deep)'
-                                : 'text-(--ink)',
-                            )}
-                          >
-                            {option.price === 0
-                              ? 'Grátis'
-                              : `R$ ${option.price}`}
-                          </span>
-                        }
-                      />
-                    ))}
-                  </div>
+                  {shippingLoading ? (
+                    <div className="flex flex-col gap-3" aria-busy="true">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Spinner />
+                        Consultando opções de frete para o CEP informado…
+                      </div>
+                      <Skeleton className="h-24 w-full" />
+                      <Skeleton className="h-24 w-full" />
+                      <Skeleton className="h-24 w-full" />
+                    </div>
+                  ) : shippingError ? (
+                    <Empty className="border border-dashed border-(--ink)/15 bg-(--paper-soft) p-8">
+                      <EmptyHeader>
+                        <EmptyMedia variant="icon">
+                          <IconTruck />
+                        </EmptyMedia>
+                        <EmptyTitle>Frete indisponível</EmptyTitle>
+                        <EmptyDescription>{shippingError}</EmptyDescription>
+                      </EmptyHeader>
+                      <EmptyContent>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          disabled={!selectedZipCode}
+                          onClick={() => {
+                            if (selectedZipCode)
+                              void refreshShipping(selectedZipCode)
+                          }}
+                          className="rounded-[9px]"
+                        >
+                          Tentar novamente
+                        </Button>
+                      </EmptyContent>
+                    </Empty>
+                  ) : shippingOptions.length === 0 ? (
+                    <Empty className="border border-dashed border-(--ink)/15 bg-(--paper-soft) p-8">
+                      <EmptyHeader>
+                        <EmptyMedia variant="icon">
+                          <IconTruck />
+                        </EmptyMedia>
+                        <EmptyTitle>Nenhuma opção de frete</EmptyTitle>
+                        <EmptyDescription>
+                          Selecione um endereço com CEP válido para cotar o
+                          envio.
+                        </EmptyDescription>
+                      </EmptyHeader>
+                    </Empty>
+                  ) : (
+                    <FieldSet className="gap-4">
+                      <FieldLegend variant="label">
+                        Escolha a forma de envio
+                      </FieldLegend>
+                      <FieldDescription>
+                        Preços e prazos calculados para o CEP{' '}
+                        {selectedZipCode ? formatCep(selectedZipCode) : '—'}.
+                      </FieldDescription>
+                      <RadioGroup
+                        value={selectedShippingId}
+                        onValueChange={handleSelectShipping}
+                        className="gap-3"
+                      >
+                        {shippingOptions.map((option) => {
+                          const optionId = `shipping-${option.id}`
+                          const isCheapest =
+                            cheapestShippingPrice != null &&
+                            option.price === cheapestShippingPrice
+                          const isFastest =
+                            fastestShippingDays != null &&
+                            option.estimatedDays === fastestShippingDays
+
+                          return (
+                            <FieldLabel
+                              key={option.id}
+                              htmlFor={optionId}
+                              className={cn(
+                                'w-full rounded-[10px] border transition-colors has-data-checked:bg-(--teal)/8',
+                                selectedShippingId === option.id
+                                  ? 'border-(--teal) bg-(--teal)/8'
+                                  : 'border-[rgba(33,28,24,0.15)] bg-(--paper-soft) hover:border-(--red)/35',
+                              )}
+                            >
+                              <Field
+                                orientation="horizontal"
+                                className="items-start"
+                              >
+                                <FieldContent className="gap-2">
+                                  <div className="flex flex-wrap items-center gap-2">
+                                    <FieldTitle>{option.label}</FieldTitle>
+                                    {option.carrier ? (
+                                      <Badge variant="secondary">
+                                        {option.carrier}
+                                      </Badge>
+                                    ) : null}
+                                    {isFastest ? (
+                                      <Badge className="border-transparent bg-(--teal)/15 text-(--teal-deep)">
+                                        Mais rápida
+                                      </Badge>
+                                    ) : null}
+                                    {isCheapest ? (
+                                      <Badge className="border-transparent bg-(--amber)/20 text-(--ink-soft)">
+                                        Mais econômica
+                                      </Badge>
+                                    ) : null}
+                                  </div>
+                                  <FieldDescription>
+                                    Prazo estimado:{' '}
+                                    {formatBusinessDays(option.estimatedDays)}
+                                  </FieldDescription>
+                                </FieldContent>
+                                <div className="flex shrink-0 flex-col items-end gap-2">
+                                  <span
+                                    className={cn(
+                                      fontHeading,
+                                      'text-sm font-bold text-(--ink)',
+                                    )}
+                                  >
+                                    {option.price === 0
+                                      ? 'Grátis'
+                                      : formatCurrency(option.price)}
+                                  </span>
+                                  <RadioGroupItem
+                                    value={option.id}
+                                    id={optionId}
+                                  />
+                                </div>
+                              </Field>
+                            </FieldLabel>
+                          )
+                        })}
+                      </RadioGroup>
+                    </FieldSet>
+                  )}
                 </Section>
               </Step>
 
@@ -826,7 +1002,17 @@ export function CheckoutStepper({
                   <Review
                     label="Frete"
                     value={selectedShipping?.label ?? '—'}
-                    detail={selectedShipping?.estimatedDays}
+                    detail={
+                      selectedShipping
+                        ? [
+                            selectedShipping.carrier,
+                            formatBusinessDays(selectedShipping.estimatedDays),
+                            formatCurrency(selectedShipping.price),
+                          ]
+                            .filter(Boolean)
+                            .join(' · ')
+                        : undefined
+                    }
                   />
                   <Review
                     label="Pagamento"
