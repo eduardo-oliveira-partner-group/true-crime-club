@@ -1019,56 +1019,6 @@ paths:
                 $ref: '#/components/schemas/Erro'
       security:
       - cookieAuth: []
-  /cliente/cartao:
-    post:
-      tags:
-      - Cliente & Painel
-      summary: Atualizar cartão padrão do cliente
-      description: 'Atualiza o meio de pagamento cartão padrão.
-
-        Usado em `/cliente/financeiro/atualizar-cartao` (`updateCard`).
-
-        '
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-              - nomeImpresso
-              - ultimosQuatro
-              - bandeira
-              - token
-              properties:
-                nomeImpresso:
-                  type: string
-                  example: Mariana Silva
-                ultimosQuatro:
-                  type: string
-                  example: '4242'
-                bandeira:
-                  type: string
-                  example: Visa
-                token:
-                  type: string
-                  description: Token do gateway (mock/futuro).
-                  example: tok_novo
-      responses:
-        '200':
-          description: Cartão atualizado.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/MetodoPagamento'
-        '401':
-          description: Não autenticado.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Erro'
-      security:
-      - cookieAuth: []
   /cliente/cartoes:
     get:
       tags:
@@ -1139,6 +1089,49 @@ paths:
       security:
       - cookieAuth: []
   /cliente/cartoes/{id}:
+    patch:
+      tags:
+      - Cliente & Painel
+      summary: Atualizar cartão de crédito
+      description: 'Define ou remove a flag de cartão padrão (`padrao`).
+
+        Usado em `/cliente/financeiro/atualizar-cartao` (`updateCard`).
+
+        '
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          example: pm-001
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - padrao
+              properties:
+                padrao:
+                  type: boolean
+                  example: true
+      responses:
+        '200':
+          description: Cartão atualizado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetodoPagamento'
+        '401':
+          description: Não autenticado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+      security:
+      - cookieAuth: []
     delete:
       tags:
       - Cliente & Painel
