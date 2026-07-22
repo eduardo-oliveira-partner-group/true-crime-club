@@ -8,6 +8,7 @@ import {
   IconCreditCard,
   IconMapPin,
   IconPackage,
+  IconPlus,
   IconShirt,
   IconTruck,
   IconUser,
@@ -16,7 +17,17 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
+import { CheckoutAddressForm } from '@/src/components/checkout/checkout-address-form'
+import { CheckoutCardForm } from '@/src/components/checkout/checkout-card-form'
 import { Button } from '@/src/components/ui/button'
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@/src/components/ui/empty'
 import { Field, FieldGroup, FieldLabel } from '@/src/components/ui/field'
 import {
   NativeSelect,
@@ -41,6 +52,8 @@ import {
   formInputClass,
   warmShadowClass,
 } from '@/src/lib/design/classes'
+import { calculateShipping } from '@/src/lib/domain/repositories'
+import type { Address, PaymentMethod } from '@/src/lib/domain/types'
 import { formatCurrency, SHIRT_SIZES, SHOE_SIZES } from '@/src/lib/formatters'
 import { cn } from '@/src/lib/utils'
 
@@ -104,32 +117,66 @@ const steps = [
   { key: 'revisao', label: 'Revisão', code: '06', Icon: IconPackage },
 ] as const
 
+function toCheckoutAddress(address: Address): CheckoutAddress {
+  return {
+    id: address.id,
+    label: address.label,
+    street: address.street,
+    number: address.number,
+    city: address.city,
+    state: address.state,
+    zipCode: address.zipCode,
+  }
+}
+
+function toCheckoutPayment(method: PaymentMethod): CheckoutPaymentOption {
+  return {
+    id: method.id,
+    label:
+      method.label ||
+      (method.type === 'pix'
+        ? 'Pix'
+        : `${method.brand ?? 'Cartão'} •••• ${method.lastFour ?? ''}`),
+    type: method.type,
+  }
+}
+
 export function CheckoutStepper({
   customer,
-  addresses,
-  paymentOptions,
-  shippingOptions,
+  addresses: initialAddresses,
+  paymentOptions: initialPaymentOptions,
+  shippingOptions: initialShippingOptions,
   isSubscriptionFlow,
   planName,
   planPrice,
   cartItems,
   subtotalAmount,
   discountAmount,
-  shippingPrice,
-  totalAmount,
+  shippingPrice: initialShippingPrice,
+  totalAmount: initialTotalAmount,
   onSavePreferences,
   onCreateOrder,
 }: CheckoutStepperProps) {
   const router = useRouter()
   const [currentStep, setCurrentStep] = useState(1)
+  const [addresses, setAddresses] = useState(initialAddresses)
+  const [paymentOptions, setPaymentOptions] = useState(initialPaymentOptions)
+  const [shippingOptions, setShippingOptions] = useState(initialShippingOptions)
+  const [shippingPrice, setShippingPrice] = useState(initialShippingPrice)
   const [selectedAddressId, setSelectedAddressId] = useState(
-    addresses[0]?.id ?? '',
+    initialAddresses[0]?.id ?? '',
   )
   const [selectedShippingId, setSelectedShippingId] = useState(
-    shippingOptions[0]?.id ?? '',
+    initialShippingOptions[0]?.id ?? '',
   )
   const [selectedPaymentId, setSelectedPaymentId] = useState(
-    paymentOptions[0]?.id ?? '',
+    initialPaymentOptions[0]?.id ?? '',
+  )
+  const [showAddressForm, setShowAddressForm] = useState(
+    initialAddresses.length === 0,
+  )
+  const [showCardForm, setShowCardForm] = useState(
+    initialPaymentOptions.length === 0,
   )
   const [preferences, setPreferences] = useState<SubscriberPreferencesValue>({
     shirtSize: '',
@@ -143,6 +190,7 @@ export function CheckoutStepper({
   const isAnnualPlan =
     isSubscriptionFlow && planName?.toLowerCase().includes('anual')
   const selectedPayment = paymentOptions.find((p) => p.id === selectedPaymentId)
+  const totalAmount = initialTotalAmount - initialShippingPrice + shippingPrice
 
   const maxInstallments = isAnnualPlan ? 12 : totalAmount > 10000 ? 6 : 1
 
@@ -150,10 +198,74 @@ export function CheckoutStepper({
 
   const isLastStep = currentStep === steps.length
   const hasCustomer = Boolean(customer)
+  const addressStepIndex = 2
+  const paymentStepIndex = 4
+  const canAdvance =
+    hasCustomer &&
+    (currentStep !== addressStepIndex || Boolean(selectedAddressId)) &&
+    (currentStep !== paymentStepIndex || Boolean(selectedPaymentId)) &&
+    (!isLastStep || (Boolean(selectedAddressId) && Boolean(selectedPaymentId)))
   const processingMessage =
     selectedPayment?.type === 'pix'
       ? 'Gerando cobrança Pix e preparando o QR Code…'
       : 'Validando cartão e lacrando o pedido…'
+
+  async function refreshShipping(zipCode: string) {
+    try {
+      const shipping = await calculateShipping(zipCode)
+      setShippingPrice(shipping.price)
+      setShippingOptions([
+        {
+          id: 'standard',
+          label: 'Envio padrão',
+          price: shipping.price,
+          estimatedDays: shipping.estimatedDays,
+        },
+      ])
+      setSelectedShippingId('standard')
+    } catch {
+      // Mantém frete atual se a cotação falhar
+    }
+  }
+
+  async function handleAddressSaved(nextAddresses: Address[]) {
+    const mapped = nextAddresses.map(toCheckoutAddress)
+    setAddresses(mapped)
+    setShowAddressForm(false)
+    setError(null)
+
+    const preferred =
+      mapped.find((address) => address.id === selectedAddressId) ??
+      mapped.find(
+        (address) =>
+          nextAddresses.find((item) => item.id === address.id)?.isDefault,
+      ) ??
+      mapped[0]
+
+    if (preferred) {
+      setSelectedAddressId(preferred.id)
+      await refreshShipping(preferred.zipCode)
+    }
+  }
+
+  async function handleSelectAddress(addressId: string) {
+    setSelectedAddressId(addressId)
+    const address = addresses.find((item) => item.id === addressId)
+    if (address) {
+      await refreshShipping(address.zipCode)
+    }
+  }
+
+  function handleCardSaved(card: PaymentMethod) {
+    const option = toCheckoutPayment(card)
+    setPaymentOptions((prev) => {
+      if (prev.some((item) => item.id === option.id)) return prev
+      return [...prev, option]
+    })
+    setSelectedPaymentId(option.id)
+    setShowCardForm(false)
+    setError(null)
+  }
 
   async function handleFinalStepCompleted() {
     setError(null)
@@ -293,7 +405,7 @@ export function CheckoutStepper({
               }
               backButtonProps={{ disabled: submitting }}
               nextButtonProps={{
-                disabled: submitting || !hasCustomer,
+                disabled: submitting || !canAdvance,
                 className: isLastStep ? 'is-complete' : undefined,
               }}
               renderStepIndicator={(props) => (
@@ -346,22 +458,65 @@ export function CheckoutStepper({
                   code="STEP-02"
                 >
                   <div className="space-y-3">
-                    {addresses.length === 0 ? (
-                      <p className="text-sm text-(--ink-soft)">
-                        Nenhum endereço cadastrado.
-                      </p>
-                    ) : (
-                      addresses.map((address) => (
-                        <OptionCard
-                          key={address.id}
-                          selected={selectedAddressId === address.id}
-                          onSelect={() => setSelectedAddressId(address.id)}
-                          name="address"
-                          title={address.label}
-                          detail={`${address.street}, ${address.number} — ${address.city}/${address.state} · CEP ${address.zipCode}`}
-                        />
-                      ))
-                    )}
+                    {addresses.length === 0 && !showAddressForm ? (
+                      <Empty className="border border-dashed border-(--ink)/15 bg-(--paper-soft) p-8">
+                        <EmptyHeader>
+                          <EmptyMedia variant="icon">
+                            <IconMapPin />
+                          </EmptyMedia>
+                          <EmptyTitle>Nenhum endereço cadastrado</EmptyTitle>
+                          <EmptyDescription>
+                            Cadastre um endereço de entrega para continuar o
+                            checkout.
+                          </EmptyDescription>
+                        </EmptyHeader>
+                        <EmptyContent>
+                          <Button
+                            type="button"
+                            onClick={() => setShowAddressForm(true)}
+                            className="inline-flex items-center gap-2 rounded-[9px] bg-(--red) text-[#fbf9f6] hover:bg-(--red-deep)"
+                          >
+                            <IconPlus className="size-4" />
+                            Cadastrar endereço
+                          </Button>
+                        </EmptyContent>
+                      </Empty>
+                    ) : null}
+
+                    {addresses.map((address) => (
+                      <OptionCard
+                        key={address.id}
+                        selected={selectedAddressId === address.id}
+                        onSelect={() => {
+                          void handleSelectAddress(address.id)
+                        }}
+                        name="address"
+                        title={address.label}
+                        detail={`${address.street}, ${address.number} — ${address.city}/${address.state} · CEP ${address.zipCode}`}
+                      />
+                    ))}
+
+                    {showAddressForm ? (
+                      <CheckoutAddressForm
+                        onSaved={handleAddressSaved}
+                        onCancel={
+                          addresses.length > 0
+                            ? () => setShowAddressForm(false)
+                            : undefined
+                        }
+                      />
+                    ) : addresses.length > 0 ? (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowAddressForm(true)}
+                        className="inline-flex items-center gap-2 rounded-[9px]"
+                      >
+                        <IconPlus className="size-3.5" />
+                        Adicionar outro endereço
+                      </Button>
+                    ) : null}
                   </div>
                 </Section>
               </Step>
@@ -402,6 +557,31 @@ export function CheckoutStepper({
               <Step>
                 <Section title="Pagamento" eyebrow="Cobrança" code="STEP-04">
                   <div className="space-y-3">
+                    {paymentOptions.length === 0 && !showCardForm ? (
+                      <Empty className="border border-dashed border-(--ink)/15 bg-(--paper-soft) p-8">
+                        <EmptyHeader>
+                          <EmptyMedia variant="icon">
+                            <IconCreditCard />
+                          </EmptyMedia>
+                          <EmptyTitle>Nenhuma forma de pagamento</EmptyTitle>
+                          <EmptyDescription>
+                            Cadastre um cartão de crédito para finalizar o
+                            pedido.
+                          </EmptyDescription>
+                        </EmptyHeader>
+                        <EmptyContent>
+                          <Button
+                            type="button"
+                            onClick={() => setShowCardForm(true)}
+                            className="inline-flex items-center gap-2 rounded-[9px] bg-(--red) text-[#fbf9f6] hover:bg-(--red-deep)"
+                          >
+                            <IconPlus className="size-4" />
+                            Cadastrar cartão
+                          </Button>
+                        </EmptyContent>
+                      </Empty>
+                    ) : null}
+
                     {paymentOptions.map((option) => (
                       <OptionCard
                         key={option.id}
@@ -416,6 +596,28 @@ export function CheckoutStepper({
                         }
                       />
                     ))}
+
+                    {showCardForm ? (
+                      <CheckoutCardForm
+                        onSaved={handleCardSaved}
+                        onCancel={
+                          paymentOptions.length > 0
+                            ? () => setShowCardForm(false)
+                            : undefined
+                        }
+                      />
+                    ) : paymentOptions.length > 0 ? (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowCardForm(true)}
+                        className="inline-flex items-center gap-2 rounded-[9px]"
+                      >
+                        <IconPlus className="size-3.5" />
+                        Adicionar cartão
+                      </Button>
+                    ) : null}
                   </div>
                   {selectedPayment?.type === 'credit_card' &&
                     maxInstallments > 1 && (

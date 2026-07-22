@@ -189,6 +189,7 @@ export const customerApi = {
     holderName: string
     lastFour: string
     brand: string
+    holderDocument: string
   }) =>
     fetcher('/cliente/cartoes', {
       method: 'POST',
@@ -197,6 +198,7 @@ export const customerApi = {
         nomeImpresso: body.holderName,
         ultimosQuatro: body.lastFour,
         bandeira: body.brand,
+        cpfTitular: normalizeDigits(body.holderDocument),
       }),
     }).then(toPaymentMethod),
   deleteCard: (id: string) =>

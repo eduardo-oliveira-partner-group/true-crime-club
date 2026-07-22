@@ -86,6 +86,28 @@ export function isValidCep(value: string): boolean {
   return normalizeDigits(value).length === 8
 }
 
+/** Número do cartão em grupos de 4 (máx. 16 dígitos — Visa/Mastercard). */
+export function formatCardNumber(value: string): string {
+  const digits = normalizeDigits(value).slice(0, 16)
+  return digits.replace(/(\d{4})(?=\d)/g, '$1 ').trim()
+}
+
+/** CVC/CVV: apenas dígitos (3–4). */
+export function formatCvc(value: string): string {
+  return normalizeDigits(value).slice(0, 4)
+}
+
+/** Nome impresso no cartão: maiúsculas, letras e espaços. */
+export function formatCardHolderName(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/\p{M}/gu, '')
+    .replace(/[^a-zA-Z\s]/g, '')
+    .replace(/\s+/g, ' ')
+    .toUpperCase()
+    .slice(0, 40)
+}
+
 /** Normaliza UF para 2 letras maiúsculas (ex.: "sp" → "SP"). */
 export function formatUf(value: string): string {
   return value

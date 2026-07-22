@@ -60,6 +60,7 @@ export async function addCustomerAddress(body: {
   city: string
   state: string
   zipCode: string
+  isDefault?: boolean
 }): Promise<Address[]> {
   return await apiClient.customer.addAddress(body)
 }
@@ -186,6 +187,7 @@ export async function addCard(input: {
   holderName: string
   lastFour: string
   brand: string
+  holderDocument: string
 }): Promise<PaymentMethod> {
   return await apiClient.customer.addCard(input)
 }

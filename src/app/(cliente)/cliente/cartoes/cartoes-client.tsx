@@ -35,6 +35,14 @@ import {
 } from '@/src/lib/design/classes'
 import { addCard, deleteCard, listCards } from '@/src/lib/domain/repositories'
 import type { PaymentMethod } from '@/src/lib/domain/types'
+import {
+  formatCardHolderName,
+  formatCardNumber,
+  formatCpf,
+  formatCvc,
+  isValidCpf,
+  normalizeDigits,
+} from '@/src/lib/formatters'
 
 function getErrorMessage(error: unknown, fallback: string): string {
   return error instanceof Error ? error.message : fallback
@@ -53,6 +61,7 @@ export default function CartoesClient() {
   const [showAddForm, setShowAddForm] = useState(false)
   const [cardNumber, setCardNumber] = useState('')
   const [holderName, setHolderName] = useState('')
+  const [holderDocument, setHolderDocument] = useState('')
   const [expiryMonth, setExpiryMonth] = useState('01')
   const [expiryYear, setExpiryYear] = useState('2026')
   const [cvc, setCvc] = useState('')
@@ -70,19 +79,40 @@ export default function CartoesClient() {
 
   const handleAddCard = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!cardNumber || !holderName || !cvc) return
+    if (!cardNumber || !holderName || !holderDocument || !cvc) return
 
-    const lastFour = cardNumber.replace(/\s+/g, '').slice(-4)
-    const brand = cardNumber.startsWith('5') ? 'Mastercard' : 'Visa'
+    const digits = normalizeDigits(cardNumber)
+    if (digits.length !== 16) {
+      setError('Informe um número de cartão válido com 16 dígitos.')
+      return
+    }
+    if (!isValidCpf(holderDocument)) {
+      setError('Informe um CPF válido do titular.')
+      return
+    }
+    if (cvc.length < 3) {
+      setError('Informe um CVC válido.')
+      return
+    }
+
+    const lastFour = digits.slice(-4)
+    const brand = digits.startsWith('5') ? 'Mastercard' : 'Visa'
     const token = `tok_mock_${Date.now()}`
 
     setSubmitting(true)
     setError(null)
     try {
-      await addCard({ token, holderName, lastFour, brand })
+      await addCard({
+        token,
+        holderName: holderName.trim(),
+        lastFour,
+        brand,
+        holderDocument,
+      })
       setShowAddForm(false)
       setCardNumber('')
       setHolderName('')
+      setHolderDocument('')
       setExpiryMonth('01')
       setExpiryYear('2026')
       setCvc('')
@@ -157,7 +187,12 @@ export default function CartoesClient() {
                 required
                 placeholder="4000 1234 5678 9010"
                 value={cardNumber}
-                onChange={(e) => setCardNumber(e.target.value)}
+                onChange={(e) =>
+                  setCardNumber(formatCardNumber(e.target.value))
+                }
+                inputMode="numeric"
+                autoComplete="cc-number"
+                maxLength={19}
                 className={formInputClass}
               />
             </Field>
@@ -171,7 +206,28 @@ export default function CartoesClient() {
                 required
                 placeholder="MARIANA SILVA"
                 value={holderName}
-                onChange={(e) => setHolderName(e.target.value)}
+                onChange={(e) =>
+                  setHolderName(formatCardHolderName(e.target.value))
+                }
+                autoComplete="cc-name"
+                maxLength={40}
+                className={formInputClass}
+              />
+            </Field>
+            <Field>
+              <FieldLabel className={formLabelClass} htmlFor="holderDocument">
+                CPF do Titular
+              </FieldLabel>
+              <Input
+                id="holderDocument"
+                type="text"
+                required
+                placeholder="000.000.000-00"
+                value={holderDocument}
+                onChange={(e) => setHolderDocument(formatCpf(e.target.value))}
+                inputMode="numeric"
+                autoComplete="off"
+                maxLength={14}
                 className={formInputClass}
               />
             </Field>
@@ -214,7 +270,10 @@ export default function CartoesClient() {
                   required
                   placeholder="123"
                   value={cvc}
-                  onChange={(e) => setCvc(e.target.value)}
+                  onChange={(e) => setCvc(formatCvc(e.target.value))}
+                  inputMode="numeric"
+                  autoComplete="cc-csc"
+                  maxLength={4}
                   className={formInputClass}
                 />
               </Field>
