@@ -165,20 +165,10 @@ export const customerApi = {
       method: 'POST',
     }),
   listInvoices: () => fetcher('/cliente/faturas'),
-  updateCard: (body: {
-    holderName: string
-    lastFour: string
-    brand: string
-    token?: string
-  }) =>
-    fetcher('/cliente/cartao', {
-      method: 'POST',
-      body: JSON.stringify({
-        nomeImpresso: body.holderName,
-        ultimosQuatro: body.lastFour,
-        bandeira: body.brand,
-        token: body.token,
-      }),
+  updateCard: (body: { id: string; padrao: boolean }) =>
+    fetcher(`/cliente/cartoes/${body.id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ padrao: body.padrao }),
     }).then(toPaymentMethod),
   listCards: () =>
     fetcher('/cliente/cartoes').then((items) =>

@@ -187,10 +187,8 @@ export async function renewPixPayment(paymentId: string): Promise<Payment> {
 }
 
 export async function updateCard(input: {
-  holderName: string
-  lastFour: string
-  brand: string
-  token?: string
+  id: string
+  padrao: boolean
 }): Promise<PaymentMethod> {
   return await apiClient.customer.updateCard(input)
 }

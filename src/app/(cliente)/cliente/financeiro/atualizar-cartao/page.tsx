@@ -13,24 +13,33 @@ import {
   formInputClass,
   formLabelClass,
 } from '@/src/lib/design/classes'
-import { updateCard } from '@/src/lib/domain/repositories'
+import { listCards, updateCard } from '@/src/lib/domain/repositories'
 
 export default function AtualizarCartaoPage() {
   const [submitting, setSubmitting] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
 
   const submit = async (formData: FormData) => {
-    const lastFour = String(formData.get('lastFour') ?? '0000').slice(-4)
+    const lastFour = String(formData.get('lastFour') ?? '').slice(-4)
+    if (!/^\d{4}$/.test(lastFour)) {
+      setMessage('Informe os quatro últimos dígitos do cartão.')
+      return
+    }
     setSubmitting(true)
     setMessage(null)
     try {
+      const cards = await listCards()
+      const defaultCard =
+        cards.find((card) => card.isDefault) ?? cards[0] ?? null
+      if (!defaultCard) {
+        setMessage('Nenhum cartão cadastrado para atualizar.')
+        return
+      }
       await updateCard({
-        holderName: String(formData.get('holder') ?? ''),
-        lastFour,
-        brand: String(formData.get('brand') ?? 'Visa'),
-        token: `tok_mock_${Date.now()}_${lastFour}`,
+        id: defaultCard.id,
+        padrao: true,
       })
-      setMessage('Cartão atualizado.')
+      setMessage('Cartão definido como padrão.')
     } catch (error) {
       setMessage(
         error instanceof Error
