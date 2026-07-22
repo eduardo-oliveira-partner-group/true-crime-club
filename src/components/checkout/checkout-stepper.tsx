@@ -16,7 +16,7 @@ import {
 } from '@tabler/icons-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { AddressForm } from '@/src/components/customer/address-form'
 import { CardForm } from '@/src/components/customer/card-form'
@@ -185,6 +185,7 @@ export function CheckoutStepper({
   const isLastStep = currentStep === steps.length
   const hasCustomer = Boolean(customer)
   const addressStepIndex = 2
+  const shippingStepIndex = 3
   const paymentStepIndex = 4
   const canAdvance =
     hasCustomer &&
@@ -216,7 +217,16 @@ export function CheckoutStepper({
     }
   }
 
-  async function handleAddressSaved(nextAddresses: Address[]) {
+  const selectedZipCode = addresses.find(
+    (item) => item.id === selectedAddressId,
+  )?.zipCode
+
+  useEffect(() => {
+    if (currentStep !== shippingStepIndex || !selectedZipCode) return
+    void refreshShipping(selectedZipCode)
+  }, [currentStep, selectedZipCode])
+
+  function handleAddressSaved(nextAddresses: Address[]) {
     setAddresses(nextAddresses)
     setShowAddressForm(false)
     setEditingAddressId(null)
@@ -229,7 +239,6 @@ export function CheckoutStepper({
 
     if (preferred) {
       setSelectedAddressId(preferred.id)
-      await refreshShipping(preferred.zipCode)
     }
   }
 
@@ -238,13 +247,9 @@ export function CheckoutStepper({
     setEditingAddressId(null)
   }
 
-  async function handleSelectAddress(addressId: string) {
+  function handleSelectAddress(addressId: string) {
     if (editingAddressId) return
     setSelectedAddressId(addressId)
-    const address = addresses.find((item) => item.id === addressId)
-    if (address) {
-      await refreshShipping(address.zipCode)
-    }
   }
 
   function handleCardSaved(card: PaymentMethod) {

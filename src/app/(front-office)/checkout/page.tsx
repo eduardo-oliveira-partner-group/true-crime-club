@@ -23,7 +23,6 @@ import {
   warmShadowClass,
 } from '@/src/lib/design/classes'
 import {
-  calculateShipping,
   getCart,
   getCartTotals,
   getPlanBySlug,
@@ -76,20 +75,20 @@ export default function CheckoutPage() {
           redirectToLogin()
           return
         }
-        const [shipping, monthlyPlan] = await Promise.all([
-          profile.addresses[0]?.zipCode
-            ? calculateShipping(profile.addresses[0].zipCode)
-            : Promise.resolve({
-                price: 0,
-                estimatedDays: '5-8 dias úteis',
-                region: '',
-              }),
-          plan?.slug === 'anual'
-            ? getPlanBySlug('mensal')
-            : Promise.resolve(null),
-        ])
+        const monthlyPlan =
+          plan?.slug === 'anual' ? await getPlanBySlug('mensal') : null
         if (cancelled) return
-        setState({ cart, profile, plan, monthlyPlan, shipping })
+        setState({
+          cart,
+          profile,
+          plan,
+          monthlyPlan,
+          shipping: {
+            price: 0,
+            estimatedDays: 'A calcular',
+            region: '',
+          },
+        })
       })
       .catch((error: unknown) => {
         if (cancelled) return
