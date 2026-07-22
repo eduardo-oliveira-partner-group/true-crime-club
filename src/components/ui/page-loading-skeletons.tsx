@@ -1,7 +1,9 @@
+import { Skeleton } from '@/src/components/ui/skeleton'
+
 function Block({ className }: { className: string }) {
   return (
-    <div
-      className={`animate-pulse rounded-[9px] bg-(--ink)/10 motion-reduce:animate-none ${className}`}
+    <Skeleton
+      className={`rounded-[9px] bg-(--ink)/10 motion-reduce:animate-none ${className}`}
     />
   )
 }

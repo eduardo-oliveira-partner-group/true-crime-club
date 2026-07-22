@@ -12,6 +12,12 @@ import { useId, useLayoutEffect, useRef, useState } from 'react'
 
 import { SectionEyebrow } from '@/src/components/public-design/section-eyebrow'
 import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyTitle,
+} from '@/src/components/ui/empty'
+import {
   PriceBlock,
   ProductQuickView,
 } from '@/src/components/ui/product-quick-view'
@@ -325,8 +331,13 @@ function EvidencePlaceholder({ product }: { product: Product }) {
 
 function EmptyCatalog() {
   return (
-    <div className="rounded-[14px_14px_16px_16px] border border-dashed border-[rgba(33,28,24,0.18)] bg-(--card) p-8 text-center text-(--ink-soft)">
-      Nenhum produto disponível no momento.
-    </div>
+    <Empty className="border border-dashed border-[rgba(33,28,24,0.18)] bg-(--card) p-8">
+      <EmptyHeader>
+        <EmptyTitle>Nenhum produto disponível</EmptyTitle>
+        <EmptyDescription>
+          Nenhum produto disponível no momento.
+        </EmptyDescription>
+      </EmptyHeader>
+    </Empty>
   )
 }

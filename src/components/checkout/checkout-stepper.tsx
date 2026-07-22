@@ -17,6 +17,11 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 import { Button } from '@/src/components/ui/button'
+import { Field, FieldGroup, FieldLabel } from '@/src/components/ui/field'
+import {
+  NativeSelect,
+  NativeSelectOption,
+} from '@/src/components/ui/native-select'
 import {
   Step,
   Stepper,
@@ -417,29 +422,35 @@ export function CheckoutStepper({
                   </div>
                   {selectedPayment?.type === 'credit_card' &&
                     maxInstallments > 1 && (
-                      <div className="mt-4">
-                        <Field label="Quantidade de parcelas">
-                          <select
-                            value={installments}
-                            onChange={(e) =>
-                              setInstallments(Number(e.target.value))
-                            }
-                            className={cn(formInputClass, 'h-10 px-3 py-0')}
-                          >
-                            {Array.from(
-                              { length: maxInstallments },
-                              (_, i) => i + 1,
-                            ).map((n) => {
-                              const val = Math.round(totalAmount / n)
-                              return (
-                                <option key={n} value={n}>
-                                  {n}x de {formatCurrency(val)}
-                                </option>
-                              )
-                            })}
-                          </select>
-                        </Field>
-                      </div>
+                      <Field className="mt-4">
+                        <FieldLabel
+                          className={cn(
+                            fontMono,
+                            'text-[0.65rem] font-semibold tracking-[0.14em] text-(--ink) uppercase',
+                          )}
+                        >
+                          Quantidade de parcelas
+                        </FieldLabel>
+                        <NativeSelect
+                          value={String(installments)}
+                          onChange={(e) =>
+                            setInstallments(Number(e.target.value))
+                          }
+                          className={cn(formInputClass, 'h-10 px-3')}
+                        >
+                          {Array.from(
+                            { length: maxInstallments },
+                            (_, i) => i + 1,
+                          ).map((n) => {
+                            const val = Math.round(totalAmount / n)
+                            return (
+                              <NativeSelectOption key={n} value={String(n)}>
+                                {n}x de {formatCurrency(val)}
+                              </NativeSelectOption>
+                            )
+                          })}
+                        </NativeSelect>
+                      </Field>
                     )}
                   <p className="mt-4 text-[0.7rem]/5 text-(--ink-mute)">
                     Ambiente de validação — nenhum pagamento real será
@@ -462,35 +473,75 @@ export function CheckoutStepper({
                           ? `Para o ${planName}, capturamos suas preferências para curadoria das boxes.`
                           : 'Capturamos suas preferências para curadoria das boxes.'}
                       </p>
-                      <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                        <Field label="Tamanho de camiseta">
-                          <SelectInput
+                      <FieldGroup className="mt-5 gap-4 sm:grid sm:grid-cols-2">
+                        <Field>
+                          <FieldLabel
+                            className={cn(
+                              fontMono,
+                              'text-[0.65rem] font-semibold tracking-[0.14em] text-(--ink) uppercase',
+                            )}
+                          >
+                            Tamanho de camiseta
+                          </FieldLabel>
+                          <NativeSelect
                             value={preferences.shirtSize ?? ''}
-                            onChange={(value) =>
+                            onChange={(e) =>
                               setPreferences((prev) => ({
                                 ...prev,
-                                shirtSize: value,
+                                shirtSize: e.target.value,
                               }))
                             }
-                            options={shirtSizes}
-                            placeholder="Prefiro não informar"
-                          />
+                            className={cn(formInputClass, 'h-10 px-3')}
+                          >
+                            <NativeSelectOption value="">
+                              Prefiro não informar
+                            </NativeSelectOption>
+                            {shirtSizes.map((option) => (
+                              <NativeSelectOption key={option} value={option}>
+                                {option}
+                              </NativeSelectOption>
+                            ))}
+                          </NativeSelect>
                         </Field>
-                        <Field label="Tamanho de calçado">
-                          <SelectInput
+                        <Field>
+                          <FieldLabel
+                            className={cn(
+                              fontMono,
+                              'text-[0.65rem] font-semibold tracking-[0.14em] text-(--ink) uppercase',
+                            )}
+                          >
+                            Tamanho de calçado
+                          </FieldLabel>
+                          <NativeSelect
                             value={preferences.shoeSize ?? ''}
-                            onChange={(value) =>
+                            onChange={(e) =>
                               setPreferences((prev) => ({
                                 ...prev,
-                                shoeSize: value,
+                                shoeSize: e.target.value,
                               }))
                             }
-                            options={shoeSizes}
-                            placeholder="Prefiro não informar"
-                          />
+                            className={cn(formInputClass, 'h-10 px-3')}
+                          >
+                            <NativeSelectOption value="">
+                              Prefiro não informar
+                            </NativeSelectOption>
+                            {shoeSizes.map((option) => (
+                              <NativeSelectOption key={option} value={option}>
+                                {option}
+                              </NativeSelectOption>
+                            ))}
+                          </NativeSelect>
                         </Field>
-                      </div>
-                      <Field label="Notas para curadoria">
+                      </FieldGroup>
+                      <Field className="mt-4">
+                        <FieldLabel
+                          className={cn(
+                            fontMono,
+                            'text-[0.65rem] font-semibold tracking-[0.14em] text-(--ink) uppercase',
+                          )}
+                        >
+                          Notas para curadoria
+                        </FieldLabel>
                         <Textarea
                           value={preferences.notes}
                           onChange={(e) =>
@@ -501,7 +552,7 @@ export function CheckoutStepper({
                           }
                           rows={3}
                           placeholder="Preferências de cores, estilo, alergias, etc."
-                          className={cn(formInputClass, 'mt-4 resize-none')}
+                          className={cn(formInputClass, 'resize-none')}
                         />
                       </Field>
                     </>
@@ -881,55 +932,6 @@ function Section({
       </div>
       {children}
     </section>
-  )
-}
-
-function Field({
-  label,
-  children,
-}: {
-  label: string
-  children: React.ReactNode
-}) {
-  return (
-    <label className="block space-y-1.5">
-      <span
-        className={cn(
-          fontMono,
-          'text-[0.65rem] font-semibold tracking-[0.14em] text-(--ink) uppercase',
-        )}
-      >
-        {label}
-      </span>
-      {children}
-    </label>
-  )
-}
-
-function SelectInput({
-  value,
-  onChange,
-  options,
-  placeholder,
-}: {
-  value: string
-  onChange: (value: string) => void
-  options: string[]
-  placeholder: string
-}) {
-  return (
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className={cn(formInputClass, 'h-10 px-3 py-0')}
-    >
-      <option value="">{placeholder}</option>
-      {options.map((option) => (
-        <option key={option} value={option}>
-          {option}
-        </option>
-      ))}
-    </select>
   )
 }
 

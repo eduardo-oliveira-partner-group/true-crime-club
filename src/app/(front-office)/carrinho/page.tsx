@@ -18,6 +18,14 @@ import { useEffect, useState } from 'react'
 import { DesignPageShell } from '@/src/components/public-design/design-page-shell'
 import { SectionEyebrow } from '@/src/components/public-design/section-eyebrow'
 import { Button } from '@/src/components/ui/button'
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@/src/components/ui/empty'
 import { Input } from '@/src/components/ui/input'
 import { CartSkeleton } from '@/src/components/ui/page-loading-skeletons'
 import {
@@ -154,50 +162,44 @@ export default function CarrinhoPage() {
 
 function EmptyCart() {
   return (
-    <div
+    <Empty
       className={cn(
         dossierCardSurface,
         cardShadowBase,
-        'mt-12 p-8 text-center sm:p-10',
+        'mt-12 border border-[rgba(33,28,24,0.15)] p-8 sm:p-10',
       )}
     >
-      <div className="mx-auto flex size-14 items-center justify-center rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-(--paper-soft) text-(--red)">
-        <IconShoppingBag className="size-6" />
-      </div>
-      <p
-        className={cn(
-          fontMono,
-          'mt-5 text-xs font-bold tracking-[0.12em] text-(--red) uppercase',
-        )}
-      >
-        Arquivo vazio
-      </p>
-      <h2
-        className={cn(
-          fontHeading,
-          'mx-auto mt-3 max-w-xl text-2xl/tight font-semibold tracking-[-0.015em] text-(--ink) sm:text-3xl/tight',
-        )}
-      >
-        Nenhuma evidência selecionada ainda.
-      </h2>
-      <p className="mx-auto mt-3 max-w-md text-sm/6 text-(--ink-soft)">
-        Abra o arquivo da loja e adicione boxes avulsas e itens colecionáveis
-        para montar seu dossiê de compra.
-      </p>
-      <Button
-        asChild
-        className={cn(
-          fontMono,
-          buttonLiftShadow,
-          'mt-6 h-11 rounded-[9px] border border-[rgba(33,28,24,0.15)] bg-(--red) px-5 text-[13px] font-bold tracking-[0.04em] text-[#fbf9f6] uppercase hover:-translate-y-0.5 hover:bg-(--red-deep) motion-reduce:hover:translate-y-0',
-        )}
-      >
-        <Link href="/loja">
-          Ir para a loja
-          <IconArrowRight className="size-4" />
-        </Link>
-      </Button>
-    </div>
+      <EmptyHeader>
+        <EmptyMedia
+          variant="icon"
+          className="size-14 rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-(--paper-soft) text-(--red)"
+        >
+          <IconShoppingBag />
+        </EmptyMedia>
+        <EmptyTitle className="text-2xl/tight sm:text-3xl/tight">
+          Nenhuma evidência selecionada ainda.
+        </EmptyTitle>
+        <EmptyDescription>
+          Abra o arquivo da loja e adicione boxes avulsas e itens colecionáveis
+          para montar seu dossiê de compra.
+        </EmptyDescription>
+      </EmptyHeader>
+      <EmptyContent>
+        <Button
+          asChild
+          className={cn(
+            fontMono,
+            buttonLiftShadow,
+            'h-11 rounded-[9px] border border-[rgba(33,28,24,0.15)] bg-(--red) px-5 text-[13px] font-bold tracking-[0.04em] text-[#fbf9f6] uppercase hover:-translate-y-0.5 hover:bg-(--red-deep) motion-reduce:hover:translate-y-0',
+          )}
+        >
+          <Link href="/loja">
+            Ir para a loja
+            <IconArrowRight className="size-4" />
+          </Link>
+        </Button>
+      </EmptyContent>
+    </Empty>
   )
 }
 

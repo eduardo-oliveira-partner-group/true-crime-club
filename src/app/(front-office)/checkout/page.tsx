@@ -11,6 +11,7 @@ import {
 } from '@/src/components/checkout/checkout-stepper'
 import { DesignPageShell } from '@/src/components/public-design/design-page-shell'
 import { SectionEyebrow } from '@/src/components/public-design/section-eyebrow'
+import { Alert, AlertDescription, AlertTitle } from '@/src/components/ui/alert'
 import { Button } from '@/src/components/ui/button'
 import { CheckoutSkeleton } from '@/src/components/ui/page-loading-skeletons'
 import { apiClient, ApiClientError } from '@/src/lib/api-client'
@@ -132,9 +133,11 @@ export default function CheckoutPage() {
               >
                 Não foi possível abrir o checkout
               </h2>
-              <p className="mt-2 max-w-xs text-sm/6 text-(--ink)" role="alert">
-                {loadError}
-              </p>
+              <Alert variant="destructive" className="mt-4 text-left">
+                <IconAlertTriangle />
+                <AlertTitle>Erro ao carregar</AlertTitle>
+                <AlertDescription>{loadError}</AlertDescription>
+              </Alert>
               <Button
                 type="button"
                 onClick={() => window.location.reload()}

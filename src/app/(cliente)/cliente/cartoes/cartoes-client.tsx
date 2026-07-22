@@ -1,11 +1,28 @@
 'use client'
 
-import { IconCreditCard, IconPlus, IconTrash } from '@tabler/icons-react'
+import {
+  IconAlertCircle,
+  IconCreditCard,
+  IconPlus,
+  IconTrash,
+} from '@tabler/icons-react'
 import { useEffect, useState } from 'react'
 
+import { Alert, AlertDescription, AlertTitle } from '@/src/components/ui/alert'
 import { Button } from '@/src/components/ui/button'
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@/src/components/ui/empty'
+import { Field, FieldGroup, FieldLabel } from '@/src/components/ui/field'
 import { Input } from '@/src/components/ui/input'
-import { Label } from '@/src/components/ui/label'
+import {
+  NativeSelect,
+  NativeSelectOption,
+} from '@/src/components/ui/native-select'
 import { CustomerListSkeleton } from '@/src/components/ui/page-loading-skeletons'
 import {
   cardShadowBase,
@@ -22,6 +39,11 @@ import type { PaymentMethod } from '@/src/lib/domain/types'
 function getErrorMessage(error: unknown, fallback: string): string {
   return error instanceof Error ? error.message : fallback
 }
+
+const EXPIRY_MONTHS = Array.from({ length: 12 }, (_, i) =>
+  String(i + 1).padStart(2, '0'),
+)
+const EXPIRY_YEARS = Array.from({ length: 10 }, (_, i) => String(2026 + i))
 
 export default function CartoesClient() {
   const [cards, setCards] = useState<PaymentMethod[]>([])
@@ -104,6 +126,14 @@ export default function CartoesClient() {
         futuras no clube.
       </p>
 
+      {error && !showAddForm ? (
+        <Alert variant="destructive" className="mt-4 max-w-xl">
+          <IconAlertCircle />
+          <AlertTitle>Erro</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      ) : null}
+
       {showAddForm ? (
         <form
           onSubmit={handleAddCard}
@@ -116,11 +146,11 @@ export default function CartoesClient() {
               Adicionar Cartão de Crédito
             </h3>
           </div>
-          <div className="mt-4 space-y-4">
-            <div>
-              <Label className={formLabelClass} htmlFor="cardNumber">
+          <FieldGroup className="mt-4 gap-4">
+            <Field>
+              <FieldLabel className={formLabelClass} htmlFor="cardNumber">
                 Número do Cartão
-              </Label>
+              </FieldLabel>
               <Input
                 id="cardNumber"
                 type="text"
@@ -130,11 +160,11 @@ export default function CartoesClient() {
                 onChange={(e) => setCardNumber(e.target.value)}
                 className={formInputClass}
               />
-            </div>
-            <div>
-              <Label className={formLabelClass} htmlFor="holderName">
+            </Field>
+            <Field>
+              <FieldLabel className={formLabelClass} htmlFor="holderName">
                 Nome do Titular (idêntico ao cartão)
-              </Label>
+              </FieldLabel>
               <Input
                 id="holderName"
                 type="text"
@@ -144,44 +174,40 @@ export default function CartoesClient() {
                 onChange={(e) => setHolderName(e.target.value)}
                 className={formInputClass}
               />
-            </div>
+            </Field>
             <div className="grid grid-cols-3 gap-4">
-              <div>
-                <label className={formLabelClass}>Mês de Exp.</label>
-                <select
+              <Field>
+                <FieldLabel className={formLabelClass}>Mês de Exp.</FieldLabel>
+                <NativeSelect
                   value={expiryMonth}
                   onChange={(e) => setExpiryMonth(e.target.value)}
                   className={formInputClass}
                 >
-                  {Array.from({ length: 12 }, (_, i) =>
-                    String(i + 1).padStart(2, '0'),
-                  ).map((month) => (
-                    <option key={month} value={month}>
+                  {EXPIRY_MONTHS.map((month) => (
+                    <NativeSelectOption key={month} value={month}>
                       {month}
-                    </option>
+                    </NativeSelectOption>
                   ))}
-                </select>
-              </div>
-              <div>
-                <label className={formLabelClass}>Ano de Exp.</label>
-                <select
+                </NativeSelect>
+              </Field>
+              <Field>
+                <FieldLabel className={formLabelClass}>Ano de Exp.</FieldLabel>
+                <NativeSelect
                   value={expiryYear}
                   onChange={(e) => setExpiryYear(e.target.value)}
                   className={formInputClass}
                 >
-                  {Array.from({ length: 10 }, (_, i) => String(2026 + i)).map(
-                    (year) => (
-                      <option key={year} value={year}>
-                        {year}
-                      </option>
-                    ),
-                  )}
-                </select>
-              </div>
-              <div>
-                <Label className={formLabelClass} htmlFor="cvc">
+                  {EXPIRY_YEARS.map((year) => (
+                    <NativeSelectOption key={year} value={year}>
+                      {year}
+                    </NativeSelectOption>
+                  ))}
+                </NativeSelect>
+              </Field>
+              <Field>
+                <FieldLabel className={formLabelClass} htmlFor="cvc">
                   CVC
-                </Label>
+                </FieldLabel>
                 <Input
                   id="cvc"
                   type="text"
@@ -191,13 +217,17 @@ export default function CartoesClient() {
                   onChange={(e) => setCvc(e.target.value)}
                   className={formInputClass}
                 />
-              </div>
+              </Field>
             </div>
-          </div>
-          {error && (
-            <p className="mt-2 text-xs font-semibold text-(--red)">{error}</p>
-          )}
-          <div className="flex justify-end gap-2 pt-2">
+          </FieldGroup>
+          {error ? (
+            <Alert variant="destructive" className="mt-4">
+              <IconAlertCircle />
+              <AlertTitle>Erro ao cadastrar</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          ) : null}
+          <div className="flex justify-end gap-2 pt-4">
             <Button
               type="button"
               variant="outline"
@@ -229,19 +259,22 @@ export default function CartoesClient() {
         </div>
       )}
 
-      <div className="mt-8 max-w-xl space-y-4">
+      <div className="mt-8 flex max-w-xl flex-col gap-4">
         {isLoading ? <CustomerListSkeleton rows={2} /> : null}
         {!isLoading && cards.length === 0 ? (
-          <div className="rounded-[14px] border border-dashed border-(--ink)/15 bg-(--paper-soft) p-8 text-center">
-            <p
-              className={`text-lg font-semibold text-(--ink-soft) ${fontHeading}`}
-            >
-              Sua lista de cartões está vazia
-            </p>
-            <p className="mt-2 text-sm text-(--ink-mute)">
-              Nenhuma credencial de faturamento ativa cadastrada.
-            </p>
-          </div>
+          <Empty className="border border-dashed border-(--ink)/15 bg-(--paper-soft) p-8">
+            <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <IconCreditCard />
+              </EmptyMedia>
+              <EmptyTitle className="text-lg font-semibold text-(--ink-soft)">
+                Sua lista de cartões está vazia
+              </EmptyTitle>
+              <EmptyDescription>
+                Nenhuma credencial de faturamento ativa cadastrada.
+              </EmptyDescription>
+            </EmptyHeader>
+          </Empty>
         ) : (
           cards.map((card) => (
             <div

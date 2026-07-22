@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 import { Button } from '@/src/components/ui/button'
+import { Skeleton } from '@/src/components/ui/skeleton'
 import {
   cardShadowBase,
   dossierCardSurface,
@@ -19,9 +20,6 @@ import {
   formatSubscriptionStatus,
 } from '@/src/lib/formatters'
 import { cn } from '@/src/lib/utils'
-
-const skeletonBlockClass =
-  'animate-pulse rounded-[9px] bg-(--ink)/10 motion-reduce:animate-none'
 
 const statusTone: Record<SubscriptionStatus, string> = {
   active: 'border-(--teal)/30 bg-(--teal)/10 text-(--teal-deep)',
@@ -42,21 +40,23 @@ function SubscriptionLoadingSkeleton() {
         <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-3">
-              <div className={`${skeletonBlockClass} h-6 w-28 rounded-[2px]`} />
-              <div className={`${skeletonBlockClass} h-4 w-28`} />
+              <Skeleton className="h-6 w-28 rounded-[2px] bg-(--ink)/10" />
+              <Skeleton className="h-4 w-28 bg-(--ink)/10" />
             </div>
-            <div className={`${skeletonBlockClass} mt-4 h-6 w-52 max-w-full`} />
-            <div className={`${skeletonBlockClass} mt-2 h-4 w-4/5 max-w-88`} />
+            <Skeleton className="mt-4 h-6 w-52 max-w-full bg-(--ink)/10" />
+            <Skeleton className="mt-2 h-4 w-4/5 max-w-88 bg-(--ink)/10" />
           </div>
           <div className="flex min-w-36 items-end justify-between gap-5 border-t border-dashed border-(--ink)/12 pt-4 sm:block sm:border-t-0 sm:pt-0 sm:text-right">
             <div>
-              <div className={`${skeletonBlockClass} ml-auto h-3 w-28`} />
-              <div className={`${skeletonBlockClass} mt-2 ml-auto h-6 w-24`} />
+              <Skeleton className="ml-auto h-3 w-20 bg-(--ink)/10" />
+              <Skeleton className="mt-2 ml-auto h-6 w-24 bg-(--ink)/10" />
             </div>
+            <Skeleton className="h-4 w-20 bg-(--ink)/10 sm:mt-5 sm:ml-auto" />
           </div>
         </div>
         <div className="mt-5 flex gap-4 border-t border-dashed border-(--ink)/12 pt-4">
-          <div className={`${skeletonBlockClass} h-4 w-40`} />
+          <Skeleton className="h-4 w-32 bg-(--ink)/10" />
+          <Skeleton className="hidden h-4 w-28 bg-(--ink)/10 sm:block" />
         </div>
       </div>
     </div>

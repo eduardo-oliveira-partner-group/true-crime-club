@@ -4,6 +4,15 @@ import { IconArrowRight, IconBoxSeam, IconCalendar } from '@tabler/icons-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
+import { Button } from '@/src/components/ui/button'
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@/src/components/ui/empty'
 import { OrdersListSkeleton } from '@/src/components/ui/page-loading-skeletons'
 import {
   cardShadowBase,
@@ -72,31 +81,32 @@ export default function PedidosPage() {
       {loading ? (
         <OrdersListSkeleton />
       ) : orders.length === 0 ? (
-        <section
-          className={`mt-10 rounded-[14px] border border-dashed border-(--ink)/15 bg-(--paper-soft) p-7 text-center sm:p-10`}
-        >
-          <div className="mx-auto flex max-w-sm flex-col items-center">
-            <span className="flex size-12 items-center justify-center rounded-[12px] bg-(--amber)/15 text-(--amber)">
-              <IconBoxSeam className="size-6" />
-            </span>
-            <h2
-              className={`mt-5 text-xl font-semibold tracking-tight text-(--ink) ${fontHeading}`}
+        <Empty className="mt-10 border border-dashed border-(--ink)/15 bg-(--paper-soft) p-7 sm:p-10">
+          <EmptyHeader>
+            <EmptyMedia
+              variant="icon"
+              className="bg-(--amber)/15 text-(--amber)"
             >
-              Nenhum pedido por aqui
-            </h2>
-            <p className="mt-2 text-sm/6 text-(--ink-mute)">
+              <IconBoxSeam />
+            </EmptyMedia>
+            <EmptyTitle className="text-xl">Nenhum pedido por aqui</EmptyTitle>
+            <EmptyDescription>
               Quando uma nova box entrar no seu arquivo, ela aparecerá nesta
               lista com todos os próximos passos.
-            </p>
-            <Link
-              href="/loja"
-              className={`group mt-6 inline-flex items-center gap-2 rounded-[9px] bg-(--red) px-4 py-3 text-xs font-bold tracking-[0.04em] text-[#fbf9f6] uppercase shadow-[0_9px_22px_-8px_rgba(33,28,24,0.13)] [transition:background-color_0.2s_ease,translate_0.24s_cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:bg-(--red-deep) motion-reduce:transition-none motion-reduce:hover:translate-y-0 ${fontMono}`}
+            </EmptyDescription>
+          </EmptyHeader>
+          <EmptyContent>
+            <Button
+              asChild
+              className={`group rounded-[9px] bg-(--red) px-4 py-3 text-xs font-bold tracking-[0.04em] text-[#fbf9f6] uppercase shadow-[0_9px_22px_-8px_rgba(33,28,24,0.13)] [transition:background-color_0.2s_ease,translate_0.24s_cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:bg-(--red-deep) motion-reduce:transition-none motion-reduce:hover:translate-y-0 ${fontMono}`}
             >
-              Explorar a loja
-              <IconArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5 motion-reduce:transition-none" />
-            </Link>
-          </div>
-        </section>
+              <Link href="/loja">
+                Explorar a loja
+                <IconArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5 motion-reduce:transition-none" />
+              </Link>
+            </Button>
+          </EmptyContent>
+        </Empty>
       ) : (
         <section className="mt-8" aria-label="Lista de pedidos">
           <div className="space-y-4" aria-busy="false">
