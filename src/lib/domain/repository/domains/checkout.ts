@@ -22,8 +22,8 @@ export async function calculateShipping(
     const apiResult = await apiClient.checkout.calculateShipping(zipCode)
     return {
       region: apiResult.regiao,
-      price: apiResult.preco,
-      estimatedDays: apiResult.prazoEstimado,
+      price: Math.round(Number(apiResult.preco ?? 0) * 100),
+      estimatedDays: apiResult.prazoEstimado ?? apiResult.prazoDias,
     }
   }
 
