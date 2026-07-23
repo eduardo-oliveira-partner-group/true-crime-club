@@ -6,6 +6,7 @@ import {
   IconHome,
   IconLogout,
   IconMenu2,
+  // IconReceipt,
   IconUser,
   IconUsers,
   IconX,
@@ -33,6 +34,7 @@ const navItems = [
   { href: '/cliente/pedidos', label: 'Meus pedidos', icon: IconBoxSeam },
   { href: '/cliente/assinatura', label: 'Minhas assinaturas', icon: IconHome },
   { href: '/cliente/cartoes', label: 'Meus cartões', icon: IconCreditCard },
+  // { href: '/cliente/financeiro', label: 'Financeiro', icon: IconReceipt },
   { href: '/casos', label: 'Casos', icon: IconUsers, isGreen: true },
 ]
 

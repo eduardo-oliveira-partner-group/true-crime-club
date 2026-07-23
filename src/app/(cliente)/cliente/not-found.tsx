@@ -16,7 +16,7 @@ export default function NotFound() {
             asChild
             className="rounded-[9px] bg-(--red) text-[#fbf9f6] hover:bg-(--red-deep)"
           >
-            <Link href="/cliente/conteudos">Ver conteúdos</Link>
+            <Link href="/casos">Ver casos</Link>
           </Button>
           <Button asChild variant="outline" className="rounded-[9px]">
             <Link href="/">Voltar à home</Link>

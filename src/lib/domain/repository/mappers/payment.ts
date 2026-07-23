@@ -16,12 +16,18 @@ export type ApiPayment = {
 
 export type ApiInvoice = {
   id: string
-  numero: string
-  idPagamento: string
-  valor: number
-  emitidoEm: string
+  numero?: string
+  number?: string
+  idPagamento?: string
+  payment_id?: string
+  valor?: number
+  amount?: number
+  emitidoEm?: string
+  issued_at?: string
   urlRecibo?: string
+  receipt_url?: string
   urlDownload?: string
+  download_url?: string
 }
 
 export function mapApiPaymentToDomain(apiPayment: ApiPayment): Payment {
@@ -40,27 +46,27 @@ export function mapApiPaymentToDomain(apiPayment: ApiPayment): Payment {
 
   return {
     id: apiPayment.id,
-    orderId: apiPayment.idPedido,
-    subscriptionId: apiPayment.idAssinatura,
+    orderId: apiPayment.idPedido ?? undefined,
+    subscriptionId: apiPayment.idAssinatura ?? undefined,
     amount: apiPayment.valor,
     status: statusMap[apiPayment.status ?? ''] ?? 'paid',
     method: methodMap[apiPayment.metodo ?? ''] ?? 'credit_card',
     dueDate: apiPayment.vencimento,
-    paidAt: apiPayment.pagoEm,
-    pixQrCode: apiPayment.pixQrCode,
-    pixExpiresAt: apiPayment.pixExpiraEm,
-    refusalReason: apiPayment.motivoRecusa,
+    paidAt: apiPayment.pagoEm ?? undefined,
+    pixQrCode: apiPayment.pixQrCode ?? undefined,
+    pixExpiresAt: apiPayment.pixExpiraEm ?? undefined,
+    refusalReason: apiPayment.motivoRecusa ?? undefined,
   }
 }
 
 export function mapApiInvoiceToDomain(apiInvoice: ApiInvoice): Invoice {
   return {
     id: apiInvoice.id,
-    number: apiInvoice.numero,
-    paymentId: apiInvoice.idPagamento,
-    amount: apiInvoice.valor,
-    issuedAt: apiInvoice.emitidoEm,
-    receiptUrl: apiInvoice.urlRecibo,
-    downloadUrl: apiInvoice.urlDownload,
+    number: apiInvoice.numero ?? apiInvoice.number ?? '',
+    paymentId: apiInvoice.idPagamento ?? apiInvoice.payment_id ?? '',
+    amount: apiInvoice.valor ?? apiInvoice.amount ?? 0,
+    issuedAt: apiInvoice.emitidoEm ?? apiInvoice.issued_at ?? '',
+    receiptUrl: apiInvoice.urlRecibo ?? apiInvoice.receipt_url,
+    downloadUrl: apiInvoice.urlDownload ?? apiInvoice.download_url,
   }
 }
