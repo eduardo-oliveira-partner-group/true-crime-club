@@ -19,7 +19,11 @@ import { useEffect, useRef, useState } from 'react'
 import CRTEffect from 'vault66-crt-effect'
 
 import { apiClient } from '@/src/lib/api-client'
-import type { InvestigationFile } from '@/src/lib/domain/types'
+import type {
+  CaseDetail,
+  CaseSummary,
+  InvestigationFile,
+} from '@/src/lib/domain/types'
 
 import styles from './crt-screen.module.css'
 
@@ -54,7 +58,9 @@ export default function CasosPage() {
   const [viewStage, setViewStage] = useState<ViewStage>('investigador-root')
 
   // Selected state
-  const [selectedBox, setSelectedBox] = useState<string>('box-4')
+  const [selectedBox, setSelectedBox] = useState<string | null>(null)
+  const [cases, setCases] = useState<CaseSummary[]>([])
+  const [selectedCase, setSelectedCase] = useState<CaseDetail | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<
     'arquivos' | 'documentos'
   >('arquivos')
@@ -87,9 +93,10 @@ export default function CasosPage() {
   const [filesByBox, setFilesByBox] = useState<
     Record<string, Record<'arquivos' | 'documentos', InvestigationFile[]>>
   >({})
-  const [loadingFiles, setLoadingFiles] = useState(true)
+  const [loadingFiles, setLoadingFiles] = useState(false)
+  const [loadingCases, setLoadingCases] = useState(true)
 
-  // Auth check and load files on mount
+  // Cases and files are loaded only after the API validates the authenticated customer.
   useEffect(() => {
     apiClient.auth
       .me()
@@ -97,24 +104,10 @@ export default function CasosPage() {
         if (customer) {
           setIsAuthenticated(true)
           apiClient.cases
-            .listFiles()
-            .then((data) => {
-              const mapped: Record<
-                string,
-                Record<'arquivos' | 'documentos', InvestigationFile[]>
-              > = {}
-              data.forEach((box) => {
-                mapped[box.id] = {
-                  arquivos: box.arquivos,
-                  documentos: box.documentos,
-                }
-              })
-              setFilesByBox(mapped)
-            })
-            .catch((e) =>
-              console.error('Erro ao carregar arquivos da investigação:', e),
-            )
-            .finally(() => setLoadingFiles(false))
+            .list()
+            .then(setCases)
+            .catch((e) => console.error('Erro ao carregar casos:', e))
+            .finally(() => setLoadingCases(false))
         } else {
           router.replace('/login')
         }
@@ -155,6 +148,33 @@ export default function CasosPage() {
     setSelectedBox(boxId)
     if (viewStage === 'arquivos-list') {
       setViewStage('caso-detail')
+    }
+  }
+
+  const handleSelectCase = async (caseSummary: CaseSummary) => {
+    setLoadingFiles(true)
+    setSelectedFile(null)
+    try {
+      const detail = await apiClient.cases.get(caseSummary.identifier)
+      const files = await apiClient.cases.listFiles(caseSummary.identifier)
+      const mapped: Record<
+        string,
+        Record<'arquivos' | 'documentos', InvestigationFile[]>
+      > = {}
+      files.forEach((box) => {
+        mapped[box.id] = {
+          arquivos: box.arquivos,
+          documentos: box.documentos,
+        }
+      })
+      setSelectedCase(detail)
+      setFilesByBox(mapped)
+      setSelectedBox(detail.boxes[0]?.id ?? null)
+      setViewStage('caso-detail')
+    } catch (error) {
+      console.error('Erro ao carregar o caso:', error)
+    } finally {
+      setLoadingFiles(false)
     }
   }
 
@@ -245,8 +265,10 @@ export default function CasosPage() {
     return null
   }
 
-  const currentFiles = filesByBox[selectedBox]?.[selectedCategory] ?? []
-  const allBoxes = Array.from({ length: 12 }, (_, i) => i + 1)
+  const currentFiles = selectedBox
+    ? (filesByBox[selectedBox]?.[selectedCategory] ?? [])
+    : []
+  const boxes = selectedCase?.boxes ?? []
 
   return (
     <div className={styles.shell}>
@@ -421,21 +443,38 @@ export default function CasosPage() {
                           className={`${styles.cornerMarker} ${styles.cornerMarkerBR}`}
                         />
 
-                        <button
-                          onClick={() => setViewStage('caso-detail')}
-                          className="group flex cursor-pointer flex-col items-center justify-center focus:outline-none"
-                        >
-                          <div className={`${styles.iconBrackets} mb-2`}>
-                            <img
-                              src="/imagens/icons/Caso_VictoriaMonteiro.png"
-                              alt="Caso Victoria"
-                              className="size-20 object-contain transition-transform group-hover:scale-105"
-                            />
+                        {loadingCases ? (
+                          <p className="text-center text-sm text-[#33ff33]/70 uppercase">
+                            CARREGANDO CASOS AUTORIZADOS...
+                          </p>
+                        ) : cases.length === 0 ? (
+                          <p className="text-center text-sm text-[#33ff33]/70 uppercase">
+                            NENHUM CASO DISPONÍVEL PARA ESTE USUÁRIO.
+                          </p>
+                        ) : (
+                          <div className="flex w-full flex-col gap-4">
+                            {cases.map((caseSummary) => (
+                              <button
+                                key={caseSummary.id}
+                                onClick={() =>
+                                  void handleSelectCase(caseSummary)
+                                }
+                                className="group flex cursor-pointer flex-col items-center justify-center focus:outline-none"
+                              >
+                                <div className={`${styles.iconBrackets} mb-2`}>
+                                  <img
+                                    src="/imagens/icons/Casos.png"
+                                    alt="Caso"
+                                    className="size-16 object-contain transition-transform group-hover:scale-105"
+                                  />
+                                </div>
+                                <span className="mt-2 text-center text-xl font-bold tracking-widest uppercase group-hover:underline">
+                                  {caseSummary.title}
+                                </span>
+                              </button>
+                            ))}
                           </div>
-                          <span className="mt-2 text-center text-xl font-bold tracking-widest uppercase group-hover:underline">
-                            Caso - Victória Monteiro
-                          </span>
-                        </button>
+                        )}
                       </div>
                     </div>
                   )}
@@ -476,7 +515,7 @@ export default function CasosPage() {
 
                           {/* Case Title */}
                           <div className="text-md mb-2 flex items-center gap-2 px-1 font-bold tracking-wider text-[#33ff33] uppercase">
-                            <span>📁 CASO - VICTÓRIA MONTEIRO</span>
+                            <span>📁 {selectedCase?.title ?? 'CASO'}</span>
                           </div>
 
                           {/* Dashed Separator */}
@@ -487,13 +526,12 @@ export default function CasosPage() {
                             data-lenis-prevent
                             className={`${styles.boxStrip} ${styles.crtScrollbar} mt-2`}
                           >
-                            {allBoxes.map((num) => {
-                              const boxId = `box-${num}`
-                              const isSelected = selectedBox === boxId
+                            {boxes.map((box) => {
+                              const isSelected = selectedBox === box.id
                               return (
                                 <button
-                                  key={boxId}
-                                  onClick={() => handleSelectBox(boxId)}
+                                  key={box.id}
+                                  onClick={() => handleSelectBox(box.id)}
                                   className={`flex shrink-0 cursor-pointer items-center gap-2 px-3 py-2 font-handjet text-lg font-bold tracking-wider uppercase transition-all ${
                                     isSelected
                                       ? styles.activeBoxBtn
@@ -511,7 +549,7 @@ export default function CasosPage() {
                                     className={`size-4.5 object-contain ${isSelected ? '' : 'brightness-100'}`}
                                   />
                                   <span className="whitespace-nowrap">
-                                    Box {num}
+                                    {box.name || `Box ${box.number}`}
                                   </span>
                                 </button>
                               )
@@ -540,8 +578,13 @@ export default function CasosPage() {
                           {/* Directory Path Indicator */}
                           <div className="mb-8 flex flex-col gap-1 border-b border-[#33ff33]/25 pb-2 font-mono text-xs tracking-wider text-[#33ff33]/70 select-none sm:flex-row sm:justify-between">
                             <span>
-                              SISTEMA: CASO_VICTORIA /{' '}
-                              {selectedBox.toUpperCase().replace('-', '_')}
+                              SISTEMA:{' '}
+                              {selectedCase?.identifier?.toUpperCase() ??
+                                'CASO'}{' '}
+                              /{' '}
+                              {boxes
+                                .find((box) => box.id === selectedBox)
+                                ?.name.toUpperCase() ?? 'BOX'}
                             </span>
                             <span className="opacity-60 sm:text-right">
                               [SELECIONE UMA PASTA]
@@ -673,7 +716,7 @@ export default function CasosPage() {
 
                           {/* Case Title */}
                           <div className="text-md mb-2 flex items-center gap-2 px-1 font-bold tracking-wider text-[#33ff33] uppercase">
-                            <span>📁 CASO - VICTÓRIA MONTEIRO</span>
+                            <span>📁 {selectedCase?.title ?? 'CASO'}</span>
                           </div>
 
                           {/* Dashed Separator */}
@@ -684,13 +727,12 @@ export default function CasosPage() {
                             data-lenis-prevent
                             className={`${styles.boxStrip} ${styles.crtScrollbar} mt-2`}
                           >
-                            {allBoxes.map((num) => {
-                              const boxId = `box-${num}`
-                              const isSelected = selectedBox === boxId
+                            {boxes.map((box) => {
+                              const isSelected = selectedBox === box.id
                               return (
                                 <button
-                                  key={boxId}
-                                  onClick={() => handleSelectBox(boxId)}
+                                  key={box.id}
+                                  onClick={() => handleSelectBox(box.id)}
                                   className={`flex shrink-0 cursor-pointer items-center gap-2 px-3 py-2 font-handjet text-lg font-bold tracking-wider uppercase transition-all ${
                                     isSelected
                                       ? styles.activeBoxBtn
@@ -708,7 +750,7 @@ export default function CasosPage() {
                                     className={`size-4.5 object-contain ${isSelected ? '' : 'brightness-100'}`}
                                   />
                                   <span className="whitespace-nowrap">
-                                    Box {num}
+                                    {box.name || `Box ${box.number}`}
                                   </span>
                                 </button>
                               )
@@ -737,9 +779,14 @@ export default function CasosPage() {
                           {/* Directory Path Indicator */}
                           <div className="mb-4 flex flex-col gap-1 border-b border-[#33ff33]/25 pb-2 font-mono text-xs tracking-wider text-[#33ff33]/70 select-none sm:flex-row sm:justify-between">
                             <span>
-                              SISTEMA: CASO_VICTORIA /{' '}
-                              {selectedBox.toUpperCase().replace('-', '_')} /{' '}
-                              {selectedCategory.toUpperCase()}
+                              SISTEMA:{' '}
+                              {selectedCase?.identifier?.toUpperCase() ??
+                                'CASO'}{' '}
+                              /{' '}
+                              {boxes
+                                .find((box) => box.id === selectedBox)
+                                ?.name.toUpperCase() ?? 'BOX'}{' '}
+                              / {selectedCategory.toUpperCase()}
                             </span>
                             <span className="opacity-60 sm:text-right">
                               [LISTANDO ARQUIVOS]
@@ -939,6 +986,11 @@ export default function CasosPage() {
                         <span>
                           <b>MODIFICADO:</b> {selectedFile.modified}
                         </span>
+                        {selectedFile.storageKey && (
+                          <span className="w-full break-all">
+                            <b>STORAGE KEY:</b> {selectedFile.storageKey}
+                          </span>
+                        )}
                       </div>
 
                       {/* Modal Body */}
@@ -1237,7 +1289,10 @@ export default function CasosPage() {
                             <IconDownload className="size-3.5" /> Baixar
                           </a>
                         ) : (
-                          <div />
+                          <span className="text-[10px] text-[#33ff33]/50 uppercase">
+                            Download indisponível até a integração de URL
+                            assinada.
+                          </span>
                         )}
                         <button
                           onClick={() => {
