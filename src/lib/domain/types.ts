@@ -357,6 +357,27 @@ export interface RepositoryResult<T> {
   loading?: boolean
 }
 
+export interface CaseSummary {
+  id: string
+  identifier: string
+  title: string
+  description?: string
+  year?: number
+  liveEventDate?: string
+  liveEventTitle?: string
+}
+
+export interface CaseBox {
+  id: string
+  number: number
+  name: string
+  description?: string
+}
+
+export interface CaseDetail extends CaseSummary {
+  boxes: CaseBox[]
+}
+
 export type InvestigationFileType = 'audio' | 'image' | 'text' | 'sheet'
 
 export interface InvestigationFile {
@@ -365,6 +386,7 @@ export interface InvestigationFile {
   type: InvestigationFileType
   modified: string
   size: string
+  storageKey?: string
   downloadUrl?: string
   content?: string
   corrupted?: boolean
@@ -375,6 +397,8 @@ export interface InvestigationFile {
 
 export interface InvestigationFilesByBox {
   id: string
+  number?: number
+  name?: string
   arquivos: InvestigationFile[]
   documentos: InvestigationFile[]
 }

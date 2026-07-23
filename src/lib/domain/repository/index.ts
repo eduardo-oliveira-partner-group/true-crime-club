@@ -7,10 +7,8 @@ export {
   updateCartItemQuantity,
 } from './domains/cart'
 export {
-  getActiveCase,
-  getClueBySlug,
-  getSubscriberProgress,
-  listClues,
+  getCase,
+  listCases,
   listInvestigationFilesByBox,
 } from './domains/cases'
 export { calculateShipping, createOrder } from './domains/checkout'

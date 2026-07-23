@@ -5,7 +5,7 @@ import type {
 } from '@/src/lib/domain/types'
 
 import type { JsonObject, JsonValue } from '../core/json'
-import { asArray, asOptionalString, asString } from '../core/json'
+import { asArray, asNumber, asOptionalString, asString } from '../core/json'
 
 function toInvestigationFileType(
   value: JsonValue | undefined,
@@ -24,8 +24,8 @@ export function toInvestigationFile(data: JsonObject): InvestigationFile {
     name: asString(data.nome),
     type: toInvestigationFileType(data.tipo),
     modified: asString(data.modificadoEm),
-    size: asString(data.tamanho),
-    downloadUrl: asOptionalString(data.urlDownload),
+    size: String(data.tamanhoBytes ?? ''),
+    storageKey: asOptionalString(data.storageKey),
     content: asOptionalString(data.conteudo),
     corrupted: data.corrompido === true,
     columns: Array.isArray(data.colunas) ? data.colunas.map(String) : undefined,
@@ -41,6 +41,8 @@ export function toInvestigationFilesByBox(
 ): InvestigationFilesByBox {
   return {
     id: asString(data.id),
+    number: asNumber(data.numero),
+    name: asOptionalString(data.nome),
     arquivos: asArray(data.arquivos).map(toInvestigationFile),
     documentos: asArray(data.documentos).map(toInvestigationFile),
   }
