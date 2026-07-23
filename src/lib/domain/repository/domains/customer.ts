@@ -198,13 +198,14 @@ export async function listCards(): Promise<PaymentMethod[]> {
 }
 
 export async function addCard(input: {
-  token: string
   holderName: string
   lastFour: string
   brand: string
   holderDocument: string
   expiryMonth: string
   expiryYear: string
+  cardNumber: string
+  cvc: string
 }): Promise<PaymentMethod> {
   return await apiClient.customer.addCard(input)
 }

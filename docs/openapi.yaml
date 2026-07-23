@@ -1047,8 +1047,10 @@ paths:
       tags:
       - Cliente & Painel
       summary: Adicionar novo cartão de crédito
-      description: Adiciona um novo cartão de crédito usando um token gerado pelo
-        gateway.
+      description: |
+        Cadastra um cartão enviando `creditCard` (number/ccv) para a API
+        tokenizar nos gateways. `bandeira` e `ultimosQuatro` no POST são
+        metadados; a fonte de verdade na UI é GET /cliente/cartoes.
       requestBody:
         required: true
         content:
@@ -1056,13 +1058,17 @@ paths:
             schema:
               type: object
               required:
-              - token
               - nomeImpresso
               - ultimosQuatro
               - bandeira
+              - cpfTitular
+              - mesValidade
+              - anoValidade
+              - creditCard
               properties:
                 token:
                   type: string
+                  description: Token legado (opcional se `creditCard` for enviado).
                   example: tok_visa_1234
                 nomeImpresso:
                   type: string
@@ -1073,6 +1079,27 @@ paths:
                 bandeira:
                   type: string
                   example: Visa
+                cpfTitular:
+                  type: string
+                  example: '24971563792'
+                mesValidade:
+                  type: string
+                  example: '12'
+                anoValidade:
+                  type: string
+                  example: '2030'
+                creditCard:
+                  type: object
+                  required:
+                  - number
+                  - ccv
+                  properties:
+                    number:
+                      type: string
+                      example: '4235647728025682'
+                    ccv:
+                      type: string
+                      example: '123'
       responses:
         '201':
           description: Cartão adicionado com sucesso.

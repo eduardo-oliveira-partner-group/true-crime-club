@@ -92,6 +92,57 @@ export function formatCardNumber(value: string): string {
   return digits.replace(/(\d{4})(?=\d)/g, '$1 ').trim()
 }
 
+/** Máscara de cartão salvo: •••• •••• •••• 1234 */
+export function formatMaskedCardNumber(lastFour?: string): string {
+  const digits = normalizeDigits(lastFour ?? '').slice(-4)
+  const suffix = digits.padStart(4, '•')
+  return `•••• •••• •••• ${suffix}`
+}
+
+/** Validade MM/AA a partir de mês e ano da API. */
+export function formatCardExpiry(month?: string, year?: string): string | null {
+  const mm = normalizeDigits(month ?? '')
+    .padStart(2, '0')
+    .slice(0, 2)
+  const yyyy = normalizeDigits(year ?? '')
+  if (!mm || mm === '00' || yyyy.length < 2) return null
+  const yy = yyyy.slice(-2)
+  return `${mm}/${yy}`
+}
+
+/**
+ * Inferência local só para o POST (a API ainda exige `bandeira`).
+ * A fonte de verdade na UI é o campo retornado por GET /cliente/cartoes.
+ */
+export function detectCardBrand(cardNumber: string): string {
+  const digits = normalizeDigits(cardNumber)
+  if (digits.startsWith('4')) return 'Visa'
+  if (
+    digits.startsWith('51') ||
+    digits.startsWith('52') ||
+    digits.startsWith('53') ||
+    digits.startsWith('54') ||
+    digits.startsWith('55') ||
+    (digits.length >= 2 && digits[0] === '2')
+  ) {
+    return 'Mastercard'
+  }
+  if (digits.startsWith('34') || digits.startsWith('37')) {
+    return 'American Express'
+  }
+  if (digits.startsWith('6011') || digits.startsWith('65')) {
+    return 'Discover'
+  }
+  if (
+    digits.startsWith('636') ||
+    digits.startsWith('638') ||
+    digits.startsWith('5067')
+  ) {
+    return 'Elo'
+  }
+  return 'Cartao'
+}
+
 /** CVC/CVV: apenas dígitos (3–4). */
 export function formatCvc(value: string): string {
   return normalizeDigits(value).slice(0, 4)

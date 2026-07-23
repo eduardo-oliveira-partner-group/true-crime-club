@@ -16,6 +16,10 @@ export function toPaymentMethod(data: JsonObject): PaymentMethod {
     label: asString(data.rotulo),
     lastFour: asOptionalString(data.ultimosQuatro),
     brand: asOptionalString(data.bandeira),
+    holderName: asOptionalString(data.nomeImpresso),
+    holderDocument: asOptionalString(data.cpfTitular),
+    expiryMonth: asOptionalString(data.mesValidade),
+    expiryYear: asOptionalString(data.anoValidade),
     isDefault: data.padrao === true,
   }
 }

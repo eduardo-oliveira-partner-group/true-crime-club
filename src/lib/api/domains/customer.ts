@@ -175,24 +175,29 @@ export const customerApi = {
       asArray(items).map(toPaymentMethod),
     ),
   addCard: (body: {
-    token: string
     holderName: string
     lastFour: string
     brand: string
     holderDocument: string
     expiryMonth: string
     expiryYear: string
+    cardNumber: string
+    cvc: string
   }) =>
     fetcher('/cliente/cartoes', {
       method: 'POST',
       body: JSON.stringify({
-        token: body.token,
         nomeImpresso: body.holderName,
         ultimosQuatro: body.lastFour,
         bandeira: body.brand,
         cpfTitular: normalizeDigits(body.holderDocument),
         mesValidade: body.expiryMonth,
         anoValidade: body.expiryYear,
+        // A API tokeniza nos gateways; GET /cliente/cartoes devolve a bandeira.
+        creditCard: {
+          number: normalizeDigits(body.cardNumber),
+          ccv: normalizeDigits(body.cvc),
+        },
       }),
     }).then(toPaymentMethod),
   deleteCard: (id: string) =>
