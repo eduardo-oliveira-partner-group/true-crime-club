@@ -1,31 +1,30 @@
-import { IconFileAlert } from '@tabler/icons-react'
 import Link from 'next/link'
 
 import { Button } from '@/src/components/ui/button'
+import { NotFoundEmptyState } from '@/src/components/ui/not-found-empty-state'
 
 export default function NotFound() {
   return (
-    <div className="mx-auto max-w-2xl px-4 py-16 text-center text-[#fffaf0] sm:px-6">
-      <span className="mx-auto flex size-12 items-center justify-center border border-[#d7b56d]/30 bg-[#171211] text-[#d7b56d]">
-        <IconFileAlert className="size-6" />
-      </span>
-      <p className="mt-5 font-mono text-xs tracking-[0.24em] text-[#d7b56d] uppercase">
-        Arquivo 404
-      </p>
-      <h1 className="mt-3 font-heading text-3xl font-black tracking-tight sm:text-4xl">
-        Este dossiê não foi encontrado
-      </h1>
-      <p className="mt-3 text-sm/6 text-[#d7c9b5]">
-        O endereço que você buscou não existe ou foi removido do arquivo.
-      </p>
-      <div className="mt-6 flex flex-wrap justify-center gap-3">
-        <Button asChild className="bg-[#d84132] text-white hover:bg-[#b93227]">
-          <Link href="/">Voltar à home</Link>
-        </Button>
-        <Button asChild variant="outline">
-          <Link href="/loja">Explorar a loja</Link>
-        </Button>
-      </div>
-    </div>
+    <NotFoundEmptyState
+      code="Arquivo 404"
+      title="A página que você procura não foi encontrada"
+      description="O endereço que você buscou não existe ou foi removido do arquivo."
+      className="px-[22px] py-[clamp(48px,8vw,96px)]"
+      mediaClassName="max-w-[540px]"
+      imageSizes="(max-width: 640px) calc(100vw - 44px), 540px"
+      actions={
+        <>
+          <Button
+            asChild
+            className="rounded-[9px] bg-(--red) text-[#fbf9f6] hover:bg-(--red-deep)"
+          >
+            <Link href="/">Voltar à home</Link>
+          </Button>
+          <Button asChild variant="outline" className="rounded-[9px]">
+            <Link href="/loja">Explorar a loja</Link>
+          </Button>
+        </>
+      }
+    />
   )
 }

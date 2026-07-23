@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useEffect } from 'react'
 
 import { Button } from '@/src/components/ui/button'
+import { fontHeading } from '@/src/lib/design/classes'
 
 export default function Error({
   error,
@@ -19,24 +20,26 @@ export default function Error({
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-16 text-center text-(--ink) sm:px-6">
-      <span className="mx-auto flex size-12 items-center justify-center rounded-[2px] border border-[#d84132]/40 bg-(--card) text-[#d84132] shadow-[0_3px_5px_rgba(33,28,24,0.15)]">
+      <span className="mx-auto flex size-12 items-center justify-center rounded-[10px] border border-(--red)/25 bg-(--card) text-(--red)">
         <IconAlertTriangle className="size-6" />
       </span>
-      <h1 className="mt-5 font-heading text-2xl font-semibold tracking-tight sm:text-3xl">
+      <h1
+        className={`mt-5 text-2xl font-semibold tracking-tight text-(--ink) sm:text-3xl ${fontHeading}`}
+      >
         Não foi possível abrir este item
       </h1>
-      <p className="mt-3 text-sm/6 text-(--ink-soft)">
+      <p className="mt-3 text-sm/6 text-(--ink-mute)">
         Ocorreu um erro ao carregar este produto. Tente novamente.
       </p>
       <div className="mt-6 flex flex-wrap justify-center gap-3">
         <Button
           type="button"
           onClick={() => unstable_retry()}
-          className="rounded-[9px] bg-(--red) font-bold text-[#fbf9f6] hover:bg-(--red-deep)"
+          className="rounded-[9px] bg-(--red) text-[#fbf9f6] hover:bg-(--red-deep)"
         >
           Tentar novamente
         </Button>
-        <Button asChild variant="outline" className="rounded-[10px]">
+        <Button asChild variant="outline" className="rounded-[9px]">
           <Link href="/loja">Voltar à loja</Link>
         </Button>
       </div>

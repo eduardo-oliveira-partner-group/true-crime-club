@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useEffect } from 'react'
 
 import { Button } from '@/src/components/ui/button'
+import { fontHeading, fontMono } from '@/src/lib/design/classes'
 
 export default function Error({
   error,
@@ -18,18 +19,22 @@ export default function Error({
   }, [error])
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-16 text-center text-[#fffaf0] sm:px-6">
-      <span className="mx-auto flex size-12 items-center justify-center border border-[#d84132]/40 bg-[#171211] text-[#d84132]">
+    <div className="mx-auto max-w-2xl px-4 py-16 text-center text-(--ink) sm:px-6">
+      <span className="mx-auto flex size-12 items-center justify-center rounded-[10px] border border-(--red)/25 bg-(--card) text-(--red)">
         <IconAlertTriangle className="size-6" />
       </span>
-      <h1 className="mt-5 font-heading text-2xl font-semibold tracking-tight sm:text-3xl">
+      <h1
+        className={`mt-5 text-2xl font-semibold tracking-tight text-(--ink) sm:text-3xl ${fontHeading}`}
+      >
         Falha ao carregar este arquivo
       </h1>
-      <p className="mt-3 text-sm/6 text-[#d7c9b5]">
+      <p className="mt-3 text-sm/6 text-(--ink-mute)">
         Algo deu errado ao montar esta página. Tente novamente em instantes.
       </p>
       {error.digest ? (
-        <p className="mt-2 font-mono text-xs tracking-wide text-[#d7c9b5]/60 uppercase">
+        <p
+          className={`mt-2 text-xs tracking-wide text-(--ink-mute)/70 uppercase ${fontMono}`}
+        >
           Referência: {error.digest}
         </p>
       ) : null}
@@ -37,11 +42,11 @@ export default function Error({
         <Button
           type="button"
           onClick={() => unstable_retry()}
-          className="bg-[#d84132] text-white hover:bg-[#b93227]"
+          className="rounded-[9px] bg-(--red) text-[#fbf9f6] hover:bg-(--red-deep)"
         >
           Tentar novamente
         </Button>
-        <Button asChild variant="outline">
+        <Button asChild variant="outline" className="rounded-[9px]">
           <Link href="/">Voltar à home</Link>
         </Button>
       </div>
