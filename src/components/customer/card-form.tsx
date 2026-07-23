@@ -19,6 +19,7 @@ import {
 import { addCard } from '@/src/lib/domain/repositories'
 import type { PaymentMethod } from '@/src/lib/domain/types'
 import {
+  detectCardBrand,
   formatCardHolderName,
   formatCardNumber,
   formatCpf,
@@ -31,7 +32,10 @@ import { cn } from '@/src/lib/utils'
 const EXPIRY_MONTHS = Array.from({ length: 12 }, (_, i) =>
   String(i + 1).padStart(2, '0'),
 )
-const EXPIRY_YEARS = Array.from({ length: 10 }, (_, i) => String(2026 + i))
+const EXPIRY_YEAR_START = new Date().getFullYear()
+const EXPIRY_YEARS = Array.from({ length: 10 }, (_, i) =>
+  String(EXPIRY_YEAR_START + i),
+)
 
 export type CardFormProps = {
   onCancel?: () => void
@@ -52,7 +56,7 @@ export function CardForm({
   const [holderName, setHolderName] = useState('')
   const [holderDocument, setHolderDocument] = useState('')
   const [expiryMonth, setExpiryMonth] = useState('01')
-  const [expiryYear, setExpiryYear] = useState('2026')
+  const [expiryYear, setExpiryYear] = useState(String(EXPIRY_YEAR_START))
   const [cvc, setCvc] = useState('')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -75,21 +79,19 @@ export function CardForm({
       return
     }
 
-    const lastFour = digits.slice(-4)
-    const brand = digits.startsWith('5') ? 'Mastercard' : 'Visa'
-    const token = `tok_mock_${Date.now()}`
-
     try {
       setSaving(true)
       setError(null)
+      // Metadados exigidos no POST; a UI usa bandeira/rótulo do GET após salvar.
       const card = await addCard({
-        token,
         holderName: holderName.trim(),
-        lastFour,
-        brand,
+        lastFour: digits.slice(-4),
+        brand: detectCardBrand(digits),
         holderDocument,
         expiryMonth,
         expiryYear,
+        cardNumber: digits,
+        cvc,
       })
       onSaved(card)
     } catch (err) {

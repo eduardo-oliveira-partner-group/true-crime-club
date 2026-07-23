@@ -56,6 +56,10 @@ type ProfilePayload = {
     rotulo?: string
     ultimosQuatro?: string | null
     bandeira?: string | null
+    nomeImpresso?: string | null
+    cpfTitular?: string | null
+    mesValidade?: string | null
+    anoValidade?: string | null
     padrao?: boolean
   }>
 }
@@ -90,6 +94,10 @@ type ApiCardPayload = {
   rotulo?: string
   ultimosQuatro?: string | null
   bandeira?: string | null
+  nomeImpresso?: string | null
+  cpfTitular?: string | null
+  mesValidade?: string | null
+  anoValidade?: string | null
   padrao?: boolean
 }
 
@@ -281,6 +289,10 @@ export async function listCards(): Promise<PaymentMethod[]> {
       label: card.rotulo ?? '',
       lastFour: card.ultimosQuatro ?? undefined,
       brand: card.bandeira ?? undefined,
+      holderName: card.nomeImpresso ?? undefined,
+      holderDocument: card.cpfTitular ?? undefined,
+      expiryMonth: card.mesValidade ?? undefined,
+      expiryYear: card.anoValidade ?? undefined,
       isDefault: card.padrao ?? false,
     }),
   )
@@ -359,6 +371,10 @@ export async function getCustomerProfile(): Promise<{
       label: method.rotulo ?? '',
       lastFour: method.ultimosQuatro ?? undefined,
       brand: method.bandeira ?? undefined,
+      holderName: method.nomeImpresso ?? undefined,
+      holderDocument: method.cpfTitular ?? undefined,
+      expiryMonth: method.mesValidade ?? undefined,
+      expiryYear: method.anoValidade ?? undefined,
       isDefault: method.padrao ?? false,
     })),
   }

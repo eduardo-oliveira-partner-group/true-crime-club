@@ -84,6 +84,10 @@ export interface PaymentMethod {
   label: string
   lastFour?: string
   brand?: string
+  holderName?: string
+  holderDocument?: string
+  expiryMonth?: string
+  expiryYear?: string
   isDefault: boolean
 }
 

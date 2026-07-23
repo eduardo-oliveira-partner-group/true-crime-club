@@ -170,6 +170,54 @@ export function CustomerListSkeleton({ rows = 3 }: { rows?: number }) {
   )
 }
 
+/** Skeleton da grade de cartões (2 colunas + slot de adicionar). */
+export function CardsListSkeleton({ cards = 2 }: { cards?: number }) {
+  return (
+    <div
+      className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-2"
+      aria-busy="true"
+      aria-label="Carregando cartões"
+    >
+      {Array.from({ length: cards }).map((_, index) => (
+        <div
+          key={index}
+          className="overflow-hidden rounded-[16px] border border-(--ink)/10 bg-(--card) shadow-[0_16px_32px_-18px_rgba(33,28,24,0.2)]"
+        >
+          <div className="relative aspect-85/54 overflow-hidden bg-(--ink)/15 p-5 sm:p-6">
+            <div className="flex h-full flex-col justify-between">
+              <div className="flex items-start justify-between gap-3">
+                <Block className="h-3 w-14 bg-white/25" />
+                <Block className="h-4 w-20 bg-white/30" />
+              </div>
+              <Block className="mt-auto h-5 w-4/5 max-w-56 bg-white/35" />
+              <div className="mt-5 flex items-end justify-between gap-4">
+                <div className="min-w-0 flex-1">
+                  <Block className="h-2.5 w-14 bg-white/25" />
+                  <Block className="mt-2 h-3.5 w-40 max-w-full bg-white/35" />
+                  <Block className="mt-2 h-3 w-32 bg-white/25" />
+                </div>
+                <div className="shrink-0">
+                  <Block className="ml-auto h-2.5 w-14 bg-white/25" />
+                  <Block className="mt-2 h-3.5 w-12 bg-white/35" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center justify-between gap-2 border-t border-(--ink)/8 px-3.5 py-2.5">
+            <Block className="h-8 w-40 rounded-[9px]" />
+            <Block className="size-8 rounded-[9px]" />
+          </div>
+        </div>
+      ))}
+      <div className="flex min-h-56 w-full flex-col items-center justify-center gap-3 rounded-[16px] border border-dashed border-(--ink)/20 bg-(--paper-soft)/60 p-6">
+        <Block className="size-14 rounded-full" />
+        <Block className="h-4 w-32" />
+        <Block className="h-3 w-48 max-w-full" />
+      </div>
+    </div>
+  )
+}
+
 export function CustomerDetailSkeleton() {
   return (
     <div
