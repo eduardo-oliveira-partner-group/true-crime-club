@@ -119,6 +119,8 @@ interface CheckoutStepperProps {
   discountAmount: number
   shippingPrice: number
   totalAmount: number
+  /** Preferências já salvas no perfil do cliente (pré-preenche a etapa). */
+  initialPreferences?: SubscriberPreferencesValue
   /** Salva preferências do assinante (server action). */
   onSavePreferences: (preferences: SubscriberPreferencesValue) => Promise<void>
   /** Cria o pedido (server action). */
@@ -178,6 +180,7 @@ export function CheckoutStepper({
   discountAmount,
   shippingPrice: initialShippingPrice,
   totalAmount: initialTotalAmount,
+  initialPreferences,
   onSavePreferences,
   onCreateOrder,
 }: CheckoutStepperProps) {
@@ -206,9 +209,9 @@ export function CheckoutStepper({
     initialPaymentOptions.length === 0,
   )
   const [preferences, setPreferences] = useState<SubscriberPreferencesValue>({
-    shirtSize: '',
-    shoeSize: '',
-    notes: '',
+    shirtSize: initialPreferences?.shirtSize ?? '',
+    shoeSize: initialPreferences?.shoeSize ?? '',
+    notes: initialPreferences?.notes ?? '',
   })
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)

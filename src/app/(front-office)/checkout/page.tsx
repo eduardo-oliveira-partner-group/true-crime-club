@@ -351,6 +351,7 @@ export default function CheckoutPage() {
               discountAmount={discountAmount}
               shippingPrice={shipping.price}
               totalAmount={total}
+              initialPreferences={customer?.preferences}
               onSavePreferences={savePreferences}
               onCreateOrder={submitOrder}
             />
