@@ -183,22 +183,22 @@ export function CardsListSkeleton({ cards = 2 }: { cards?: number }) {
           key={index}
           className="overflow-hidden rounded-[16px] border border-(--ink)/10 bg-(--card) shadow-[0_16px_32px_-18px_rgba(33,28,24,0.2)]"
         >
-          <div className="relative aspect-85/54 overflow-hidden bg-(--ink)/15 p-5 sm:p-6">
+          <div className="relative aspect-85/54 overflow-hidden p-5 sm:p-6">
             <div className="flex h-full flex-col justify-between">
               <div className="flex items-start justify-between gap-3">
-                <Block className="h-3 w-14 bg-white/25" />
-                <Block className="h-4 w-20 bg-white/30" />
+                <Block className="h-3 w-14" />
+                <Block className="h-4 w-20" />
               </div>
-              <Block className="mt-auto h-5 w-4/5 max-w-56 bg-white/35" />
+              <Block className="mt-auto h-5 w-4/5 max-w-56" />
               <div className="mt-5 flex items-end justify-between gap-4">
                 <div className="min-w-0 flex-1">
-                  <Block className="h-2.5 w-14 bg-white/25" />
-                  <Block className="mt-2 h-3.5 w-40 max-w-full bg-white/35" />
-                  <Block className="mt-2 h-3 w-32 bg-white/25" />
+                  <Block className="h-2.5 w-14" />
+                  <Block className="mt-2 h-3.5 w-40 max-w-full" />
+                  <Block className="mt-2 h-3 w-32" />
                 </div>
                 <div className="shrink-0">
-                  <Block className="ml-auto h-2.5 w-14 bg-white/25" />
-                  <Block className="mt-2 h-3.5 w-12 bg-white/35" />
+                  <Block className="ml-auto h-2.5 w-14" />
+                  <Block className="mt-2 h-3.5 w-12" />
                 </div>
               </div>
             </div>
