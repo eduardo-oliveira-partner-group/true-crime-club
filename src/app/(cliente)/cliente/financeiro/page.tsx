@@ -252,7 +252,7 @@ export default function FinanceiroPage() {
       <p
         className={`text-[13px] leading-none font-bold tracking-[0.12em] text-(--red) uppercase ${fontMono}`}
       >
-        Arquivo do assinante
+        Visão financeira
       </p>
       <div className="mt-2 flex flex-wrap items-end justify-between gap-4 border-b border-dashed border-(--ink)/12 pb-5">
         <div>

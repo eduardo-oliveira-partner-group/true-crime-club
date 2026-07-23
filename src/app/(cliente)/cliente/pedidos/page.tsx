@@ -66,7 +66,7 @@ export default function PedidosPage() {
       <p
         className={`text-[13px] leading-none font-bold tracking-[0.12em] text-(--red) uppercase ${fontMono}`}
       >
-        Arquivo do assinante
+        Histórico de pedidos
       </p>
       <h1
         className={`mt-2 text-2xl font-black tracking-tight text-(--ink) uppercase ${fontHeading}`}
