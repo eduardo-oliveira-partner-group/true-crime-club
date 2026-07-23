@@ -63,20 +63,26 @@ function mapShippingOption(option: ApiShippingOption): ShippingOption | null {
 
 export async function calculateShipping(
   zipCode: string,
+  options?: {
+    planoId?: string
+    simulacaoAssinatura?: boolean
+  },
 ): Promise<ShippingEstimate> {
-  const apiResult = (await apiClient.checkout.calculateShipping(
-    zipCode,
-  )) as ApiShippingEstimate
+  const apiResult = (await apiClient.checkout.calculateShipping({
+    cep: zipCode,
+    planoId: options?.planoId,
+    simulacaoAssinatura: options?.simulacaoAssinatura,
+  })) as ApiShippingEstimate
 
-  const options = Array.isArray(apiResult.opcoes)
+  const shippingOptions = Array.isArray(apiResult.opcoes)
     ? apiResult.opcoes
         .map(mapShippingOption)
         .filter((option): option is ShippingOption => option != null)
     : []
 
   const preferred =
-    options.find((option) => option.sessionId === apiResult.sessionId) ??
-    options[0]
+    shippingOptions.find((option) => option.sessionId === apiResult.sessionId) ??
+    shippingOptions[0]
 
   const fallbackDays = apiResult.prazoEstimado
     ? String(apiResult.prazoEstimado)
@@ -88,7 +94,7 @@ export async function calculateShipping(
     estimatedDays: preferred
       ? formatBusinessDays(preferred.estimatedDays)
       : fallbackDays,
-    options,
+    options: shippingOptions,
     sessionId:
       preferred?.sessionId ??
       (apiResult.sessionId ? String(apiResult.sessionId) : undefined),
@@ -100,16 +106,23 @@ export async function createOrder(input?: {
   shipping?: number
   enderecoId?: string
   pagamentoMetodoId?: string
+  cep?: string
   subscription?: {
     id: string
-    name: string
-    price: number
   }
 }): Promise<Order> {
-  const apiOrder = await apiClient.checkout.createOrder({
+  const apiResult = await apiClient.checkout.createOrder({
     enderecoId: input?.enderecoId,
     pagamentoMetodoId: input?.pagamentoMetodoId,
+    cep: input?.cep,
     subscription: input?.subscription,
   })
-  return mapApiOrderToDomain(apiOrder)
+  const pedido =
+    apiResult &&
+    typeof apiResult === 'object' &&
+    'pedido' in apiResult &&
+    apiResult.pedido
+      ? apiResult.pedido
+      : apiResult
+  return mapApiOrderToDomain(pedido)
 }

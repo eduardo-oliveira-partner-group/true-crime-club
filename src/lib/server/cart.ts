@@ -18,10 +18,9 @@ import type { Cart, Order, Payment } from '@/src/lib/domain/types'
 export type CreateOrderInput = {
   enderecoId: string
   pagamentoMetodoId: string
+  cep?: string
   subscription?: {
     id: string
-    name: string
-    price: number
   }
 }
 
@@ -175,8 +174,7 @@ export async function createOrder(
         idMetodoPagamento: input?.pagamentoMetodoId,
         simulacaoAssinatura: Boolean(input?.subscription),
         planoId: input?.subscription?.id,
-        planoNome: input?.subscription?.name,
-        planoPreco: input?.subscription?.price,
+        cep: input?.cep,
       }),
     },
   )

@@ -112,6 +112,7 @@ interface CheckoutStepperProps {
   paymentOptions: CheckoutPaymentOption[]
   shippingOptions: CheckoutShippingOption[]
   isSubscriptionFlow: boolean
+  planId?: string
   planName?: string
   planPrice?: number
   cartItems: { id: string; label: string; value: string }[]
@@ -127,6 +128,7 @@ interface CheckoutStepperProps {
   onCreateOrder: (input: {
     enderecoId: string
     pagamentoMetodoId: string
+    cep: string
   }) => Promise<string | void>
 }
 
@@ -173,6 +175,7 @@ export function CheckoutStepper({
   paymentOptions: initialPaymentOptions,
   shippingOptions: initialShippingOptions,
   isSubscriptionFlow,
+  planId,
   planName,
   planPrice,
   cartItems,
@@ -249,7 +252,10 @@ export function CheckoutStepper({
     setShippingLoading(true)
     setShippingError(null)
     try {
-      const shipping = await calculateShipping(zipCode)
+      const shipping = await calculateShipping(zipCode, {
+        planoId: isSubscriptionFlow ? planId : undefined,
+        simulacaoAssinatura: isSubscriptionFlow,
+      })
       const options = shipping.options.map(toCheckoutShippingOption)
       setShippingOptions(options)
       setShippingPrice(shipping.price)
@@ -333,6 +339,7 @@ export function CheckoutStepper({
       const orderId = await onCreateOrder({
         enderecoId: selectedAddressId,
         pagamentoMetodoId: selectedPaymentId,
+        cep: selectedAddress?.zipCode ?? '',
       })
       router.push(
         `/checkout/confirmacao${orderId ? `?pedido=${encodeURIComponent(orderId)}` : ''}`,
@@ -874,8 +881,7 @@ export function CheckoutStepper({
                       </Field>
                     )}
                   <p className="mt-4 text-[0.7rem]/5 text-(--ink-mute)">
-                    Ambiente de validação — nenhum pagamento real será
-                    processado.
+                    O cartão é tokenizado no gateway ativo antes de ser salvo.
                   </p>
                 </Section>
               </Step>
@@ -1248,8 +1254,8 @@ function OrderSummary({
       </div>
 
       <p className="mt-4 text-[0.7rem]/5 text-(--ink-mute)">
-        Ambiente de validação — nenhum pagamento real será processado. O dossiê
-        do pedido é gerado ao finalizar.
+        Ao confirmar, o pedido é criado e a cobrança é processada no gateway
+        configurado (cartão ou Pix).
       </p>
     </section>
   )

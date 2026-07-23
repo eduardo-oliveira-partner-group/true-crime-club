@@ -32,11 +32,14 @@ export type ApiOrder = {
 
 export function mapApiOrderToDomain(apiOrder: ApiOrder): Order {
   const statusMap: Record<string, Order['status']> = {
+    aberto: 'pending_payment',
     pagamento_pendente: 'pending_payment',
     pago: 'paid',
     em_processamento: 'processing',
+    em_preparacao: 'processing',
     aguardando_envio: 'awaiting_shipment',
     enviado: 'shipped',
+    expedido: 'shipped',
     entregue: 'delivered',
     cancelado: 'cancelled',
   }
@@ -65,8 +68,9 @@ export function mapApiOrderToDomain(apiOrder: ApiOrder): Order {
           image: item.imagem,
         }))
       : [],
-    status: statusMap[apiOrder.status ?? ''] ?? 'paid',
-    paymentStatus: paymentStatusMap[apiOrder.statusPagamento ?? ''] ?? 'paid',
+    status: statusMap[apiOrder.status ?? ''] ?? 'pending_payment',
+    paymentStatus:
+      paymentStatusMap[apiOrder.statusPagamento ?? ''] ?? 'pending',
     subtotal: apiOrder.subtotal,
     shipping: apiOrder.frete,
     discount: apiOrder.desconto,

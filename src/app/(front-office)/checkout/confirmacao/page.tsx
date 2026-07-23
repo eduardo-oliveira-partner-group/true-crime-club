@@ -13,7 +13,7 @@ import {
 import Image from 'next/image'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import { DesignPageShell } from '@/src/components/public-design/design-page-shell'
 import { Button } from '@/src/components/ui/button'
@@ -35,11 +35,57 @@ import {
 } from '@/src/lib/formatters'
 import { getProductImage } from '@/src/lib/product-images'
 import { cn } from '@/src/lib/utils'
+import { useCheckoutPaymentWs } from '@/src/hooks/use-checkout-payment-ws'
 
 export default function ConfirmacaoPage() {
   const searchParams = useSearchParams()
   const [order, setOrder] = useState<Order | null>(null)
   const [loading, setLoading] = useState(true)
+  const [pixPayment, setPixPayment] = useState<Pick<
+    Payment,
+    'pixQrCode' | 'pixExpiresAt'
+  > | null>(null)
+  const [pixQrImage, setPixQrImage] = useState<string | null>(null)
+  const [awaitingPixConfirmation, setAwaitingPixConfirmation] = useState(false)
+
+  const refreshOrder = useCallback(async (orderId: string) => {
+    const updated = await getOrderById(orderId)
+    if (!updated) return null
+    setOrder(updated)
+    if (updated.paymentStatus === 'paid') {
+      setPixPayment(null)
+      setPixQrImage(null)
+      setAwaitingPixConfirmation(false)
+    }
+    return updated
+  }, [])
+
+  useEffect(() => {
+    const raw = sessionStorage.getItem('checkout:lastPayment')
+    if (!raw) return
+    try {
+      const payment = JSON.parse(raw) as {
+        metodo?: string
+        pixQrCode?: string
+        pixQrCodeBase64?: string
+        pixExpiraEm?: string
+      }
+      if (payment.metodo === 'pix' && payment.pixQrCode) {
+        setAwaitingPixConfirmation(true)
+        setPixPayment({
+          pixQrCode: payment.pixQrCode,
+          pixExpiresAt: payment.pixExpiraEm,
+        })
+        if (payment.pixQrCodeBase64) {
+          setPixQrImage(`data:image/png;base64,${payment.pixQrCodeBase64}`)
+        }
+      }
+    } catch {
+      // ignora payload invalido
+    } finally {
+      sessionStorage.removeItem('checkout:lastPayment')
+    }
+  }, [])
 
   useEffect(() => {
     const id = searchParams.get('pedido')
@@ -47,10 +93,28 @@ export default function ConfirmacaoPage() {
       ? getOrderById(id)
       : listOrders().then((orders) => orders[0] ?? null)
     request
-      .then(setOrder)
+      .then((loaded) => {
+        setOrder(loaded)
+        if (loaded?.paymentStatus === 'paid') {
+          setAwaitingPixConfirmation(false)
+          setPixPayment(null)
+          setPixQrImage(null)
+        }
+      })
       .catch(() => setOrder(null))
       .finally(() => setLoading(false))
   }, [searchParams])
+
+  const orderId = order?.id
+  const paymentPending =
+    order?.paymentStatus === 'pending' || awaitingPixConfirmation
+
+  useCheckoutPaymentWs(orderId, {
+    enabled: Boolean(orderId && paymentPending),
+    onPaymentConfirmed: () => {
+      if (orderId) void refreshOrder(orderId)
+    },
+  })
 
   if (loading) return <ConfirmationSkeleton />
 
@@ -59,8 +123,6 @@ export default function ConfirmacaoPage() {
   }
 
   const itemCount = order.items.reduce((sum, item) => sum + item.quantity, 0)
-  const pixPayment = null
-  const pixQrImage = null
 
   return (
     <DesignPageShell className="overflow-hidden">
@@ -146,10 +208,10 @@ export default function ConfirmacaoPage() {
               orderStatus={formatOrderStatus(order.status)}
               paymentStatus={formatPaymentStatus(order.paymentStatus)}
               createdAt={formatDateTime(order.createdAt)}
-              pixPending={Boolean(pixPayment)}
+              pixPending={Boolean(pixPayment) || order.paymentStatus === 'pending'}
             />
 
-            {pixPayment && pixQrImage ? (
+            {pixPayment ? (
               <PixPaymentPanel payment={pixPayment} qrImage={pixQrImage} />
             ) : null}
 
@@ -451,7 +513,7 @@ function PixPaymentPanel({
   qrImage,
 }: {
   payment: Pick<Payment, 'pixQrCode' | 'pixExpiresAt'>
-  qrImage: string
+  qrImage: string | null
 }) {
   return (
     <section
@@ -491,15 +553,17 @@ function PixPaymentPanel({
       </div>
 
       <div className="mt-5 grid gap-5 sm:grid-cols-[10rem_1fr] sm:items-center">
-        <div className="rounded-[12px] border border-[rgba(33,28,24,0.15)] bg-[#fbf9f6] p-3 shadow-[0_10px_24px_-16px_rgba(33,28,24,0.5)]">
-          <Image
-            alt="QR Code para pagamento Pix"
-            height={160}
-            src={qrImage}
-            unoptimized
-            width={160}
-          />
-        </div>
+        {qrImage ? (
+          <div className="rounded-[12px] border border-[rgba(33,28,24,0.15)] bg-[#fbf9f6] p-3 shadow-[0_10px_24px_-16px_rgba(33,28,24,0.5)]">
+            <Image
+              alt="QR Code para pagamento Pix"
+              height={160}
+              src={qrImage}
+              unoptimized
+              width={160}
+            />
+          </div>
+        ) : null}
         <div className="space-y-3 text-sm/6 text-(--ink-soft)">
           <p>
             Use o app do seu banco para escanear o QR Code e concluir a

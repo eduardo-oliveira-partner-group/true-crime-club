@@ -1,18 +1,31 @@
 import { fetcher } from '../core/fetcher'
+import { toPaymentMethod } from '../mappers/payment'
+import { asArray } from '../core/json'
 
 export const checkoutApi = {
-  calculateShipping: (zipCode: string) =>
+  listPaymentMethods: () =>
+    fetcher('/finalizacao/metodos-pagamento').then((items) =>
+      asArray(items).map(toPaymentMethod),
+    ),
+  calculateShipping: (body: {
+    cep: string
+    planoId?: string
+    simulacaoAssinatura?: boolean
+  }) =>
     fetcher('/finalizacao/frete', {
       method: 'POST',
-      body: JSON.stringify({ cep: zipCode }),
+      body: JSON.stringify({
+        cep: body.cep,
+        planoId: body.planoId,
+        simulacaoAssinatura: body.simulacaoAssinatura,
+      }),
     }),
   createOrder: (body?: {
     enderecoId?: string
     pagamentoMetodoId?: string
+    cep?: string
     subscription?: {
       id: string
-      name: string
-      price: number
     }
   }) =>
     fetcher('/finalizacao/pedido', {
@@ -24,8 +37,7 @@ export const checkoutApi = {
           ? {
               simulacaoAssinatura: true,
               planoId: body.subscription.id,
-              planoNome: body.subscription.name,
-              planoPreco: body.subscription.price,
+              cep: body.cep,
             }
           : {}),
       }),
