@@ -31,7 +31,7 @@ import {
   updateCustomerProfile,
 } from '@/src/lib/domain/repositories'
 import { emptyCart } from '@/src/lib/domain/repository/core/helpers'
-import type { CartItem } from '@/src/lib/domain/types'
+import type { CartItem, PaymentMethod } from '@/src/lib/domain/types'
 import { formatCurrency } from '@/src/lib/formatters'
 import { cn } from '@/src/lib/utils'
 
@@ -50,6 +50,7 @@ export default function CheckoutPage() {
   const [state, setState] = useState<{
     cart: Awaited<ReturnType<typeof getCart>>
     profile: Awaited<ReturnType<typeof apiClient.customer.getProfile>>
+    paymentMethods: PaymentMethod[]
     plan: Awaited<ReturnType<typeof getPlanById>>
     monthlyPlan: Awaited<ReturnType<typeof getPlanById>>
     shipping: { price: number; estimatedDays: string; region: string }
@@ -87,9 +88,14 @@ export default function CheckoutPage() {
               ) ?? null)
             : null
         if (cancelled) return
+        const paymentMethods = await apiClient.checkout
+          .listPaymentMethods()
+          .catch(() => [] as PaymentMethod[])
+        if (cancelled) return
         setState({
           cart,
           profile,
+          paymentMethods,
           plan,
           monthlyPlan,
           shipping: {
@@ -175,7 +181,7 @@ export default function CheckoutPage() {
 
   if (!state) return <CheckoutSkeleton />
 
-  const { cart, profile, plan, monthlyPlan, shipping } = state
+  const { cart, profile, paymentMethods, plan, monthlyPlan, shipping } = state
   // const checkoutPath = plano
   //   ? `/checkout?${new URLSearchParams({ plano }).toString()}`
   //   : '/checkout'
@@ -185,7 +191,6 @@ export default function CheckoutPage() {
   const customer = profile.customer
 
   const addresses = profile.addresses || []
-  const paymentMethods = profile.paymentMethods || []
 
   const shippingOptions: CheckoutShippingOption[] = []
 
@@ -218,20 +223,40 @@ export default function CheckoutPage() {
   async function submitOrder(input: {
     enderecoId: string
     pagamentoMetodoId: string
+    cep: string
   }) {
-    const confirmation = await apiClient.checkout.createOrder({
-      ...input,
-      ...(plan
-        ? {
-            subscription: {
+    const result = await apiClient.checkout.createOrder({
+      enderecoId: input.enderecoId,
+      pagamentoMetodoId: input.pagamentoMetodoId,
+      cep: input.cep,
+      subscription:
+        isSubscriptionFlow && plan
+          ? {
               id: plan.id,
-              name: plan.name,
-              price: plan.price,
-            },
-          }
-        : {}),
+            }
+          : undefined,
     })
-    return typeof confirmation.id === 'string' ? confirmation.id : undefined
+    if (result && typeof result === 'object' && 'pagamento' in result) {
+      const pagamento = (result as { pagamento?: unknown }).pagamento
+      if (pagamento) {
+        sessionStorage.setItem(
+          'checkout:lastPayment',
+          JSON.stringify(pagamento),
+        )
+      }
+    }
+    if (
+      result &&
+      typeof result === 'object' &&
+      'pedido' in result &&
+      result.pedido &&
+      typeof result.pedido === 'object' &&
+      'id' in result.pedido &&
+      typeof result.pedido.id === 'string'
+    ) {
+      return result.pedido.id
+    }
+    return undefined
   }
 
   return (
@@ -261,8 +286,8 @@ export default function CheckoutPage() {
                 Finalize seu ingresso no clube
               </h1>
               <p className="max-w-xl text-sm/6 text-(--ink-soft)">
-                Fluxo de validação — nenhum pagamento real será processado.
-                Confira dados, frete e pagamento antes de confirmar.
+                Confira endereço, frete e pagamento antes de confirmar o
+                pedido.
               </p>
             </div>
             {plan ? (
@@ -331,6 +356,7 @@ export default function CheckoutPage() {
               paymentOptions={paymentOptions}
               shippingOptions={shippingOptions}
               isSubscriptionFlow={isSubscriptionFlow}
+              planId={plan?.id}
               planName={plan?.name}
               planPrice={
                 isSubscriptionFlow && plan?.billingInterval === 'annual'

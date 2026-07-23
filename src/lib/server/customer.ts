@@ -121,11 +121,14 @@ function mapApiOrder(
   order: ApiOrderPayload,
 ): import('@/src/lib/domain/types').Order {
   const status = {
+    aberto: 'pending_payment',
     pagamento_pendente: 'pending_payment',
     pago: 'paid',
     em_processamento: 'processing',
+    em_preparacao: 'processing',
     aguardando_envio: 'awaiting_shipment',
     enviado: 'shipped',
+    expedido: 'shipped',
     entregue: 'delivered',
     cancelado: 'cancelled',
   } as const
@@ -151,10 +154,10 @@ function mapApiOrder(
       unitPrice: item.precoUnitario,
       image: item.imagem,
     })),
-    status: status[order.status as keyof typeof status] ?? 'paid',
+    status: status[order.status as keyof typeof status] ?? 'pending_payment',
     paymentStatus:
       paymentStatus[order.statusPagamento as keyof typeof paymentStatus] ??
-      'paid',
+      'pending',
     subtotal: order.subtotal,
     shipping: order.frete,
     discount: order.desconto,
