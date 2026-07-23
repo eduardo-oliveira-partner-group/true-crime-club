@@ -46,6 +46,7 @@ export function mapApiOrderToDomain(apiOrder: ApiOrder): Order {
 
   const paymentStatusMap: Record<string, Order['paymentStatus']> = {
     pendente: 'pending',
+    aprovado: 'pending',
     pago: 'paid',
     recusado: 'refused',
     expirado: 'expired',

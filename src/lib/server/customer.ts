@@ -134,6 +134,7 @@ function mapApiOrder(
   } as const
   const paymentStatus = {
     pendente: 'pending',
+    aprovado: 'pending',
     pago: 'paid',
     recusado: 'refused',
     expirado: 'expired',

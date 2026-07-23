@@ -42,7 +42,7 @@ export function parseCheckoutPaymentMessage(raw: string): {
 
     const confirmed =
       paidFlag ||
-      ['PAGO', 'PAID', 'CONFIRMED', 'RECEIVED', 'APPROVED', 'ACCREDITED'].includes(
+      ['PAGO', 'PAID', 'CONFIRMED', 'RECEIVED', 'ACCREDITED'].includes(
         status,
       )
 
