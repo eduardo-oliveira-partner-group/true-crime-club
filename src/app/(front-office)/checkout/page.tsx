@@ -82,8 +82,9 @@ export default function CheckoutPage() {
         }
         const monthlyPlan =
           plan?.billingInterval === 'annual'
-            ? ((await listPlans()).find((p) => p.billingInterval === 'monthly') ??
-              null)
+            ? ((await listPlans()).find(
+                (p) => p.billingInterval === 'monthly',
+              ) ?? null)
             : null
         if (cancelled) return
         setState({

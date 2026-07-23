@@ -201,15 +201,52 @@
     overflow-x: clip;
     overscroll-behavior: none;
   }
-  body {
-    @apply bg-background text-foreground;
+
+  /*
+    Fundo do documento alinhado ao papel do front-office.
+    Sem isso, qualquer gutter/compensação de scrollbar vira faixa branca.
+  */
+  html {
+    @apply font-sans text-foreground;
+    background-color: var(--paper);
   }
+  body {
+    @apply text-foreground;
+    background-color: var(--paper);
+  }
+
   button:not(:disabled),
   [role='button']:not(:disabled) {
     cursor: pointer;
   }
-  html {
-    @apply bg-background font-sans text-foreground;
+
+  /*
+    Radix (react-remove-scroll) ao abrir Dialog/Select/Sheet some a scrollbar
+    (overflow:hidden) e compensa com margin-right — a faixa branca do print.
+
+    Lenis stop() ainda aplica .lenis-stopped { overflow: clip }, o que também
+    remove a barra. Mantém a scrollbar visível e cancela a compensação; o scroll
+    continua bloqueado pelos listeners do Radix + lenis.stop().
+  */
+  html body[data-scroll-locked] {
+    --removed-body-scroll-bar-size: 0 !important;
+    margin-right: 0 !important;
+    padding-right: 0 !important;
+    overflow: visible !important;
+  }
+
+  html.lenis.lenis-stopped,
+  html.lenis.lenis-stopped:not(.lenis-autoToggle) {
+    overflow-x: clip !important;
+    overflow-y: auto !important;
+  }
+
+  html .right-scroll-bar-position {
+    right: 0 !important;
+  }
+
+  html .width-before-scroll-bar {
+    margin-right: 0 !important;
   }
 
   @media (prefers-reduced-motion: no-preference) {

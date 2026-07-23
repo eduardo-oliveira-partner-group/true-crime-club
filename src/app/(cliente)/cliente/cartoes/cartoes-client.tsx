@@ -13,6 +13,7 @@ import { useEffect, useRef, useState } from 'react'
 import { CardForm } from '@/src/components/customer/card-form'
 import { Alert, AlertDescription, AlertTitle } from '@/src/components/ui/alert'
 import { Button } from '@/src/components/ui/button'
+import { ConfirmDialog } from '@/src/components/ui/confirm-dialog'
 import { CardsListSkeleton } from '@/src/components/ui/page-loading-skeletons'
 import {
   fontHeading,
@@ -240,6 +241,8 @@ export default function CartoesClient() {
   const [isLoading, setIsLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [cardToDelete, setCardToDelete] = useState<PaymentMethod | null>(null)
+  const [deletingCard, setDeletingCard] = useState(false)
   const [showAddForm, setShowAddForm] = useState(
     () => searchParams.get('acao') === 'adicionar',
   )
@@ -289,17 +292,20 @@ export default function CartoesClient() {
     }
   }
 
-  const handleDeleteCard = async (id: string) => {
-    setSubmitting(true)
+  const handleConfirmDeleteCard = async () => {
+    if (!cardToDelete) return
+    setDeletingCard(true)
     setError(null)
     try {
-      await deleteCard(id)
+      await deleteCard(cardToDelete.id)
       await reloadCards()
+      setCardToDelete(null)
     } catch (e: unknown) {
       console.error(e)
       setError(getErrorMessage(e, 'Erro ao remover cartão.'))
+      setCardToDelete(null)
     } finally {
-      setSubmitting(false)
+      setDeletingCard(false)
     }
   }
 
@@ -339,7 +345,10 @@ export default function CartoesClient() {
                 card={card}
                 submitting={submitting}
                 onSetDefault={handleSetDefaultCard}
-                onDelete={handleDeleteCard}
+                onDelete={(id) => {
+                  const card = cards.find((item) => item.id === id) ?? null
+                  setCardToDelete(card)
+                }}
               />
             ))}
             {showAddForm ? (
@@ -365,6 +374,31 @@ export default function CartoesClient() {
           </div>
         </section>
       )}
+
+      <ConfirmDialog
+        open={Boolean(cardToDelete)}
+        onOpenChange={(open) => {
+          if (!open) setCardToDelete(null)
+        }}
+        title="Excluir cartão?"
+        description={
+          cardToDelete ? (
+            <>
+              O cartão{' '}
+              <span className="font-semibold text-(--ink)">
+                {cardToDelete.brand?.trim() || 'Cartão'}{' '}
+                {formatMaskedCardNumber(cardToDelete.lastFour)}
+              </span>{' '}
+              será removido das suas formas de pagamento. Essa ação não pode ser
+              desfeita.
+            </>
+          ) : null
+        }
+        confirmLabel="Excluir cartão"
+        confirmingLabel="Excluindo…"
+        confirming={deletingCard}
+        onConfirm={handleConfirmDeleteCard}
+      />
     </div>
   )
 }

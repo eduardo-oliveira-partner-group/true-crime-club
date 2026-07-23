@@ -18,6 +18,7 @@ import { useEffect, useState } from 'react'
 import { DesignPageShell } from '@/src/components/public-design/design-page-shell'
 import { SectionEyebrow } from '@/src/components/public-design/section-eyebrow'
 import { Button } from '@/src/components/ui/button'
+import { ConfirmDialog } from '@/src/components/ui/confirm-dialog'
 import {
   Empty,
   EmptyContent,
@@ -219,6 +220,19 @@ function CartLineItem({
   const productImage = getProductImage(item.image ?? '')
   const lineTotal = item.unitPrice * item.quantity
   const itemCode = `EVID-${String(item.quantity).padStart(2, '0')}`
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [removing, setRemoving] = useState(false)
+
+  const handleRemove = async () => {
+    setRemoving(true)
+    try {
+      await removeCartItem(item.id)
+      window.location.reload()
+    } catch {
+      setRemoving(false)
+      setConfirmOpen(false)
+    }
+  }
 
   return (
     <article
@@ -293,9 +307,7 @@ function CartLineItem({
             <div>
               <Button
                 type="button"
-                onClick={() =>
-                  removeCartItem(item.id).then(() => window.location.reload())
-                }
+                onClick={() => setConfirmOpen(true)}
                 variant="ghost"
                 size="sm"
                 className="h-8 gap-1.5 rounded-[9px] px-3 text-xs font-medium text-(--red) hover:bg-(--red)/10 hover:text-(--red-deep)"
@@ -307,6 +319,24 @@ function CartLineItem({
           </div>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={confirmOpen}
+        onOpenChange={setConfirmOpen}
+        title="Remover item?"
+        description={
+          <>
+            <span className="font-semibold text-(--ink)">
+              {item.productName}
+            </span>{' '}
+            será removido do carrinho.
+          </>
+        }
+        confirmLabel="Remover item"
+        confirmingLabel="Removendo…"
+        confirming={removing}
+        onConfirm={handleRemove}
+      />
     </article>
   )
 }

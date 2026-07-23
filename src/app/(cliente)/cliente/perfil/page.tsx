@@ -14,6 +14,7 @@ import { useEffect, useState } from 'react'
 import { AddressForm } from '@/src/components/customer/address-form'
 import { Alert, AlertDescription, AlertTitle } from '@/src/components/ui/alert'
 import { Button } from '@/src/components/ui/button'
+import { ConfirmDialog } from '@/src/components/ui/confirm-dialog'
 import {
   Empty,
   EmptyDescription,
@@ -157,6 +158,8 @@ export default function PerfilPage() {
   const [addresses, setAddresses] = useState<Address[]>([])
   const [showAddAddress, setShowAddAddress] = useState(false)
   const [editingAddressId, setEditingAddressId] = useState<string | null>(null)
+  const [addressToDelete, setAddressToDelete] = useState<Address | null>(null)
+  const [deletingAddress, setDeletingAddress] = useState(false)
 
   const [loading, setLoading] = useState(true)
   const [savingSection, setSavingSection] = useState<
@@ -279,17 +282,23 @@ export default function PerfilPage() {
     }
   }
 
-  const handleDeleteAddress = async (id: string) => {
+  const handleConfirmDeleteAddress = async () => {
+    if (!addressToDelete) return
     try {
+      setDeletingAddress(true)
       setSaveError(null)
-      const updatedList = await deleteCustomerAddress(id)
+      const updatedList = await deleteCustomerAddress(addressToDelete.id)
       setAddresses(updatedList)
+      setAddressToDelete(null)
     } catch (error) {
       setSaveError(
         error instanceof Error
           ? error.message
           : 'Não foi possível excluir o endereço.',
       )
+      setAddressToDelete(null)
+    } finally {
+      setDeletingAddress(false)
     }
   }
 
@@ -767,7 +776,7 @@ export default function PerfilPage() {
                             type="button"
                             variant="ghost"
                             size="icon-sm"
-                            onClick={() => handleDeleteAddress(addr.id)}
+                            onClick={() => setAddressToDelete(addr)}
                             disabled={
                               Boolean(editingAddressId) || showAddAddress
                             }
@@ -784,6 +793,29 @@ export default function PerfilPage() {
               </div>
             </div>
           </div>
+
+          <ConfirmDialog
+            open={Boolean(addressToDelete)}
+            onOpenChange={(open) => {
+              if (!open) setAddressToDelete(null)
+            }}
+            title="Excluir endereço?"
+            description={
+              addressToDelete ? (
+                <>
+                  O endereço{' '}
+                  <span className="font-semibold text-(--ink)">
+                    {addressToDelete.label}
+                  </span>{' '}
+                  será removido da sua conta. Essa ação não pode ser desfeita.
+                </>
+              ) : null
+            }
+            confirmLabel="Excluir endereço"
+            confirmingLabel="Excluindo…"
+            confirming={deletingAddress}
+            onConfirm={handleConfirmDeleteAddress}
+          />
         </>
       )}
     </div>

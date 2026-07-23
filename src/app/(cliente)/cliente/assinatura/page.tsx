@@ -1,10 +1,17 @@
 'use client'
 
-import { IconArrowRight, IconCalendar, IconTicket } from '@tabler/icons-react'
+import {
+  IconAlertCircle,
+  IconArrowRight,
+  IconCalendar,
+  IconTicket,
+} from '@tabler/icons-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
+import { Alert, AlertDescription, AlertTitle } from '@/src/components/ui/alert'
 import { Button } from '@/src/components/ui/button'
+import { ConfirmDialog } from '@/src/components/ui/confirm-dialog'
 import {
   Empty,
   EmptyContent,
@@ -20,7 +27,10 @@ import {
   fontHeading,
   fontMono,
 } from '@/src/lib/design/classes'
-import { getSubscription } from '@/src/lib/domain/repositories'
+import {
+  cancelSubscription,
+  getSubscription,
+} from '@/src/lib/domain/repositories'
 import type { Subscription, SubscriptionStatus } from '@/src/lib/domain/types'
 import {
   formatCurrency,
@@ -71,7 +81,13 @@ function SubscriptionLoadingSkeleton() {
   )
 }
 
-function SubscriptionCard({ subscription }: { subscription: Subscription }) {
+function SubscriptionCard({
+  subscription,
+  onCancelClick,
+}: {
+  subscription: Subscription
+  onCancelClick: () => void
+}) {
   return (
     <article className={`${dossierCardSurface} ${cardShadowBase} p-5`}>
       <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
@@ -130,13 +146,14 @@ function SubscriptionCard({ subscription }: { subscription: Subscription }) {
         {subscription.canCancel ? (
           <>
             <span className="hidden size-1 rounded-full bg-(--ink)/25 sm:block" />
-            <Link
-              href="/cliente/assinatura/cancelar"
-              className="inline-flex items-center gap-1.5 font-semibold text-(--red) transition-colors duration-200 hover:text-(--red-deep)"
+            <button
+              type="button"
+              onClick={onCancelClick}
+              className="inline-flex cursor-pointer items-center gap-1.5 font-semibold text-(--red) transition-colors duration-200 hover:text-(--red-deep)"
             >
               Cancelar assinatura
               <IconArrowRight className="size-3.5" />
-            </Link>
+            </button>
           </>
         ) : null}
       </div>
@@ -147,6 +164,9 @@ function SubscriptionCard({ subscription }: { subscription: Subscription }) {
 export default function AssinaturaClientePage() {
   const [subscription, setSubscription] = useState<Subscription | null>(null)
   const [loading, setLoading] = useState(true)
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [cancelling, setCancelling] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     getSubscription()
@@ -154,6 +174,25 @@ export default function AssinaturaClientePage() {
       .catch(() => setSubscription(null))
       .finally(() => setLoading(false))
   }, [])
+
+  const handleCancelSubscription = async () => {
+    setCancelling(true)
+    setError(null)
+    try {
+      await cancelSubscription()
+      setSubscription(await getSubscription())
+      setConfirmOpen(false)
+    } catch (cause) {
+      setError(
+        cause instanceof Error
+          ? cause.message
+          : 'Não foi possível cancelar a assinatura.',
+      )
+      setConfirmOpen(false)
+    } finally {
+      setCancelling(false)
+    }
+  }
 
   return (
     <div>
@@ -171,6 +210,14 @@ export default function AssinaturaClientePage() {
         Consulte o plano ativo, a próxima cobrança e o status da assinatura no
         mesmo lugar.
       </p>
+
+      {error ? (
+        <Alert variant="destructive" className="mt-4">
+          <IconAlertCircle />
+          <AlertTitle>Erro ao cancelar</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      ) : null}
 
       {loading ? (
         <SubscriptionLoadingSkeleton />
@@ -201,9 +248,47 @@ export default function AssinaturaClientePage() {
         </Empty>
       ) : (
         <section className="mt-8" aria-label="Assinatura ativa">
-          <SubscriptionCard subscription={subscription} />
+          <SubscriptionCard
+            subscription={subscription}
+            onCancelClick={() => {
+              setError(null)
+              setConfirmOpen(true)
+            }}
+          />
         </section>
       )}
+
+      <ConfirmDialog
+        open={confirmOpen}
+        onOpenChange={setConfirmOpen}
+        title="Cancelar assinatura"
+        description="Simulação de cancelamento — nenhuma ação real será executada."
+        confirmLabel="Confirmar cancelamento"
+        confirmingLabel="Cancelando…"
+        confirming={cancelling}
+        onConfirm={handleCancelSubscription}
+      >
+        {subscription ? (
+          <div className="rounded-[14px] border border-(--red)/25 bg-(--red)/6 p-4 text-sm">
+            <p
+              className={`text-[11px] font-bold tracking-[0.12em] text-(--red) uppercase ${fontMono}`}
+            >
+              Ação irreversível
+            </p>
+            <p className="mt-2 text-(--ink-soft)">
+              Plano atual:{' '}
+              <span className={`font-semibold text-(--ink) ${fontHeading}`}>
+                {subscription.planName}
+              </span>{' '}
+              ({formatSubscriptionStatus(subscription.status)})
+            </p>
+            <p className="mt-2 text-xs/5 text-(--ink-mute)">
+              Você perderá o acesso aos benefícios do ciclo atual após a
+              confirmação.
+            </p>
+          </div>
+        ) : null}
+      </ConfirmDialog>
     </div>
   )
 }
