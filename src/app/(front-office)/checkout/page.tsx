@@ -26,7 +26,8 @@ import {
 import {
   getCart,
   getCartTotals,
-  getPlanBySlug,
+  getPlanById,
+  listPlans,
   updateCustomerProfile,
 } from '@/src/lib/domain/repositories'
 import { emptyCart } from '@/src/lib/domain/repository/core/helpers'
@@ -49,8 +50,8 @@ export default function CheckoutPage() {
   const [state, setState] = useState<{
     cart: Awaited<ReturnType<typeof getCart>>
     profile: Awaited<ReturnType<typeof apiClient.customer.getProfile>>
-    plan: Awaited<ReturnType<typeof getPlanBySlug>>
-    monthlyPlan: Awaited<ReturnType<typeof getPlanBySlug>>
+    plan: Awaited<ReturnType<typeof getPlanById>>
+    monthlyPlan: Awaited<ReturnType<typeof getPlanById>>
     shipping: { price: number; estimatedDays: string; region: string }
   } | null>(null)
 
@@ -71,7 +72,7 @@ export default function CheckoutPage() {
       // (o header já consulta o contador).
       plano ? Promise.resolve(emptyCart()) : getCart(),
       apiClient.customer.getProfile(),
-      plano ? getPlanBySlug(plano) : Promise.resolve(null),
+      plano ? getPlanById(plano) : Promise.resolve(null),
     ])
       .then(async ([cart, profile, plan]) => {
         if (cancelled) return
@@ -80,7 +81,10 @@ export default function CheckoutPage() {
           return
         }
         const monthlyPlan =
-          plan?.slug === 'anual' ? await getPlanBySlug('mensal') : null
+          plan?.billingInterval === 'annual'
+            ? ((await listPlans()).find((p) => p.billingInterval === 'monthly') ??
+              null)
+            : null
         if (cancelled) return
         setState({
           cart,
@@ -194,7 +198,7 @@ export default function CheckoutPage() {
   let subtotalAmount = totals.subtotal
 
   if (isSubscriptionFlow && plan) {
-    if (plan.slug === 'anual') {
+    if (plan.billingInterval === 'annual') {
       const monthlyPrice = monthlyPlan ? monthlyPlan.price : 14990
       const commitment = plan.commitmentMonths || 12
       subtotalAmount = monthlyPrice * commitment
@@ -210,32 +214,22 @@ export default function CheckoutPage() {
   const total =
     (isSubscriptionFlow && plan ? plan.price : totals.total) + shipping.price
 
-  // let installmentsCount = 1
-  // let installmentValue = total
-
-  // if (isSubscriptionFlow && plan) {
-  //   if (plan.slug === 'anual') {
-  //     installmentsCount = 12
-  //     installmentValue = plan.pricePerMonth ?? plan.price
-  //   } else {
-  //     installmentsCount = 1
-  //     installmentValue = plan.price
-  //   }
-  // } else {
-  //   if (total > 10000) {
-  //     installmentsCount = 3
-  //     installmentValue = Math.round(total / 3)
-  //   } else {
-  //     installmentsCount = 1
-  //     installmentValue = total
-  //   }
-  // }
-
   async function submitOrder(input: {
     enderecoId: string
     pagamentoMetodoId: string
   }) {
-    const confirmation = await apiClient.checkout.createOrder(input)
+    const confirmation = await apiClient.checkout.createOrder({
+      ...input,
+      ...(plan
+        ? {
+            subscription: {
+              id: plan.id,
+              name: plan.name,
+              price: plan.price,
+            },
+          }
+        : {}),
+    })
     return typeof confirmation.id === 'string' ? confirmation.id : undefined
   }
 
@@ -338,7 +332,7 @@ export default function CheckoutPage() {
               isSubscriptionFlow={isSubscriptionFlow}
               planName={plan?.name}
               planPrice={
-                isSubscriptionFlow && plan?.slug === 'anual'
+                isSubscriptionFlow && plan?.billingInterval === 'annual'
                   ? plan.pricePerMonth
                   : plan?.price
               }

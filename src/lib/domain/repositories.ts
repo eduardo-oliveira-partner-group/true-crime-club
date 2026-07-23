@@ -19,7 +19,7 @@ export {
   getDynamicContentByRoute,
   getExclusiveContentBySlug,
   getOrderById,
-  getPlanBySlug,
+  getPlanById,
   getProductBySlug,
   getSeoEntry,
   getSubscription,

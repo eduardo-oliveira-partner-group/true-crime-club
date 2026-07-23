@@ -46,5 +46,5 @@ export {
   getExclusiveContentBySlug,
   listExclusiveContent,
 } from './domains/exclusive-content'
-export { getPlanBySlug, listPlans } from './domains/plans'
+export { getPlanById, listPlans } from './domains/plans'
 export { getProductBySlug, listProducts } from './domains/products'

@@ -9,11 +9,11 @@ export async function listPlans(): Promise<SubscriptionPlan[]> {
   return apiPlans.map(mapApiPlanToDomain)
 }
 
-export async function getPlanBySlug(
-  slug: string,
+export async function getPlanById(
+  id: string,
 ): Promise<SubscriptionPlan | null> {
   try {
-    const apiPlan = await apiClient.plans.getBySlug(slug)
+    const apiPlan = await apiClient.plans.getById(id)
     return mapApiPlanToDomain(apiPlan)
   } catch (error: unknown) {
     if (isNotFoundError(error)) {

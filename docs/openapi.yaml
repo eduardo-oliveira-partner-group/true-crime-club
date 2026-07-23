@@ -456,18 +456,18 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PlanoAssinatura'
-  /planos/{identificador}:
+  /planos/{id}:
     get:
       tags:
       - Catálogo
-      summary: Obter detalhes do plano pelo identificador
+      summary: Obter detalhes do plano pelo id
       parameters:
-      - name: identificador
+      - name: id
         in: path
         required: true
         schema:
           type: string
-          example: anual
+          example: '2'
       responses:
         '200':
           description: Plano encontrado.
@@ -711,8 +711,8 @@ paths:
                   description: Indica que o checkout também deve contratar a assinatura via RPC.
                 planoId:
                   type: string
-                  description: Obrigatório quando simulacaoAssinatura for true.
-                  example: plano-anual
+                  description: Obrigatório quando simulacaoAssinatura for true. Usar plano.id.
+                  example: '2'
                 planoNome:
                   type: string
                   example: Plano Anual
@@ -1590,10 +1590,11 @@ components:
       properties:
         id:
           type: string
-          example: plano-anual
+          example: '2'
         identificador:
           type: string
           example: anual
+          description: Slug legível para exibição, SEO ou analytics. Não usar em rotas de API.
         nome:
           type: string
           example: Plano Anual
@@ -1845,7 +1846,7 @@ components:
           example: cliente-001
         idPlano:
           type: string
-          example: plano-mensal
+          example: '2'
         nomePlano:
           type: string
           example: Plano Mensal

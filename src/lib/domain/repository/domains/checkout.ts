@@ -100,10 +100,16 @@ export async function createOrder(input?: {
   shipping?: number
   enderecoId?: string
   pagamentoMetodoId?: string
+  subscription?: {
+    id: string
+    name: string
+    price: number
+  }
 }): Promise<Order> {
   const apiOrder = await apiClient.checkout.createOrder({
     enderecoId: input?.enderecoId,
     pagamentoMetodoId: input?.pagamentoMetodoId,
+    subscription: input?.subscription,
   })
   return mapApiOrderToDomain(apiOrder)
 }
