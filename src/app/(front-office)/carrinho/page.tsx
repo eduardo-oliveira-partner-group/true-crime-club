@@ -45,10 +45,11 @@ import {
   calculateShipping,
   getCart,
   getCartTotals,
+  getPlanById,
   removeCartItem,
   updateCartItemQuantity,
 } from '@/src/lib/domain/repositories'
-import type { Cart, CartItem } from '@/src/lib/domain/types'
+import type { Cart, CartItem, SubscriptionPlan } from '@/src/lib/domain/types'
 import { formatCurrency } from '@/src/lib/formatters'
 import { getProductImage } from '@/src/lib/product-images'
 import { cn } from '@/src/lib/utils'
@@ -57,6 +58,9 @@ const sampleZipCode = '05435-020'
 
 export default function CarrinhoPage() {
   const [cart, setCart] = useState<Cart | null>(null)
+  const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(
+    null,
+  )
   const [shipping, setShipping] = useState({
     price: 0,
     region: '',
@@ -64,10 +68,17 @@ export default function CarrinhoPage() {
   })
 
   useEffect(() => {
-    Promise.all([getCart(), calculateShipping(sampleZipCode)])
-      .then(([nextCart, nextShipping]) => {
+    const planId = new URLSearchParams(window.location.search).get('plano')
+
+    Promise.all([
+      getCart(),
+      calculateShipping(sampleZipCode),
+      planId ? getPlanById(planId) : Promise.resolve(null),
+    ])
+      .then(([nextCart, nextShipping, nextPlan]) => {
         setCart(nextCart)
         setShipping(nextShipping)
+        setSelectedPlan(nextPlan)
       })
       .catch(() => setCart(null))
   }, [])
@@ -75,12 +86,16 @@ export default function CarrinhoPage() {
   if (!cart) return <CartSkeleton />
 
   const totals = { ...cart, ...getCartTotals(cart) }
-  const grandTotal = totals.total + shipping.price
+  const hasSelectedPlan = selectedPlan !== null
+  const subtotal = hasSelectedPlan ? selectedPlan.price : totals.subtotal
+  const discount = hasSelectedPlan ? 0 : totals.discount
+  const grandTotal = subtotal - discount + shipping.price
   const itemCount = cart.items.reduce(
     (sum: number, item: CartItem) => sum + item.quantity,
     0,
   )
-  const dossierCode = `CART-${String(cart.items.length).padStart(2, '0')}`
+  const totalItemCount = itemCount + Number(hasSelectedPlan)
+  const dossierCode = `CART-${String(totalItemCount).padStart(2, '0')}`
 
   return (
     <DesignPageShell>
@@ -107,20 +122,29 @@ export default function CarrinhoPage() {
             >
               Seu carrinho
             </h1>
-            {cart.items.length > 0 ? (
+            {totalItemCount > 0 ? (
               <p className="rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-(--card) px-4 py-3 text-sm font-medium text-(--ink-soft)">
-                {itemCount}{' '}
-                {itemCount === 1 ? 'peça em análise' : 'peças em análise'}
+                {totalItemCount}{' '}
+                {totalItemCount === 1 ? 'item em análise' : 'itens em análise'}
               </p>
             ) : null}
           </div>
         </header>
 
-        {cart.items.length === 0 ? (
+        {totalItemCount === 0 ? (
           <EmptyCart />
         ) : (
           <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_0.42fr] lg:gap-10">
             <section aria-label="Itens do carrinho" className="space-y-4">
+              {selectedPlan ? (
+                <SelectedPlanLineItem
+                  plan={selectedPlan}
+                  onRemove={() => {
+                    window.history.replaceState(null, '', '/carrinho')
+                    setSelectedPlan(null)
+                  }}
+                />
+              ) : null}
               {cart.items.map((item: CartItem) => (
                 <CartLineItem key={item.id} item={item} />
               ))}
@@ -145,13 +169,14 @@ export default function CarrinhoPage() {
               className="lg:sticky lg:top-6 lg:self-start"
             >
               <OrderSummary
-                subtotal={totals.subtotal}
-                discount={totals.discount}
+                subtotal={subtotal}
+                discount={discount}
                 shipping={shipping.price}
                 shippingRegion={shipping.region}
                 shippingDays={shipping.estimatedDays}
                 total={grandTotal}
                 couponCode={cart.couponCode}
+                selectedPlan={selectedPlan}
               />
             </aside>
           </div>
@@ -201,6 +226,79 @@ function EmptyCart() {
         </Button>
       </EmptyContent>
     </Empty>
+  )
+}
+
+function SelectedPlanLineItem({
+  plan,
+  onRemove,
+}: {
+  plan: SubscriptionPlan
+  onRemove: () => void
+}) {
+  const intervalLabel =
+    plan.billingInterval === 'annual'
+      ? 'Assinatura anual'
+      : plan.billingInterval === 'monthly'
+        ? 'Assinatura mensal'
+        : 'Plano avulso'
+
+  return (
+    <article
+      className={cn(
+        dossierCardSurface,
+        cardShadowBase,
+        'relative isolate overflow-hidden border border-(--red)/30',
+      )}
+    >
+      <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:gap-5 sm:p-5">
+        <div className="flex size-16 shrink-0 items-center justify-center rounded-[10px] border border-(--red)/20 bg-(--red)/10 text-(--red)">
+          <IconClipboardText className="size-7" />
+        </div>
+        <div className="min-w-0 flex-1 space-y-1.5">
+          <p
+            className={cn(
+              fontMono,
+              'text-[0.68rem] font-bold tracking-[0.14em] text-(--red) uppercase',
+            )}
+          >
+            Plano de assinatura · {intervalLabel}
+          </p>
+          <h3
+            className={cn(
+              fontHeading,
+              'text-lg/tight font-semibold tracking-[-0.01em] text-(--ink)',
+            )}
+          >
+            {plan.name}
+          </h3>
+          <p className="text-sm text-(--ink-soft)">{plan.description}</p>
+        </div>
+        <div className="flex items-center justify-between gap-4 sm:flex-col sm:items-end">
+          <p
+            className={cn(
+              fontHeading,
+              'text-lg leading-none font-semibold text-(--ink)',
+            )}
+          >
+            {formatCurrency(plan.price)}
+          </p>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={onRemove}
+            className="h-8 gap-1.5 rounded-[9px] px-3 text-xs font-medium text-(--red) hover:bg-(--red)/10 hover:text-(--red-deep)"
+          >
+            <IconTrash className="size-4" />
+            Remover
+          </Button>
+        </div>
+      </div>
+      <p className="border-t border-dashed border-[rgba(33,28,24,0.18)] px-5 py-3 text-xs text-(--ink-soft)">
+        A assinatura será finalizada separadamente dos demais itens do carrinho.
+      </p>
+    </article>
   )
 }
 
@@ -417,6 +515,7 @@ function OrderSummary({
   shippingDays,
   total,
   couponCode,
+  selectedPlan,
 }: {
   subtotal: number
   discount: number
@@ -425,7 +524,12 @@ function OrderSummary({
   shippingDays: string
   total: number
   couponCode?: string
+  selectedPlan: SubscriptionPlan | null
 }) {
+  const checkoutHref = selectedPlan
+    ? `/checkout?plano=${encodeURIComponent(selectedPlan.id)}`
+    : '/checkout'
+
   return (
     <div
       className={cn(
@@ -449,7 +553,10 @@ function OrderSummary({
       </div>
 
       <div className="space-y-4 p-5 text-sm sm:p-6">
-        <SummaryRow label="Subtotal" value={formatCurrency(subtotal)} />
+        <SummaryRow
+          label={selectedPlan ? 'Plano selecionado' : 'Subtotal'}
+          value={formatCurrency(subtotal)}
+        />
         {discount > 0 ? (
           <SummaryRow
             label={`Desconto${couponCode ? ` · ${couponCode}` : ''}`}
@@ -506,7 +613,7 @@ function OrderSummary({
             'h-12 w-full justify-between rounded-[9px] border border-[rgba(33,28,24,0.15)] bg-(--red) px-5 text-[13px] font-bold tracking-[0.04em] text-[#fbf9f6] uppercase hover:-translate-y-0.5 hover:bg-(--red-deep) motion-reduce:hover:translate-y-0',
           )}
         >
-          <Link href="/checkout">
+          <Link href={checkoutHref}>
             Ir para checkout
             <IconArrowRight className="size-4" />
           </Link>

@@ -72,7 +72,6 @@ function StandardPlanCard({
   const isOneTime = plan.billingInterval === 'one_time'
   const tabLabel = isOneTime ? 'CASO ISOLADO' : 'MENSAL'
   const displayPrice = plan.pricePerMonth ?? plan.price
-  const ctaLabel = isOneTime ? 'Escolher plano' : 'Assinar mensal'
 
   return (
     <article
@@ -109,10 +108,10 @@ function StandardPlanCard({
       <div className="mb-[22px] h-[1.5px] [background:repeating-linear-gradient(90deg,rgba(33,28,24,0.18)_0,rgba(33,28,24,0.18)_5px,transparent_5px,transparent_9px)]" />
       <FeatureList color="#1AA587" items={plan.features} />
       <Link
-        href={`/checkout?plano=${plan.id}`}
+        href={`/carrinho?plano=${encodeURIComponent(plan.id)}`}
         className={`flex w-full items-center justify-center rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-transparent px-4 py-[15px] text-[14px] leading-none font-bold tracking-[0.04em] text-(--ink) uppercase no-underline ${transitionBgColor} hover:bg-(--ink) hover:text-[#fbf9f6] ${fontMono}`}
       >
-        {ctaLabel}
+        Assinar Mensal
       </Link>
     </article>
   )
@@ -167,10 +166,10 @@ function AnnualPlanCard({
         <div className="mb-[22px] h-[1.5px] [background:repeating-linear-gradient(90deg,rgba(255,255,255,0.28)_0,rgba(255,255,255,0.28)_5px,transparent_5px,transparent_9px)]" />
         <FeatureList color="#F4CF5A" items={plan.features} />
         <Link
-          href={`/checkout?plano=${plan.id}`}
+          href={`/carrinho?plano=${encodeURIComponent(plan.id)}`}
           className={`group flex w-full items-center justify-center rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-(--yellow) px-4 py-[15px] text-[14px] leading-none font-bold tracking-[0.04em] text-(--ink) uppercase no-underline ${transitionBgColor} hover:bg-[#fbf4e3] hover:text-(--purple) ${fontMono}`}
         >
-          Escolher plano{' '}
+          Assinar Anual{' '}
           <IconArrowRight
             size={16}
             stroke={2}
