@@ -281,60 +281,62 @@ export function ProductQuickView({
           </div>
         </motion.div>
 
-        <div className="relative z-20 flex flex-col bg-(--card) p-5 pb-32 sm:p-7 sm:pb-32 lg:min-h-0 lg:overflow-y-auto lg:p-9">
-          <div className="pr-14 sm:pr-16">
-            <ProductKicker product={product} showAvailability={false} />
-          </div>
-
-          <motion.h2
-            id={titleId}
-            layoutId={`box-title-${product.id}`}
-            className={`mt-6 text-3xl/tight font-semibold tracking-[-0.015em] text-(--ink) sm:text-4xl ${fontHeading}`}
-            transition={
-              reduceMotion
-                ? { duration: 0.01 }
-                : { type: 'tween', duration: 0.3, ease: 'easeOut' }
-            }
-          >
-            {product.name}
-          </motion.h2>
-
-          <div className="mt-5 grid gap-3 border-y border-[rgba(33,28,24,0.1)] py-5 text-sm text-(--ink-soft) sm:grid-cols-2">
-            {product.editionMonth ? (
-              <DetailDatum
-                icon={<IconCalendarEvent className="size-4" />}
-                label="Edição"
-                value={formatEditionMonth(product.editionMonth)}
-              />
-            ) : null}
-            <DetailDatum
-              icon={<IconPackage className="size-4" />}
-              label="Tipo"
-              value={product.type === 'box' ? 'Box avulsa' : 'Produto'}
-            />
-          </div>
-
-          <p className="mt-5 text-base/7 text-(--ink-soft)">
-            {product.description}
-          </p>
-
-          {product.includedItems?.length ? (
-            <div className="mt-7">
-              <p className="text-xs font-semibold tracking-[0.2em] text-(--amber) uppercase">
-                Conteúdo do arquivo
-              </p>
-              <ul className="mt-3 grid gap-2 text-sm/6 text-(--ink-soft)">
-                {product.includedItems.map((item) => (
-                  <li key={item} className="flex gap-3">
-                    <span className="mt-2 size-1.5 shrink-0 bg-[#b5332a]" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
+        <div className="relative z-20 flex flex-col bg-(--card) p-5 pb-32 sm:p-7 sm:pb-32 lg:h-full lg:min-h-0 lg:p-0">
+          <div className="min-h-0 flex-1 lg:overflow-y-auto lg:p-9 lg:pb-6">
+            <div className="pr-14 sm:pr-16">
+              <ProductKicker product={product} showAvailability={false} />
             </div>
-          ) : null}
 
-          <div className="mt-8 hidden flex-col gap-4 border-t border-[rgba(33,28,24,0.1)] pt-6 lg:flex xl:flex-row xl:items-end xl:justify-between">
+            <motion.h2
+              id={titleId}
+              layoutId={`box-title-${product.id}`}
+              className={`mt-6 text-3xl/tight font-semibold tracking-[-0.015em] text-(--ink) sm:text-4xl ${fontHeading}`}
+              transition={
+                reduceMotion
+                  ? { duration: 0.01 }
+                  : { type: 'tween', duration: 0.3, ease: 'easeOut' }
+              }
+            >
+              {product.name}
+            </motion.h2>
+
+            <div className="mt-5 grid gap-3 border-y border-[rgba(33,28,24,0.1)] py-5 text-sm text-(--ink-soft) sm:grid-cols-2">
+              {product.editionMonth ? (
+                <DetailDatum
+                  icon={<IconCalendarEvent className="size-4" />}
+                  label="Edição"
+                  value={formatEditionMonth(product.editionMonth)}
+                />
+              ) : null}
+              <DetailDatum
+                icon={<IconPackage className="size-4" />}
+                label="Tipo"
+                value={product.type === 'box' ? 'Box avulsa' : 'Produto'}
+              />
+            </div>
+
+            <p className="mt-5 text-base/7 text-(--ink-soft)">
+              {product.description}
+            </p>
+
+            {product.includedItems?.length ? (
+              <div className="mt-7">
+                <p className="text-xs font-semibold tracking-[0.2em] text-(--amber) uppercase">
+                  Conteúdo do arquivo
+                </p>
+                <ul className="mt-3 grid gap-2 text-sm/6 text-(--ink-soft)">
+                  {product.includedItems.map((item) => (
+                    <li key={item} className="flex gap-3">
+                      <span className="mt-2 size-1.5 shrink-0 bg-[#b5332a]" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+          </div>
+
+          <div className="mt-auto hidden shrink-0 flex-col gap-4 border-t border-[rgba(33,28,24,0.1)] px-9 pt-6 pb-9 lg:flex xl:flex-row xl:items-end xl:justify-between">
             <PriceBlock product={product} />
             <div className="flex w-full gap-3 xl:w-auto xl:min-w-88">
               <TooltipProvider delayDuration={150}>
