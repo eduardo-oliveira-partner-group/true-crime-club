@@ -44,6 +44,9 @@ interface ShopCatalogProps {
   extraProducts: Product[]
 }
 
+/** Reveals product cards as soon as 5% of the grid enters the viewport. */
+const productRevealAmount = 0.05
+
 /** Prioridade na listagem: disponíveis → em breve → esgotados. */
 const availabilitySortOrder: Record<AvailabilityStatus, number> = {
   available: 0,
@@ -136,6 +139,7 @@ export function ShopCatalog({ boxProducts, extraProducts }: ShopCatalogProps) {
             <ScrollRevealGroup
               className="grid items-stretch gap-[30px] sm:grid-cols-2 lg:grid-cols-3"
               staggerChildren={0.08}
+              amount={productRevealAmount}
             >
               {sortedBoxProducts.map((product) => {
                 const dimmed = isDimmed(product)
@@ -172,6 +176,7 @@ export function ShopCatalog({ boxProducts, extraProducts }: ShopCatalogProps) {
             <ScrollRevealGroup
               className="grid items-stretch gap-[30px] sm:grid-cols-2 lg:grid-cols-3"
               staggerChildren={0.08}
+              amount={productRevealAmount}
             >
               {sortedExtraProducts.map((product) => {
                 const dimmed = isDimmed(product)
