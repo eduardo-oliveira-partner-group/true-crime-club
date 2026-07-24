@@ -18,7 +18,6 @@ import {
   transitionBgColor,
   transitionCardHover,
 } from '@/src/lib/design/classes'
-import { getProductImage } from '@/src/lib/product-images'
 
 export function ArchiveBand() {
   const [archiveItems, setArchiveItems] = useState<LandingArchiveItem[]>([])
@@ -146,7 +145,7 @@ function ArchiveCard({
   index: number
 }) {
   const { ref, revealClassName, style } = useReveal(index * 80)
-  const image = getProductImage(box.imagePath)
+  const image = box.imageUrl
 
   return (
     <article
@@ -177,7 +176,6 @@ function ArchiveCard({
               alt={box.alt}
               fill
               sizes="(max-width: 540px) 100vw, (max-width: 860px) 50vw, 25vw"
-              style={{ objectPosition: box.objectPosition }}
               className="block object-cover"
             />
           ) : null}

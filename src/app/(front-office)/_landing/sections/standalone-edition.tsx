@@ -17,7 +17,6 @@ import {
 } from '@/src/lib/design/classes'
 import type { Product } from '@/src/lib/domain/types'
 import { formatCurrency } from '@/src/lib/formatters'
-import { getProductImage } from '@/src/lib/product-images'
 
 export function StandaloneEdition() {
   const [product, setProduct] = useState<Product | null>(null)
@@ -65,7 +64,7 @@ export function StandaloneEdition() {
 
   if (!product) return null
 
-  const productImage = getProductImage(product.images[0] ?? '')
+  const productImage = product.images[0]
   const fileLabel = product.editionMonth ?? product.slug
 
   return (
