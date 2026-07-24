@@ -94,6 +94,8 @@ interface ScrollRevealItemProps {
   className?: string
   duration?: number
   y?: number
+  /** Opacidade final ao revelar (padrão 1). Use < 1 para itens esgotados etc. */
+  opacity?: number
 }
 
 export function ScrollRevealItem({
@@ -101,13 +103,14 @@ export function ScrollRevealItem({
   className,
   duration = 0.55,
   y = 24,
+  opacity = 1,
 }: ScrollRevealItemProps) {
   return (
     <motion.div
       variants={{
         hidden: { opacity: 0, y },
         visible: {
-          opacity: 1,
+          opacity,
           y: 0,
           transition: { duration, ease },
         },

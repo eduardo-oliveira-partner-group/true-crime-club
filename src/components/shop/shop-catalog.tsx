@@ -34,7 +34,7 @@ import {
   sectionFrame,
   transitionCardHover,
 } from '@/src/lib/design/classes'
-import type { Product } from '@/src/lib/domain/types'
+import type { AvailabilityStatus, Product } from '@/src/lib/domain/types'
 import { formatAvailability, formatEditionMonth } from '@/src/lib/formatters'
 import { getProductImage } from '@/src/lib/product-images'
 import { cn } from '@/src/lib/utils'
@@ -44,12 +44,45 @@ interface ShopCatalogProps {
   extraProducts: Product[]
 }
 
+/** Prioridade na listagem: disponíveis → em breve → esgotados. */
+const availabilitySortOrder: Record<AvailabilityStatus, number> = {
+  available: 0,
+  limited: 0,
+  coming_soon: 1,
+  out_of_stock: 2,
+}
+
+/** Esgotado de verdade — não inclui "em breve" (também vem com emEstoque: false). */
+function isOutOfStock(product: Product) {
+  return (
+    product.availability === 'out_of_stock' ||
+    (!product.inStock && product.availability !== 'coming_soon')
+  )
+}
+
+/** Esgotados e "em breve" ficam com opacidade reduzida na grade. */
+function isDimmed(product: Product) {
+  return isOutOfStock(product) || product.availability === 'coming_soon'
+}
+
+function sortAvailableFirst(products: Product[]) {
+  return [...products].sort((a, b) => {
+    const byAvailability =
+      availabilitySortOrder[a.availability] -
+      availabilitySortOrder[b.availability]
+    if (byAvailability !== 0) return byAvailability
+    return Number(isOutOfStock(a)) - Number(isOutOfStock(b))
+  })
+}
+
 export function ShopCatalog({ boxProducts, extraProducts }: ShopCatalogProps) {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const shouldReduceMotion = useReducedMotion()
   const layoutGroupId = useId()
   const dialogTitleId = useId()
   const openScrollYRef = useRef(0)
+  const sortedBoxProducts = sortAvailableFirst(boxProducts)
+  const sortedExtraProducts = sortAvailableFirst(extraProducts)
 
   useLayoutEffect(() => {
     if (!selectedProduct) {
@@ -97,22 +130,29 @@ export function ShopCatalog({ boxProducts, extraProducts }: ShopCatalogProps) {
             description="Cada caixa carrega um recorte da coleção: pistas, objetos e conteúdos preparados para quem quer completar o arquivo ou entrar pelo caso que mais chama atenção."
           />
 
-          {boxProducts.length === 0 ? (
+          {sortedBoxProducts.length === 0 ? (
             <EmptyCatalog />
           ) : (
             <ScrollRevealGroup
               className="grid items-stretch gap-[30px] sm:grid-cols-2 lg:grid-cols-3"
               staggerChildren={0.08}
             >
-              {boxProducts.map((product) => (
-                <ScrollRevealItem key={product.id} className="h-full">
-                  <ProductArchiveCard
-                    product={product}
-                    variant="box"
-                    onOpen={() => openProduct(product)}
-                  />
-                </ScrollRevealItem>
-              ))}
+              {sortedBoxProducts.map((product) => {
+                const dimmed = isDimmed(product)
+                return (
+                  <ScrollRevealItem
+                    key={product.id}
+                    className={cn('h-full', dimmed && 'grayscale-[0.25]')}
+                    opacity={dimmed ? 0.45 : 1}
+                  >
+                    <ProductArchiveCard
+                      product={product}
+                      variant="box"
+                      onOpen={() => openProduct(product)}
+                    />
+                  </ScrollRevealItem>
+                )
+              })}
             </ScrollRevealGroup>
           )}
         </div>
@@ -126,22 +166,29 @@ export function ShopCatalog({ boxProducts, extraProducts }: ShopCatalogProps) {
             description="Produtos extras para registrar teorias, decorar o espaço e manter a experiência ativa entre uma box e outra."
           />
 
-          {extraProducts.length === 0 ? (
+          {sortedExtraProducts.length === 0 ? (
             <EmptyCatalog />
           ) : (
             <ScrollRevealGroup
               className="grid items-stretch gap-[30px] sm:grid-cols-2 lg:grid-cols-3"
               staggerChildren={0.08}
             >
-              {extraProducts.map((product) => (
-                <ScrollRevealItem key={product.id} className="h-full">
-                  <ProductArchiveCard
-                    product={product}
-                    variant="extra"
-                    onOpen={() => openProduct(product)}
-                  />
-                </ScrollRevealItem>
-              ))}
+              {sortedExtraProducts.map((product) => {
+                const dimmed = isDimmed(product)
+                return (
+                  <ScrollRevealItem
+                    key={product.id}
+                    className={cn('h-full', dimmed && 'grayscale-[0.25]')}
+                    opacity={dimmed ? 0.45 : 1}
+                  >
+                    <ProductArchiveCard
+                      product={product}
+                      variant="extra"
+                      onOpen={() => openProduct(product)}
+                    />
+                  </ScrollRevealItem>
+                )
+              })}
             </ScrollRevealGroup>
           )}
         </div>

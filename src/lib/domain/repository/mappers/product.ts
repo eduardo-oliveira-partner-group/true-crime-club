@@ -33,6 +33,10 @@ export function mapApiProductToDomain(apiProduct: ApiProduct): Product {
     produto: 'product',
   }
 
+  const disponibilidade = (apiProduct.disponibilidade ?? '')
+    .trim()
+    .toLowerCase()
+
   return {
     id: apiProduct.id,
     slug: apiProduct.identificador,
@@ -45,8 +49,7 @@ export function mapApiProductToDomain(apiProduct: ApiProduct): Product {
     images: apiProduct.imagens ?? [],
     categories: apiProduct.categorias ?? [],
     inStock: apiProduct.emEstoque ?? false,
-    availability:
-      availabilityMap[apiProduct.disponibilidade ?? ''] ?? 'available',
+    availability: availabilityMap[disponibilidade] ?? 'available',
     featured:
       apiProduct.categorias?.includes('destaque') ||
       apiProduct.destaque ||
