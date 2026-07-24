@@ -11,8 +11,9 @@ export const authApi = {
     password: string
     document: string
     phone: string
-  }) =>
-    fetcher('/clientes', {
+  }) => {
+    // Sucesso vem do envelope ({ sucesso: true, data: null, ... }).
+    await fetcher('/clientes', {
       method: 'POST',
       body: JSON.stringify({
         nome: body.name,
@@ -21,22 +22,16 @@ export const authApi = {
         documento: normalizeDigits(body.document),
         telefone: normalizeDigits(body.phone),
       }),
-    }).then((data) => {
-      return {
-        ...data,
-        cliente: data.cliente ? toCustomer(data.cliente) : undefined,
-      }
-    }),
-  login: async (body: { email: string; password: string }) =>
-    fetcher('/autenticacao/entrar', {
+    })
+  },
+  login: async (body: { email: string; password: string }) => {
+    // Envelope: { data: null, sucesso: true, ... }. Sessão via cookie.
+    // O fetcher já valida sucesso/erros; data null não é usado.
+    await fetcher('/autenticacao/entrar', {
       method: 'POST',
       body: JSON.stringify({ email: body.email, senha: body.password }),
-    }).then((data) => {
-      return {
-        ...data,
-        cliente: data.cliente ? toCustomer(data.cliente) : undefined,
-      }
-    }),
+    })
+  },
   recoverPassword: (body: { email: string }) =>
     fetcher('/clientes/recuperar-senha', {
       method: 'POST',
@@ -44,7 +39,6 @@ export const authApi = {
     }),
   logout: async () => {
     await fetcher('/autenticacao/sair', { method: 'POST' })
-    return { sucesso: true }
   },
   me: () =>
     fetcher('/autenticacao/cliente-atual')

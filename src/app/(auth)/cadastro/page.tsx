@@ -2,7 +2,7 @@
 
 import { IconArrowRight } from '@tabler/icons-react'
 import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { FormEvent, Suspense, useState } from 'react'
 
 import {
@@ -23,9 +23,9 @@ import {
   normalizeDigits,
 } from '@/src/lib/formatters'
 
-function safeNextPath(raw: string | null): string | null {
+function safeNextPath(raw: string | null): string {
   if (!raw || !raw.startsWith('/') || raw.startsWith('//')) {
-    return null
+    return '/cliente/perfil'
   }
 
   const pathname = raw.split(/[?#]/, 1)[0] ?? raw
@@ -34,7 +34,7 @@ function safeNextPath(raw: string | null): string | null {
     pathname === '/cadastro' ||
     pathname === '/recuperar-senha'
   ) {
-    return null
+    return '/cliente/perfil'
   }
 
   return raw
@@ -58,12 +58,12 @@ function CadastroForm() {
     phone?: string
     general?: string
   }>({})
-  const router = useRouter()
   const searchParams = useSearchParams()
   const nextPath = safeNextPath(searchParams.get('next'))
-  const loginHref = nextPath
-    ? `/login?next=${encodeURIComponent(nextPath)}`
-    : '/login'
+  const loginHref =
+    nextPath === '/cliente/perfil'
+      ? '/login'
+      : `/login?next=${encodeURIComponent(nextPath)}`
 
   const handleRegister = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -127,11 +127,14 @@ function CadastroForm() {
         phone: normalizeDigits(phoneValue),
       })
 
-      setIsSuccess(true)
+      await apiClient.auth.login({
+        email: emailValue,
+        password: passwordValue,
+      })
+      await apiClient.auth.me()
 
-      setTimeout(() => {
-        router.replace(loginHref)
-      }, 800)
+      setIsSuccess(true)
+      window.location.assign(nextPath)
     } catch (err) {
       console.error(err)
       const message =
@@ -157,13 +160,13 @@ function CadastroForm() {
       <AuthFormMeta left="CLUB · CADASTRO" right="Novo dossiê" />
 
       <p className="mt-4 text-sm/6 text-(--ink-soft)">
-        Informe seus dados para criar seu cadastro. Você entrará após confirmar
-        o login.
+        Informe seus dados para criar seu cadastro. Ao concluir, você já entra
+        no seu dossiê.
       </p>
 
       {isSuccess ? (
         <div className="mt-4 rounded-lg border border-(--teal)/20 bg-(--teal)/10 p-3 [font-family:var(--design-font-body)] text-xs font-medium text-(--teal)">
-          Conta criada com sucesso! Redirecionando para o login...
+          Conta criada com sucesso! Entrando no arquivo...
         </div>
       ) : null}
 
@@ -244,7 +247,7 @@ function CadastroForm() {
         />
         <DesignFormButton disabled={isLoading || isSuccess}>
           {isLoading
-            ? 'Registrando informações...'
+            ? 'Abrindo seu dossiê...'
             : isSuccess
               ? 'Acesso liberado!'
               : 'Abrir meu dossiê'}
