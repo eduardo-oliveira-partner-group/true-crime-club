@@ -204,7 +204,11 @@ export default function CarrinhoPage() {
                 />
               ) : null}
               {cart.items.map((item: CartItem) => (
-                <CartLineItem key={item.id} item={item} />
+                <CartLineItem
+                  key={item.id}
+                  item={item}
+                  onCartChange={setCart}
+                />
               ))}
 
               <Link
@@ -362,6 +366,7 @@ function SelectedPlanLineItem({
 
 function CartLineItem({
   item,
+  onCartChange,
 }: {
   item: {
     id: string
@@ -372,6 +377,7 @@ function CartLineItem({
     unitPrice: number
     image?: string
   }
+  onCartChange: (cart: Cart) => void
 }) {
   const productImage = getProductImage(item.image ?? '')
   const lineTotal = item.unitPrice * item.quantity
@@ -459,7 +465,11 @@ function CartLineItem({
           </div>
 
           <div className="mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-dashed border-[rgba(33,28,24,0.18)] pt-4">
-            <QuantityControls itemId={item.id} quantity={item.quantity} />
+            <QuantityControls
+              itemId={item.id}
+              quantity={item.quantity}
+              onCartChange={onCartChange}
+            />
             <div>
               <Button
                 type="button"
@@ -500,12 +510,28 @@ function CartLineItem({
 function QuantityControls({
   itemId,
   quantity,
+  onCartChange,
 }: {
   itemId: string
   quantity: number
+  onCartChange: (cart: Cart) => void
 }) {
+  const [updating, setUpdating] = useState(false)
   const baseButton =
     'flex size-8 items-center justify-center rounded-[9px] border border-[rgba(33,28,24,0.15)] bg-(--card) text-(--ink) transition hover:border-(--red) hover:text-(--red) disabled:pointer-events-none disabled:opacity-40'
+
+  const changeQuantity = async (nextQuantity: number) => {
+    if (updating || nextQuantity < 1) return
+    setUpdating(true)
+    try {
+      const nextCart = await updateCartItemQuantity(itemId, nextQuantity)
+      onCartChange(nextCart)
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setUpdating(false)
+    }
+  }
 
   return (
     <div className="inline-flex items-center gap-2">
@@ -523,14 +549,10 @@ function QuantityControls({
             type="button"
             variant="outline"
             size="icon-sm"
-            onClick={() =>
-              updateCartItemQuantity(itemId, Math.max(quantity - 1, 1)).then(
-                () => window.location.reload(),
-              )
-            }
+            onClick={() => changeQuantity(quantity - 1)}
             aria-label="Diminuir quantidade"
             className={baseButton}
-            disabled={quantity <= 1}
+            disabled={updating || quantity <= 1}
           >
             <IconMinus className="size-3.5" />
           </Button>
@@ -549,13 +571,10 @@ function QuantityControls({
             type="button"
             variant="outline"
             size="icon-sm"
-            onClick={() =>
-              updateCartItemQuantity(itemId, quantity + 1).then(() =>
-                window.location.reload(),
-              )
-            }
+            onClick={() => changeQuantity(quantity + 1)}
             aria-label="Aumentar quantidade"
             className={baseButton}
+            disabled={updating}
           >
             <IconPlus className="size-3.5" />
           </Button>
