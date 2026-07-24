@@ -50,7 +50,7 @@ export function ProductDetailActions({
       <Button
         asChild
         variant="outline"
-        className={`h-12 rounded-[10px] border-[#211c18]/18 bg-(--paper-soft) text-(--ink) hover:bg-(--ink) ${fontMono}`}
+        className={`h-12 rounded-[10px] border-[#211c18]/18 bg-(--paper-soft) text-(--ink) hover:border-(--red)/45 hover:bg-(--red)/10 hover:text-(--red) ${fontMono}`}
       >
         <Link href="/loja">Voltar à loja</Link>
       </Button>

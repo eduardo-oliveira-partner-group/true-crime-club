@@ -35,7 +35,7 @@ export function ProductDetailPricing({
           Assinantes do clube têm preço reduzido.{' '}
           <Link
             href="/assinatura"
-            className="font-medium text-(--red) underline-offset-4 transition hover:text-[#f4d891] hover:underline"
+            className="font-medium text-(--red) underline-offset-4 transition-colors hover:text-(--red-deep) hover:underline"
           >
             Conheça os planos
           </Link>

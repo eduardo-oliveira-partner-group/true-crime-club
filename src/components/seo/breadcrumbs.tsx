@@ -31,7 +31,7 @@ export function Breadcrumbs({ items, className }: BreadcrumbsProps) {
     <>
       <nav
         aria-label="Trilha de navegação"
-        className={cn('text-sm text-[#d7c9b5]', className)}
+        className={cn('text-sm text-(--ink-soft)', className)}
       >
         <ol className="flex flex-wrap items-center gap-2">
           {items.map((item, index) => {
@@ -39,18 +39,23 @@ export function Breadcrumbs({ items, className }: BreadcrumbsProps) {
             return (
               <li key={item.path} className="flex items-center gap-2">
                 {isLast ? (
-                  <span aria-current="page" className="text-[#fffaf0]">
+                  <span
+                    aria-current="page"
+                    className="font-medium text-(--ink)"
+                  >
                     {item.name}
                   </span>
                 ) : (
                   <Link
                     href={item.path}
-                    className="transition hover:text-[#d7b56d]"
+                    className="transition-colors hover:text-(--red)"
                   >
                     {item.name}
                   </Link>
                 )}
-                {!isLast ? <span className="text-[#d7c9b5]/50">/</span> : null}
+                {!isLast ? (
+                  <span className="text-(--ink-mute)/55">/</span>
+                ) : null}
               </li>
             )
           })}

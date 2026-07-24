@@ -29,7 +29,7 @@ export function ProductDetailGallery({ product }: ProductDetailGalleryProps) {
         ) : (
           <EvidencePlaceholder product={product} />
         )}
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(9,8,7,0.02)_0%,rgba(9,8,7,0.48)_100%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(33,28,24,0.01)_0%,rgba(33,28,24,0.18)_100%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,250,240,0.035)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.035)_1px,transparent_1px)] bg-size-[34px_34px]" />
 
         {product.type === 'box' ? (
@@ -78,12 +78,14 @@ export function ProductDetailGallery({ product }: ProductDetailGalleryProps) {
 
 function EvidencePlaceholder({ product }: { product: Product }) {
   return (
-    <div className="absolute inset-0 flex items-center justify-center bg-[#120f0d]">
-      <div className="absolute inset-6 rounded-[10px] border border-[#d7b56d]/20" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_38%,rgba(216,65,50,0.16),transparent_28%),radial-gradient(circle_at_48%_58%,rgba(215,181,109,0.12),transparent_32%)]" />
+    <div className="absolute inset-0 flex items-center justify-center bg-(--card)">
+      <div className="absolute inset-6 border border-[rgba(33,28,24,0.15)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_38%,rgba(197,39,31,0.1),transparent_28%),radial-gradient(circle_at_48%_58%,rgba(26,165,135,0.08),transparent_32%)]" />
       <div className="relative z-10 flex flex-col items-center text-center">
         <IconSparkles className="size-9 text-(--red)" />
-        <p className="mt-3 max-w-44 text-xs font-semibold tracking-[0.18em] text-(--ink) uppercase">
+        <p
+          className={`mt-3 max-w-44 text-xs tracking-[0.14em] text-(--ink) uppercase ${fontType}`}
+        >
           {product.categories[0] ?? 'item'} do arquivo
         </p>
       </div>

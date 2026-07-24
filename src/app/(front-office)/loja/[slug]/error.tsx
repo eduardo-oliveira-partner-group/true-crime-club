@@ -39,7 +39,11 @@ export default function Error({
         >
           Tentar novamente
         </Button>
-        <Button asChild variant="outline" className="rounded-[9px]">
+        <Button
+          asChild
+          variant="outline"
+          className="rounded-[9px] border-[rgba(33,28,24,0.18)] bg-(--paper-soft) text-(--ink) hover:border-(--red)/45 hover:bg-(--red)/10 hover:text-(--red)"
+        >
           <Link href="/loja">Voltar à loja</Link>
         </Button>
       </div>

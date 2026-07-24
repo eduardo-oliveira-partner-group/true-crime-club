@@ -18,7 +18,11 @@ export default function NotFound() {
           >
             <Link href="/loja">Ver loja completa</Link>
           </Button>
-          <Button asChild variant="outline" className="rounded-[9px]">
+          <Button
+            asChild
+            variant="outline"
+            className="rounded-[9px] border-[rgba(33,28,24,0.18)] bg-(--paper-soft) text-(--ink) hover:border-(--red)/45 hover:bg-(--red)/10 hover:text-(--red)"
+          >
             <Link href="/">Voltar à home</Link>
           </Button>
         </>
