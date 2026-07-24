@@ -18,6 +18,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { DesignPageShell } from '@/src/components/public-design/design-page-shell'
 import { Button } from '@/src/components/ui/button'
 import { ConfirmationSkeleton } from '@/src/components/ui/page-loading-skeletons'
+import { useCheckoutPaymentWs } from '@/src/hooks/use-checkout-payment-ws'
 import {
   dossierCardSurface,
   fontHeading,
@@ -35,7 +36,6 @@ import {
 } from '@/src/lib/formatters'
 import { getProductImage } from '@/src/lib/product-images'
 import { cn } from '@/src/lib/utils'
-import { useCheckoutPaymentWs } from '@/src/hooks/use-checkout-payment-ws'
 
 export default function ConfirmacaoPage() {
   const searchParams = useSearchParams()
@@ -208,7 +208,9 @@ export default function ConfirmacaoPage() {
               orderStatus={formatOrderStatus(order.status)}
               paymentStatus={formatPaymentStatus(order.paymentStatus)}
               createdAt={formatDateTime(order.createdAt)}
-              pixPending={Boolean(pixPayment) || order.paymentStatus === 'pending'}
+              pixPending={
+                Boolean(pixPayment) || order.paymentStatus === 'pending'
+              }
             />
 
             {pixPayment ? (

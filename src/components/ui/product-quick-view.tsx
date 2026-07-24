@@ -20,6 +20,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/src/components/ui/tooltip'
+import { addCartItemRequiringAuth } from '@/src/lib/add-to-cart'
 import {
   cardShadowBase,
   fontHeading,
@@ -27,7 +28,6 @@ import {
   fontType,
 } from '@/src/lib/design/classes'
 import { designTokens } from '@/src/lib/design/tokens'
-import { addCartItem } from '@/src/lib/domain/repositories'
 import type { Product } from '@/src/lib/domain/types'
 import {
   formatAvailability,
@@ -178,7 +178,7 @@ export function ProductQuickView({
     if (!product.inStock || isAdding) return
     setIsAdding(true)
     try {
-      await addCartItem({ productId: product.id })
+      await addCartItemRequiringAuth(product.id)
     } catch (error) {
       console.error(error)
     } finally {

@@ -286,8 +286,7 @@ export default function CheckoutPage() {
                 Finalize seu ingresso no clube
               </h1>
               <p className="max-w-xl text-sm/6 text-(--ink-soft)">
-                Confira endereço, frete e pagamento antes de confirmar o
-                pedido.
+                Confira endereço, frete e pagamento antes de confirmar o pedido.
               </p>
             </div>
             {plan ? (

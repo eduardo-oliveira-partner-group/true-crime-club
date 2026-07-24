@@ -81,8 +81,9 @@ export async function calculateShipping(
     : []
 
   const preferred =
-    shippingOptions.find((option) => option.sessionId === apiResult.sessionId) ??
-    shippingOptions[0]
+    shippingOptions.find(
+      (option) => option.sessionId === apiResult.sessionId,
+    ) ?? shippingOptions[0]
 
   const fallbackDays = apiResult.prazoEstimado
     ? String(apiResult.prazoEstimado)

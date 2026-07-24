@@ -13,6 +13,7 @@ import {
 } from '@tabler/icons-react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 import { DesignPageShell } from '@/src/components/public-design/design-page-shell'
@@ -29,6 +30,7 @@ import {
 } from '@/src/components/ui/empty'
 import { Input } from '@/src/components/ui/input'
 import { CartSkeleton } from '@/src/components/ui/page-loading-skeletons'
+import { apiClient, ApiClientError } from '@/src/lib/api-client'
 import {
   arrowIconClass,
   buttonLiftShadow,
@@ -41,6 +43,7 @@ import {
   transitionColors,
 } from '@/src/lib/design/classes'
 import {
+  addCartItem,
   applyCoupon,
   calculateShipping,
   getCart,
@@ -49,39 +52,94 @@ import {
   removeCartItem,
   updateCartItemQuantity,
 } from '@/src/lib/domain/repositories'
+import { emptyCart } from '@/src/lib/domain/repository/core/helpers'
 import type { Cart, CartItem, SubscriptionPlan } from '@/src/lib/domain/types'
 import { formatCurrency } from '@/src/lib/formatters'
 import { getProductImage } from '@/src/lib/product-images'
 import { cn } from '@/src/lib/utils'
 
 const sampleZipCode = '05435-020'
+const emptyShipping = { price: 0, region: '', estimatedDays: '' }
+
+function isAuthError(error: unknown): boolean {
+  return (
+    error instanceof ApiClientError &&
+    (error.status === 401 || error.status === 403)
+  )
+}
 
 export default function CarrinhoPage() {
+  const router = useRouter()
   const [cart, setCart] = useState<Cart | null>(null)
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(
     null,
   )
-  const [shipping, setShipping] = useState({
-    price: 0,
-    region: '',
-    estimatedDays: '',
-  })
+  const [shipping, setShipping] = useState(emptyShipping)
 
   useEffect(() => {
-    const planId = new URLSearchParams(window.location.search).get('plano')
+    let cancelled = false
 
-    Promise.all([
-      getCart(),
-      calculateShipping(sampleZipCode),
-      planId ? getPlanById(planId) : Promise.resolve(null),
-    ])
-      .then(([nextCart, nextShipping, nextPlan]) => {
+    const redirectToLogin = () => {
+      const next = encodeURIComponent(
+        window.location.pathname + window.location.search,
+      )
+      router.replace(`/login?next=${next}`)
+    }
+
+    const searchParams = new URLSearchParams(window.location.search)
+    const planId = searchParams.get('plano')
+    const productToAdd = searchParams.get('adicionar')
+
+    apiClient.auth
+      .me()
+      .then(async () => {
+        if (cancelled) return
+
+        if (productToAdd) {
+          try {
+            await addCartItem({ productId: productToAdd })
+          } catch (error) {
+            if (isAuthError(error)) throw error
+            console.error(error)
+          }
+          if (cancelled) return
+
+          const cleaned = new URLSearchParams(searchParams)
+          cleaned.delete('adicionar')
+          const query = cleaned.toString()
+          window.history.replaceState(
+            null,
+            '',
+            query ? `/carrinho?${query}` : '/carrinho',
+          )
+        }
+
+        return Promise.all([
+          getCart(),
+          calculateShipping(sampleZipCode).catch(() => emptyShipping),
+          planId ? getPlanById(planId) : Promise.resolve(null),
+        ])
+      })
+      .then((result) => {
+        if (cancelled || !result) return
+        const [nextCart, nextShipping, nextPlan] = result
         setCart(nextCart)
         setShipping(nextShipping)
         setSelectedPlan(nextPlan)
       })
-      .catch(() => setCart(null))
-  }, [])
+      .catch((error: unknown) => {
+        if (cancelled) return
+        if (isAuthError(error)) {
+          redirectToLogin()
+          return
+        }
+        setCart(emptyCart())
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [router])
 
   if (!cart) return <CartSkeleton />
 

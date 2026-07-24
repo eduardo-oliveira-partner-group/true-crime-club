@@ -1,6 +1,6 @@
 import { fetcher } from '../core/fetcher'
-import { toPaymentMethod } from '../mappers/payment'
 import { asArray } from '../core/json'
+import { toPaymentMethod } from '../mappers/payment'
 
 export const checkoutApi = {
   listPaymentMethods: () =>

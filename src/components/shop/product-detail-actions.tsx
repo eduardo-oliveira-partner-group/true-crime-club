@@ -5,8 +5,8 @@ import Link from 'next/link'
 import { useState } from 'react'
 
 import { Button } from '@/src/components/ui/button'
+import { addCartItemRequiringAuth } from '@/src/lib/add-to-cart'
 import { fontMono } from '@/src/lib/design/classes'
-import { addCartItem } from '@/src/lib/domain/repositories'
 
 interface ProductDetailActionsProps {
   productId: string
@@ -24,7 +24,7 @@ export function ProductDetailActions({
 
     setIsAdding(true)
     try {
-      await addCartItem({ productId })
+      await addCartItemRequiringAuth(productId)
     } catch (error) {
       console.error(error)
     } finally {
