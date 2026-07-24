@@ -428,7 +428,7 @@ export default function CasosPage() {
                       className={`${styles.stageEnter} flex flex-1 flex-col items-center justify-center py-8`}
                     >
                       <div
-                        className={`${styles.terminalWindow} flex w-full max-w-md flex-col items-center p-6 sm:p-12`}
+                        className={`${styles.terminalWindow} flex w-full max-w-5xl flex-col items-center p-6 sm:p-10`}
                       >
                         <span
                           className={`${styles.cornerMarker} ${styles.cornerMarkerTL}`}
@@ -452,14 +452,14 @@ export default function CasosPage() {
                             NENHUM CASO DISPONÍVEL PARA ESTE USUÁRIO.
                           </p>
                         ) : (
-                          <div className="flex w-full flex-col gap-4">
+                          <div className="grid w-full grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8 lg:grid-cols-3">
                             {cases.map((caseSummary) => (
                               <button
                                 key={caseSummary.id}
                                 onClick={() =>
                                   void handleSelectCase(caseSummary)
                                 }
-                                className="group flex cursor-pointer flex-col items-center justify-center focus:outline-none"
+                                className="group flex min-w-0 cursor-pointer flex-col items-center justify-center focus:outline-none"
                               >
                                 <div className={`${styles.iconBrackets} mb-2`}>
                                   <img
@@ -468,7 +468,7 @@ export default function CasosPage() {
                                     className="size-16 object-contain transition-transform group-hover:scale-105"
                                   />
                                 </div>
-                                <span className="mt-2 text-center text-xl font-bold tracking-widest uppercase group-hover:underline">
+                                <span className="mt-2 text-center text-base font-bold tracking-widest uppercase group-hover:underline sm:text-lg">
                                   {caseSummary.title}
                                 </span>
                               </button>
