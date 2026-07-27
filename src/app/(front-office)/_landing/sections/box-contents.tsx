@@ -31,15 +31,12 @@ export function BoxContents() {
             aria-hidden="true"
           >
             {[0, 1, 2].map((i) => (
-              <motion.line
+              <line
                 key={i}
-                animate={{
-                  x1: boardPinOffsets[i],
-                  y1: hoveredBoxIndex === i ? '19px' : '29px',
-                  x2: boardPinOffsets[i + 1],
-                  y2: hoveredBoxIndex === i + 1 ? '19px' : '29px',
-                }}
-                transition={SPRING_TRANSITION}
+                x1={boardPinOffsets[i]}
+                y1={hoveredBoxIndex === i ? '19px' : '29px'}
+                x2={boardPinOffsets[i + 1]}
+                y2={hoveredBoxIndex === i + 1 ? '19px' : '29px'}
                 stroke="var(--red)"
                 strokeWidth="2"
                 strokeDasharray="7 4"

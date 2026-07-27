@@ -40,6 +40,21 @@ const SPRING_TRANSITION = {
 export function CorkboardTimeline({ steps }: CorkboardTimelineProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
 
+  const pinX = [
+    `calc(16.6% - ${hoveredIndex === 0 ? 0 : 4}px)`,
+    `calc(50% + ${hoveredIndex === 1 ? 0 : 3}px)`,
+    `calc(83.4% - ${hoveredIndex === 2 ? 0 : 3}px)`,
+  ] as const
+  const pinY = [
+    hoveredIndex === 0 ? '-0.625rem' : '0rem',
+    hoveredIndex === 1 ? '-0.625rem' : '0rem',
+    hoveredIndex === 2 ? '-0.625rem' : '0rem',
+  ] as const
+  const lineSegments = [
+    { x1: pinX[0], y1: pinY[0], x2: pinX[1], y2: pinY[1] },
+    { x1: pinX[1], y1: pinY[1], x2: pinX[2], y2: pinY[2] },
+  ]
+
   return (
     <div className="relative mx-auto max-w-5xl">
       {/* 
@@ -52,42 +67,27 @@ export function CorkboardTimeline({ steps }: CorkboardTimelineProps) {
         className="pointer-events-none absolute inset-x-0 top-0 z-10 hidden h-1 overflow-visible opacity-45 md:block"
         aria-hidden="true"
       >
-        <motion.line
-          animate={{
-            x1: `calc(16.6% - ${hoveredIndex === 0 ? 0 : 4}px)`,
-            y1: hoveredIndex === 0 ? '-0.625rem' : '0rem',
-            x2: `calc(50% + ${hoveredIndex === 1 ? 0 : 3}px)`,
-            y2: hoveredIndex === 1 ? '-0.625rem' : '0rem',
-          }}
-          transition={SPRING_TRANSITION}
-          stroke="#C5271F"
-          strokeWidth="2"
-          strokeDasharray="7 4"
-        />
-        <motion.line
-          animate={{
-            x1: `calc(50% + ${hoveredIndex === 1 ? 0 : 3}px)`,
-            y1: hoveredIndex === 1 ? '-0.625rem' : '0rem',
-            x2: `calc(83.4% - ${hoveredIndex === 2 ? 0 : 3}px)`,
-            y2: hoveredIndex === 2 ? '-0.625rem' : '0rem',
-          }}
-          transition={SPRING_TRANSITION}
-          stroke="#C5271F"
-          strokeWidth="2"
-          strokeDasharray="7 4"
-        />
+        {lineSegments.map((segment, index) => (
+          <motion.line
+            key={index}
+            x1={segment.x1}
+            y1={segment.y1}
+            x2={segment.x2}
+            y2={segment.y2}
+            animate={segment}
+            transition={SPRING_TRANSITION}
+            stroke="#C5271F"
+            strokeWidth="2"
+            strokeDasharray="7 4"
+          />
+        ))}
       </svg>
 
       {/* Pins Rendered in Parent (Desktop only, layered above SVG line at z-20) */}
       {steps.map((step, index) => {
         const stepColor = STEP_COLORS[index] ?? '#C5271F'
-        const x =
-          index === 0
-            ? `calc(16.6% - ${hoveredIndex === 0 ? 0 : 4}px)`
-            : index === 1
-              ? `calc(50% + ${hoveredIndex === 1 ? 0 : 3}px)`
-              : `calc(83.4% - ${hoveredIndex === 2 ? 0 : 3}px)`
-        const y = hoveredIndex === index ? '-0.625rem' : '0rem'
+        const x = pinX[index] ?? pinX[0]
+        const y = pinY[index] ?? pinY[0]
 
         return (
           <motion.div
