@@ -1,14 +1,8 @@
 'use client'
 
 import { IconArrowRight, IconSparkles } from '@tabler/icons-react'
-import {
-  AnimatePresence,
-  LayoutGroup,
-  motion,
-  useReducedMotion,
-} from 'motion/react'
 import Image from 'next/image'
-import { useId, useLayoutEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 
 import { SectionEyebrow } from '@/src/components/public-design/section-eyebrow'
 import {
@@ -80,51 +74,11 @@ function sortAvailableFirst(products: Product[]) {
 
 export function ShopCatalog({ boxProducts, extraProducts }: ShopCatalogProps) {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
-  const shouldReduceMotion = useReducedMotion()
-  const layoutGroupId = useId()
-  const dialogTitleId = useId()
-  const openScrollYRef = useRef(0)
   const sortedBoxProducts = sortAvailableFirst(boxProducts)
   const sortedExtraProducts = sortAvailableFirst(extraProducts)
 
-  useLayoutEffect(() => {
-    if (!selectedProduct) {
-      return
-    }
-
-    const previousBodyPaddingRight = document.body.style.paddingRight
-    const previousDocumentOverflow = document.documentElement.style.overflow
-    const scrollbarWidth =
-      window.innerWidth - document.documentElement.clientWidth
-
-    document.documentElement.style.overflow = 'hidden'
-    document.body.style.paddingRight =
-      scrollbarWidth > 0 ? `${scrollbarWidth}px` : previousBodyPaddingRight
-    window.scrollTo(0, openScrollYRef.current)
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setSelectedProduct(null)
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
-
-    return () => {
-      document.body.style.paddingRight = previousBodyPaddingRight
-      document.documentElement.style.overflow = previousDocumentOverflow
-      window.scrollTo(0, openScrollYRef.current)
-      window.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [selectedProduct])
-
-  const openProduct = (product: Product) => {
-    openScrollYRef.current = window.scrollY
-    setSelectedProduct(product)
-  }
-
   return (
-    <LayoutGroup id={layoutGroupId}>
+    <>
       <section className="relative isolate overflow-hidden border-b border-[rgba(33,28,24,0.15)] bg-(--card)">
         <div className={`${sectionFrame} relative z-10 py-14 lg:py-20`}>
           <SectionHeader
@@ -152,7 +106,7 @@ export function ShopCatalog({ boxProducts, extraProducts }: ShopCatalogProps) {
                     <ProductArchiveCard
                       product={product}
                       variant="box"
-                      onOpen={() => openProduct(product)}
+                      onOpen={() => setSelectedProduct(product)}
                     />
                   </ScrollRevealItem>
                 )
@@ -189,7 +143,7 @@ export function ShopCatalog({ boxProducts, extraProducts }: ShopCatalogProps) {
                     <ProductArchiveCard
                       product={product}
                       variant="extra"
-                      onOpen={() => openProduct(product)}
+                      onOpen={() => setSelectedProduct(product)}
                     />
                   </ScrollRevealItem>
                 )
@@ -199,18 +153,14 @@ export function ShopCatalog({ boxProducts, extraProducts }: ShopCatalogProps) {
         </div>
       </section>
 
-      <AnimatePresence>
-        {selectedProduct ? (
-          <ProductQuickView
-            key={selectedProduct.id}
-            product={selectedProduct}
-            titleId={dialogTitleId}
-            reduceMotion={Boolean(shouldReduceMotion)}
-            onClose={() => setSelectedProduct(null)}
-          />
-        ) : null}
-      </AnimatePresence>
-    </LayoutGroup>
+      <ProductQuickView
+        product={selectedProduct}
+        open={selectedProduct !== null}
+        onOpenChange={(open) => {
+          if (!open) setSelectedProduct(null)
+        }}
+      />
+    </>
   )
 }
 
@@ -270,9 +220,8 @@ function ProductArchiveCard({
       : 'rotate-[-2.5deg] origin-bottom-left left-4'
 
   return (
-    <motion.button
+    <button
       type="button"
-      layoutId={`box-shell-${product.id}`}
       onClick={onOpen}
       className={cn(
         'group relative block size-full cursor-pointer appearance-none border-0 bg-transparent p-0 pt-[25px] text-left text-inherit focus-visible:ring-2 focus-visible:ring-(--red) focus-visible:ring-offset-2 focus-visible:ring-offset-(--paper) focus-visible:outline-none',
@@ -315,10 +264,7 @@ function ProductArchiveCard({
           {formatAvailability(product.availability)}
         </div>
 
-        <motion.div
-          layoutId={`box-image-${product.id}`}
-          className="relative aspect-square w-full shrink-0 overflow-hidden border-b border-[rgba(33,28,24,0.15)] bg-(--card)"
-        >
+        <div className="relative aspect-square w-full shrink-0 overflow-hidden border-b border-[rgba(33,28,24,0.15)] bg-(--card)">
           {productImage ? (
             <Image
               src={productImage}
@@ -331,7 +277,7 @@ function ProductArchiveCard({
           ) : (
             <EvidencePlaceholder product={product} />
           )}
-        </motion.div>
+        </div>
 
         <div className="relative z-20 flex w-full flex-1 flex-col px-4 pt-4 pb-[18px]">
           <div
@@ -339,12 +285,11 @@ function ProductArchiveCard({
           >
             {detailLabel}
           </div>
-          <motion.h3
-            layoutId={`box-title-${product.id}`}
+          <h3
             className={`m-0 mb-3 line-clamp-2 min-h-[2.24em] overflow-hidden text-[16.5px] leading-[1.12] font-semibold text-(--ink) ${fontHeading}`}
           >
             {product.name}
-          </motion.h3>
+          </h3>
           <p className="line-clamp-2 min-h-[3em] overflow-hidden text-[13px] leading-normal text-(--ink-soft)">
             {product.shortDescription}
           </p>
@@ -360,7 +305,7 @@ function ProductArchiveCard({
           </div>
         </div>
       </div>
-    </motion.button>
+    </button>
   )
 }
 

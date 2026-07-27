@@ -1,13 +1,7 @@
 'use client'
 
-import {
-  AnimatePresence,
-  LayoutGroup,
-  motion,
-  useReducedMotion,
-} from 'motion/react'
 import Image from 'next/image'
-import { useId, useLayoutEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 
 import { GlowingCard } from '@/src/components/ui/glowing-card'
 import {
@@ -32,49 +26,9 @@ export function PreviousBoxesShowcase({
   products,
 }: PreviousBoxesShowcaseProps) {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
-  const shouldReduceMotion = useReducedMotion()
-  const layoutGroupId = useId()
-  const dialogTitleId = useId()
-  const openScrollYRef = useRef(0)
-
-  useLayoutEffect(() => {
-    if (!selectedProduct) {
-      return
-    }
-
-    const previousBodyPaddingRight = document.body.style.paddingRight
-    const previousDocumentOverflow = document.documentElement.style.overflow
-    const scrollbarWidth =
-      window.innerWidth - document.documentElement.clientWidth
-
-    document.documentElement.style.overflow = 'hidden'
-    document.body.style.paddingRight =
-      scrollbarWidth > 0 ? `${scrollbarWidth}px` : previousBodyPaddingRight
-    window.scrollTo(0, openScrollYRef.current)
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setSelectedProduct(null)
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
-
-    return () => {
-      document.body.style.paddingRight = previousBodyPaddingRight
-      document.documentElement.style.overflow = previousDocumentOverflow
-      window.scrollTo(0, openScrollYRef.current)
-      window.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [selectedProduct])
-
-  const openProduct = (product: Product) => {
-    openScrollYRef.current = window.scrollY
-    setSelectedProduct(product)
-  }
 
   return (
-    <LayoutGroup id={layoutGroupId}>
+    <>
       <ScrollRevealGroup
         className="grid items-stretch gap-5 lg:grid-cols-2 lg:gap-6"
         staggerChildren={0.1}
@@ -83,24 +37,20 @@ export function PreviousBoxesShowcase({
           <ScrollRevealItem key={product.id} className="h-full">
             <PreviousBoxCard
               product={product}
-              onOpen={() => openProduct(product)}
+              onOpen={() => setSelectedProduct(product)}
             />
           </ScrollRevealItem>
         ))}
       </ScrollRevealGroup>
 
-      <AnimatePresence>
-        {selectedProduct ? (
-          <ProductQuickView
-            key={selectedProduct.id}
-            product={selectedProduct}
-            titleId={dialogTitleId}
-            reduceMotion={Boolean(shouldReduceMotion)}
-            onClose={() => setSelectedProduct(null)}
-          />
-        ) : null}
-      </AnimatePresence>
-    </LayoutGroup>
+      <ProductQuickView
+        product={selectedProduct}
+        open={selectedProduct !== null}
+        onOpenChange={(open) => {
+          if (!open) setSelectedProduct(null)
+        }}
+      />
+    </>
   )
 }
 
@@ -115,9 +65,8 @@ function PreviousBoxCard({ product, onOpen }: PreviousBoxCardProps) {
   const evidenceNumber = String(product.cycleNumber ?? 0).padStart(2, '0')
 
   return (
-    <motion.button
+    <button
       type="button"
-      layoutId={`box-shell-${product.id}`}
       onClick={onOpen}
       className="block size-full cursor-pointer appearance-none border-0 bg-transparent p-0 text-left text-inherit focus-visible:ring-2 focus-visible:ring-[#9a662a] focus-visible:ring-offset-2 focus-visible:ring-offset-[#e9dfcf] focus-visible:outline-none dark:focus-visible:ring-[#d7b56d] dark:focus-visible:ring-offset-[#171211]"
       aria-label={`Ver detalhes de ${product.name}`}
@@ -129,10 +78,7 @@ function PreviousBoxCard({ product, onOpen }: PreviousBoxCardProps) {
         <div className="pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(90deg,rgba(33,28,24,0.022)_1px,transparent_1px),linear-gradient(rgba(33,28,24,0.022)_1px,transparent_1px)] bg-size-[34px_34px] dark:bg-[linear-gradient(90deg,rgba(255,250,240,0.035)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.035)_1px,transparent_1px)]" />
 
         {productImage ? (
-          <motion.div
-            layoutId={`box-image-${product.id}`}
-            className="relative aspect-square shrink-0 overflow-hidden border-b border-[#211c18]/14 bg-[#efe4d4] md:w-[42%] md:border-r md:border-b-0 dark:border-[#fffaf0]/14 dark:bg-[#171211]"
-          >
+          <div className="relative aspect-square shrink-0 overflow-hidden border-b border-[#211c18]/14 bg-[#efe4d4] md:w-[42%] md:border-r md:border-b-0 dark:border-[#fffaf0]/14 dark:bg-[#171211]">
             <Image
               src={productImage}
               alt={product.name}
@@ -150,18 +96,15 @@ function PreviousBoxCard({ product, onOpen }: PreviousBoxCardProps) {
                 {evidenceNumber}
               </p>
             </div>
-          </motion.div>
+          </div>
         ) : null}
 
         <div className="relative z-20 flex flex-1 flex-col p-5 sm:p-6">
           <ProductKicker product={product} showAvailability={false} />
 
-          <motion.h3
-            layoutId={`box-title-${product.id}`}
-            className="mt-5 line-clamp-2 min-h-[2lh] overflow-hidden font-heading text-2xl/tight font-semibold tracking-wide text-[#211c18] uppercase dark:text-[#fffaf0]"
-          >
+          <h3 className="mt-5 line-clamp-2 min-h-[2lh] overflow-hidden font-heading text-2xl/tight font-semibold tracking-wide text-[#211c18] uppercase dark:text-[#fffaf0]">
             {product.name}
-          </motion.h3>
+          </h3>
 
           <p className="mt-3 line-clamp-2 min-h-[2lh] overflow-hidden text-sm/6 text-[#5f5147] dark:text-[#d7c9b5]">
             {product.shortDescription}
@@ -177,6 +120,6 @@ function PreviousBoxCard({ product, onOpen }: PreviousBoxCardProps) {
           </p>
         </div>
       </GlowingCard>
-    </motion.button>
+    </button>
   )
 }

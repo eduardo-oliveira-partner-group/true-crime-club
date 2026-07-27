@@ -7,13 +7,19 @@ import {
   IconShoppingBag,
   IconX,
 } from '@tabler/icons-react'
-import { motion } from 'motion/react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { type ReactNode, useState } from 'react'
-import { createPortal } from 'react-dom'
+import { type ReactNode, useEffect, useState } from 'react'
 
 import { Button } from '@/src/components/ui/button'
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogOverlay,
+  DialogTitle,
+} from '@/src/components/ui/dialog'
 import {
   Tooltip,
   TooltipContent,
@@ -158,27 +164,32 @@ export function ProductKicker({
 }
 
 interface ProductQuickViewProps {
-  product: Product
-  titleId: string
-  reduceMotion: boolean
-  onClose: () => void
+  product: Product | null
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
 export function ProductQuickView({
   product,
-  titleId,
-  reduceMotion,
-  onClose,
+  open,
+  onOpenChange,
 }: ProductQuickViewProps) {
-  const productImage = getProductImage(product.images[0] ?? '')
-  const evidenceNumber = String(product.cycleNumber ?? 0).padStart(2, '0')
   const [isAdding, setIsAdding] = useState(false)
+  const [cachedProduct, setCachedProduct] = useState(product)
+
+  useEffect(() => {
+    if (product) {
+      setCachedProduct(product)
+    }
+  }, [product])
+
+  const activeProduct = product ?? cachedProduct
 
   const onAddToCart = async () => {
-    if (!product.inStock || isAdding) return
+    if (!activeProduct?.inStock || isAdding) return
     setIsAdding(true)
     try {
-      await addCartItemRequiringAuth(product.id)
+      await addCartItemRequiringAuth(activeProduct.id)
     } catch (error) {
       console.error(error)
     } finally {
@@ -186,50 +197,40 @@ export function ProductQuickView({
     }
   }
 
-  if (typeof document === 'undefined') {
+  if (!activeProduct) {
     return null
   }
 
-  return createPortal(
-    <motion.div
-      className="fixed inset-0 z-100 flex items-start justify-center overflow-x-hidden overflow-y-auto p-3 py-8 sm:p-6 lg:items-center lg:overflow-hidden"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby={titleId}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: reduceMotion ? 0.01 : 0.3 }}
-      style={designTokens}
-    >
-      <motion.button
-        type="button"
-        className="absolute inset-0 cursor-default bg-[#211c18]/34 backdrop-blur-md"
-        onClick={onClose}
-        aria-label="Fechar detalhes do produto"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: reduceMotion ? 0.01 : 0.3 }}
-      />
+  const productImage = getProductImage(activeProduct.images[0] ?? '')
+  const evidenceNumber = String(activeProduct.cycleNumber ?? 0).padStart(2, '0')
 
-      <motion.article
-        layoutId={`box-shell-${product.id}`}
-        className={`relative z-10 grid w-full max-w-5xl overflow-hidden rounded-[14px_14px_16px_16px] border border-[rgba(33,28,24,0.16)] bg-(--card) text-(--ink) ${cardShadowBase} lg:max-h-[calc(100vh-3rem)] lg:grid-cols-[0.9fr_1.1fr]`}
-        initial={reduceMotion ? {} : { opacity: 0, scale: 0.95 }}
-        animate={reduceMotion ? {} : { opacity: 1, scale: 1 }}
-        exit={reduceMotion ? {} : { opacity: 0, scale: 0.95 }}
-        transition={
-          reduceMotion
-            ? { duration: 0.01 }
-            : { type: 'tween', duration: 0.3, ease: 'easeOut' }
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent
+        showCloseButton={false}
+        style={designTokens}
+        overlay={
+          <>
+            {/* Blur imediato — animar opacity no mesmo nó atrasa o backdrop-filter */}
+            <div
+              className="fixed inset-0 z-50 backdrop-blur-md"
+              aria-hidden="true"
+            />
+            <DialogOverlay className="bg-[#211c18]/34 backdrop-blur-none supports-backdrop-filter:backdrop-blur-none" />
+          </>
         }
+        className={cn(
+          'max-h-[calc(100vh-1.5rem)] w-[calc(100%-1.5rem)] max-w-5xl gap-0 overflow-hidden rounded-[14px_14px_16px_16px] border border-[rgba(33,28,24,0.16)] bg-(--card) p-0 text-(--ink) ring-0 sm:max-w-5xl',
+          cardShadowBase,
+          'duration-200 data-open:zoom-in-[1] data-closed:zoom-out-[1]',
+          'grid lg:max-h-[calc(100vh-3rem)] lg:grid-cols-[0.9fr_1.1fr]',
+        )}
       >
         <div
           className={`absolute top-0 left-8 z-30 inline-flex -translate-y-px items-center gap-[10px] rounded-b-[10px] border border-t-0 border-[rgba(33,28,24,0.18)] bg-(--paper-soft) px-[18px] py-[9px] pt-[11px] text-[11px] tracking-[0.14em] text-(--ink) uppercase ${fontType}`}
         >
           <span className="font-bold text-(--red)">
-            {product.type === 'box' ? `BOX-${evidenceNumber}` : 'ITEM'}
+            {activeProduct.type === 'box' ? `BOX-${evidenceNumber}` : 'ITEM'}
           </span>
           ficha rápida
         </div>
@@ -237,28 +238,21 @@ export function ProductQuickView({
           className="absolute top-[22px] right-20 z-30 size-[14px] rounded-full shadow-[0_3px_5px_rgba(33,28,24,0.45),inset_0_-2px_3px_rgba(0,0,0,0.3)] [background:radial-gradient(circle_at_35%_30%,rgba(255,255,255,0.7)_0%,var(--red)_55%,rgba(0,0,0,0.4)_100%)]"
           aria-hidden="true"
         />
-        <button
-          type="button"
-          onClick={onClose}
-          className="fixed top-10 right-8 z-30 flex size-10 items-center justify-center rounded-[10px] border border-[rgba(33,28,24,0.18)] bg-(--card)/88 text-(--ink) backdrop-blur-[2px] transition hover:border-(--red)/55 hover:bg-(--red)/10 focus-visible:ring-2 focus-visible:ring-(--amber) focus-visible:outline-none sm:absolute sm:top-4 sm:right-4"
-          aria-label="Fechar"
-        >
-          <IconX className="size-5" />
-        </button>
+        <DialogClose asChild>
+          <button
+            type="button"
+            className="absolute top-4 right-4 z-30 flex size-10 items-center justify-center rounded-[10px] border border-[rgba(33,28,24,0.18)] bg-(--card)/88 text-(--ink) backdrop-blur-[2px] transition hover:border-(--red)/55 hover:bg-(--red)/10 focus-visible:ring-2 focus-visible:ring-(--amber) focus-visible:outline-none"
+            aria-label="Fechar"
+          >
+            <IconX className="size-5" />
+          </button>
+        </DialogClose>
 
-        <motion.div
-          layoutId={`box-image-${product.id}`}
-          className="relative min-h-[260px] overflow-hidden bg-(--paper-soft) sm:min-h-[360px] lg:min-h-[620px]"
-          transition={
-            reduceMotion
-              ? { duration: 0.01 }
-              : { type: 'tween', duration: 0.3, ease: 'easeOut' }
-          }
-        >
+        <div className="relative min-h-[260px] overflow-hidden bg-(--paper-soft) sm:min-h-[360px] lg:min-h-[620px]">
           {productImage ? (
             <Image
               src={productImage}
-              alt={product.name}
+              alt={activeProduct.name}
               fill
               placeholder="blur"
               sizes="(max-width: 1024px) 100vw, 520px"
@@ -271,7 +265,7 @@ export function ProductQuickView({
             <p
               className={`text-[0.68rem] tracking-[0.18em] text-(--amber) uppercase ${fontType}`}
             >
-              {product.type === 'box' ? 'Arquivo' : 'Item'}
+              {activeProduct.type === 'box' ? 'Arquivo' : 'Item'}
             </p>
             <p
               className={`text-4xl leading-none font-semibold text-(--ink) ${fontHeading}`}
@@ -279,53 +273,52 @@ export function ProductQuickView({
               {evidenceNumber}
             </p>
           </div>
-        </motion.div>
+        </div>
 
-        <div className="relative z-20 flex flex-col bg-(--card) p-5 pb-32 sm:p-7 sm:pb-32 lg:h-full lg:min-h-0 lg:p-0">
+        <div className="relative z-20 flex min-h-0 flex-col bg-(--card) p-5 pb-32 sm:p-7 sm:pb-32 lg:h-full lg:p-0">
           <div className="min-h-0 flex-1 lg:overflow-y-auto lg:p-9 lg:pb-6">
             <div className="pr-14 sm:pr-16">
-              <ProductKicker product={product} showAvailability={false} />
+              <ProductKicker product={activeProduct} showAvailability={false} />
             </div>
 
-            <motion.h2
-              id={titleId}
-              layoutId={`box-title-${product.id}`}
-              className={`mt-6 text-3xl/tight font-semibold tracking-[-0.015em] text-(--ink) sm:text-4xl ${fontHeading}`}
-              transition={
-                reduceMotion
-                  ? { duration: 0.01 }
-                  : { type: 'tween', duration: 0.3, ease: 'easeOut' }
-              }
+            <DialogTitle
+              className={cn(
+                'mt-6 font-sans text-3xl/tight font-semibold tracking-[-0.015em] text-(--ink) sm:text-4xl',
+                fontHeading,
+              )}
             >
-              {product.name}
-            </motion.h2>
+              {activeProduct.name}
+            </DialogTitle>
+            <DialogDescription className="sr-only">
+              {activeProduct.shortDescription || activeProduct.description}
+            </DialogDescription>
 
             <div className="mt-5 grid gap-3 border-y border-[rgba(33,28,24,0.1)] py-5 text-sm text-(--ink-soft) sm:grid-cols-2">
-              {product.editionMonth ? (
+              {activeProduct.editionMonth ? (
                 <DetailDatum
                   icon={<IconCalendarEvent className="size-4" />}
                   label="Edição"
-                  value={formatEditionMonth(product.editionMonth)}
+                  value={formatEditionMonth(activeProduct.editionMonth)}
                 />
               ) : null}
               <DetailDatum
                 icon={<IconPackage className="size-4" />}
                 label="Tipo"
-                value={product.type === 'box' ? 'Box avulsa' : 'Produto'}
+                value={activeProduct.type === 'box' ? 'Box avulsa' : 'Produto'}
               />
             </div>
 
             <p className="mt-5 text-base/7 text-(--ink-soft)">
-              {product.description}
+              {activeProduct.description}
             </p>
 
-            {product.includedItems?.length ? (
+            {activeProduct.includedItems?.length ? (
               <div className="mt-7">
                 <p className="text-xs font-semibold tracking-[0.2em] text-(--amber) uppercase">
                   Conteúdo do arquivo
                 </p>
                 <ul className="mt-3 grid gap-2 text-sm/6 text-(--ink-soft)">
-                  {product.includedItems.map((item) => (
+                  {activeProduct.includedItems.map((item) => (
                     <li key={item} className="flex gap-3">
                       <span className="mt-2 size-1.5 shrink-0 bg-[#b5332a]" />
                       <span>{item}</span>
@@ -337,7 +330,7 @@ export function ProductQuickView({
           </div>
 
           <div className="mt-auto hidden shrink-0 flex-col gap-4 border-t border-[rgba(33,28,24,0.1)] px-9 pt-6 pb-9 lg:flex xl:flex-row xl:items-end xl:justify-between">
-            <PriceBlock product={product} />
+            <PriceBlock product={activeProduct} />
             <div className="flex w-full gap-3 xl:w-auto xl:min-w-88">
               <TooltipProvider delayDuration={150}>
                 <Tooltip>
@@ -349,7 +342,7 @@ export function ProductQuickView({
                       className="rounded-[10px] border-[rgba(33,28,24,0.22)] bg-[rgba(33,28,24,0.06)] text-(--ink) hover:bg-[rgba(33,28,24,0.1)] hover:text-(--ink)"
                     >
                       <Link
-                        href={`/loja/${product.slug}`}
+                        href={`/loja/${activeProduct.slug}`}
                         aria-label="Ver página completa"
                       >
                         <IconExternalLink />
@@ -363,14 +356,14 @@ export function ProductQuickView({
               </TooltipProvider>
               <Button
                 type="button"
-                disabled={!product.inStock || isAdding}
+                disabled={!activeProduct.inStock || isAdding}
                 onClick={onAddToCart}
                 className={`flex-1 rounded-[10px] bg-[#b5332a] px-5 text-white hover:bg-[#982820] disabled:opacity-50 ${fontMono}`}
               >
                 <IconShoppingBag data-icon="inline-start" />
                 {isAdding
                   ? 'Adicionando...'
-                  : product.inStock
+                  : activeProduct.inStock
                     ? 'Adicionar ao carrinho'
                     : 'Esgotado'}
               </Button>
@@ -378,9 +371,9 @@ export function ProductQuickView({
           </div>
         </div>
 
-        <div className="fixed inset-x-3 bottom-3 z-40 rounded-[14px_14px_16px_16px] border border-[rgba(33,28,24,0.16)] bg-(--card)/94 p-3 shadow-[0_18px_48px_rgba(63,46,34,0.22)] backdrop-blur-md lg:hidden">
+        <div className="absolute inset-x-3 bottom-3 z-40 rounded-[14px_14px_16px_16px] border border-[rgba(33,28,24,0.16)] bg-(--card)/94 p-3 shadow-[0_18px_48px_rgba(63,46,34,0.22)] backdrop-blur-md lg:hidden">
           <div className="flex items-end justify-between gap-3">
-            <PriceBlock product={product} compact />
+            <PriceBlock product={activeProduct} compact />
             <div className="flex shrink-0 gap-2">
               <TooltipProvider delayDuration={150}>
                 <Tooltip>
@@ -392,7 +385,7 @@ export function ProductQuickView({
                       className="rounded-[10px] border-[rgba(33,28,24,0.22)] bg-[rgba(33,28,24,0.06)] text-(--ink) hover:bg-[rgba(33,28,24,0.1)] hover:text-(--ink)"
                     >
                       <Link
-                        href={`/loja/${product.slug}`}
+                        href={`/loja/${activeProduct.slug}`}
                         aria-label="Ver página completa"
                       >
                         <IconExternalLink />
@@ -407,13 +400,13 @@ export function ProductQuickView({
               <Button
                 type="button"
                 size="icon"
-                disabled={!product.inStock || isAdding}
+                disabled={!activeProduct.inStock || isAdding}
                 onClick={onAddToCart}
                 className="rounded-[10px] bg-[#b5332a] text-white hover:bg-[#982820] disabled:opacity-50"
                 aria-label={
                   isAdding
                     ? 'Adicionando ao carrinho'
-                    : product.inStock
+                    : activeProduct.inStock
                       ? 'Adicionar ao carrinho'
                       : 'Produto esgotado'
                 }
@@ -423,8 +416,7 @@ export function ProductQuickView({
             </div>
           </div>
         </div>
-      </motion.article>
-    </motion.div>,
-    document.body,
+      </DialogContent>
+    </Dialog>
   )
 }

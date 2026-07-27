@@ -55,7 +55,7 @@ export function SmoothScrollProvider({ children }: SmoothScrollProviderProps) {
         prevent: (node) =>
           node.hasAttribute('data-lenis-prevent') ||
           node.closest(
-            '[data-slot="alert-dialog-content"], [data-slot="select-content"], [data-slot="sheet-content"], [data-slot="dropdown-menu-content"], [data-radix-select-viewport]',
+            '[data-slot="alert-dialog-content"], [data-slot="dialog-content"], [data-slot="select-content"], [data-slot="sheet-content"], [data-slot="dropdown-menu-content"], [data-radix-select-viewport]',
           ) !== null,
       }}
     >
