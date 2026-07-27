@@ -69,6 +69,10 @@ function isAuthError(error: unknown): boolean {
   )
 }
 
+function isPlanCartItem(item: CartItem): boolean {
+  return item.productType === 'subscription' || Boolean(item.planId)
+}
+
 export default function CarrinhoPage() {
   const router = useRouter()
   const [cart, setCart] = useState<Cart | null>(null)
@@ -93,7 +97,7 @@ export default function CarrinhoPage() {
     }
 
     const searchParams = new URLSearchParams(window.location.search)
-    const planId = searchParams.get('plano')
+    const planIdFromQuery = searchParams.get('plano')
     const productToAdd = searchParams.get('adicionar')
 
     apiClient.auth
@@ -122,9 +126,9 @@ export default function CarrinhoPage() {
         }
 
         // Plano: persiste item de assinatura no carrinho (CARRINHO_ITEM_ADICIONAR).
-        if (planId) {
+        if (planIdFromQuery) {
           try {
-            await addCartItem({ planoId: planId })
+            await addCartItem({ planoId: planIdFromQuery })
           } catch (error) {
             if (isAuthError(error)) throw error
             console.error(error)
@@ -132,21 +136,35 @@ export default function CarrinhoPage() {
           if (cancelled) return
         }
 
-        return Promise.all([
-          getCart(),
+        const nextCart = await getCart()
+        if (cancelled) return
+
+        const planFromCart = nextCart.items.find(isPlanCartItem)
+        const resolvedPlanId =
+          planIdFromQuery ?? planFromCart?.planId ?? undefined
+
+        const [nextShipping, nextPlan] = await Promise.all([
           calculateShipping(
             sampleZipCode,
-            planId ? { planoId: planId } : undefined,
+            resolvedPlanId ? { planoId: resolvedPlanId } : undefined,
           ).catch(() => emptyShipping),
-          planId ? getPlanById(planId) : Promise.resolve(null),
+          resolvedPlanId
+            ? getPlanById(resolvedPlanId).catch(() => null)
+            : Promise.resolve(null),
         ])
+
+        return { nextCart, nextShipping, nextPlan }
       })
       .then((result) => {
         if (cancelled || !result) return
-        const [nextCart, nextShipping, nextPlan] = result
+        const { nextCart, nextShipping, nextPlan } = result
         setCart(nextCart)
         notifyCartUpdated(nextCart)
-        setShipping(nextShipping)
+        setShipping({
+          price: nextCart.shippingEstimate ?? nextShipping.price,
+          region: nextCart.shippingRegion ?? nextShipping.region,
+          estimatedDays: nextShipping.estimatedDays,
+        })
         setSelectedPlan(nextPlan)
       })
       .catch((error: unknown) => {
@@ -166,26 +184,20 @@ export default function CarrinhoPage() {
 
   if (!cart) return <CartSkeleton />
 
-  const totals = { ...cart, ...getCartTotals(cart) }
-  const planCartItem = cart.items.find(
-    (item) => item.productType === 'subscription' || Boolean(item.planId),
-  )
-  const productItems = cart.items.filter(
-    (item) => item.productType !== 'subscription' && !item.planId,
-  )
-  const hasSelectedPlan = selectedPlan !== null || Boolean(planCartItem)
-  const subtotal = selectedPlan
-    ? selectedPlan.price
-    : planCartItem
-      ? planCartItem.unitPrice * planCartItem.quantity
-      : totals.subtotal
-  const discount = hasSelectedPlan ? 0 : totals.discount
-  const grandTotal = subtotal - discount + shipping.price
-  const itemCount = productItems.reduce(
-    (sum: number, item: CartItem) => sum + item.quantity,
+  const totals = getCartTotals(cart)
+  const planItems = cart.items.filter(isPlanCartItem)
+  const productItems = cart.items.filter((item) => !isPlanCartItem(item))
+  const planCartItem = planItems[0] ?? null
+  const planIdForCheckout = selectedPlan?.id ?? planCartItem?.planId
+  const shippingPrice = cart.shippingEstimate ?? shipping.price
+  const shippingRegion = cart.shippingRegion || shipping.region
+  const subtotal = totals.subtotal
+  const discount = totals.discount
+  const grandTotal = Math.max(subtotal - discount + shippingPrice, 0)
+  const totalItemCount = cart.items.reduce(
+    (sum, item) => sum + item.quantity,
     0,
   )
-  const totalItemCount = itemCount + Number(hasSelectedPlan)
   const dossierCode = `CART-${String(totalItemCount).padStart(2, '0')}`
 
   return (
@@ -227,23 +239,35 @@ export default function CarrinhoPage() {
         ) : (
           <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_0.42fr] lg:gap-10">
             <section aria-label="Itens do carrinho" className="space-y-4">
-              {selectedPlan ? (
+              {planItems.map((item) => (
                 <SelectedPlanLineItem
-                  plan={selectedPlan}
+                  key={item.id}
+                  item={item}
+                  plan={
+                    selectedPlan &&
+                    (selectedPlan.id === item.planId ||
+                      selectedPlan.slug === item.productSlug)
+                      ? selectedPlan
+                      : null
+                  }
                   onRemove={async () => {
-                    if (planCartItem) {
-                      try {
-                        const next = await removeCartItem(planCartItem.id)
-                        setCart(next)
-                      } catch (error) {
-                        console.error(error)
+                    try {
+                      const next = await removeCartItem(item.id)
+                      handleCartChange(next)
+                      if (
+                        selectedPlan &&
+                        (selectedPlan.id === item.planId ||
+                          selectedPlan.slug === item.productSlug)
+                      ) {
+                        setSelectedPlan(null)
                       }
+                      window.history.replaceState(null, '', '/carrinho')
+                    } catch (error) {
+                      console.error(error)
                     }
-                    window.history.replaceState(null, '', '/carrinho')
-                    setSelectedPlan(null)
                   }}
                 />
-              ) : null}
+              ))}
               {productItems.map((item: CartItem) => (
                 <CartLineItem
                   key={item.id}
@@ -274,13 +298,13 @@ export default function CarrinhoPage() {
               <OrderSummary
                 subtotal={subtotal}
                 discount={discount}
-                shipping={shipping.price}
-                shippingRegion={shipping.region}
+                shipping={shippingPrice}
+                shippingRegion={shippingRegion}
                 shippingDays={shipping.estimatedDays}
                 total={grandTotal}
                 couponCode={cart.couponCode}
-                selectedPlan={selectedPlan}
-                planIdFromCart={planCartItem?.planId}
+                planId={planIdForCheckout}
+                hasPlan={planItems.length > 0}
               />
             </aside>
           </div>
@@ -333,19 +357,40 @@ function EmptyCart() {
   )
 }
 
+function inferPlanIntervalLabel(
+  item: CartItem,
+  plan: SubscriptionPlan | null,
+): string {
+  if (plan?.billingInterval === 'annual') return 'Assinatura anual'
+  if (plan?.billingInterval === 'monthly') return 'Assinatura mensal'
+  if (plan?.billingInterval === 'one_time') return 'Plano avulso'
+
+  const slug = item.productSlug.toLowerCase()
+  const name = item.productName.toLowerCase()
+  if (slug.includes('anual') || name.includes('anual')) {
+    return 'Assinatura anual'
+  }
+  if (slug.includes('mensal') || name.includes('mensal')) {
+    return 'Assinatura mensal'
+  }
+  return 'Plano de assinatura'
+}
+
 function SelectedPlanLineItem({
+  item,
   plan,
   onRemove,
 }: {
-  plan: SubscriptionPlan
+  item: CartItem
+  plan: SubscriptionPlan | null
   onRemove: () => void
 }) {
-  const intervalLabel =
-    plan.billingInterval === 'annual'
-      ? 'Assinatura anual'
-      : plan.billingInterval === 'monthly'
-        ? 'Assinatura mensal'
-        : 'Plano avulso'
+  const intervalLabel = inferPlanIntervalLabel(item, plan)
+  const name = plan?.name ?? item.productName
+  const description =
+    plan?.description ??
+    'Assinatura TrueCrime.Club incluída neste dossiê de compra.'
+  const price = plan?.price ?? item.unitPrice * item.quantity
 
   return (
     <article
@@ -374,9 +419,9 @@ function SelectedPlanLineItem({
               'text-lg/tight font-semibold tracking-[-0.01em] text-(--ink)',
             )}
           >
-            {plan.name}
+            {name}
           </h3>
-          <p className="text-sm text-(--ink-soft)">{plan.description}</p>
+          <p className="text-sm text-(--ink-soft)">{description}</p>
         </div>
         <div className="flex items-center justify-between gap-4 sm:flex-col sm:items-end">
           <p
@@ -385,7 +430,7 @@ function SelectedPlanLineItem({
               'text-lg leading-none font-semibold text-(--ink)',
             )}
           >
-            {formatCurrency(plan.price)}
+            {formatCurrency(price)}
           </p>
           <Button
             type="button"
@@ -400,7 +445,7 @@ function SelectedPlanLineItem({
         </div>
       </div>
       <p className="border-t border-dashed border-[rgba(33,28,24,0.18)] px-5 py-3 text-xs text-(--ink-soft)">
-        A assinatura será finalizada separadamente dos demais itens do carrinho.
+        O plano entra no mesmo checkout dos demais itens do carrinho.
       </p>
     </article>
   )
@@ -634,8 +679,8 @@ function OrderSummary({
   shippingDays,
   total,
   couponCode,
-  selectedPlan,
-  planIdFromCart,
+  planId,
+  hasPlan,
 }: {
   subtotal: number
   discount: number
@@ -644,12 +689,11 @@ function OrderSummary({
   shippingDays: string
   total: number
   couponCode?: string
-  selectedPlan: SubscriptionPlan | null
-  planIdFromCart?: string
+  planId?: string
+  hasPlan: boolean
 }) {
-  const checkoutPlanId = selectedPlan?.id ?? planIdFromCart
-  const checkoutHref = checkoutPlanId
-    ? `/checkout?plano=${encodeURIComponent(checkoutPlanId)}`
+  const checkoutHref = planId
+    ? `/checkout?plano=${encodeURIComponent(planId)}`
     : '/checkout'
 
   return (
@@ -676,7 +720,7 @@ function OrderSummary({
 
       <div className="space-y-4 p-5 text-sm sm:p-6">
         <SummaryRow
-          label={selectedPlan ? 'Plano selecionado' : 'Subtotal'}
+          label={hasPlan ? 'Subtotal (produtos + plano)' : 'Subtotal'}
           value={formatCurrency(subtotal)}
         />
         {discount > 0 ? (
@@ -696,9 +740,11 @@ function OrderSummary({
               {formatCurrency(shipping)}
             </span>
           </div>
-          <p className="pl-6 text-xs text-(--ink-soft)/70">
-            {shippingRegion} · {shippingDays}
-          </p>
+          {(shippingRegion || shippingDays) && (
+            <p className="pl-6 text-xs text-(--ink-soft)/70">
+              {[shippingRegion, shippingDays].filter(Boolean).join(' · ')}
+            </p>
+          )}
         </div>
 
         <div className="h-px border-t border-dashed border-[rgba(33,28,24,0.18)]" />
