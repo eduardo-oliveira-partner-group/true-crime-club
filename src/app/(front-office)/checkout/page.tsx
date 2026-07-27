@@ -69,22 +69,35 @@ export default function CheckoutPage() {
 
     setLoadError(null)
 
-    Promise.all([
-      // Assinatura: grava item de plano no carrinho; resumo usa so o plano.
-      (plano
-        ? addCartItem({ planoId: plano })
-            .then(() => emptyCart())
-            .catch(() => emptyCart())
-        : getCart()),
-      apiClient.customer.getProfile(),
-      plano ? getPlanById(plano) : Promise.resolve(null),
-    ])
-      .then(async ([cart, profile, plan]) => {
+    Promise.all([getCart(), apiClient.customer.getProfile()])
+      .then(async ([cartFromApi, profile]) => {
         if (cancelled) return
         if (!profile.customer?.id) {
           redirectToLogin()
           return
         }
+
+        const planIdFromCart = cartFromApi.items.find(
+          (item) => item.planId || item.productType === 'subscription',
+        )?.planId
+        const resolvedPlanoId = plano ?? planIdFromCart
+
+        // Assinatura: garante item no carrinho; resumo do stepper usa o plano.
+        let cart = cartFromApi
+        if (resolvedPlanoId) {
+          try {
+            await addCartItem({ planoId: resolvedPlanoId })
+          } catch {
+            // Mantem carrinho atual se o add falhar.
+          }
+          cart = emptyCart()
+        }
+
+        const plan = resolvedPlanoId
+          ? await getPlanById(resolvedPlanoId)
+          : null
+        if (cancelled) return
+
         const monthlyPlan =
           plan?.billingInterval === 'annual'
             ? ((await listPlans()).find(
@@ -221,8 +234,13 @@ export default function CheckoutPage() {
     discountAmount = totals.discount
   }
 
-  const total =
-    (isSubscriptionFlow && plan ? plan.price : totals.total) + shipping.price
+  // Nao usar totals.total: ele ja inclui freteEstimado do carrinho.
+  // O stepper soma shipping.price a parte — senao o frete dobra.
+  const merchandiseAmount =
+    isSubscriptionFlow && plan
+      ? plan.price
+      : Math.max(totals.subtotal - discountAmount, 0)
+  const total = merchandiseAmount + shipping.price
 
   async function submitOrder(input: {
     enderecoId: string

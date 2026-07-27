@@ -280,6 +280,7 @@ export default function CarrinhoPage() {
                 total={grandTotal}
                 couponCode={cart.couponCode}
                 selectedPlan={selectedPlan}
+                planIdFromCart={planCartItem?.planId}
               />
             </aside>
           </div>
@@ -634,6 +635,7 @@ function OrderSummary({
   total,
   couponCode,
   selectedPlan,
+  planIdFromCart,
 }: {
   subtotal: number
   discount: number
@@ -643,9 +645,11 @@ function OrderSummary({
   total: number
   couponCode?: string
   selectedPlan: SubscriptionPlan | null
+  planIdFromCart?: string
 }) {
-  const checkoutHref = selectedPlan
-    ? `/checkout?plano=${encodeURIComponent(selectedPlan.id)}`
+  const checkoutPlanId = selectedPlan?.id ?? planIdFromCart
+  const checkoutHref = checkoutPlanId
+    ? `/checkout?plano=${encodeURIComponent(checkoutPlanId)}`
     : '/checkout'
 
   return (
