@@ -280,15 +280,15 @@ Response `200`:
 ```json
 [
   {
-    "id": "plan-annual",
-    "slug": "anual",
+    "id": "2",
+    "identificador": "anual",
     "nome": "Plano Anual",
     "descricao": "Melhor custo-benefício...",
-    "intervaloCobranca": "annual",
+    "intervaloCobranca": "anual",
     "preco": 143880,
     "precoPorMes": 11990,
     "recomendado": true,
-    "permanenciaMeses": 12,
+    "mesesCompromisso": 12,
     "beneficios": ["Tudo do plano mensal", "Economia equivalente a 2 meses"]
   }
 ]
@@ -415,7 +415,7 @@ Request:
   "enderecoId": "addr-001",
   "frete": 1990,
   "pagamento": { "metodoId": "pm-001" },
-  "planoId": "plan-annual"
+  "planoId": "2"
 }
 ```
 
@@ -559,7 +559,7 @@ Response `200`:
 ```json
 {
   "id": "sub-001",
-  "planoId": "plan-monthly",
+  "planoId": "1",
   "planoNome": "Plano Mensal",
   "status": "active",
   "inicio": "2025-12-01T00:00:00.000Z",
