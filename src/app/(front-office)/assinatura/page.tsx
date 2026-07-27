@@ -1,13 +1,9 @@
-import { SubscriptionPlansGrid } from '@/src/components/home/plan-dossier-card'
+import { SubscriptionPlansFromApi } from '@/src/components/home/subscription-plans-from-api'
 import { DesignPageShell } from '@/src/components/public-design/design-page-shell'
 import { DossierCard } from '@/src/components/public-design/dossier-card'
 import { SectionEyebrow } from '@/src/components/public-design/section-eyebrow'
 import { fontHeading, sectionFrame } from '@/src/lib/design/classes'
-import {
-  getDynamicContent,
-  getSeoEntry,
-  listPlans,
-} from '@/src/lib/domain/repositories'
+import { getDynamicContent, getSeoEntry } from '@/src/lib/domain/repositories'
 import { buildMetadata } from '@/src/lib/seo'
 
 export const metadata = buildMetadata({
@@ -15,8 +11,7 @@ export const metadata = buildMetadata({
   entry: getSeoEntry('/assinatura'),
 })
 
-export default async function AssinaturaPage() {
-  const plans = await listPlans()
+export default function AssinaturaPage() {
   const howItWorks = getDynamicContent('assinatura.how_it_works')
 
   return (
@@ -35,7 +30,7 @@ export default async function AssinaturaPage() {
           </p>
         </div>
 
-        <SubscriptionPlansGrid plans={plans} />
+        <SubscriptionPlansFromApi />
       </section>
 
       <section className={`${sectionFrame} relative z-10 py-14 lg:py-16`}>
