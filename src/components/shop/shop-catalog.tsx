@@ -6,12 +6,6 @@ import { useState } from 'react'
 
 import { SectionEyebrow } from '@/src/components/public-design/section-eyebrow'
 import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyTitle,
-} from '@/src/components/ui/empty'
-import {
   PriceBlock,
   ProductQuickView,
 } from '@/src/components/ui/product-quick-view'
@@ -79,17 +73,15 @@ export function ShopCatalog({ boxProducts, extraProducts }: ShopCatalogProps) {
 
   return (
     <>
-      <section className="relative isolate overflow-hidden border-b border-[rgba(33,28,24,0.15)] bg-(--card)">
-        <div className={`${sectionFrame} relative z-10 py-14 lg:py-20`}>
-          <SectionHeader
-            eyebrow="01 — Boxes avulsas"
-            title="Edições anteriores ainda em investigação."
-            description="Cada caixa carrega um recorte da coleção: pistas, objetos e conteúdos preparados para quem quer completar o arquivo ou entrar pelo caso que mais chama atenção."
-          />
+      {sortedBoxProducts.length > 0 ? (
+        <section className="relative isolate overflow-hidden border-b border-[rgba(33,28,24,0.15)] bg-(--card)">
+          <div className={`${sectionFrame} relative z-10 py-14 lg:py-20`}>
+            <SectionHeader
+              eyebrow="01 — Boxes avulsas"
+              title="Edições anteriores ainda em investigação."
+              description="Cada caixa carrega um recorte da coleção: pistas, objetos e conteúdos preparados para quem quer completar o arquivo ou entrar pelo caso que mais chama atenção."
+            />
 
-          {sortedBoxProducts.length === 0 ? (
-            <EmptyCatalog />
-          ) : (
             <ScrollRevealGroup
               className="grid items-stretch gap-[30px] sm:grid-cols-2 lg:grid-cols-3"
               staggerChildren={0.08}
@@ -112,21 +104,19 @@ export function ShopCatalog({ boxProducts, extraProducts }: ShopCatalogProps) {
                 )
               })}
             </ScrollRevealGroup>
-          )}
-        </div>
-      </section>
+          </div>
+        </section>
+      ) : null}
 
-      <section className="relative isolate overflow-hidden bg-(--paper-soft)">
-        <div className={`${sectionFrame} relative z-10 py-14 lg:py-20`}>
-          <SectionHeader
-            eyebrow="02 — Itens complementares"
-            title="Ferramentas para montar sua própria mesa de evidências."
-            description="Produtos extras para registrar teorias, decorar o espaço e manter a experiência ativa entre uma box e outra."
-          />
+      {sortedExtraProducts.length > 0 ? (
+        <section className="relative isolate overflow-hidden bg-(--paper-soft)">
+          <div className={`${sectionFrame} relative z-10 py-14 lg:py-20`}>
+            <SectionHeader
+              eyebrow="02 — Itens complementares"
+              title="Ferramentas para montar sua própria mesa de evidências."
+              description="Produtos extras para registrar teorias, decorar o espaço e manter a experiência ativa entre uma box e outra."
+            />
 
-          {sortedExtraProducts.length === 0 ? (
-            <EmptyCatalog />
-          ) : (
             <ScrollRevealGroup
               className="grid items-stretch gap-[30px] sm:grid-cols-2 lg:grid-cols-3"
               staggerChildren={0.08}
@@ -149,9 +139,9 @@ export function ShopCatalog({ boxProducts, extraProducts }: ShopCatalogProps) {
                 )
               })}
             </ScrollRevealGroup>
-          )}
-        </div>
-      </section>
+          </div>
+        </section>
+      ) : null}
 
       <ProductQuickView
         product={selectedProduct}
@@ -220,15 +210,12 @@ function ProductArchiveCard({
       : 'rotate-[-2.5deg] origin-bottom-left left-4'
 
   return (
-    <button
-      type="button"
-      onClick={onOpen}
+    <article
       className={cn(
-        'group relative block size-full cursor-pointer appearance-none border-0 bg-transparent p-0 pt-[25px] text-left text-inherit focus-visible:ring-2 focus-visible:ring-(--red) focus-visible:ring-offset-2 focus-visible:ring-offset-(--paper) focus-visible:outline-none',
+        'group relative block size-full pt-[25px]',
         transitionCardHover,
         'motion-reduce:transition-none',
       )}
-      aria-label={`Ver detalhes de ${product.name}`}
     >
       <div
         aria-hidden="true"
@@ -257,14 +244,21 @@ function ProductArchiveCard({
           'group-hover:translate-y-[-5px] group-hover:shadow-[0_20px_36px_-14px_rgba(33,28,24,0.45),inset_0_0_0_1px_rgba(255,255,255,0.6)] motion-reduce:transition-none motion-reduce:group-hover:translate-y-0',
         )}
       >
+        <button
+          type="button"
+          onClick={onOpen}
+          className="absolute inset-0 z-10 cursor-pointer appearance-none border-0 bg-transparent focus-visible:ring-2 focus-visible:ring-(--red) focus-visible:ring-offset-2 focus-visible:ring-offset-(--paper) focus-visible:outline-none"
+          aria-label={`Ver detalhes de ${product.name}`}
+        />
+
         <div
           aria-hidden="true"
-          className={`absolute top-[10px] right-[10px] z-20 rotate-[-9deg] border-2 border-[rgba(94,94,162,0.85)] bg-[rgba(251,249,246,0.65)] px-[9px] py-[5px] pb-1.5 text-[9.5px] font-bold tracking-[0.14em] text-[rgba(94,94,162,0.95)] uppercase shadow-[inset_0_0_0_1px_rgba(94,94,162,0.4)] backdrop-blur-[2px] ${fontType}`}
+          className={`pointer-events-none absolute top-[10px] right-[10px] z-20 rotate-[-9deg] border-2 border-[rgba(94,94,162,0.85)] bg-[rgba(251,249,246,0.65)] px-[9px] py-[5px] pb-1.5 text-[9.5px] font-bold tracking-[0.14em] text-[rgba(94,94,162,0.95)] uppercase shadow-[inset_0_0_0_1px_rgba(94,94,162,0.4)] backdrop-blur-[2px] ${fontType}`}
         >
           {formatAvailability(product.availability)}
         </div>
 
-        <div className="relative aspect-square w-full shrink-0 overflow-hidden border-b border-[rgba(33,28,24,0.15)] bg-(--card)">
+        <div className="pointer-events-none relative aspect-square w-full shrink-0 overflow-hidden border-b border-[rgba(33,28,24,0.15)] bg-(--card)">
           {productImage ? (
             <Image
               src={productImage}
@@ -279,7 +273,7 @@ function ProductArchiveCard({
           )}
         </div>
 
-        <div className="relative z-20 flex w-full flex-1 flex-col px-4 pt-4 pb-[18px]">
+        <div className="pointer-events-none relative z-20 flex w-full flex-1 flex-col px-4 pt-4 pb-[18px]">
           <div
             className={`mb-[5px] text-[10.5px] tracking-[0.06em] text-(--ink-mute) uppercase ${fontType}`}
           >
@@ -294,18 +288,22 @@ function ProductArchiveCard({
             {product.shortDescription}
           </p>
 
-          <div className="mt-auto flex w-full items-center justify-between gap-[10px] pt-5">
+          <div className="mt-auto flex w-full items-end justify-between gap-[10px] pt-5">
             <PriceBlock product={product} compact />
-            <div
-              className={`inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg bg-(--ink) px-[13px] py-[9px] text-[11px] leading-none font-bold tracking-[0.04em] text-[#fbf9f6] uppercase ${fontMono} group-hover:bg-(--red)`}
-            >
-              Ver
-              <IconArrowRight className={cn('size-4', arrowIconClass)} />
+            <div className="pointer-events-auto relative z-30 flex shrink-0 items-center gap-2">
+              <button
+                type="button"
+                onClick={onOpen}
+                className={`inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-[rgba(33,28,24,0.18)] bg-(--yellow) px-[13px] py-[9px] text-[11px] leading-none font-bold tracking-[0.04em] text-(--ink) uppercase transition hover:bg-(--amber) focus-visible:ring-2 focus-visible:ring-(--red) focus-visible:outline-none ${fontMono}`}
+              >
+                Ver
+                <IconArrowRight className={cn('size-4', arrowIconClass)} />
+              </button>
             </div>
           </div>
         </div>
       </div>
-    </button>
+    </article>
   )
 }
 
@@ -323,18 +321,5 @@ function EvidencePlaceholder({ product }: { product: Product }) {
         </p>
       </div>
     </div>
-  )
-}
-
-function EmptyCatalog() {
-  return (
-    <Empty className="border border-dashed border-[rgba(33,28,24,0.18)] bg-(--card) p-8">
-      <EmptyHeader>
-        <EmptyTitle>Nenhum produto disponível</EmptyTitle>
-        <EmptyDescription>
-          Nenhum produto disponível no momento.
-        </EmptyDescription>
-      </EmptyHeader>
-    </Empty>
   )
 }

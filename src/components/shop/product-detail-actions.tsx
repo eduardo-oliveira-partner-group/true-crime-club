@@ -1,8 +1,8 @@
 'use client'
 
-import { IconShoppingBag } from '@tabler/icons-react'
+import { IconCheck, IconShoppingBag } from '@tabler/icons-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { Button } from '@/src/components/ui/button'
 import { addCartItemRequiringAuth } from '@/src/lib/add-to-cart'
@@ -18,13 +18,23 @@ export function ProductDetailActions({
   inStock,
 }: ProductDetailActionsProps) {
   const [isAdding, setIsAdding] = useState(false)
+  const [justAdded, setJustAdded] = useState(false)
+
+  useEffect(() => {
+    if (!justAdded) return
+    const timer = window.setTimeout(() => setJustAdded(false), 2000)
+    return () => window.clearTimeout(timer)
+  }, [justAdded])
 
   const onAddToCart = async () => {
     if (!inStock || isAdding) return
 
     setIsAdding(true)
     try {
-      await addCartItemRequiringAuth(productId)
+      const result = await addCartItemRequiringAuth(productId)
+      if (result === 'added') {
+        setJustAdded(true)
+      }
     } catch (error) {
       console.error(error)
     } finally {
@@ -38,14 +48,20 @@ export function ProductDetailActions({
         type="button"
         disabled={!inStock || isAdding}
         onClick={onAddToCart}
-        className={`h-12 flex-1 rounded-[10px] bg-[#d84132] px-6 text-base text-white shadow-[0_12px_32px_rgba(216,65,50,0.28)] hover:bg-[#b83227] disabled:opacity-50 ${fontMono}`}
+        className={`h-12 flex-1 rounded-[10px] bg-(--red) px-6 text-base text-white shadow-[0_12px_32px_rgba(197,39,31,0.28)] hover:bg-(--red-deep) disabled:opacity-50 ${fontMono}`}
       >
-        <IconShoppingBag data-icon="inline-start" />
+        {justAdded ? (
+          <IconCheck data-icon="inline-start" />
+        ) : (
+          <IconShoppingBag data-icon="inline-start" />
+        )}
         {isAdding
           ? 'Adicionando...'
-          : inStock
-            ? 'Adicionar ao carrinho'
-            : 'Indisponível'}
+          : justAdded
+            ? 'Adicionado!'
+            : inStock
+              ? 'Adicionar ao carrinho'
+              : 'Indisponível'}
       </Button>
       <Button
         asChild

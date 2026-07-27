@@ -11,6 +11,11 @@ import logo from '@/src/assets/images/brand/logo.png'
 import { Button } from '@/src/components/ui/button'
 import { apiClient } from '@/src/lib/api-client'
 import {
+  CART_UPDATED_EVENT,
+  type CartUpdatedDetail,
+  getCartItemCount,
+} from '@/src/lib/cart-events'
+import {
   fontMono,
   fontType,
   sectionFrame,
@@ -47,16 +52,34 @@ export function PublicHeaderContent() {
   }, [])
 
   useEffect(() => {
-    apiClient.cart
-      .get()
-      .then((cart) => {
-        setItemCount(
-          cart.items.reduce((total, item) => total + item.quantity, 0),
-        )
-      })
-      .catch(() => {
-        setItemCount(0)
-      })
+    let cancelled = false
+
+    const refreshCount = () => {
+      apiClient.cart
+        .get()
+        .then((cart) => {
+          if (!cancelled) setItemCount(getCartItemCount(cart))
+        })
+        .catch(() => {
+          if (!cancelled) setItemCount(0)
+        })
+    }
+
+    const onCartUpdated = (event: Event) => {
+      const detail = (event as CustomEvent<CartUpdatedDetail>).detail
+      if (typeof detail?.itemCount === 'number') {
+        setItemCount(detail.itemCount)
+        return
+      }
+      refreshCount()
+    }
+
+    refreshCount()
+    window.addEventListener(CART_UPDATED_EVENT, onCartUpdated)
+    return () => {
+      cancelled = true
+      window.removeEventListener(CART_UPDATED_EVENT, onCartUpdated)
+    }
   }, [])
 
   useEffect(() => {

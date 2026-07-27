@@ -6,6 +6,7 @@ import { Geist_Mono, Handjet, Inter, Libre_Baskerville } from 'next/font/google'
 
 import { SmoothScrollProvider } from '@/src/components/smooth-scroll-provider'
 import { ThemeProvider } from '@/src/components/theme-provider'
+import { Toaster } from '@/src/components/ui/sonner'
 import { cn } from '@/src/lib/utils'
 
 const libreBaskervilleHeading = Libre_Baskerville({
@@ -54,6 +55,7 @@ export default function RootLayout({
       <body>
         <ThemeProvider>
           <SmoothScrollProvider>{children}</SmoothScrollProvider>
+          <Toaster position="top-center" richColors closeButton />
         </ThemeProvider>
         <SpeedInsights />
       </body>

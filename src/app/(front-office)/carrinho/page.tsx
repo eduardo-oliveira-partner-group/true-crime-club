@@ -31,6 +31,7 @@ import {
 import { Input } from '@/src/components/ui/input'
 import { CartSkeleton } from '@/src/components/ui/page-loading-skeletons'
 import { apiClient, ApiClientError } from '@/src/lib/api-client'
+import { notifyCartUpdated } from '@/src/lib/cart-events'
 import {
   arrowIconClass,
   buttonLiftShadow,
@@ -76,6 +77,11 @@ export default function CarrinhoPage() {
   )
   const [shipping, setShipping] = useState(emptyShipping)
 
+  const handleCartChange = (nextCart: Cart) => {
+    setCart(nextCart)
+    notifyCartUpdated(nextCart)
+  }
+
   useEffect(() => {
     let cancelled = false
 
@@ -97,7 +103,8 @@ export default function CarrinhoPage() {
 
         if (productToAdd) {
           try {
-            await addCartItem({ productId: productToAdd })
+            const updated = await addCartItem({ productId: productToAdd })
+            notifyCartUpdated(updated)
           } catch (error) {
             if (isAuthError(error)) throw error
             console.error(error)
@@ -124,6 +131,7 @@ export default function CarrinhoPage() {
         if (cancelled || !result) return
         const [nextCart, nextShipping, nextPlan] = result
         setCart(nextCart)
+        notifyCartUpdated(nextCart)
         setShipping(nextShipping)
         setSelectedPlan(nextPlan)
       })
@@ -134,6 +142,7 @@ export default function CarrinhoPage() {
           return
         }
         setCart(emptyCart())
+        notifyCartUpdated(emptyCart())
       })
 
     return () => {
@@ -207,7 +216,7 @@ export default function CarrinhoPage() {
                 <CartLineItem
                   key={item.id}
                   item={item}
-                  onCartChange={setCart}
+                  onCartChange={handleCartChange}
                 />
               ))}
 

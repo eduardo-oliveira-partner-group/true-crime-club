@@ -1,8 +1,11 @@
+'use client'
+
 import { IconArrowRight, IconSparkles } from '@tabler/icons-react'
 import Image from 'next/image'
 import Link from 'next/link'
 
 import { DossierCard } from '@/src/components/public-design/dossier-card'
+import { AddToCartIconButton } from '@/src/components/shop/add-to-cart-icon-button'
 import {
   AvailabilityBadge,
   PriceBlock,
@@ -25,14 +28,19 @@ export function RelatedProductCard({ product }: RelatedProductCardProps) {
   const productImage = getProductImage(product.images[0] ?? '')
 
   return (
-    <Link
-      href={`/loja/${product.slug}`}
+    <div
       className={cn(
-        'group block focus-visible:ring-2 focus-visible:ring-(--red) focus-visible:outline-none',
+        'group relative block',
         transitionCardHover,
         'hover:-translate-y-1 motion-reduce:transition-none motion-reduce:hover:translate-y-0',
       )}
     >
+      <Link
+        href={`/loja/${product.slug}`}
+        className="absolute inset-0 z-10 focus-visible:ring-2 focus-visible:ring-(--red) focus-visible:outline-none"
+        aria-label={`Ver ${product.name}`}
+      />
+
       <DossierCard
         tabCode={product.type === 'box' ? 'BOX' : 'ITEM'}
         tabLabel="relacionado"
@@ -40,7 +48,7 @@ export function RelatedProductCard({ product }: RelatedProductCardProps) {
         pinColor={product.type === 'box' ? 'var(--red)' : 'var(--teal)'}
         className="overflow-hidden p-0"
       >
-        <div className="relative aspect-4/3 overflow-hidden rounded-t-[14px] border-b border-[rgba(33,28,24,0.15)] bg-(--card)">
+        <div className="pointer-events-none relative aspect-4/3 overflow-hidden rounded-t-[14px] border-b border-[rgba(33,28,24,0.15)] bg-(--card)">
           {productImage ? (
             <Image
               src={productImage}
@@ -69,7 +77,7 @@ export function RelatedProductCard({ product }: RelatedProductCardProps) {
             className="absolute right-4 bottom-4"
           />
         </div>
-        <div className="p-5">
+        <div className="pointer-events-none p-5">
           <p
             className={`text-[0.65rem] tracking-[0.14em] text-(--red) uppercase ${fontType}`}
           >
@@ -82,12 +90,19 @@ export function RelatedProductCard({ product }: RelatedProductCardProps) {
           </h3>
           <div className="mt-5 flex items-end justify-between gap-4 border-t border-[rgba(33,28,24,0.15)] pt-4">
             <PriceBlock product={product} compact />
-            <span className="inline-flex size-10 items-center justify-center rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-(--red) text-[#fbf9f6] transition group-hover:bg-(--red-deep)">
-              <IconArrowRight className={cn('size-4', arrowIconClass)} />
-            </span>
+            <div className="pointer-events-auto relative z-30 flex shrink-0 items-center gap-2">
+              <AddToCartIconButton
+                productId={product.id}
+                productName={product.name}
+                inStock={product.inStock}
+              />
+              <span className="inline-flex size-10 items-center justify-center rounded-[10px] border border-[rgba(33,28,24,0.18)] bg-(--yellow) text-(--ink) transition group-hover:bg-(--amber)">
+                <IconArrowRight className={cn('size-4', arrowIconClass)} />
+              </span>
+            </div>
           </div>
         </div>
       </DossierCard>
-    </Link>
+    </div>
   )
 }

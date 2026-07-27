@@ -2,6 +2,7 @@
 
 import {
   IconCalendarEvent,
+  IconCheck,
   IconExternalLink,
   IconPackage,
   IconShoppingBag,
@@ -175,13 +176,21 @@ export function ProductQuickView({
   onOpenChange,
 }: ProductQuickViewProps) {
   const [isAdding, setIsAdding] = useState(false)
+  const [justAdded, setJustAdded] = useState(false)
   const [cachedProduct, setCachedProduct] = useState(product)
 
   useEffect(() => {
     if (product) {
       setCachedProduct(product)
+      setJustAdded(false)
     }
   }, [product])
+
+  useEffect(() => {
+    if (!justAdded) return
+    const timer = window.setTimeout(() => setJustAdded(false), 2000)
+    return () => window.clearTimeout(timer)
+  }, [justAdded])
 
   const activeProduct = product ?? cachedProduct
 
@@ -189,7 +198,10 @@ export function ProductQuickView({
     if (!activeProduct?.inStock || isAdding) return
     setIsAdding(true)
     try {
-      await addCartItemRequiringAuth(activeProduct.id)
+      const result = await addCartItemRequiringAuth(activeProduct.id)
+      if (result === 'added') {
+        setJustAdded(true)
+      }
     } catch (error) {
       console.error(error)
     } finally {
@@ -360,12 +372,18 @@ export function ProductQuickView({
                 onClick={onAddToCart}
                 className={`flex-1 rounded-[10px] bg-[#b5332a] px-5 text-white hover:bg-[#982820] disabled:opacity-50 ${fontMono}`}
               >
-                <IconShoppingBag data-icon="inline-start" />
+                {justAdded ? (
+                  <IconCheck data-icon="inline-start" />
+                ) : (
+                  <IconShoppingBag data-icon="inline-start" />
+                )}
                 {isAdding
                   ? 'Adicionando...'
-                  : activeProduct.inStock
-                    ? 'Adicionar ao carrinho'
-                    : 'Esgotado'}
+                  : justAdded
+                    ? 'Adicionado!'
+                    : activeProduct.inStock
+                      ? 'Adicionar ao carrinho'
+                      : 'Esgotado'}
               </Button>
             </div>
           </div>
@@ -406,12 +424,14 @@ export function ProductQuickView({
                 aria-label={
                   isAdding
                     ? 'Adicionando ao carrinho'
-                    : activeProduct.inStock
-                      ? 'Adicionar ao carrinho'
-                      : 'Produto esgotado'
+                    : justAdded
+                      ? 'Adicionado ao carrinho'
+                      : activeProduct.inStock
+                        ? 'Adicionar ao carrinho'
+                        : 'Produto esgotado'
                 }
               >
-                <IconShoppingBag />
+                {justAdded ? <IconCheck /> : <IconShoppingBag />}
               </Button>
             </div>
           </div>

@@ -1,4 +1,5 @@
 import { apiClient, ApiClientError } from '@/src/lib/api-client'
+import { notifyCartUpdated } from '@/src/lib/cart-events'
 import { addCartItem } from '@/src/lib/domain/repositories'
 
 function isAuthError(error: unknown): boolean {
@@ -33,6 +34,7 @@ export async function addCartItemRequiringAuth(
     throw error
   }
 
-  await addCartItem({ productId })
+  const cart = await addCartItem({ productId })
+  notifyCartUpdated(cart)
   return 'added'
 }

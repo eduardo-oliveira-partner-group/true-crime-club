@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import { useState } from 'react'
 
+import { AddToCartIconButton } from '@/src/components/shop/add-to-cart-icon-button'
 import { GlowingCard } from '@/src/components/ui/glowing-card'
 import {
   AvailabilityBadge,
@@ -65,12 +66,14 @@ function PreviousBoxCard({ product, onOpen }: PreviousBoxCardProps) {
   const evidenceNumber = String(product.cycleNumber ?? 0).padStart(2, '0')
 
   return (
-    <button
-      type="button"
-      onClick={onOpen}
-      className="block size-full cursor-pointer appearance-none border-0 bg-transparent p-0 text-left text-inherit focus-visible:ring-2 focus-visible:ring-[#9a662a] focus-visible:ring-offset-2 focus-visible:ring-offset-[#e9dfcf] focus-visible:outline-none dark:focus-visible:ring-[#d7b56d] dark:focus-visible:ring-offset-[#171211]"
-      aria-label={`Ver detalhes de ${product.name}`}
-    >
+    <article className="relative size-full">
+      <button
+        type="button"
+        onClick={onOpen}
+        className="absolute inset-0 z-10 cursor-pointer appearance-none border-0 bg-transparent focus-visible:ring-2 focus-visible:ring-[#9a662a] focus-visible:ring-offset-2 focus-visible:ring-offset-[#e9dfcf] focus-visible:outline-none dark:focus-visible:ring-[#d7b56d] dark:focus-visible:ring-offset-[#171211]"
+        aria-label={`Ver detalhes de ${product.name}`}
+      />
+
       <GlowingCard
         className="group h-full shadow-[0_10px_20px_rgba(63,46,34,0.07)] dark:shadow-[0_22px_48px_rgba(0,0,0,0.28)]"
         innerClassName="relative flex h-full min-h-[300px] flex-col overflow-hidden bg-[#fffaf2] p-0 md:flex-row dark:bg-[#0b0908]"
@@ -78,7 +81,7 @@ function PreviousBoxCard({ product, onOpen }: PreviousBoxCardProps) {
         <div className="pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(90deg,rgba(33,28,24,0.022)_1px,transparent_1px),linear-gradient(rgba(33,28,24,0.022)_1px,transparent_1px)] bg-size-[34px_34px] dark:bg-[linear-gradient(90deg,rgba(255,250,240,0.035)_1px,transparent_1px),linear-gradient(rgba(255,250,240,0.035)_1px,transparent_1px)]" />
 
         {productImage ? (
-          <div className="relative aspect-square shrink-0 overflow-hidden border-b border-[#211c18]/14 bg-[#efe4d4] md:w-[42%] md:border-r md:border-b-0 dark:border-[#fffaf0]/14 dark:bg-[#171211]">
+          <div className="pointer-events-none relative aspect-square shrink-0 overflow-hidden border-b border-[#211c18]/14 bg-[#efe4d4] md:w-[42%] md:border-r md:border-b-0 dark:border-[#fffaf0]/14 dark:bg-[#171211]">
             <Image
               src={productImage}
               alt={product.name}
@@ -99,7 +102,7 @@ function PreviousBoxCard({ product, onOpen }: PreviousBoxCardProps) {
           </div>
         ) : null}
 
-        <div className="relative z-20 flex flex-1 flex-col p-5 sm:p-6">
+        <div className="pointer-events-none relative z-20 flex flex-1 flex-col p-5 sm:p-6">
           <ProductKicker product={product} showAvailability={false} />
 
           <h3 className="mt-5 line-clamp-2 min-h-[2lh] overflow-hidden font-heading text-2xl/tight font-semibold tracking-wide text-[#211c18] uppercase dark:text-[#fffaf0]">
@@ -112,7 +115,14 @@ function PreviousBoxCard({ product, onOpen }: PreviousBoxCardProps) {
 
           <div className="mt-auto flex items-end justify-between gap-4 border-t border-[#211c18]/10 pt-5 dark:border-[#fffaf0]/10">
             <PriceBlock product={product} compact />
-            <AvailabilityBadge product={product} />
+            <div className="pointer-events-auto relative z-30 flex shrink-0 items-center gap-2">
+              <AddToCartIconButton
+                productId={product.id}
+                productName={product.name}
+                inStock={product.inStock}
+              />
+              <AvailabilityBadge product={product} />
+            </div>
           </div>
 
           <p className="sr-only">
@@ -120,6 +130,6 @@ function PreviousBoxCard({ product, onOpen }: PreviousBoxCardProps) {
           </p>
         </div>
       </GlowingCard>
-    </button>
+    </article>
   )
 }
