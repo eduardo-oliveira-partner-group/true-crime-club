@@ -2,10 +2,9 @@ import { listProducts } from '@/src/lib/domain/repositories'
 import type { Product } from '@/src/lib/domain/types'
 import { formatCurrency } from '@/src/lib/formatters'
 
-const LANDING_PRODUCT_CATEGORIES = {
-  archive: 'arquivos',
-  standaloneEdition: 'edicoes-especiais',
-} as const
+/** Categorias legadas/opcionais — a API atual usa `box` + `destaque`. */
+const ARCHIVE_CATEGORIES = new Set(['arquivos', 'arquivada'])
+const STANDALONE_CATEGORIES = new Set(['edicoes-especiais', 'edicao-especial'])
 
 const LANDING_ARCHIVE_LIMIT = 4
 
@@ -34,6 +33,25 @@ function parseBoxProductName(name: string): { box: string; title: string } {
   return { box: 'BOX', title: name }
 }
 
+function hasCategory(product: Product, categories: Set<string>): boolean {
+  return product.categories.some((category) => categories.has(category))
+}
+
+function isStandaloneEdition(product: Product): boolean {
+  if (product.type !== 'box') return false
+  if (hasCategory(product, STANDALONE_CATEGORIES)) return true
+  if (hasCategory(product, ARCHIVE_CATEGORIES)) return false
+  return product.featured === true
+}
+
+function isArchivedBox(product: Product): boolean {
+  if (product.type !== 'box') return false
+  if (isStandaloneEdition(product)) return false
+  if (hasCategory(product, ARCHIVE_CATEGORIES)) return true
+  // API atual: todas as caixas vêm com categoria `box`; arquivos = não destaque.
+  return !product.featured
+}
+
 export function toLandingArchiveItem(product: Product): LandingArchiveItem {
   const { box, title } = parseBoxProductName(product.name)
 
@@ -49,11 +67,7 @@ export function toLandingArchiveItem(product: Product): LandingArchiveItem {
 
 async function listArchivedBoxes(): Promise<Product[]> {
   const products = await listProducts()
-  return products.filter(
-    (product) =>
-      product.type === 'box' &&
-      product.categories.includes(LANDING_PRODUCT_CATEGORIES.archive),
-  )
+  return products.filter(isArchivedBox)
 }
 
 export async function getLandingArchiveItems(): Promise<LandingArchiveItem[]> {
@@ -66,13 +80,5 @@ export async function getLandingArchiveItems(): Promise<LandingArchiveItem[]> {
 
 export async function getLandingStandaloneProduct(): Promise<Product | null> {
   const products = await listProducts()
-  return (
-    products.find(
-      (product) =>
-        product.type === 'box' &&
-        product.categories.includes(
-          LANDING_PRODUCT_CATEGORIES.standaloneEdition,
-        ),
-    ) ?? null
-  )
+  return products.find(isStandaloneEdition) ?? null
 }
