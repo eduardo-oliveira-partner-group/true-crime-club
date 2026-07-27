@@ -172,9 +172,12 @@ export async function createOrder(
       body: JSON.stringify({
         idEndereco: input?.enderecoId,
         idMetodoPagamento: input?.pagamentoMetodoId,
-        simulacaoAssinatura: Boolean(input?.subscription),
-        planoId: input?.subscription?.id,
-        cep: input?.cep,
+        ...(input?.subscription
+          ? {
+              planoId: input.subscription.id,
+              cep: input?.cep,
+            }
+          : {}),
       }),
     },
   )

@@ -1,4 +1,4 @@
-export type ProductType = 'product' | 'box'
+export type ProductType = 'product' | 'box' | 'subscription'
 
 export type AvailabilityStatus =
   | 'available'
@@ -94,6 +94,7 @@ export interface PaymentMethod {
 export interface CartItem {
   id: string
   productId: string
+  planId?: string
   productSlug: string
   productName: string
   productType: ProductType

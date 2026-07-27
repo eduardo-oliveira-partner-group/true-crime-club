@@ -252,9 +252,17 @@ export function CheckoutStepper({
     setShippingLoading(true)
     setShippingError(null)
     try {
+      if (isSubscriptionFlow && !planId) {
+        setShippingOptions([])
+        setSelectedShippingId('')
+        setShippingPrice(0)
+        setShippingError(
+          'Plano da assinatura nao informado para cotar o frete.',
+        )
+        return
+      }
       const shipping = await calculateShipping(zipCode, {
         planoId: isSubscriptionFlow ? planId : undefined,
-        simulacaoAssinatura: isSubscriptionFlow,
       })
       const options = shipping.options.map(toCheckoutShippingOption)
       setShippingOptions(options)
@@ -290,7 +298,8 @@ export function CheckoutStepper({
   useEffect(() => {
     if (currentStep !== shippingStepIndex || !selectedZipCode) return
     void refreshShipping(selectedZipCode)
-  }, [currentStep, selectedZipCode])
+    // planId/isSubscriptionFlow: cotacao de assinatura exige planoId no body
+  }, [currentStep, selectedZipCode, planId, isSubscriptionFlow])
 
   function handleAddressSaved(nextAddresses: Address[]) {
     setAddresses(nextAddresses)

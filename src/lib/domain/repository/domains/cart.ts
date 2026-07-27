@@ -17,10 +17,15 @@ export async function getCart(): Promise<Cart> {
 }
 
 export async function addCartItem(input: {
-  productId: string
+  productId?: string
+  planoId?: string
   quantity?: number
 }): Promise<Cart> {
-  return await apiClient.cart.addItem(input.productId, input.quantity ?? 1)
+  return await apiClient.cart.addItem({
+    productId: input.productId,
+    planoId: input.planoId,
+    quantity: input.quantity ?? 1,
+  })
 }
 
 export async function updateCartItemQuantity(

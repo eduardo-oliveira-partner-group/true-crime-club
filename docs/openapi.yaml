@@ -669,6 +669,13 @@ paths:
                 cep:
                   type: string
                   example: 05435-020
+                planoId:
+                  type: string
+                  description: Obrigatorio para cotar frete de assinatura (quantidade=1).
+                  example: '1'
+                simulacaoAssinatura:
+                  type: boolean
+                  description: Legado. Sem planoId valido a cotacao retorna PLANO_OBRIGATORIO.
       responses:
         '200':
           description: Cálculo realizado.
@@ -708,11 +715,17 @@ paths:
                   example: metodo-pagamento-001
                 simulacaoAssinatura:
                   type: boolean
-                  description: Indica que o checkout também deve contratar a assinatura via RPC.
+                  description: Legado. A contratacao de assinatura depende de planoId.
                 planoId:
                   type: string
-                  description: Obrigatório quando simulacaoAssinatura for true. Usar plano.id.
+                  description: Obrigatorio para fluxo de assinatura. Usar plano.id numerico.
                   example: '2'
+                cep:
+                  type: string
+                  description: Obrigatorio com planoId (frete da assinatura).
+                chaveIdempotencia:
+                  type: string
+                  description: Chave unica do checkout para idempotencia (UUID recomendado).
                 planoNome:
                   type: string
                   example: Plano Anual

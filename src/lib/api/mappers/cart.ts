@@ -1,4 +1,4 @@
-import type { Cart, CartItem } from '@/src/lib/domain/types'
+import type { Cart, CartItem, ProductType } from '@/src/lib/domain/types'
 
 import type { JsonObject } from '../core/json'
 import {
@@ -9,13 +9,22 @@ import {
   asString,
 } from '../core/json'
 
+function toProductType(tipoProduto: unknown): ProductType {
+  if (tipoProduto === 'caixa') return 'box'
+  if (tipoProduto === 'assinatura') return 'subscription'
+  return 'product'
+}
+
 export function toCartItem(data: JsonObject): CartItem {
+  const planId = asOptionalString(data.idPlano)
+  const productId = asOptionalString(data.idProduto) ?? ''
   return {
     id: asString(data.id),
-    productId: asString(data.idProduto),
+    productId,
+    planId: planId || undefined,
     productSlug: asString(data.identificadorProduto),
     productName: asString(data.nomeProduto),
-    productType: data.tipoProduto === 'caixa' ? 'box' : 'product',
+    productType: toProductType(data.tipoProduto),
     quantity: asNumber(data.quantidade),
     unitPrice: asNumber(data.precoUnitario),
     image: asOptionalString(data.imagem),

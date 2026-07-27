@@ -24,6 +24,7 @@ import {
   warmShadowClass,
 } from '@/src/lib/design/classes'
 import {
+  addCartItem,
   getCart,
   getCartTotals,
   getPlanById,
@@ -69,9 +70,12 @@ export default function CheckoutPage() {
     setLoadError(null)
 
     Promise.all([
-      // Assinatura não depende do carrinho; evita GET /carrinho extra
-      // (o header já consulta o contador).
-      plano ? Promise.resolve(emptyCart()) : getCart(),
+      // Assinatura: grava item de plano no carrinho; resumo usa so o plano.
+      (plano
+        ? addCartItem({ planoId: plano })
+            .then(() => emptyCart())
+            .catch(() => emptyCart())
+        : getCart()),
       apiClient.customer.getProfile(),
       plano ? getPlanById(plano) : Promise.resolve(null),
     ])
@@ -225,10 +229,15 @@ export default function CheckoutPage() {
     pagamentoMetodoId: string
     cep: string
   }) {
+    const chaveIdempotencia =
+      typeof crypto !== 'undefined' && 'randomUUID' in crypto
+        ? crypto.randomUUID()
+        : `chk-${Date.now()}-${Math.random().toString(36).slice(2)}`
     const result = await apiClient.checkout.createOrder({
       enderecoId: input.enderecoId,
       pagamentoMetodoId: input.pagamentoMetodoId,
       cep: input.cep,
+      chaveIdempotencia,
       subscription:
         isSubscriptionFlow && plan
           ? {

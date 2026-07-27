@@ -121,9 +121,23 @@ export default function CarrinhoPage() {
           )
         }
 
+        // Plano: persiste item de assinatura no carrinho (CARRINHO_ITEM_ADICIONAR).
+        if (planId) {
+          try {
+            await addCartItem({ planoId: planId })
+          } catch (error) {
+            if (isAuthError(error)) throw error
+            console.error(error)
+          }
+          if (cancelled) return
+        }
+
         return Promise.all([
           getCart(),
-          calculateShipping(sampleZipCode).catch(() => emptyShipping),
+          calculateShipping(
+            sampleZipCode,
+            planId ? { planoId: planId } : undefined,
+          ).catch(() => emptyShipping),
           planId ? getPlanById(planId) : Promise.resolve(null),
         ])
       })
@@ -153,11 +167,21 @@ export default function CarrinhoPage() {
   if (!cart) return <CartSkeleton />
 
   const totals = { ...cart, ...getCartTotals(cart) }
-  const hasSelectedPlan = selectedPlan !== null
-  const subtotal = hasSelectedPlan ? selectedPlan.price : totals.subtotal
+  const planCartItem = cart.items.find(
+    (item) => item.productType === 'subscription' || Boolean(item.planId),
+  )
+  const productItems = cart.items.filter(
+    (item) => item.productType !== 'subscription' && !item.planId,
+  )
+  const hasSelectedPlan = selectedPlan !== null || Boolean(planCartItem)
+  const subtotal = selectedPlan
+    ? selectedPlan.price
+    : planCartItem
+      ? planCartItem.unitPrice * planCartItem.quantity
+      : totals.subtotal
   const discount = hasSelectedPlan ? 0 : totals.discount
   const grandTotal = subtotal - discount + shipping.price
-  const itemCount = cart.items.reduce(
+  const itemCount = productItems.reduce(
     (sum: number, item: CartItem) => sum + item.quantity,
     0,
   )
@@ -206,13 +230,21 @@ export default function CarrinhoPage() {
               {selectedPlan ? (
                 <SelectedPlanLineItem
                   plan={selectedPlan}
-                  onRemove={() => {
+                  onRemove={async () => {
+                    if (planCartItem) {
+                      try {
+                        const next = await removeCartItem(planCartItem.id)
+                        setCart(next)
+                      } catch (error) {
+                        console.error(error)
+                      }
+                    }
                     window.history.replaceState(null, '', '/carrinho')
                     setSelectedPlan(null)
                   }}
                 />
               ) : null}
-              {cart.items.map((item: CartItem) => (
+              {productItems.map((item: CartItem) => (
                 <CartLineItem
                   key={item.id}
                   item={item}

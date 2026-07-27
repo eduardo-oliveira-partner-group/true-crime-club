@@ -10,20 +10,19 @@ export const checkoutApi = {
   calculateShipping: (body: {
     cep: string
     planoId?: string
-    simulacaoAssinatura?: boolean
   }) =>
     fetcher('/finalizacao/frete', {
       method: 'POST',
       body: JSON.stringify({
         cep: body.cep,
-        planoId: body.planoId,
-        simulacaoAssinatura: body.simulacaoAssinatura,
+        ...(body.planoId ? { planoId: body.planoId } : {}),
       }),
     }),
   createOrder: (body?: {
     enderecoId?: string
     pagamentoMetodoId?: string
     cep?: string
+    chaveIdempotencia?: string
     subscription?: {
       id: string
     }
@@ -33,9 +32,9 @@ export const checkoutApi = {
       body: JSON.stringify({
         idEndereco: body?.enderecoId,
         idMetodoPagamento: body?.pagamentoMetodoId,
+        chaveIdempotencia: body?.chaveIdempotencia,
         ...(body?.subscription
           ? {
-              simulacaoAssinatura: true,
               planoId: body.subscription.id,
               cep: body.cep,
             }

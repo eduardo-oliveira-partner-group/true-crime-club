@@ -65,13 +65,11 @@ export async function calculateShipping(
   zipCode: string,
   options?: {
     planoId?: string
-    simulacaoAssinatura?: boolean
   },
 ): Promise<ShippingEstimate> {
   const apiResult = (await apiClient.checkout.calculateShipping({
     cep: zipCode,
     planoId: options?.planoId,
-    simulacaoAssinatura: options?.simulacaoAssinatura,
   })) as ApiShippingEstimate
 
   const shippingOptions = Array.isArray(apiResult.opcoes)

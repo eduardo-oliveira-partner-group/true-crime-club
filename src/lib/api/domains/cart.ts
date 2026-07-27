@@ -21,11 +21,19 @@ export const cartApi = {
     }
     return inflightGet
   },
-  addItem: (productId: string, quantity: number = 1) => {
+  addItem: (input: {
+    productId?: string
+    planoId?: string
+    quantity?: number
+  }) => {
     invalidateGetCache()
+    const quantity = input.quantity ?? 1
+    const body = input.planoId
+      ? { planoId: input.planoId, quantidade: quantity }
+      : { idProduto: input.productId, quantidade: quantity }
     return fetcher('/carrinho/itens', {
       method: 'POST',
-      body: JSON.stringify({ idProduto: productId, quantidade: quantity }),
+      body: JSON.stringify(body),
     }).then(toCart)
   },
   updateQuantity: (itemId: string, quantity: number) => {
