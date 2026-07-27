@@ -302,9 +302,11 @@ export default function CasosPage() {
               glareIntensity={0.18}
             >
               <main
-                className={`${styles.terminalSurface} ${styles.crtScrollbar} flex h-full flex-col overflow-y-auto p-3 font-handjet select-none sm:p-4 md:p-6`}
+                className={`${styles.terminalSurface} flex h-full flex-col overflow-hidden p-3 font-handjet select-none sm:p-4 md:p-6`}
               >
-                <div className="flex min-h-0 flex-1 flex-col justify-start">
+                <div
+                  className={`${styles.crtScrollbar} flex min-h-0 flex-1 flex-col justify-start overflow-y-auto`}
+                >
                   {/* ── Header ── */}
                   <header className="relative mb-5 flex flex-col gap-4 border border-[#33ff33]/45 bg-[#030703]/40 p-3 md:flex-row md:items-center md:justify-between md:p-4">
                     {/* Corner Markers */}
@@ -858,7 +860,7 @@ export default function CasosPage() {
                 </div>
 
                 {/* ── Footer ── */}
-                <footer className="relative mt-6 flex items-center justify-between border-t border-[#33ff33]/25 pt-4 font-mono text-[10px] tracking-wider text-[#33ff33]/50 uppercase select-none">
+                <footer className="relative mt-4 flex shrink-0 items-center justify-between border-t border-[#33ff33]/25 pt-4 font-mono text-[10px] tracking-wider text-[#33ff33]/50 uppercase select-none">
                   {/* Left Panel */}
                   <div className="flex items-center gap-4">
                     <span className="flex items-center gap-1.5">
