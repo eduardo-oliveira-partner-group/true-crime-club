@@ -1,6 +1,9 @@
-import { IconArrowRight, IconCheck, IconStarFilled } from '@tabler/icons-react'
-import Link from 'next/link'
+'use client'
 
+import { IconArrowRight, IconCheck, IconStarFilled } from '@tabler/icons-react'
+import { useState } from 'react'
+
+import { addPlanToCartRequiringAuth } from '@/src/lib/add-to-cart'
 import {
   arrowIconClass,
   fontHeading,
@@ -62,6 +65,57 @@ function orderPlansForDisplay(plans: SubscriptionPlan[]) {
   )
 }
 
+function SubscribePlanButton({
+  planId,
+  label,
+  className,
+  showArrow = false,
+}: {
+  planId: string
+  label: string
+  className: string
+  showArrow?: boolean
+}) {
+  const [pending, setPending] = useState(false)
+
+  const onSubscribe = async () => {
+    if (pending) return
+    setPending(true)
+    try {
+      const result = await addPlanToCartRequiringAuth(planId)
+      if (result === 'added') {
+        window.location.assign('/carrinho')
+        return
+      }
+    } catch (error) {
+      console.error(error)
+      setPending(false)
+    }
+  }
+
+  return (
+    <button
+      type="button"
+      disabled={pending}
+      onClick={onSubscribe}
+      className={cn(
+        className,
+        'disabled:pointer-events-none disabled:opacity-60',
+      )}
+    >
+      {pending ? 'Adicionando…' : label}
+      {showArrow && !pending ? (
+        <IconArrowRight
+          size={16}
+          stroke={2}
+          className={arrowIconClass}
+          aria-hidden
+        />
+      ) : null}
+    </button>
+  )
+}
+
 function StandardPlanCard({
   plan,
   className,
@@ -107,12 +161,11 @@ function StandardPlanCard({
       </p>
       <div className="mb-[22px] h-[1.5px] [background:repeating-linear-gradient(90deg,rgba(33,28,24,0.18)_0,rgba(33,28,24,0.18)_5px,transparent_5px,transparent_9px)]" />
       <FeatureList color="#1AA587" items={plan.features} />
-      <Link
-        href={`/carrinho?plano=${encodeURIComponent(plan.id)}`}
+      <SubscribePlanButton
+        planId={plan.id}
+        label={isOneTime ? 'Comprar avulsa' : 'Assinar Mensal'}
         className={`flex w-full items-center justify-center rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-transparent px-4 py-[15px] text-[14px] leading-none font-bold tracking-[0.04em] text-(--ink) uppercase no-underline ${transitionBgColor} hover:bg-(--ink) hover:text-[#fbf9f6] ${fontMono}`}
-      >
-        Assinar Mensal
-      </Link>
+      />
     </article>
   )
 }
@@ -165,18 +218,12 @@ function AnnualPlanCard({
         </p>
         <div className="mb-[22px] h-[1.5px] [background:repeating-linear-gradient(90deg,rgba(255,255,255,0.28)_0,rgba(255,255,255,0.28)_5px,transparent_5px,transparent_9px)]" />
         <FeatureList color="#F4CF5A" items={plan.features} />
-        <Link
-          href={`/carrinho?plano=${encodeURIComponent(plan.id)}`}
-          className={`group flex w-full items-center justify-center rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-(--yellow) px-4 py-[15px] text-[14px] leading-none font-bold tracking-[0.04em] text-(--ink) uppercase no-underline ${transitionBgColor} hover:bg-[#fbf4e3] hover:text-(--purple) ${fontMono}`}
-        >
-          Assinar Anual{' '}
-          <IconArrowRight
-            size={16}
-            stroke={2}
-            className={arrowIconClass}
-            aria-hidden
-          />
-        </Link>
+        <SubscribePlanButton
+          planId={plan.id}
+          label="Assinar Anual"
+          showArrow
+          className={`group flex w-full items-center justify-center gap-2 rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-(--yellow) px-4 py-[15px] text-[14px] leading-none font-bold tracking-[0.04em] text-(--ink) uppercase no-underline ${transitionBgColor} hover:bg-[#fbf4e3] hover:text-(--purple) ${fontMono}`}
+        />
       </div>
     </article>
   )

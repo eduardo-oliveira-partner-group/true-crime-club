@@ -2,6 +2,8 @@ import { apiClient, ApiClientError } from '@/src/lib/api-client'
 import { notifyCartUpdated } from '@/src/lib/cart-events'
 import { addCartItem } from '@/src/lib/domain/repositories'
 
+export const PENDING_PLAN_STORAGE_KEY = 'tcc:pending-plan-id'
+
 function isAuthError(error: unknown): boolean {
   return (
     error instanceof ApiClientError &&
@@ -15,6 +17,11 @@ export function loginPathToAddProduct(productId: string): string {
     `/carrinho?adicionar=${encodeURIComponent(productId)}`,
   )
   return `/login?next=${next}`
+}
+
+/** Destino pós-login: carrinho (plano pendente vai no sessionStorage). */
+export function loginPathToAddPlan(): string {
+  return `/login?next=${encodeURIComponent('/carrinho')}`
 }
 
 /**
@@ -35,6 +42,33 @@ export async function addCartItemRequiringAuth(
   }
 
   const cart = await addCartItem({ productId })
+  notifyCartUpdated(cart)
+  return 'added'
+}
+
+/**
+ * Adiciona o plano ao carrinho via API. Sem sessão, guarda o plano
+ * pendente e redireciona para login → `/carrinho` (sem query).
+ */
+export async function addPlanToCartRequiringAuth(
+  planId: string,
+): Promise<'added' | 'login-redirect'> {
+  try {
+    await apiClient.auth.me()
+  } catch (error) {
+    if (isAuthError(error)) {
+      try {
+        sessionStorage.setItem(PENDING_PLAN_STORAGE_KEY, planId)
+      } catch {
+        // sessionStorage pode falhar em modo restrito; o usuário reescolhe o plano.
+      }
+      window.location.assign(loginPathToAddPlan())
+      return 'login-redirect'
+    }
+    throw error
+  }
+
+  const cart = await addCartItem({ planoId: planId })
   notifyCartUpdated(cart)
   return 'added'
 }

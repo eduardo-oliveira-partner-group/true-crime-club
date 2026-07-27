@@ -30,6 +30,7 @@ import {
 } from '@/src/components/ui/empty'
 import { Input } from '@/src/components/ui/input'
 import { CartSkeleton } from '@/src/components/ui/page-loading-skeletons'
+import { PENDING_PLAN_STORAGE_KEY } from '@/src/lib/add-to-cart'
 import { apiClient, ApiClientError } from '@/src/lib/api-client'
 import { notifyCartUpdated } from '@/src/lib/cart-events'
 import {
@@ -49,12 +50,11 @@ import {
   calculateShipping,
   getCart,
   getCartTotals,
-  getPlanById,
   removeCartItem,
   updateCartItemQuantity,
 } from '@/src/lib/domain/repositories'
 import { emptyCart } from '@/src/lib/domain/repository/core/helpers'
-import type { Cart, CartItem, SubscriptionPlan } from '@/src/lib/domain/types'
+import type { Cart, CartItem } from '@/src/lib/domain/types'
 import { formatCurrency } from '@/src/lib/formatters'
 import { getProductImage } from '@/src/lib/product-images'
 import { cn } from '@/src/lib/utils'
@@ -76,9 +76,6 @@ function isPlanCartItem(item: CartItem): boolean {
 export default function CarrinhoPage() {
   const router = useRouter()
   const [cart, setCart] = useState<Cart | null>(null)
-  const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(
-    null,
-  )
   const [shipping, setShipping] = useState(emptyShipping)
 
   const handleCartChange = (nextCart: Cart) => {
@@ -97,8 +94,13 @@ export default function CarrinhoPage() {
     }
 
     const searchParams = new URLSearchParams(window.location.search)
-    const planIdFromQuery = searchParams.get('plano')
     const productToAdd = searchParams.get('adicionar')
+    let pendingPlanId: string | null = null
+    try {
+      pendingPlanId = sessionStorage.getItem(PENDING_PLAN_STORAGE_KEY)
+    } catch {
+      pendingPlanId = null
+    }
 
     apiClient.auth
       .me()
@@ -115,20 +117,14 @@ export default function CarrinhoPage() {
           }
           if (cancelled) return
 
-          const cleaned = new URLSearchParams(searchParams)
-          cleaned.delete('adicionar')
-          const query = cleaned.toString()
-          window.history.replaceState(
-            null,
-            '',
-            query ? `/carrinho?${query}` : '/carrinho',
-          )
+          window.history.replaceState(null, '', '/carrinho')
         }
 
-        // Plano: persiste item de assinatura no carrinho (CARRINHO_ITEM_ADICIONAR).
-        if (planIdFromQuery) {
+        // Plano pendente pós-login (sem query string).
+        if (pendingPlanId) {
           try {
-            await addCartItem({ planoId: planIdFromQuery })
+            sessionStorage.removeItem(PENDING_PLAN_STORAGE_KEY)
+            await addCartItem({ planoId: pendingPlanId })
           } catch (error) {
             if (isAuthError(error)) throw error
             console.error(error)
@@ -136,28 +132,33 @@ export default function CarrinhoPage() {
           if (cancelled) return
         }
 
+        // Links antigos `/carrinho?plano=` → adiciona e limpa a URL.
+        const legacyPlanId = searchParams.get('plano')
+        if (legacyPlanId && !pendingPlanId) {
+          try {
+            await addCartItem({ planoId: legacyPlanId })
+          } catch (error) {
+            if (isAuthError(error)) throw error
+            console.error(error)
+          }
+          if (cancelled) return
+          window.history.replaceState(null, '', '/carrinho')
+        }
+
         const nextCart = await getCart()
         if (cancelled) return
 
         const planFromCart = nextCart.items.find(isPlanCartItem)
-        const resolvedPlanId =
-          planIdFromQuery ?? planFromCart?.planId ?? undefined
+        const nextShipping = await calculateShipping(
+          sampleZipCode,
+          planFromCart?.planId ? { planoId: planFromCart.planId } : undefined,
+        ).catch(() => emptyShipping)
 
-        const [nextShipping, nextPlan] = await Promise.all([
-          calculateShipping(
-            sampleZipCode,
-            resolvedPlanId ? { planoId: resolvedPlanId } : undefined,
-          ).catch(() => emptyShipping),
-          resolvedPlanId
-            ? getPlanById(resolvedPlanId).catch(() => null)
-            : Promise.resolve(null),
-        ])
-
-        return { nextCart, nextShipping, nextPlan }
+        return { nextCart, nextShipping }
       })
       .then((result) => {
         if (cancelled || !result) return
-        const { nextCart, nextShipping, nextPlan } = result
+        const { nextCart, nextShipping } = result
         setCart(nextCart)
         notifyCartUpdated(nextCart)
         setShipping({
@@ -165,7 +166,6 @@ export default function CarrinhoPage() {
           region: nextCart.shippingRegion ?? nextShipping.region,
           estimatedDays: nextShipping.estimatedDays,
         })
-        setSelectedPlan(nextPlan)
       })
       .catch((error: unknown) => {
         if (cancelled) return
@@ -187,8 +187,6 @@ export default function CarrinhoPage() {
   const totals = getCartTotals(cart)
   const planItems = cart.items.filter(isPlanCartItem)
   const productItems = cart.items.filter((item) => !isPlanCartItem(item))
-  const planCartItem = planItems[0] ?? null
-  const planIdForCheckout = selectedPlan?.id ?? planCartItem?.planId
   const shippingPrice = cart.shippingEstimate ?? shipping.price
   const shippingRegion = cart.shippingRegion || shipping.region
   const subtotal = totals.subtotal
@@ -243,24 +241,10 @@ export default function CarrinhoPage() {
                 <SelectedPlanLineItem
                   key={item.id}
                   item={item}
-                  plan={
-                    selectedPlan &&
-                    (selectedPlan.id === item.planId ||
-                      selectedPlan.slug === item.productSlug)
-                      ? selectedPlan
-                      : null
-                  }
                   onRemove={async () => {
                     try {
                       const next = await removeCartItem(item.id)
                       handleCartChange(next)
-                      if (
-                        selectedPlan &&
-                        (selectedPlan.id === item.planId ||
-                          selectedPlan.slug === item.productSlug)
-                      ) {
-                        setSelectedPlan(null)
-                      }
                       window.history.replaceState(null, '', '/carrinho')
                     } catch (error) {
                       console.error(error)
@@ -303,7 +287,6 @@ export default function CarrinhoPage() {
                 shippingDays={shipping.estimatedDays}
                 total={grandTotal}
                 couponCode={cart.couponCode}
-                planId={planIdForCheckout}
                 hasPlan={planItems.length > 0}
               />
             </aside>
@@ -357,14 +340,7 @@ function EmptyCart() {
   )
 }
 
-function inferPlanIntervalLabel(
-  item: CartItem,
-  plan: SubscriptionPlan | null,
-): string {
-  if (plan?.billingInterval === 'annual') return 'Assinatura anual'
-  if (plan?.billingInterval === 'monthly') return 'Assinatura mensal'
-  if (plan?.billingInterval === 'one_time') return 'Plano avulso'
-
+function inferPlanIntervalLabel(item: CartItem): string {
   const slug = item.productSlug.toLowerCase()
   const name = item.productName.toLowerCase()
   if (slug.includes('anual') || name.includes('anual')) {
@@ -373,24 +349,21 @@ function inferPlanIntervalLabel(
   if (slug.includes('mensal') || name.includes('mensal')) {
     return 'Assinatura mensal'
   }
+  if (slug.includes('avuls') || name.includes('avuls')) {
+    return 'Plano avulso'
+  }
   return 'Plano de assinatura'
 }
 
 function SelectedPlanLineItem({
   item,
-  plan,
   onRemove,
 }: {
   item: CartItem
-  plan: SubscriptionPlan | null
   onRemove: () => void
 }) {
-  const intervalLabel = inferPlanIntervalLabel(item, plan)
-  const name = plan?.name ?? item.productName
-  const description =
-    plan?.description ??
-    'Assinatura TrueCrime.Club incluída neste dossiê de compra.'
-  const price = plan?.price ?? item.unitPrice * item.quantity
+  const intervalLabel = inferPlanIntervalLabel(item)
+  const price = item.unitPrice * item.quantity
 
   return (
     <article
@@ -419,9 +392,11 @@ function SelectedPlanLineItem({
               'text-lg/tight font-semibold tracking-[-0.01em] text-(--ink)',
             )}
           >
-            {name}
+            {item.productName}
           </h3>
-          <p className="text-sm text-(--ink-soft)">{description}</p>
+          <p className="text-sm text-(--ink-soft)">
+            Assinatura TrueCrime.Club incluída neste dossiê de compra.
+          </p>
         </div>
         <div className="flex items-center justify-between gap-4 sm:flex-col sm:items-end">
           <p
@@ -679,7 +654,6 @@ function OrderSummary({
   shippingDays,
   total,
   couponCode,
-  planId,
   hasPlan,
 }: {
   subtotal: number
@@ -689,12 +663,9 @@ function OrderSummary({
   shippingDays: string
   total: number
   couponCode?: string
-  planId?: string
   hasPlan: boolean
 }) {
-  const checkoutHref = planId
-    ? `/checkout?plano=${encodeURIComponent(planId)}`
-    : '/checkout'
+  const checkoutHref = '/checkout'
 
   return (
     <div

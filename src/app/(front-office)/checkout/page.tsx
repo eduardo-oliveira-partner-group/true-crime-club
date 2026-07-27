@@ -2,7 +2,7 @@
 
 import { IconAlertTriangle, IconRefresh } from '@tabler/icons-react'
 import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 import {
@@ -24,14 +24,12 @@ import {
   warmShadowClass,
 } from '@/src/lib/design/classes'
 import {
-  addCartItem,
   getCart,
   getCartTotals,
   getPlanById,
   listPlans,
   updateCustomerProfile,
 } from '@/src/lib/domain/repositories'
-import { emptyCart } from '@/src/lib/domain/repository/core/helpers'
 import type { CartItem, PaymentMethod } from '@/src/lib/domain/types'
 import { formatCurrency } from '@/src/lib/formatters'
 import { cn } from '@/src/lib/utils'
@@ -44,9 +42,7 @@ function isAuthError(error: unknown): boolean {
 }
 
 export default function CheckoutPage() {
-  const searchParams = useSearchParams()
   const router = useRouter()
-  const plano = searchParams.get('plano') ?? undefined
   const [loadError, setLoadError] = useState<string | null>(null)
   const [state, setState] = useState<{
     cart: Awaited<ReturnType<typeof getCart>>
@@ -70,32 +66,18 @@ export default function CheckoutPage() {
     setLoadError(null)
 
     Promise.all([getCart(), apiClient.customer.getProfile()])
-      .then(async ([cartFromApi, profile]) => {
+      .then(async ([cart, profile]) => {
         if (cancelled) return
         if (!profile.customer?.id) {
           redirectToLogin()
           return
         }
 
-        const planIdFromCart = cartFromApi.items.find(
+        const resolvedPlanoId = cart.items.find(
           (item) => item.planId || item.productType === 'subscription',
         )?.planId
-        const resolvedPlanoId = plano ?? planIdFromCart
 
-        // Assinatura: garante item no carrinho; resumo do stepper usa o plano.
-        let cart = cartFromApi
-        if (resolvedPlanoId) {
-          try {
-            await addCartItem({ planoId: resolvedPlanoId })
-          } catch {
-            // Mantem carrinho atual se o add falhar.
-          }
-          cart = emptyCart()
-        }
-
-        const plan = resolvedPlanoId
-          ? await getPlanById(resolvedPlanoId)
-          : null
+        const plan = resolvedPlanoId ? await getPlanById(resolvedPlanoId) : null
         if (cancelled) return
 
         const monthlyPlan =
@@ -145,7 +127,7 @@ export default function CheckoutPage() {
     return () => {
       cancelled = true
     }
-  }, [plano, router])
+  }, [router])
 
   if (loadError) {
     return (
@@ -199,9 +181,6 @@ export default function CheckoutPage() {
   if (!state) return <CheckoutSkeleton />
 
   const { cart, profile, paymentMethods, plan, monthlyPlan, shipping } = state
-  // const checkoutPath = plano
-  //   ? `/checkout?${new URLSearchParams({ plano }).toString()}`
-  //   : '/checkout'
   const isSubscriptionFlow = Boolean(plan)
   const totals = { ...cart, ...getCartTotals(cart) }
 
