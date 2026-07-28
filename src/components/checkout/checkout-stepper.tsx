@@ -23,6 +23,13 @@ import { CardForm } from '@/src/components/customer/card-form'
 import { Badge } from '@/src/components/ui/badge'
 import { Button } from '@/src/components/ui/button'
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/src/components/ui/dialog'
+import {
   Empty,
   EmptyContent,
   EmptyDescription,
@@ -407,34 +414,27 @@ export function CheckoutStepper({
 
   return (
     <div className="relative grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-10">
-      {submitting ? (
-        <div
-          aria-live="assertive"
-          aria-label="Processamento do pedido em curso"
-          className="fixed inset-0 z-50 grid place-items-center bg-[rgba(33,28,24,0.62)] p-4 backdrop-blur-[1px] sm:p-6"
-          role="status"
+      <Dialog open={submitting}>
+        <DialogContent
+          className={cn(
+            dossierCardSurface,
+            warmShadowClass,
+            'max-w-sm gap-0 p-6 text-center sm:p-7',
+          )}
+          overlayClassName="bg-foreground/30"
+          showCloseButton={false}
         >
-          <div className="w-full max-w-sm rounded-[14px] border border-[#d7b56d]/40 bg-[#241f1b] p-6 text-center text-[#fbf9f6] shadow-[0_8px_14px_-8px_rgba(33,28,24,0.45)] sm:p-7">
-            <span className="mx-auto flex size-12 animate-pulse items-center justify-center rounded-full border border-[#d7b56d]/70 text-[#d7b56d] motion-reduce:animate-none">
-              <IconPackage className="size-5" />
-            </span>
-            <p
-              className={cn(
-                fontMono,
-                'mt-4 text-xs font-semibold tracking-[0.16em] text-[#d7b56d] uppercase',
-              )}
-            >
+          <DialogHeader className="items-center gap-3 text-center">
+            <Spinner aria-hidden className="size-8 text-(--red)" />
+            <DialogTitle className={cn(fontHeading, 'text-lg text-(--ink)')}>
               Processamento em curso
-            </p>
-            <p className="mt-3 text-sm/6 text-[#fbf9f6]/80">
+            </DialogTitle>
+            <DialogDescription className="text-sm/6 text-(--ink-mute)">
               {processingMessage}
-            </p>
-            <div className="mx-auto mt-5 h-px w-24 overflow-hidden bg-[#fbf9f6]/20">
-              <span className="block h-full w-1/2 animate-[pulse_1s_ease-in-out_infinite] bg-[#d7b56d] motion-reduce:animate-none" />
-            </div>
-          </div>
-        </div>
-      ) : null}
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
       <div className="order-2 space-y-7 lg:order-1">
         <div className={cn(dossierCardSurface, warmShadowClass)}>
           <div className="flex items-center justify-between gap-4 border-b border-[rgba(33,28,24,0.12)] px-5 py-4 sm:px-6">
