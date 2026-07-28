@@ -8,6 +8,8 @@ const STANDALONE_CATEGORIES = new Set(['edicoes-especiais', 'edicao-especial'])
 
 const LANDING_ARCHIVE_LIMIT = 4
 
+let landingProductsPromise: Promise<Product[]> | null = null
+
 export type LandingArchiveItem = {
   box: string
   title: string
@@ -65,8 +67,19 @@ export function toLandingArchiveItem(product: Product): LandingArchiveItem {
   }
 }
 
+async function getLandingProducts(): Promise<Product[]> {
+  if (!landingProductsPromise) {
+    landingProductsPromise = listProducts().catch((error: unknown) => {
+      landingProductsPromise = null
+      throw error
+    })
+  }
+
+  return landingProductsPromise
+}
+
 async function listArchivedBoxes(): Promise<Product[]> {
-  const products = await listProducts()
+  const products = await getLandingProducts()
   return products.filter(isArchivedBox)
 }
 
@@ -79,6 +92,6 @@ export async function getLandingArchiveItems(): Promise<LandingArchiveItem[]> {
 }
 
 export async function getLandingStandaloneProduct(): Promise<Product | null> {
-  const products = await listProducts()
+  const products = await getLandingProducts()
   return products.find(isStandaloneEdition) ?? null
 }
