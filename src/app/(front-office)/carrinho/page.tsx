@@ -14,7 +14,7 @@ import {
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { DesignPageShell } from '@/src/components/public-design/design-page-shell'
 import { SectionEyebrow } from '@/src/components/public-design/section-eyebrow'
@@ -458,6 +458,36 @@ function CartLineItem({
   const itemCode = `EVID-${String(item.quantity).padStart(2, '0')}`
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [removing, setRemoving] = useState(false)
+  const [desktopImageSize, setDesktopImageSize] = useState<number | null>(null)
+  const contentRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(min-width: 640px)')
+    const content = contentRef.current
+    if (!content) return
+
+    const syncImageSize = () => {
+      if (!mediaQuery.matches) {
+        setDesktopImageSize(null)
+        return
+      }
+
+      const nextSize = Math.ceil(content.getBoundingClientRect().height)
+      setDesktopImageSize((currentSize) =>
+        currentSize === nextSize ? currentSize : nextSize,
+      )
+    }
+
+    const observer = new ResizeObserver(syncImageSize)
+    observer.observe(content)
+    mediaQuery.addEventListener('change', syncImageSize)
+    syncImageSize()
+
+    return () => {
+      observer.disconnect()
+      mediaQuery.removeEventListener('change', syncImageSize)
+    }
+  }, [])
 
   const handleRemove = async () => {
     setRemoving(true)
@@ -481,17 +511,22 @@ function CartLineItem({
         'relative isolate overflow-hidden hover:-translate-y-1 hover:shadow-[0_24px_44px_-18px_rgba(33,28,24,0.3),inset_0_0_0_1px_rgba(255,255,255,0.6)]',
       )}
     >
-      <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-stretch sm:gap-5 sm:p-5">
+      <div className="flex items-stretch gap-4 p-4 sm:gap-5 sm:p-5">
         <Link
           href={`/loja/${item.productSlug}`}
-          className="group relative aspect-square w-full shrink-0 overflow-hidden rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-(--paper-soft) sm:size-28"
+          className="group relative aspect-square size-24 shrink-0 overflow-hidden rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-(--paper-soft) sm:size-28"
+          style={
+            desktopImageSize
+              ? { height: desktopImageSize, width: desktopImageSize }
+              : undefined
+          }
         >
           {productImage ? (
             <Image
               src={productImage}
               alt={item.productName}
               fill
-              sizes="(max-width: 640px) 100vw, 112px"
+              sizes="(max-width: 640px) 96px, 180px"
               className="object-cover object-center transition duration-500 group-hover:scale-[1.04]"
             />
           ) : (
@@ -501,7 +536,7 @@ function CartLineItem({
           )}
         </Link>
 
-        <div className="flex min-w-0 flex-1 flex-col gap-4">
+        <div ref={contentRef} className="flex min-w-0 flex-1 flex-col gap-4">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="min-w-0 space-y-1.5">
               <p
@@ -540,7 +575,7 @@ function CartLineItem({
             </p>
           </div>
 
-          <div className="mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-dashed border-[rgba(33,28,24,0.18)] pt-4">
+          <div className="mt-auto hidden flex-wrap items-center justify-between gap-3 border-t border-dashed border-[rgba(33,28,24,0.18)] pt-4 sm:flex">
             <QuantityControls
               itemId={item.id}
               quantity={item.quantity}
@@ -560,6 +595,24 @@ function CartLineItem({
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="flex w-full items-center justify-between gap-3 border-t border-dashed border-[rgba(33,28,24,0.18)] p-4 sm:hidden">
+        <QuantityControls
+          itemId={item.id}
+          quantity={item.quantity}
+          onCartChange={onCartChange}
+        />
+        <Button
+          type="button"
+          onClick={() => setConfirmOpen(true)}
+          variant="ghost"
+          size="sm"
+          className="h-8 gap-1.5 rounded-[9px] px-3 text-xs font-medium text-(--red) hover:bg-(--red)/10 hover:text-(--red-deep)"
+        >
+          <IconTrash className="size-4" />
+          Remover
+        </Button>
       </div>
 
       <ConfirmDialog

@@ -238,7 +238,7 @@ export function ProductQuickView({
           'max-h-[calc(100vh-1.5rem)] w-[calc(100%-1.5rem)] max-w-6xl gap-0 overflow-y-auto rounded-[14px_14px_16px_16px] border border-[rgba(33,28,24,0.16)] bg-(--card) p-0 text-(--ink) ring-0 sm:max-w-6xl lg:max-h-[calc(100vh-3rem)] lg:overflow-hidden',
           cardShadowBase,
           'duration-200 data-open:zoom-in-[1] data-closed:zoom-out-[1]',
-          'grid grid-rows-[180px_minmax(0,1fr)] sm:grid-rows-[360px_minmax(0,1fr)] lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:grid-rows-none',
+          'grid grid-rows-[240px_minmax(0,1fr)] sm:grid-rows-[360px_minmax(0,1fr)] lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:grid-rows-none',
         )}
       >
         <div
@@ -263,7 +263,7 @@ export function ProductQuickView({
           </button>
         </DialogClose>
 
-        <div className="relative min-h-[180px] min-w-0 overflow-hidden bg-(--paper-soft) sm:min-h-[360px] lg:min-h-[620px]">
+        <div className="relative min-h-[240px] min-w-0 overflow-hidden bg-(--paper-soft) sm:min-h-[360px] lg:min-h-[620px]">
           {productImage ? (
             <Image
               src={productImage}
