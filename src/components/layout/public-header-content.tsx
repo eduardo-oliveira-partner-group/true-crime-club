@@ -52,6 +52,11 @@ export function PublicHeaderContent() {
   }, [])
 
   useEffect(() => {
+    if (!isLoggedIn) {
+      setItemCount(0)
+      return
+    }
+
     let cancelled = false
 
     const refreshCount = () => {
@@ -80,7 +85,7 @@ export function PublicHeaderContent() {
       cancelled = true
       window.removeEventListener(CART_UPDATED_EVENT, onCartUpdated)
     }
-  }, [])
+  }, [isLoggedIn])
 
   useEffect(() => {
     if (!isMenuOpen) return
