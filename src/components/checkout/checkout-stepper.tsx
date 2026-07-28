@@ -122,7 +122,7 @@ interface CheckoutStepperProps {
   totalAmount: number
   /** Preferências já salvas no perfil do cliente (pré-preenche a etapa). */
   initialPreferences?: SubscriberPreferencesValue
-  /** Salva preferências do assinante (server action). */
+  /** Salva preferências para a curadoria das caixas (server action). */
   onSavePreferences: (preferences: SubscriberPreferencesValue) => Promise<void>
   /** Cria o pedido (server action). */
   onCreateOrder: (input: {
@@ -342,9 +342,7 @@ export function CheckoutStepper({
     setError(null)
     setSubmitting(true)
     try {
-      if (isSubscriptionFlow) {
-        await onSavePreferences(preferences)
-      }
+      await onSavePreferences(preferences)
       const orderId = await onCreateOrder({
         enderecoId: selectedAddressId,
         pagamentoMetodoId: selectedPaymentId,
@@ -898,106 +896,97 @@ export function CheckoutStepper({
               {/* 05 — Preferências */}
               <Step>
                 <Section
-                  title="Preferências do assinante"
+                  title="Preferências da caixa"
                   eyebrow="Curadoria"
                   code="STEP-05"
                 >
-                  {isSubscriptionFlow ? (
-                    <>
-                      <p className="text-sm text-(--ink-soft)">
-                        {planName
-                          ? `Para o ${planName}, capturamos suas preferências para curadoria das boxes.`
-                          : 'Capturamos suas preferências para curadoria das boxes.'}
-                      </p>
-                      <FieldGroup className="mt-5 gap-4 sm:grid sm:grid-cols-2">
-                        <Field>
-                          <FieldLabel
-                            className={cn(
-                              fontMono,
-                              'text-[0.65rem] font-semibold tracking-[0.14em] text-(--ink) uppercase',
-                            )}
-                          >
-                            Tamanho de camiseta
-                          </FieldLabel>
-                          <NativeSelect
-                            value={preferences.shirtSize ?? ''}
-                            onChange={(e) =>
-                              setPreferences((prev) => ({
-                                ...prev,
-                                shirtSize: e.target.value,
-                              }))
-                            }
-                            className={cn(formInputClass, 'px-3')}
-                          >
-                            <NativeSelectOption value="">
-                              Prefiro não informar
-                            </NativeSelectOption>
-                            {SHIRT_SIZES.map((option) => (
-                              <NativeSelectOption key={option} value={option}>
-                                {option}
-                              </NativeSelectOption>
-                            ))}
-                          </NativeSelect>
-                        </Field>
-                        <Field>
-                          <FieldLabel
-                            className={cn(
-                              fontMono,
-                              'text-[0.65rem] font-semibold tracking-[0.14em] text-(--ink) uppercase',
-                            )}
-                          >
-                            Tamanho de calçado
-                          </FieldLabel>
-                          <NativeSelect
-                            value={preferences.shoeSize ?? ''}
-                            onChange={(e) =>
-                              setPreferences((prev) => ({
-                                ...prev,
-                                shoeSize: e.target.value,
-                              }))
-                            }
-                            className={cn(formInputClass, 'px-3')}
-                          >
-                            <NativeSelectOption value="">
-                              Prefiro não informar
-                            </NativeSelectOption>
-                            {SHOE_SIZES.map((option) => (
-                              <NativeSelectOption key={option} value={option}>
-                                {option}
-                              </NativeSelectOption>
-                            ))}
-                          </NativeSelect>
-                        </Field>
-                      </FieldGroup>
-                      <Field className="mt-4">
-                        <FieldLabel
-                          className={cn(
-                            fontMono,
-                            'text-[0.65rem] font-semibold tracking-[0.14em] text-(--ink) uppercase',
-                          )}
-                        >
-                          Notas para curadoria
-                        </FieldLabel>
-                        <Textarea
-                          value={preferences.notes}
-                          onChange={(e) =>
-                            setPreferences((prev) => ({
-                              ...prev,
-                              notes: e.target.value,
-                            }))
-                          }
-                          rows={3}
-                          placeholder="Preferências de cores, estilo, alergias, etc."
-                          className={cn(formInputClass, 'resize-none')}
-                        />
-                      </Field>
-                    </>
-                  ) : (
-                    <p className="text-sm text-(--ink-soft)">
-                      Etapa exclusiva para assinantes. Para compra avulsa, siga
-                      para a revisão.
-                    </p>
-                  )}
+                  <p className="text-sm text-(--ink-soft)">
+                    {planName
+                      ? `Para o ${planName}, usamos suas preferências na curadoria dos itens surpresa da sua caixa.`
+                      : 'Usamos suas preferências na curadoria dos itens surpresa da sua caixa.'}
+                  </p>
+                  <FieldGroup className="mt-5 gap-4 sm:grid sm:grid-cols-2">
+                    <Field>
+                      <FieldLabel
+                        className={cn(
+                          fontMono,
+                          'text-[0.65rem] font-semibold tracking-[0.14em] text-(--ink) uppercase',
+                        )}
+                      >
+                        Tamanho de camiseta
+                      </FieldLabel>
+                      <NativeSelect
+                        value={preferences.shirtSize ?? ''}
+                        onChange={(e) =>
+                          setPreferences((prev) => ({
+                            ...prev,
+                            shirtSize: e.target.value,
+                          }))
+                        }
+                        className={cn(formInputClass, 'px-3')}
+                      >
+                        <NativeSelectOption value="">
+                          Prefiro não informar
+                        </NativeSelectOption>
+                        {SHIRT_SIZES.map((option) => (
+                          <NativeSelectOption key={option} value={option}>
+                            {option}
+                          </NativeSelectOption>
+                        ))}
+                      </NativeSelect>
+                    </Field>
+                    <Field>
+                      <FieldLabel
+                        className={cn(
+                          fontMono,
+                          'text-[0.65rem] font-semibold tracking-[0.14em] text-(--ink) uppercase',
+                        )}
+                      >
+                        Tamanho de calçado
+                      </FieldLabel>
+                      <NativeSelect
+                        value={preferences.shoeSize ?? ''}
+                        onChange={(e) =>
+                          setPreferences((prev) => ({
+                            ...prev,
+                            shoeSize: e.target.value,
+                          }))
+                        }
+                        className={cn(formInputClass, 'px-3')}
+                      >
+                        <NativeSelectOption value="">
+                          Prefiro não informar
+                        </NativeSelectOption>
+                        {SHOE_SIZES.map((option) => (
+                          <NativeSelectOption key={option} value={option}>
+                            {option}
+                          </NativeSelectOption>
+                        ))}
+                      </NativeSelect>
+                    </Field>
+                  </FieldGroup>
+                  <Field className="mt-4">
+                    <FieldLabel
+                      className={cn(
+                        fontMono,
+                        'text-[0.65rem] font-semibold tracking-[0.14em] text-(--ink) uppercase',
+                      )}
+                    >
+                      Notas para curadoria
+                    </FieldLabel>
+                    <Textarea
+                      value={preferences.notes}
+                      onChange={(e) =>
+                        setPreferences((prev) => ({
+                          ...prev,
+                          notes: e.target.value,
+                        }))
+                      }
+                      rows={3}
+                      placeholder="Preferências de cores, estilo, alergias, etc."
+                      className={cn(formInputClass, 'resize-none')}
+                    />
+                  </Field>
                 </Section>
               </Step>
 
@@ -1045,24 +1034,22 @@ export function CheckoutStepper({
                         : '—'
                     }
                   />
-                  {isSubscriptionFlow ? (
-                    <Review
-                      label="Preferências"
-                      value={
-                        [
-                          preferences.shirtSize
-                            ? `Camiseta ${preferences.shirtSize}`
-                            : null,
-                          preferences.shoeSize
-                            ? `Calçado ${preferences.shoeSize}`
-                            : null,
-                          preferences.notes ? 'Notas informadas' : null,
-                        ]
-                          .filter(Boolean)
-                          .join(' · ') || 'Sem preferências informadas'
-                      }
-                    />
-                  ) : null}
+                  <Review
+                    label="Preferências"
+                    value={
+                      [
+                        preferences.shirtSize
+                          ? `Camiseta ${preferences.shirtSize}`
+                          : null,
+                        preferences.shoeSize
+                          ? `Calçado ${preferences.shoeSize}`
+                          : null,
+                        preferences.notes ? 'Notas informadas' : null,
+                      ]
+                        .filter(Boolean)
+                        .join(' · ') || 'Sem preferências informadas'
+                    }
+                  />
                   {error ? (
                     <p className="mt-4 rounded-[10px] border border-(--red)/45 bg-(--red)/10 px-3 py-2 text-sm text-(--ink)">
                       {error}
