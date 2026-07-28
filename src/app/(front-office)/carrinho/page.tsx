@@ -812,14 +812,41 @@ function SummaryRow({
 }
 
 function CouponForm() {
+  const [error, setError] = useState<string | null>(null)
+  const [pending, setPending] = useState(false)
+
   return (
     <form
-      onSubmit={(event) => {
+      onSubmit={async (event) => {
         event.preventDefault()
+        setError(null)
+
         const formData = new FormData(event.currentTarget)
-        applyCoupon(String(formData.get('coupon') ?? '')).then(() =>
-          window.location.reload(),
-        )
+        const code = String(formData.get('coupon') ?? '').trim()
+        if (!code) {
+          setError('Informe o código do cupom.')
+          return
+        }
+
+        setPending(true)
+        try {
+          const result = await applyCoupon(code)
+          if (!result.valid) {
+            setError(result.message || 'Cupom inválido ou expirado.')
+            return
+          }
+          window.location.reload()
+        } catch (err) {
+          const message =
+            err instanceof ApiClientError
+              ? err.message.trim()
+              : err instanceof Error
+                ? err.message.trim()
+                : ''
+          setError(message || 'Não foi possível aplicar o cupom.')
+        } finally {
+          setPending(false)
+        }
       }}
       className="mt-2 space-y-2"
     >
@@ -839,17 +866,33 @@ function CouponForm() {
             id="coupon"
             name="coupon"
             placeholder="Informe o código"
-            className="h-10 w-full rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-(--paper-soft) pr-3 pl-9 text-sm text-(--ink) placeholder:text-(--ink-mute) focus:border-(--red) focus-visible:ring-2 focus-visible:ring-(--red)/20 focus-visible:outline-none"
+            aria-invalid={Boolean(error)}
+            aria-describedby={error ? 'coupon-error' : undefined}
+            onChange={() => {
+              if (error) setError(null)
+            }}
+            className={cn(
+              'h-10 w-full rounded-[10px] border bg-(--paper-soft) pr-3 pl-9 text-sm text-(--ink) placeholder:text-(--ink-mute) focus-visible:ring-2 focus-visible:outline-none',
+              error
+                ? 'border-(--red) focus:border-(--red) focus-visible:ring-(--red)/25'
+                : 'border-[rgba(33,28,24,0.15)] focus:border-(--red) focus-visible:ring-(--red)/20',
+            )}
           />
         </div>
         <Button
           type="submit"
           variant="outline"
+          disabled={pending}
           className="h-10 shrink-0 rounded-[9px] border-[rgba(33,28,24,0.15)] bg-(--card) px-4 text-(--ink) hover:border-(--ink) hover:bg-(--ink) hover:text-[#fbf9f6]"
         >
-          Aplicar
+          {pending ? 'Aplicando…' : 'Aplicar'}
         </Button>
       </div>
+      {error ? (
+        <p id="coupon-error" role="alert" className="text-xs text-(--red)">
+          {error}
+        </p>
+      ) : null}
     </form>
   )
 }
