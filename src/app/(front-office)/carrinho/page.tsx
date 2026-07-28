@@ -901,7 +901,7 @@ function CouponForm() {
           setPending(false)
         }
       }}
-      className="mt-2 space-y-2"
+      className="mt-6 space-y-2"
     >
       <label
         htmlFor="coupon"
