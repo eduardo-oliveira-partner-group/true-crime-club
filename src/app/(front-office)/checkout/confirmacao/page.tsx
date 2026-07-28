@@ -114,6 +114,9 @@ export default function ConfirmacaoPage() {
     onPaymentConfirmed: () => {
       if (orderId) void refreshOrder(orderId)
     },
+    onPoll: () => {
+      if (orderId) void refreshOrder(orderId)
+    },
   })
 
   if (loading) return <ConfirmationSkeleton />

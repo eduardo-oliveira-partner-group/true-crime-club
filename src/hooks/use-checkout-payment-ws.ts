@@ -11,14 +11,24 @@ type UseCheckoutPaymentWsOptions = {
   enabled: boolean
   onPaymentConfirmed: () => void
   onTimeout?: () => void
+  /** Polling de backup enquanto o WS nao entrega (ex.: Redis/pubsub). */
+  onPoll?: () => void | Promise<void>
+  pollIntervalMs?: number
 }
 
 export function useCheckoutPaymentWs(
   checkoutId: string | undefined,
-  { enabled, onPaymentConfirmed, onTimeout }: UseCheckoutPaymentWsOptions,
+  {
+    enabled,
+    onPaymentConfirmed,
+    onTimeout,
+    onPoll,
+    pollIntervalMs = 4000,
+  }: UseCheckoutPaymentWsOptions,
 ) {
   const onPaymentConfirmedRef = useRef(onPaymentConfirmed)
   const onTimeoutRef = useRef(onTimeout)
+  const onPollRef = useRef(onPoll)
 
   useEffect(() => {
     onPaymentConfirmedRef.current = onPaymentConfirmed
@@ -29,8 +39,13 @@ export function useCheckoutPaymentWs(
   }, [onTimeout])
 
   useEffect(() => {
+    onPollRef.current = onPoll
+  }, [onPoll])
+
+  useEffect(() => {
     if (!checkoutId || !enabled) return
 
+    let closed = false
     const ws = new WebSocket(getCheckoutWebSocketUrl(checkoutId))
 
     ws.onmessage = (event) => {
@@ -49,10 +64,17 @@ export function useCheckoutPaymentWs(
     }
 
     ws.onerror = () => {
-      ws.close()
+      // Mantem a conexao para o onclose; polling cobre a falha.
     }
 
+    const pollId = window.setInterval(() => {
+      if (closed) return
+      void onPollRef.current?.()
+    }, pollIntervalMs)
+
     return () => {
+      closed = true
+      window.clearInterval(pollId)
       if (
         ws.readyState === WebSocket.OPEN ||
         ws.readyState === WebSocket.CONNECTING
@@ -60,5 +82,5 @@ export function useCheckoutPaymentWs(
         ws.close()
       }
     }
-  }, [checkoutId, enabled])
+  }, [checkoutId, enabled, pollIntervalMs])
 }

@@ -1,8 +1,22 @@
 import { getApiBaseUrl } from '@/src/lib/api-mode'
 
+function toWebSocketBase(apiBase: string): string {
+  if (/^https?:\/\//i.test(apiBase)) {
+    return apiBase.replace(/^http/i, 'ws')
+  }
+
+  if (typeof window !== 'undefined') {
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+    const path = apiBase.startsWith('/') ? apiBase : `/${apiBase}`
+    return `${protocol}//${window.location.host}${path.replace(/\/$/, '')}`
+  }
+
+  return apiBase.replace(/^http/i, 'ws')
+}
+
 export function getCheckoutWebSocketUrl(checkoutId: string): string {
   const apiBase = getApiBaseUrl()
-  const wsBase = apiBase.replace(/^http/i, 'ws')
+  const wsBase = toWebSocketBase(apiBase)
   return `${wsBase.replace(/\/$/, '')}/ws/checkout/${encodeURIComponent(checkoutId)}`
 }
 
