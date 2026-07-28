@@ -73,14 +73,31 @@ function isPlanCartItem(item: CartItem): boolean {
   return item.productType === 'subscription' || Boolean(item.planId)
 }
 
+async function fetchShippingForCart(cart: Cart) {
+  if (cart.items.length === 0) return emptyShipping
+
+  const planFromCart = cart.items.find(isPlanCartItem)
+  return calculateShipping(
+    sampleZipCode,
+    planFromCart?.planId ? { planoId: planFromCart.planId } : undefined,
+  ).catch(() => emptyShipping)
+}
+
 export default function CarrinhoPage() {
   const router = useRouter()
   const [cart, setCart] = useState<Cart | null>(null)
   const [shipping, setShipping] = useState(emptyShipping)
 
-  const handleCartChange = (nextCart: Cart) => {
-    setCart(nextCart)
-    notifyCartUpdated(nextCart)
+  const handleCartChange = async (nextCart: Cart) => {
+    const nextShipping = await fetchShippingForCart(nextCart)
+    const cartWithShipping: Cart = {
+      ...nextCart,
+      shippingEstimate: nextShipping.price,
+      shippingRegion: nextShipping.region || undefined,
+    }
+    setCart(cartWithShipping)
+    notifyCartUpdated(cartWithShipping)
+    setShipping(nextShipping)
   }
 
   useEffect(() => {
@@ -148,16 +165,7 @@ export default function CarrinhoPage() {
         const nextCart = await getCart()
         if (cancelled) return
 
-        if (nextCart.items.length === 0) {
-          return { nextCart, nextShipping: emptyShipping }
-        }
-
-        const planFromCart = nextCart.items.find(isPlanCartItem)
-        const nextShipping = await calculateShipping(
-          sampleZipCode,
-          planFromCart?.planId ? { planoId: planFromCart.planId } : undefined,
-        ).catch(() => emptyShipping)
-
+        const nextShipping = await fetchShippingForCart(nextCart)
         return { nextCart, nextShipping }
       })
       .then((result) => {
@@ -248,7 +256,7 @@ export default function CarrinhoPage() {
                   onRemove={async () => {
                     try {
                       const next = await removeCartItem(item.id)
-                      handleCartChange(next)
+                      await handleCartChange(next)
                       window.history.replaceState(null, '', '/carrinho')
                     } catch (error) {
                       console.error(error)
@@ -443,7 +451,7 @@ function CartLineItem({
     unitPrice: number
     image?: string
   }
-  onCartChange: (cart: Cart) => void
+  onCartChange: (cart: Cart) => Promise<void>
 }) {
   const productImage = getProductImage(item.image ?? '')
   const lineTotal = item.unitPrice * item.quantity
@@ -455,7 +463,7 @@ function CartLineItem({
     setRemoving(true)
     try {
       const next = await removeCartItem(item.id)
-      onCartChange(next)
+      await onCartChange(next)
       setConfirmOpen(false)
     } catch {
       setConfirmOpen(false)
@@ -582,7 +590,7 @@ function QuantityControls({
 }: {
   itemId: string
   quantity: number
-  onCartChange: (cart: Cart) => void
+  onCartChange: (cart: Cart) => Promise<void>
 }) {
   const [updating, setUpdating] = useState(false)
   const baseButton =
@@ -593,7 +601,7 @@ function QuantityControls({
     setUpdating(true)
     try {
       const nextCart = await updateCartItemQuantity(itemId, nextQuantity)
-      onCartChange(nextCart)
+      await onCartChange(nextCart)
     } catch (error) {
       console.error(error)
     } finally {
