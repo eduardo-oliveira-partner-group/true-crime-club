@@ -450,11 +450,13 @@ function CartLineItem({
   const handleRemove = async () => {
     setRemoving(true)
     try {
-      await removeCartItem(item.id)
-      window.location.reload()
-    } catch {
-      setRemoving(false)
+      const next = await removeCartItem(item.id)
+      onCartChange(next)
       setConfirmOpen(false)
+    } catch {
+      setConfirmOpen(false)
+    } finally {
+      setRemoving(false)
     }
   }
 
