@@ -232,10 +232,10 @@ export function ProductQuickView({
           </>
         }
         className={cn(
-          'max-h-[calc(100vh-1.5rem)] w-[calc(100%-1.5rem)] max-w-5xl gap-0 overflow-hidden rounded-[14px_14px_16px_16px] border border-[rgba(33,28,24,0.16)] bg-(--card) p-0 text-(--ink) ring-0 sm:max-w-5xl',
+          'max-h-[calc(100vh-1.5rem)] w-[calc(100%-1.5rem)] max-w-6xl gap-0 overflow-hidden rounded-[14px_14px_16px_16px] border border-[rgba(33,28,24,0.16)] bg-(--card) p-0 text-(--ink) ring-0 sm:max-w-6xl',
           cardShadowBase,
           'duration-200 data-open:zoom-in-[1] data-closed:zoom-out-[1]',
-          'grid lg:max-h-[calc(100vh-3rem)] lg:grid-cols-[0.9fr_1.1fr]',
+          'grid lg:max-h-[calc(100vh-3rem)] lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]',
         )}
       >
         <div
@@ -260,7 +260,7 @@ export function ProductQuickView({
           </button>
         </DialogClose>
 
-        <div className="relative min-h-[260px] overflow-hidden bg-(--paper-soft) sm:min-h-[360px] lg:min-h-[620px]">
+        <div className="relative min-h-0 min-w-0 overflow-hidden bg-(--paper-soft) sm:min-h-[360px] lg:min-h-[620px]">
           {productImage ? (
             <Image
               src={productImage}
@@ -287,7 +287,7 @@ export function ProductQuickView({
           </div>
         </div>
 
-        <div className="relative z-20 flex min-h-0 flex-col bg-(--card) p-5 pb-32 sm:p-7 sm:pb-32 lg:h-full lg:p-0">
+        <div className="relative z-20 flex min-h-0 min-w-0 flex-col bg-(--card) p-5 pb-32 sm:p-7 sm:pb-32 lg:h-full lg:p-0">
           <div className="min-h-0 flex-1 lg:overflow-y-auto lg:p-9 lg:pb-6">
             <div className="pr-14 sm:pr-16">
               <ProductKicker product={activeProduct} showAvailability={false} />
@@ -341,7 +341,7 @@ export function ProductQuickView({
             ) : null}
           </div>
 
-          <div className="mt-auto hidden shrink-0 flex-col gap-4 border-t border-[rgba(33,28,24,0.1)] px-9 pt-6 pb-9 lg:flex xl:flex-row xl:items-end xl:justify-between">
+          <div className="mt-auto hidden shrink-0 flex-col gap-6 border-t border-[rgba(33,28,24,0.1)] px-9 pt-6 pb-9 lg:flex xl:flex-row xl:items-end xl:justify-between">
             <PriceBlock product={activeProduct} />
             <div className="flex w-full gap-3 xl:w-auto xl:min-w-88">
               <TooltipProvider delayDuration={150}>
