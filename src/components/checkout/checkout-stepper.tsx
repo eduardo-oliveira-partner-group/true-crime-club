@@ -218,6 +218,7 @@ export function CheckoutStepper({
   })
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [navigationHint, setNavigationHint] = useState<string | null>(null)
   const [stepperKey, setStepperKey] = useState(0)
 
   const isAnnualPlan =
@@ -234,15 +235,37 @@ export function CheckoutStepper({
   const addressStepIndex = 2
   const shippingStepIndex = 3
   const paymentStepIndex = 4
+  const hasSelectedAddress = Boolean(selectedAddressId) && !showAddressForm
+  const hasSelectedShipping = !shippingLoading && Boolean(selectedShippingId)
+  const hasSelectedPayment = Boolean(selectedPaymentId)
   const canAdvance =
     hasCustomer &&
     !editingAddressId &&
-    (currentStep !== addressStepIndex ||
-      (Boolean(selectedAddressId) && !showAddressForm)) &&
-    (currentStep !== shippingStepIndex ||
-      (!shippingLoading && Boolean(selectedShippingId))) &&
-    (currentStep !== paymentStepIndex || Boolean(selectedPaymentId)) &&
-    (!isLastStep || (Boolean(selectedAddressId) && Boolean(selectedPaymentId)))
+    (currentStep !== addressStepIndex || hasSelectedAddress) &&
+    (currentStep !== shippingStepIndex || hasSelectedShipping) &&
+    (currentStep !== paymentStepIndex || hasSelectedPayment) &&
+    (!isLastStep ||
+      (hasSelectedAddress && hasSelectedShipping && hasSelectedPayment))
+
+  function canNavigateToStep(targetStep: number, activeStep: number) {
+    if (targetStep < activeStep) return true
+    if (targetStep !== activeStep + 1) return false
+
+    switch (targetStep) {
+      case addressStepIndex:
+        return hasCustomer
+      case shippingStepIndex:
+        return hasSelectedAddress
+      case paymentStepIndex:
+        return hasSelectedShipping
+      case 5:
+        return hasSelectedPayment
+      case 6:
+        return true
+      default:
+        return false
+    }
+  }
   const processingMessage =
     selectedPayment?.type === 'pix'
       ? 'Gerando cobrança Pix e preparando o QR Code…'
@@ -296,10 +319,11 @@ export function CheckoutStepper({
   )?.zipCode
 
   useEffect(() => {
-    if (currentStep !== shippingStepIndex || !selectedZipCode) return
+    if (!selectedZipCode) return
     void refreshShipping(selectedZipCode)
-    // planId/isSubscriptionFlow: cotacao de assinatura exige planoId no body
-  }, [currentStep, selectedZipCode, planId, isSubscriptionFlow])
+    // Recalcula assim que o endereço selecionado muda; a cotação de
+    // assinatura exige planoId no body.
+  }, [selectedZipCode, planId, isSubscriptionFlow])
 
   function handleAddressSaved(nextAddresses: Address[]) {
     setAddresses(nextAddresses)
@@ -456,9 +480,16 @@ export function CheckoutStepper({
               initialStep={currentStep}
               onStepChange={(step) => {
                 setError(null)
+                setNavigationHint(null)
                 setCurrentStep(step)
               }}
               onFinalStepCompleted={handleFinalStepCompleted}
+              canNavigateToStep={canNavigateToStep}
+              onInvalidStepNavigation={(step) => {
+                setNavigationHint(
+                  `Conclua a etapa atual para acessar ${steps[step - 1]?.label ?? 'esta etapa'}.`,
+                )
+              }}
               stepCircleContainerClassName="space-y-6"
               stepContainerClassName="pb-5"
               contentClassName="pb-2"
@@ -1058,6 +1089,15 @@ export function CheckoutStepper({
                 </Section>
               </Step>
             </Stepper>
+            {navigationHint ? (
+              <p
+                id="checkout-step-navigation-hint"
+                role="status"
+                className="mt-3 text-sm text-(--ink-soft)"
+              >
+                {navigationHint}
+              </p>
+            ) : null}
           </div>
         </div>
       </div>
@@ -1261,6 +1301,7 @@ function StepIndicatorWithTooltip({
   step,
   currentStep,
   onStepClick,
+  isNavigable,
 }: StepperStepIndicatorProps) {
   const stepMeta = steps[step - 1]
   const StepIcon = stepMeta?.Icon ?? IconPackage
@@ -1278,6 +1319,10 @@ function StepIndicatorWithTooltip({
           <button
             type="button"
             onClick={() => onStepClick(step)}
+            aria-disabled={!isNavigable}
+            aria-describedby={
+              !isNavigable ? 'checkout-step-navigation-hint' : undefined
+            }
             aria-label={`Etapa ${stepMeta?.code} — ${stepMeta?.label}`}
             aria-current={status === 'active' ? 'step' : undefined}
             className={cn(
@@ -1286,7 +1331,9 @@ function StepIndicatorWithTooltip({
                 ? 'border-(--red) bg-(--red)/10 text-(--red)'
                 : status === 'complete'
                   ? 'border-(--teal) bg-(--teal) text-[#fbf9f6]'
-                  : 'border-[rgba(33,28,24,0.15)] text-(--ink-mute) hover:border-(--red)/35 hover:text-(--red)',
+                  : isNavigable
+                    ? 'border-[rgba(33,28,24,0.15)] text-(--ink-mute) hover:border-(--red)/35 hover:text-(--red)'
+                    : 'cursor-not-allowed border-[rgba(33,28,24,0.1)] text-(--ink-mute)/55',
             )}
           >
             {status === 'complete' ? (

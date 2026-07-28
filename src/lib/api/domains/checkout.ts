@@ -7,10 +7,7 @@ export const checkoutApi = {
     fetcher('/finalizacao/metodos-pagamento').then((items) =>
       asArray(items).map(toPaymentMethod),
     ),
-  calculateShipping: (body: {
-    cep: string
-    planoId?: string
-  }) =>
+  calculateShipping: (body: { cep: string; planoId?: string }) =>
     fetcher('/finalizacao/frete', {
       method: 'POST',
       body: JSON.stringify({

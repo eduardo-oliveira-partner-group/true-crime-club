@@ -19,6 +19,7 @@ export interface StepperStepIndicatorProps {
   step: number
   currentStep: number
   onStepClick: (step: number) => void
+  isNavigable: boolean
 }
 
 export interface StepperProps extends HTMLAttributes<HTMLDivElement> {
@@ -36,6 +37,9 @@ export interface StepperProps extends HTMLAttributes<HTMLDivElement> {
   nextButtonText?: ReactNode
   completeButtonText?: ReactNode
   disableStepIndicators?: boolean
+  /** Defines whether a step can be opened through its indicator. */
+  canNavigateToStep?: (step: number, currentStep: number) => boolean
+  onInvalidStepNavigation?: (step: number, currentStep: number) => void
   renderStepIndicator?: (props: StepperStepIndicatorProps) => ReactNode
 }
 
@@ -54,6 +58,8 @@ export function Stepper({
   nextButtonText = 'Continue',
   completeButtonText = 'Complete',
   disableStepIndicators = false,
+  canNavigateToStep = () => true,
+  onInvalidStepNavigation = () => {},
   renderStepIndicator,
   ...rest
 }: StepperProps) {
@@ -71,6 +77,18 @@ export function Stepper({
     } else {
       onStepChange(newStep)
     }
+  }
+
+  const handleStepClick = (clicked: number) => {
+    if (clicked === currentStep) return
+
+    if (!canNavigateToStep(clicked, currentStep)) {
+      onInvalidStepNavigation(clicked, currentStep)
+      return
+    }
+
+    setDirection(clicked > currentStep ? 1 : -1)
+    updateStep(clicked)
   }
 
   const handleBack = () => {
@@ -110,20 +128,20 @@ export function Stepper({
                   renderStepIndicator({
                     step: stepNumber,
                     currentStep,
-                    onStepClick: (clicked) => {
-                      setDirection(clicked > currentStep ? 1 : -1)
-                      updateStep(clicked)
-                    },
+                    onStepClick: handleStepClick,
+                    isNavigable:
+                      stepNumber !== currentStep &&
+                      canNavigateToStep(stepNumber, currentStep),
                   })
                 ) : (
                   <StepIndicator
                     step={stepNumber}
-                    disableStepIndicators={disableStepIndicators}
+                    disableStepIndicators={
+                      disableStepIndicators ||
+                      !canNavigateToStep(stepNumber, currentStep)
+                    }
                     currentStep={currentStep}
-                    onClickStep={(clicked) => {
-                      setDirection(clicked > currentStep ? 1 : -1)
-                      updateStep(clicked)
-                    }}
+                    onClickStep={handleStepClick}
                   />
                 )}
                 {isNotLastStep ? (
