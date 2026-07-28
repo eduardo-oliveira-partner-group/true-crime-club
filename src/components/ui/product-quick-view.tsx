@@ -6,6 +6,7 @@ import {
   IconExternalLink,
   IconPackage,
   IconShoppingBag,
+  IconSparkles,
   IconX,
 } from '@tabler/icons-react'
 import Image from 'next/image'
@@ -89,20 +90,22 @@ export function PriceBlock({
   if (product.subscriberPrice) {
     return (
       <div className={cn('min-w-0', compact ? 'space-y-1.5' : 'space-y-2')}>
-        <p className="text-xs text-(--ink-soft)/70 line-through decoration-[#b5332a]/55 decoration-2">
+        <p className="pb-0.5 text-xs text-(--ink-soft)/70 line-through decoration-[#b5332a]/55 decoration-2">
           de {formatCurrency(product.price)}
         </p>
-        <p className="text-xs font-semibold tracking-[0.16em] text-(--amber) uppercase">
-          Assinante
-        </p>
-        <p
-          className={cn(
-            `leading-none font-semibold text-(--ink) ${fontHeading}`,
-            compact ? 'text-xl' : 'text-3xl',
-          )}
-        >
-          {formatCurrency(product.subscriberPrice)}
-        </p>
+        <div className={cn('min-w-0', compact ? 'space-y-1' : 'space-y-2')}>
+          <p className="text-xs font-semibold tracking-[0.16em] text-(--amber) uppercase">
+            Assinante
+          </p>
+          <p
+            className={cn(
+              `leading-none font-semibold text-(--ink) ${fontHeading}`,
+              compact ? 'text-xl' : 'text-3xl',
+            )}
+          >
+            {formatCurrency(product.subscriberPrice)}
+          </p>
+        </div>
       </div>
     )
   }
@@ -129,15 +132,15 @@ export function DetailDatum({
   value: string
 }) {
   return (
-    <div className="flex items-center gap-3">
-      <div className="flex size-9 shrink-0 items-center justify-center rounded-[10px] border border-[#211c18]/14 bg-[#211c18]/7 text-(--amber)">
+    <div className="flex min-w-0 items-center gap-2 lg:gap-3">
+      <div className="flex size-8 shrink-0 items-center justify-center rounded-[9px] border border-[#211c18]/14 bg-[#211c18]/7 text-(--amber) lg:size-9 lg:rounded-[10px]">
         {icon}
       </div>
       <div className="min-w-0">
-        <p className="text-[0.68rem] font-semibold tracking-[0.18em] text-(--amber) uppercase">
+        <p className="text-[0.6rem] font-semibold tracking-[0.12em] text-(--amber) uppercase lg:text-[0.68rem] lg:tracking-[0.18em]">
           {label}
         </p>
-        <p className="mt-0.5 truncate text-sm text-[#211c18] capitalize">
+        <p className="mt-0.5 truncate text-xs text-[#211c18] capitalize lg:text-sm">
           {value}
         </p>
       </div>
@@ -232,14 +235,14 @@ export function ProductQuickView({
           </>
         }
         className={cn(
-          'max-h-[calc(100vh-1.5rem)] w-[calc(100%-1.5rem)] max-w-6xl gap-0 overflow-hidden rounded-[14px_14px_16px_16px] border border-[rgba(33,28,24,0.16)] bg-(--card) p-0 text-(--ink) ring-0 sm:max-w-6xl',
+          'max-h-[calc(100vh-1.5rem)] w-[calc(100%-1.5rem)] max-w-6xl gap-0 overflow-y-auto rounded-[14px_14px_16px_16px] border border-[rgba(33,28,24,0.16)] bg-(--card) p-0 text-(--ink) ring-0 sm:max-w-6xl lg:max-h-[calc(100vh-3rem)] lg:overflow-hidden',
           cardShadowBase,
           'duration-200 data-open:zoom-in-[1] data-closed:zoom-out-[1]',
-          'grid lg:max-h-[calc(100vh-3rem)] lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]',
+          'grid grid-rows-[180px_minmax(0,1fr)] sm:grid-rows-[360px_minmax(0,1fr)] lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:grid-rows-none',
         )}
       >
         <div
-          className={`absolute top-0 left-8 z-30 inline-flex -translate-y-px items-center gap-[10px] rounded-b-[10px] border border-t-0 border-[rgba(33,28,24,0.18)] bg-(--paper-soft) px-[18px] py-[9px] pt-[11px] text-[11px] tracking-[0.14em] text-(--ink) uppercase ${fontType}`}
+          className={`absolute top-0 left-8 z-30 hidden -translate-y-px items-center gap-[10px] rounded-b-[10px] border border-t-0 border-[rgba(33,28,24,0.18)] bg-(--paper-soft) px-[18px] py-[9px] pt-[11px] text-[11px] tracking-[0.14em] text-(--ink) uppercase lg:inline-flex ${fontType}`}
         >
           <span className="font-bold text-(--red)">
             {activeProduct.type === 'box' ? `BOX-${evidenceNumber}` : 'ITEM'}
@@ -247,7 +250,7 @@ export function ProductQuickView({
           ficha rápida
         </div>
         <span
-          className="absolute top-[22px] right-20 z-30 size-[14px] rounded-full shadow-[0_3px_5px_rgba(33,28,24,0.45),inset_0_-2px_3px_rgba(0,0,0,0.3)] [background:radial-gradient(circle_at_35%_30%,rgba(255,255,255,0.7)_0%,var(--red)_55%,rgba(0,0,0,0.4)_100%)]"
+          className="absolute top-[22px] right-20 z-30 hidden size-[14px] rounded-full shadow-[0_3px_5px_rgba(33,28,24,0.45),inset_0_-2px_3px_rgba(0,0,0,0.3)] [background:radial-gradient(circle_at_35%_30%,rgba(255,255,255,0.7)_0%,var(--red)_55%,rgba(0,0,0,0.4)_100%)] lg:block"
           aria-hidden="true"
         />
         <DialogClose asChild>
@@ -260,7 +263,7 @@ export function ProductQuickView({
           </button>
         </DialogClose>
 
-        <div className="relative min-h-0 min-w-0 overflow-hidden bg-(--paper-soft) sm:min-h-[360px] lg:min-h-[620px]">
+        <div className="relative min-h-[180px] min-w-0 overflow-hidden bg-(--paper-soft) sm:min-h-[360px] lg:min-h-[620px]">
           {productImage ? (
             <Image
               src={productImage}
@@ -271,9 +274,11 @@ export function ProductQuickView({
               className="object-cover object-center"
               priority
             />
-          ) : null}
+          ) : (
+            <ProductImagePlaceholder product={activeProduct} />
+          )}
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(244,241,236,0.02)_0%,rgba(33,28,24,0.22)_100%)]" />
-          <div className="absolute bottom-5 left-5 z-20 rounded-[10px] border border-[rgba(33,28,24,0.2)] bg-(--paper-soft)/90 px-4 py-3 backdrop-blur-[2px]">
+          <div className="absolute bottom-5 left-5 z-20 hidden rounded-[10px] border border-[rgba(33,28,24,0.2)] bg-(--paper-soft)/90 px-4 py-3 backdrop-blur-[2px] lg:block">
             <p
               className={`text-[0.68rem] tracking-[0.18em] text-(--amber) uppercase ${fontType}`}
             >
@@ -287,15 +292,16 @@ export function ProductQuickView({
           </div>
         </div>
 
-        <div className="relative z-20 flex min-h-0 min-w-0 flex-col bg-(--card) p-5 pb-32 sm:p-7 sm:pb-32 lg:h-full lg:p-0">
+        <div className="relative z-20 flex min-h-0 min-w-0 flex-col bg-(--card) p-5 sm:p-7 lg:h-full lg:overflow-hidden lg:p-0">
           <div className="min-h-0 flex-1 lg:overflow-y-auto lg:p-9 lg:pb-6">
+            {/* Metadados BOX / Arquivo omitidos no mobile para priorizar o conteúdo do produto. */}
             <div className="pr-14 sm:pr-16">
               <ProductKicker product={activeProduct} showAvailability={false} />
             </div>
 
             <DialogTitle
               className={cn(
-                'mt-6 font-sans text-3xl/tight font-semibold tracking-[-0.015em] text-(--ink) sm:text-4xl',
+                'mt-4 font-sans text-3xl/tight font-semibold tracking-[-0.015em] text-(--ink) sm:text-4xl lg:mt-6',
                 fontHeading,
               )}
             >
@@ -305,7 +311,7 @@ export function ProductQuickView({
               {activeProduct.shortDescription || activeProduct.description}
             </DialogDescription>
 
-            <div className="mt-5 grid gap-3 border-y border-[rgba(33,28,24,0.1)] py-5 text-sm text-(--ink-soft) sm:grid-cols-2">
+            <div className="mt-5 grid gap-2 border-y border-[rgba(33,28,24,0.1)] py-4 text-(--ink-soft) lg:grid-cols-2 lg:gap-3 lg:py-5 lg:text-sm">
               {activeProduct.editionMonth ? (
                 <DetailDatum
                   icon={<IconCalendarEvent className="size-4" />}
@@ -389,10 +395,10 @@ export function ProductQuickView({
           </div>
         </div>
 
-        <div className="absolute inset-x-3 bottom-3 z-40 rounded-[14px_14px_16px_16px] border border-[rgba(33,28,24,0.16)] bg-(--card)/94 p-3 shadow-[0_18px_48px_rgba(63,46,34,0.22)] backdrop-blur-md lg:hidden">
-          <div className="flex items-end justify-between gap-3">
+        <div className="shrink-0 border-t border-[rgba(33,28,24,0.1)] bg-(--card) p-3 lg:hidden">
+          <div className="flex flex-col gap-3">
             <PriceBlock product={activeProduct} compact />
-            <div className="flex shrink-0 gap-2">
+            <div className="flex min-w-0 gap-2">
               <TooltipProvider delayDuration={150}>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -417,26 +423,44 @@ export function ProductQuickView({
               </TooltipProvider>
               <Button
                 type="button"
-                size="icon"
                 disabled={!activeProduct.inStock || isAdding}
                 onClick={onAddToCart}
-                className="rounded-[10px] bg-[#b5332a] text-white hover:bg-[#982820] disabled:opacity-50"
-                aria-label={
-                  isAdding
-                    ? 'Adicionando ao carrinho'
-                    : justAdded
-                      ? 'Adicionado ao carrinho'
-                      : activeProduct.inStock
-                        ? 'Adicionar ao carrinho'
-                        : 'Produto esgotado'
-                }
+                className={`min-w-0 flex-1 rounded-[10px] bg-[#b5332a] px-3 text-white hover:bg-[#982820] disabled:opacity-50 ${fontMono}`}
               >
-                {justAdded ? <IconCheck /> : <IconShoppingBag />}
+                {justAdded ? (
+                  <IconCheck data-icon="inline-start" />
+                ) : (
+                  <IconShoppingBag data-icon="inline-start" />
+                )}
+                {isAdding
+                  ? 'Adicionando...'
+                  : justAdded
+                    ? 'Adicionado!'
+                    : activeProduct.inStock
+                      ? 'Adicionar ao carrinho'
+                      : 'Esgotado'}
               </Button>
             </div>
           </div>
         </div>
       </DialogContent>
     </Dialog>
+  )
+}
+
+function ProductImagePlaceholder({ product }: { product: Product }) {
+  return (
+    <div className="absolute inset-0 flex items-center justify-center bg-(--card)">
+      <div className="absolute inset-6 border border-[rgba(33,28,24,0.15)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_38%,rgba(197,39,31,0.1),transparent_28%),radial-gradient(circle_at_48%_58%,rgba(26,165,135,0.08),transparent_32%)]" />
+      <div className="relative z-10 flex flex-col items-center text-center">
+        <IconSparkles className="size-9 text-(--red)" />
+        <p
+          className={`mt-3 max-w-44 text-xs tracking-[0.14em] text-(--ink) uppercase ${fontType}`}
+        >
+          {product.categories[0] ?? 'item'} do arquivo
+        </p>
+      </div>
+    </div>
   )
 }
