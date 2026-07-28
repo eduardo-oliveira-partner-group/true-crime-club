@@ -148,6 +148,10 @@ export default function CarrinhoPage() {
         const nextCart = await getCart()
         if (cancelled) return
 
+        if (nextCart.items.length === 0) {
+          return { nextCart, nextShipping: emptyShipping }
+        }
+
         const planFromCart = nextCart.items.find(isPlanCartItem)
         const nextShipping = await calculateShipping(
           sampleZipCode,
