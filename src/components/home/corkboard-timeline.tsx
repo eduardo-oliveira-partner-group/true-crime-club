@@ -51,8 +51,18 @@ export function CorkboardTimeline({ steps }: CorkboardTimelineProps) {
     hoveredIndex === 2 ? '-0.625rem' : '0rem',
   ] as const
   const lineSegments = [
-    { x1: pinX[0], y1: pinY[0], x2: pinX[1], y2: pinY[1] },
-    { x1: pinX[1], y1: pinY[1], x2: pinX[2], y2: pinY[2] },
+    {
+      x1: pinX[0],
+      x2: pinX[1],
+      y1: hoveredIndex === 0 ? -10 : 0,
+      y2: hoveredIndex === 1 ? -10 : 0,
+    },
+    {
+      x1: pinX[1],
+      x2: pinX[2],
+      y1: hoveredIndex === 1 ? -10 : 0,
+      y2: hoveredIndex === 2 ? -10 : 0,
+    },
   ]
 
   return (
@@ -71,10 +81,9 @@ export function CorkboardTimeline({ steps }: CorkboardTimelineProps) {
           <motion.line
             key={index}
             x1={segment.x1}
-            y1={segment.y1}
             x2={segment.x2}
-            y2={segment.y2}
-            animate={segment}
+            initial={false}
+            animate={{ y1: segment.y1, y2: segment.y2 }}
             transition={SPRING_TRANSITION}
             stroke="#C5271F"
             strokeWidth="2"

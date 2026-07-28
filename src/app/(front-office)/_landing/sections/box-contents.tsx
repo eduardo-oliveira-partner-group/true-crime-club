@@ -30,29 +30,22 @@ export function BoxContents() {
             className="pointer-events-none absolute inset-x-0 top-0 z-2 hidden h-16 overflow-visible opacity-60 md:block"
             aria-hidden="true"
           >
-            {[0, 1, 2].map((i) => {
-              const segment = {
-                x1: boardPinOffsets[i],
-                y1: hoveredBoxIndex === i ? '19px' : '29px',
-                x2: boardPinOffsets[i + 1],
-                y2: hoveredBoxIndex === i + 1 ? '19px' : '29px',
-              }
-
-              return (
-                <motion.line
-                  key={i}
-                  x1={segment.x1}
-                  y1={segment.y1}
-                  x2={segment.x2}
-                  y2={segment.y2}
-                  animate={segment}
-                  transition={SPRING_TRANSITION}
-                  stroke="var(--red)"
-                  strokeWidth="2"
-                  strokeDasharray="7 4"
-                />
-              )
-            })}
+            {[0, 1, 2].map((i) => (
+              <motion.line
+                key={i}
+                x1={boardPinOffsets[i]}
+                x2={boardPinOffsets[i + 1]}
+                initial={false}
+                animate={{
+                  y1: hoveredBoxIndex === i ? 19 : 29,
+                  y2: hoveredBoxIndex === i + 1 ? 19 : 29,
+                }}
+                transition={SPRING_TRANSITION}
+                stroke="var(--red)"
+                strokeWidth="2"
+                strokeDasharray="7 4"
+              />
+            ))}
           </svg>
           {boxItems.map((item, index) => (
             <FeatureCardItem
