@@ -172,7 +172,7 @@ function CatalogSkeleton() {
       <span className="sr-only">Carregando produtos...</span>
       <Skeleton className="h-4 w-40 bg-(--ink)/10" />
       <Skeleton className="mt-4 h-9 w-64 max-w-full bg-(--ink)/10" />
-      <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-7 grid grid-cols-2 gap-x-3 gap-y-6 sm:mt-10 sm:gap-5 lg:grid-cols-3">
         {Array.from({ length: 6 }).map((_, index) => (
           <div
             key={index}

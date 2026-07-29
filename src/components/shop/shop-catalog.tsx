@@ -75,7 +75,9 @@ export function ShopCatalog({ boxProducts, extraProducts }: ShopCatalogProps) {
     <>
       {sortedBoxProducts.length > 0 ? (
         <section className="relative isolate overflow-hidden border-b border-[rgba(33,28,24,0.15)] bg-(--card)">
-          <div className={`${sectionFrame} relative z-10 py-14 lg:py-20`}>
+          <div
+            className={`${sectionFrame} relative z-10 py-12 sm:py-14 lg:py-20`}
+          >
             <SectionHeader
               eyebrow="01 — Boxes avulsas"
               title="Edições anteriores ainda em investigação."
@@ -83,7 +85,7 @@ export function ShopCatalog({ boxProducts, extraProducts }: ShopCatalogProps) {
             />
 
             <ScrollRevealGroup
-              className="grid items-stretch gap-[30px] sm:grid-cols-2 lg:grid-cols-3"
+              className="grid grid-cols-2 items-stretch gap-x-4 gap-y-7 sm:gap-[30px] lg:grid-cols-3"
               staggerChildren={0.08}
               amount={productRevealAmount}
             >
@@ -110,7 +112,9 @@ export function ShopCatalog({ boxProducts, extraProducts }: ShopCatalogProps) {
 
       {sortedExtraProducts.length > 0 ? (
         <section className="relative isolate overflow-hidden bg-(--paper-soft)">
-          <div className={`${sectionFrame} relative z-10 py-14 lg:py-20`}>
+          <div
+            className={`${sectionFrame} relative z-10 py-12 sm:py-14 lg:py-20`}
+          >
             <SectionHeader
               eyebrow="02 — Itens complementares"
               title="Ferramentas para montar sua própria mesa de evidências."
@@ -118,7 +122,7 @@ export function ShopCatalog({ boxProducts, extraProducts }: ShopCatalogProps) {
             />
 
             <ScrollRevealGroup
-              className="grid items-stretch gap-[30px] sm:grid-cols-2 lg:grid-cols-3"
+              className="grid grid-cols-2 items-stretch gap-x-4 gap-y-7 sm:gap-[30px] lg:grid-cols-3"
               staggerChildren={0.08}
               amount={productRevealAmount}
             >
@@ -164,7 +168,7 @@ function SectionHeader({
   description: string
 }) {
   return (
-    <div className="mb-10 max-w-3xl space-y-4 text-left">
+    <div className="mb-7 max-w-3xl space-y-3 text-left sm:mb-10 sm:space-y-4">
       <ScrollReveal>
         <SectionEyebrow>{eyebrow}</SectionEyebrow>
       </ScrollReveal>
@@ -176,7 +180,7 @@ function SectionHeader({
         </h2>
       </ScrollReveal>
       <ScrollReveal delay={0.12}>
-        <p className="max-w-2xl text-[16px] leading-[1.55] text-(--ink-soft)">
+        <p className="max-w-2xl text-[15px] leading-[1.55] text-(--ink-soft) sm:text-[16px]">
           {description}
         </p>
       </ScrollReveal>
@@ -202,6 +206,9 @@ function ProductArchiveCard({
   const detailLabel = product.editionMonth
     ? formatEditionMonth(product.editionMonth)
     : (product.categories[0] ?? 'produto')
+  const mobileDetailLabel = product.editionMonth
+    ? `${product.editionMonth.slice(5, 7)}/${product.editionMonth.slice(0, 4)}`
+    : detailLabel
   const backingRotation =
     variant === 'box' ? 'rotate-[2.5deg]' : 'rotate-[-2.2deg]'
   const tabRotation =
@@ -212,7 +219,7 @@ function ProductArchiveCard({
   return (
     <article
       className={cn(
-        'group relative block size-full pt-[25px]',
+        'group relative block size-full pt-5 sm:pt-[25px]',
         transitionCardHover,
         'motion-reduce:transition-none',
       )}
@@ -220,7 +227,7 @@ function ProductArchiveCard({
       <div
         aria-hidden="true"
         className={cn(
-          'absolute inset-x-0 top-[25px] bottom-0 z-0 translate-y-[-3px] rounded-[10px] bg-(--yellow) shadow-[0_14px_26px_-14px_rgba(33,28,24,0.4)]',
+          'absolute inset-x-0 top-5 bottom-0 z-0 translate-y-[-3px] rounded-[10px] bg-(--yellow) shadow-[0_14px_26px_-14px_rgba(33,28,24,0.4)] sm:top-[25px]',
           backingRotation,
         )}
       >
@@ -229,12 +236,12 @@ function ProductArchiveCard({
 
       <div
         className={cn(
-          `absolute top-0 z-0 inline-flex items-center gap-2 rounded-t-[8px] bg-(--yellow) px-[15px] pt-1.5 pb-6 text-[9.5px] tracking-wider text-(--ink) uppercase shadow-[0_6px_14px_-8px_rgba(33,28,24,0.4)] ${fontType}`,
+          `absolute top-0 z-0 inline-flex items-center gap-1.5 rounded-t-[8px] bg-(--yellow) px-3 pt-1.5 pb-5 text-[8.5px] tracking-wider text-(--ink) uppercase shadow-[0_6px_14px_-8px_rgba(33,28,24,0.4)] sm:gap-2 sm:px-[15px] sm:pb-6 sm:text-[9.5px] ${fontType}`,
           tabRotation,
         )}
       >
         <span className="font-bold text-(--red)">{tabCode}</span>
-        {tabLabel}
+        <span className="hidden sm:inline">{tabLabel}</span>
       </div>
 
       <div
@@ -253,7 +260,7 @@ function ProductArchiveCard({
 
         <div
           aria-hidden="true"
-          className={`pointer-events-none absolute top-[10px] right-[10px] z-20 rotate-[-9deg] border-2 border-[rgba(94,94,162,0.85)] bg-[rgba(251,249,246,0.65)] px-[9px] py-[5px] pb-1.5 text-[9.5px] font-bold tracking-[0.14em] text-[rgba(94,94,162,0.95)] uppercase shadow-[inset_0_0_0_1px_rgba(94,94,162,0.4)] backdrop-blur-[2px] ${fontType}`}
+          className={`pointer-events-none absolute top-2 right-2 z-20 rotate-[-9deg] border-2 border-[rgba(94,94,162,0.85)] bg-[rgba(251,249,246,0.65)] px-2 py-1 pb-1.5 text-[9px] font-bold tracking-[0.12em] text-[rgba(94,94,162,0.95)] uppercase shadow-[inset_0_0_0_1px_rgba(94,94,162,0.4)] backdrop-blur-[2px] sm:top-[10px] sm:right-[10px] sm:px-[9px] sm:py-[5px] sm:pb-1.5 sm:text-[9.5px] sm:tracking-[0.14em] ${fontType}`}
         >
           {formatAvailability(product.availability)}
         </div>
@@ -265,7 +272,7 @@ function ProductArchiveCard({
               alt={product.name}
               fill
               placeholder="blur"
-              sizes="(max-width: 540px) 100vw, (max-width: 1024px) 50vw, 25vw"
+              sizes="(max-width: 1024px) 50vw, 25vw"
               className="size-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-[1.03] motion-reduce:transition-none"
             />
           ) : (
@@ -273,28 +280,31 @@ function ProductArchiveCard({
           )}
         </div>
 
-        <div className="pointer-events-none relative z-20 flex w-full flex-1 flex-col px-4 pt-4 pb-[18px]">
+        <div className="pointer-events-none relative z-20 flex w-full flex-1 flex-col px-3 pt-3 pb-3.5 sm:px-4 sm:pt-4 sm:pb-[18px]">
           <div
-            className={`mb-[5px] text-[10.5px] tracking-[0.06em] text-(--ink-mute) uppercase ${fontType}`}
+            className={`mb-1 text-[9px] leading-tight tracking-wider text-(--ink-mute) uppercase sm:mb-[5px] sm:text-[10.5px] sm:tracking-[0.06em] ${fontType}`}
           >
-            {detailLabel}
+            <span className="sm:hidden">{mobileDetailLabel}</span>
+            <span className="hidden sm:inline">{detailLabel}</span>
           </div>
           <h3
-            className={`m-0 mb-3 line-clamp-2 min-h-[2.24em] overflow-hidden text-[16.5px] leading-[1.12] font-semibold text-(--ink) ${fontHeading}`}
+            className={`m-0 mb-2 line-clamp-2 overflow-hidden text-[15px] leading-[1.15] font-semibold text-(--ink) sm:mb-3 sm:min-h-[2.24em] sm:text-[16.5px] sm:leading-[1.12] ${fontHeading}`}
           >
             {product.name}
           </h3>
-          <p className="line-clamp-2 min-h-[3em] overflow-hidden text-[13px] leading-normal text-(--ink-soft)">
+          <p className="line-clamp-2 overflow-hidden text-[13px] leading-normal text-(--ink-soft) sm:min-h-[3em]">
             {product.shortDescription}
           </p>
 
-          <div className="mt-auto flex w-full items-end justify-between gap-[10px] pt-5">
-            <PriceBlock product={product} compact />
-            <div className="pointer-events-auto relative z-30 flex shrink-0 items-center gap-2">
+          <div className="mt-auto flex w-full flex-col gap-2.5 pt-4 min-[480px]:flex-row min-[480px]:items-end min-[480px]:justify-between min-[480px]:gap-[10px] min-[480px]:pt-5">
+            <div className="[&_p:last-child]:text-[17px] min-[480px]:[&_p:last-child]:text-xl">
+              <PriceBlock product={product} compact />
+            </div>
+            <div className="pointer-events-auto relative z-30 flex w-full shrink-0 min-[480px]:w-auto">
               <button
                 type="button"
                 onClick={onOpen}
-                className={`inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-[rgba(33,28,24,0.18)] bg-(--yellow) px-[13px] py-[9px] text-[11px] leading-none font-bold tracking-[0.04em] text-(--ink) uppercase transition hover:bg-(--amber) focus-visible:ring-2 focus-visible:ring-(--red) focus-visible:outline-none ${fontMono}`}
+                className={`inline-flex min-h-11 w-full cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-[rgba(33,28,24,0.18)] bg-(--yellow) px-3 text-[10px] leading-none font-bold tracking-[0.04em] text-(--ink) uppercase transition hover:bg-(--amber) focus-visible:ring-2 focus-visible:ring-(--red) focus-visible:outline-none min-[480px]:min-h-0 min-[480px]:w-auto min-[480px]:px-[13px] min-[480px]:py-[9px] min-[480px]:text-[11px] ${fontMono}`}
               >
                 Ver
                 <IconArrowRight className={cn('size-4', arrowIconClass)} />
