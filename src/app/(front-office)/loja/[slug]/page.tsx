@@ -15,16 +15,12 @@ import { ProductDetailActions } from '@/src/components/shop/product-detail-actio
 import { ProductDetailGallery } from '@/src/components/shop/product-detail-gallery'
 import { ProductDetailIncludedPreview } from '@/src/components/shop/product-detail-included-preview'
 import { ProductDetailPricing } from '@/src/components/shop/product-detail-pricing'
-import { RelatedProductCard } from '@/src/components/shop/related-product-card'
+import { RelatedProductsGrid } from '@/src/components/shop/related-products-grid'
 import {
   DetailDatum,
   ProductKicker,
 } from '@/src/components/ui/product-quick-view'
-import {
-  ScrollReveal,
-  ScrollRevealGroup,
-  ScrollRevealItem,
-} from '@/src/components/ui/scroll-reveal'
+import { ScrollReveal } from '@/src/components/ui/scroll-reveal'
 import { fontHeading, fontType, sectionFrame } from '@/src/lib/design/classes'
 import {
   getProductBySlug,
@@ -301,32 +297,25 @@ export default async function ProductDetailPage({
 
       {related.length > 0 ? (
         <section className="relative isolate overflow-hidden border-t border-[rgba(33,28,24,0.15)] bg-(--card)">
-          <div className={`${sectionFrame} relative z-10 py-14 lg:py-20`}>
+          <div
+            className={`${sectionFrame} relative z-10 py-12 sm:py-14 lg:py-20`}
+          >
             <ScrollReveal>
-              <div className="mb-10 max-w-2xl space-y-4">
+              <div className="mb-7 max-w-2xl space-y-3 sm:mb-10 sm:space-y-4">
                 <SectionEyebrow>Arquivos relacionados</SectionEyebrow>
                 <h2
-                  className={`text-2xl/tight font-semibold tracking-[-0.015em] text-(--ink) sm:text-3xl ${fontHeading}`}
+                  className={`text-wrap-balance text-[clamp(28px,3.4vw,44px)] leading-[1.02] font-semibold tracking-[-0.015em] text-(--ink) ${fontHeading}`}
                 >
                   Continue montando o dossie.
                 </h2>
-                <p className="text-sm/6 text-(--ink-soft)">
+                <p className="text-[15px] leading-[1.55] text-(--ink-soft) sm:text-[16px]">
                   Outras peças do arquivo que complementam esta entrega ou
                   ajudam a completar a coleção.
                 </p>
               </div>
             </ScrollReveal>
 
-            <ScrollRevealGroup
-              className="grid gap-5 sm:grid-cols-2"
-              staggerChildren={0.08}
-            >
-              {related.map((item) => (
-                <ScrollRevealItem key={item.id}>
-                  <RelatedProductCard product={item} />
-                </ScrollRevealItem>
-              ))}
-            </ScrollRevealGroup>
+            <RelatedProductsGrid products={related} />
           </div>
         </section>
       ) : null}
