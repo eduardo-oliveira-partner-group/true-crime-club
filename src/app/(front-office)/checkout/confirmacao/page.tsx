@@ -520,6 +520,22 @@ function PixPaymentPanel({
   payment: Pick<Payment, 'pixQrCode' | 'pixExpiresAt'>
   qrImage: string | null
 }) {
+  const [copyFeedback, setCopyFeedback] = useState<
+    'idle' | 'success' | 'error'
+  >('idle')
+  const pixCode = payment.pixQrCode ?? ''
+
+  const handleCopyPixCode = async () => {
+    try {
+      await navigator.clipboard.writeText(pixCode)
+      setCopyFeedback('success')
+    } catch {
+      setCopyFeedback('error')
+    }
+
+    window.setTimeout(() => setCopyFeedback('idle'), 2500)
+  }
+
   return (
     <section
       className={cn(
@@ -591,9 +607,55 @@ function PixPaymentPanel({
         >
           Código Pix copia e cola
         </p>
-        <code className="mt-2 block max-h-20 overflow-auto rounded-[9px] bg-[#241f1b] p-3 text-xs/5 break-all text-[#fbf9f6]/85">
-          {payment.pixQrCode}
-        </code>
+        <div className="mt-2 overflow-hidden rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-(--paper-soft)">
+          <code className="block p-3 text-xs/5 break-all text-(--ink)">
+            {pixCode}
+          </code>
+          <div className="border-t border-[rgba(33,28,24,0.12)] px-2 py-1">
+            <Button
+              type="button"
+              variant="link"
+              disabled={!pixCode}
+              onClick={() => void handleCopyPixCode()}
+              className={cn(
+                fontMono,
+                'group h-10 min-h-10 gap-2 rounded-[8px] px-2.5 text-xs font-semibold tracking-[0.04em] no-underline [transition:scale_0.18s_cubic-bezier(0.22,1,0.36,1),background-color_0.2s_ease,color_0.2s_ease] hover:bg-(--red)/10 hover:text-(--red-deep) hover:no-underline focus-visible:ring-2 focus-visible:ring-(--red)/25 active:scale-[0.98] disabled:opacity-50 motion-reduce:transition-none motion-reduce:active:scale-100',
+                copyFeedback === 'success'
+                  ? 'bg-(--teal)/10 text-(--teal-deep) hover:bg-(--teal)/15 hover:text-(--teal-deep)'
+                  : 'text-(--red)',
+              )}
+            >
+              {copyFeedback === 'success' ? (
+                <IconCheck className="size-4 animate-in duration-200 fade-in-0 zoom-in-75 motion-reduce:animate-none" />
+              ) : (
+                <IconClipboardText className="size-4 transition-transform duration-200 group-hover:scale-110 motion-reduce:transition-none" />
+              )}
+              <span
+                className={cn(
+                  copyFeedback === 'success'
+                    ? 'animate-in duration-200 fade-in-0 slide-in-from-left-1 motion-reduce:animate-none'
+                    : undefined,
+                )}
+              >
+                {copyFeedback === 'success'
+                  ? 'Código copiado'
+                  : 'Copiar código'}
+              </span>
+            </Button>
+          </div>
+        </div>
+        <p className="sr-only" aria-live="polite">
+          {copyFeedback === 'success'
+            ? 'Código Pix copiado para a área de transferência.'
+            : copyFeedback === 'error'
+              ? 'Não foi possível copiar o código Pix. Selecione o código e copie manualmente.'
+              : ''}
+        </p>
+        {copyFeedback === 'error' ? (
+          <p className="mt-2 text-xs/5 text-(--red)">
+            Não foi possível copiar. Selecione o código e copie manualmente.
+          </p>
+        ) : null}
       </div>
     </section>
   )
