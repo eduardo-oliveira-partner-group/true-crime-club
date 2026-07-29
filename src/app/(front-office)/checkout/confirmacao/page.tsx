@@ -361,7 +361,7 @@ export default function ConfirmacaoPage() {
             <div
               className={cn(dossierCardSurface, warmShadowClass, 'p-5 sm:p-6')}
             >
-              <div className="flex items-center justify-between border-b border-[rgba(33,28,24,0.15)] pb-4">
+              <div className="flex flex-col justify-between gap-2 border-b border-[rgba(33,28,24,0.15)] pb-4">
                 <p
                   className={cn(
                     fontMono,
