@@ -43,12 +43,12 @@ export function ProductDetailActions({
   }
 
   return (
-    <div className="flex flex-col gap-3 sm:flex-row">
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-stretch">
       <Button
         type="button"
         disabled={!inStock || isAdding}
         onClick={onAddToCart}
-        className={`h-12 flex-1 rounded-[10px] bg-(--red) px-6 text-base text-white shadow-[0_12px_32px_rgba(197,39,31,0.28)] hover:bg-(--red-deep) disabled:opacity-50 ${fontMono}`}
+        className={`h-auto min-h-11 w-full flex-none rounded-[10px] bg-(--red) px-5 py-[14px] text-[14px] leading-none font-bold tracking-[0.04em] text-white uppercase shadow-[0_12px_32px_rgba(197,39,31,0.28)] hover:bg-(--red-deep) disabled:opacity-50 sm:min-h-12 sm:flex-1 ${fontMono}`}
       >
         {justAdded ? (
           <IconCheck data-icon="inline-start" />
@@ -66,7 +66,7 @@ export function ProductDetailActions({
       <Button
         asChild
         variant="outline"
-        className={`h-12 rounded-[10px] border-[#211c18]/18 bg-(--paper-soft) text-(--ink) hover:border-(--red)/45 hover:bg-(--red)/10 hover:text-(--red) ${fontMono}`}
+        className={`h-auto min-h-11 w-full flex-none rounded-[10px] border-[#211c18]/18 bg-(--paper-soft) px-5 py-[14px] text-[14px] leading-none font-bold tracking-[0.04em] text-(--ink) uppercase hover:border-(--red)/45 hover:bg-(--red)/10 hover:text-(--red) sm:min-h-12 sm:w-auto ${fontMono}`}
       >
         <Link href="/loja">Voltar à loja</Link>
       </Button>
