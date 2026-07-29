@@ -79,11 +79,13 @@ export async function fetcher(endpoint: string, options: RequestInit = {}) {
   const payload = await response.json().catch(() => null)
 
   if (!response.ok || isApiFailureEnvelope(payload)) {
-    const status = readStatusCode(
-      isApiEnvelope(payload) ? payload.codigo : undefined,
-      response.status,
+    const code = isApiEnvelope(payload) ? payload.codigo : undefined
+    const status = readStatusCode(code, response.status)
+    throw new ApiClientError(
+      extractApiErrorMessage(payload, status),
+      status,
+      code,
     )
-    throw new ApiClientError(extractApiErrorMessage(payload, status), status)
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- preserva o contrato any do response.json()

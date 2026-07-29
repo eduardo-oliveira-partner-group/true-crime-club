@@ -32,11 +32,38 @@ export const authApi = {
       body: JSON.stringify({ email: body.email, senha: body.password }),
     })
   },
-  recoverPassword: (body: { email: string }) =>
-    fetcher('/clientes/recuperar-senha', {
+  requestPasswordReset: async (body: { email: string }) => {
+    await fetcher('/autenticacao/esqueci-senha', {
       method: 'POST',
       body: JSON.stringify({ email: body.email }),
-    }),
+    })
+  },
+  validatePasswordResetToken: async (body: { token: string }) => {
+    const data = await fetcher('/autenticacao/recuperacao-senha/validar', {
+      method: 'POST',
+      body: JSON.stringify({ token: body.token }),
+    })
+
+    if (!data || typeof data.valido !== 'boolean') {
+      throw new Error('A API retornou uma validação de token inválida.')
+    }
+
+    return { valid: data.valido }
+  },
+  resetPassword: async (body: {
+    token: string
+    newPassword: string
+    passwordConfirmation: string
+  }) => {
+    await fetcher('/autenticacao/recuperacao-senha/redefinir', {
+      method: 'POST',
+      body: JSON.stringify({
+        token: body.token,
+        nova_senha: body.newPassword,
+        confirmacao_senha: body.passwordConfirmation,
+      }),
+    })
+  },
   logout: async () => {
     await fetcher('/autenticacao/sair', { method: 'POST' })
   },

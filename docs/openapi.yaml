@@ -132,11 +132,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Erro'
-  /clientes/recuperar-senha:
+  /autenticacao/esqueci-senha:
     post:
       tags:
       - Autenticação
-      summary: Disparar fluxo de recuperação de senha
+      summary: Solicitar recuperação de senha
+      description: Solicita o envio de um link de recuperação sem revelar se o e-mail está cadastrado.
       requestBody:
         required: true
         content:
@@ -151,24 +152,108 @@ paths:
                   format: email
                   example: mariana.silva@email.com
       responses:
-        '202':
-          description: Solicitação aceita e e-mail disparado.
+        '200':
+          description: Solicitação processada.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    example: email_enviado
-        '401':
-          description: Não autenticado.
+                $ref: '#/components/schemas/RespostaRecuperacaoSenha'
+  /autenticacao/recuperacao-senha/validar:
+    post:
+      tags:
+      - Autenticação
+      summary: Validar token de recuperação de senha
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - token
+              properties:
+                token:
+                  type: string
+                  example: TOKEN_RECEBIDO
+      responses:
+        '200':
+          description: Resultado da validação do token.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Erro'
-      security:
-      - cookieAuth: []
+                $ref: '#/components/schemas/RespostaValidacaoToken'
+              examples:
+                tokenValido:
+                  value:
+                    sucesso: true
+                    codigo: OK
+                    mensagem: Token válido.
+                    data:
+                      valido: true
+                    erros: []
+                tokenInvalido:
+                  value:
+                    sucesso: false
+                    codigo: TOKEN_INVALIDO
+                    mensagem: O link de recuperação é inválido ou expirou.
+                    data:
+                      valido: false
+                    erros: []
+  /autenticacao/recuperacao-senha/redefinir:
+    post:
+      tags:
+      - Autenticação
+      summary: Redefinir senha com token de recuperação
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - token
+              - nova_senha
+              - confirmacao_senha
+              properties:
+                token:
+                  type: string
+                  example: TOKEN_RECEBIDO
+                nova_senha:
+                  type: string
+                  format: password
+                  example: NovaSenha@123
+                confirmacao_senha:
+                  type: string
+                  format: password
+                  example: NovaSenha@123
+      responses:
+        '200':
+          description: Senha redefinida com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RespostaRedefinicaoSenha'
+        '400':
+          description: Token inválido ou confirmação de senha divergente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RespostaRedefinicaoSenha'
+              examples:
+                tokenInvalido:
+                  value:
+                    sucesso: false
+                    codigo: TOKEN_INVALIDO
+                    mensagem: O link de recuperação é inválido ou expirou.
+                    data: null
+                    erros: []
+                senhasDivergentes:
+                  value:
+                    sucesso: false
+                    codigo: SENHAS_DIVERGENTES
+                    mensagem: A confirmação da senha não corresponde à nova senha.
+                    data: null
+                    erros: []
   /clientes:
     post:
       tags:
@@ -1415,6 +1500,95 @@ components:
       in: cookie
       name: tcc_session
   schemas:
+    RespostaRecuperacaoSenha:
+      type: object
+      required:
+      - sucesso
+      - codigo
+      - mensagem
+      - data
+      - erros
+      properties:
+        sucesso:
+          type: boolean
+          example: true
+        codigo:
+          type: string
+          example: OK
+        mensagem:
+          type: string
+          example: Se o e-mail estiver cadastrado, enviaremos as instruções.
+        data:
+          type: object
+          nullable: true
+          example: null
+        erros:
+          type: array
+          items:
+            type: object
+          example: []
+    RespostaValidacaoToken:
+      type: object
+      required:
+      - sucesso
+      - codigo
+      - mensagem
+      - data
+      - erros
+      properties:
+        sucesso:
+          type: boolean
+          example: true
+        codigo:
+          type: string
+          example: OK
+        mensagem:
+          type: string
+          example: Token válido.
+        data:
+          type: object
+          required:
+          - valido
+          properties:
+            valido:
+              type: boolean
+              example: true
+        erros:
+          type: array
+          items:
+            type: object
+          example: []
+    RespostaRedefinicaoSenha:
+      type: object
+      required:
+      - sucesso
+      - codigo
+      - mensagem
+      - data
+      - erros
+      properties:
+        sucesso:
+          type: boolean
+          example: true
+        codigo:
+          type: string
+          enum:
+          - OK
+          - TOKEN_INVALIDO
+          - SENHAS_DIVERGENTES
+          example: OK
+        mensagem:
+          type: string
+          example: Senha redefinida com sucesso.
+        data:
+          type: object
+          nullable: true
+          example: null
+        erros:
+          type: array
+          items:
+            type: object
+          example: []
     Cliente:
       type: object
       properties:

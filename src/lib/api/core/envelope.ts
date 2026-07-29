@@ -35,7 +35,7 @@ export function isApiFailureEnvelope(payload: unknown): boolean {
   return false
 }
 
-/** Extrai o conteúdo de `{ data, sucesso, ... }`. */
+/** Extrai o conteúdo de envelopes com `data`. */
 export function unwrapApiPayload<T = unknown>(payload: unknown): T {
   if (isApiEnvelope(payload) && 'data' in payload) {
     return (payload.data ?? null) as T

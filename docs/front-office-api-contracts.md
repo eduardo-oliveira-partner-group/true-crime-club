@@ -87,13 +87,12 @@ Erros:
 - `401` — Credenciais inválidas.
 - `429` — Muitas tentativas (rate limit).
 
-### Recuperar senha
+### Solicitar recuperação de senha
 
 - **Método:** `POST`
-- **Endpoint:** `/clientes/recuperar-senha`
-- **Descrição:** Dispara e-mail de recuperação de senha.
+- **Endpoint:** `/autenticacao/esqueci-senha`
+- **Descrição:** Solicita o envio do link de recuperação sem revelar se o e-mail está cadastrado.
 - **Usada em:** `/recuperar-senha`
-- **Substitui:** (mock futuro)
 
 Request:
 
@@ -101,16 +100,88 @@ Request:
 { "email": "mariana.silva@email.com" }
 ```
 
-Response `202`:
+Response `200`:
 
 ```json
-{ "status": "email_enviado" }
+{
+  "sucesso": true,
+  "codigo": "OK",
+  "mensagem": "Se o e-mail estiver cadastrado, enviaremos as instruções.",
+  "data": null,
+  "erros": []
+}
 ```
 
-Erros:
+### Validar link de recuperação
 
-- `400` — E-mail inválido.
-- `404` — E-mail não encontrado (opcional, conforme política de privacidade).
+- **Método:** `POST`
+- **Endpoint:** `/autenticacao/recuperacao-senha/validar`
+- **Descrição:** Verifica se o token recebido ainda é válido e não foi utilizado.
+- **Usada em:** `/redefinir-senha?token=TOKEN_RECEBIDO`
+
+Request:
+
+```json
+{ "token": "TOKEN_RECEBIDO" }
+```
+
+Response com token válido:
+
+```json
+{
+  "sucesso": true,
+  "codigo": "OK",
+  "mensagem": "Token válido.",
+  "data": { "valido": true },
+  "erros": []
+}
+```
+
+Response com token inválido, expirado ou utilizado:
+
+```json
+{
+  "sucesso": false,
+  "codigo": "TOKEN_INVALIDO",
+  "mensagem": "O link de recuperação é inválido ou expirou.",
+  "data": { "valido": false },
+  "erros": []
+}
+```
+
+### Redefinir senha
+
+- **Método:** `POST`
+- **Endpoint:** `/autenticacao/recuperacao-senha/redefinir`
+- **Descrição:** Atualiza a senha e invalida o token utilizado.
+- **Usada em:** `/redefinir-senha?token=TOKEN_RECEBIDO`
+
+Request:
+
+```json
+{
+  "token": "TOKEN_RECEBIDO",
+  "nova_senha": "NovaSenha@123",
+  "confirmacao_senha": "NovaSenha@123"
+}
+```
+
+Response de sucesso:
+
+```json
+{
+  "sucesso": true,
+  "codigo": "OK",
+  "mensagem": "Senha redefinida com sucesso.",
+  "data": null,
+  "erros": []
+}
+```
+
+Erros de negócio:
+
+- `TOKEN_INVALIDO` — Link inválido, expirado ou já utilizado.
+- `SENHAS_DIVERGENTES` — A confirmação não corresponde à nova senha.
 
 ### Atualizar dados cadastrais
 

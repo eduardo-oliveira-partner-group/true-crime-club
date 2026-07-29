@@ -15,34 +15,46 @@ import { DesignFormButton } from '@/src/components/public-design/design-button'
 import { apiClient } from '@/src/lib/api-client'
 import { arrowIconClass, formLinkClass } from '@/src/lib/design/classes'
 
+const SUCCESS_MESSAGE =
+  'Se o e-mail estiver cadastrado, enviaremos as instruções.'
+
 export default function RecuperarSenhaPage() {
   const [emailValue, setEmailValue] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
-  const [error, setError] = useState('')
+  const [emailError, setEmailError] = useState('')
+  const [generalError, setGeneralError] = useState('')
 
-  const handleRecover = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setError('')
+  const handleRequestReset = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setEmailError('')
+    setGeneralError('')
     setIsSuccess(false)
 
-    if (!emailValue) {
-      setError('E-mail é obrigatório.')
+    const email = emailValue.trim()
+
+    if (!email) {
+      setEmailError('E-mail é obrigatório.')
       return
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue)) {
-      setError('E-mail inválido.')
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setEmailError('E-mail inválido.')
       return
     }
 
     setIsLoading(true)
 
     try {
-      await apiClient.auth.recoverPassword({ email: emailValue })
+      await apiClient.auth.requestPasswordReset({ email })
       setIsSuccess(true)
       setEmailValue('')
-    } catch (err) {
-      console.error(err)
-      setError('Falha ao enviar e-mail. Tente novamente.')
+    } catch (error) {
+      setGeneralError(
+        error instanceof Error && error.message
+          ? error.message
+          : 'Não foi possível enviar o link. Tente novamente.',
+      )
     } finally {
       setIsLoading(false)
     }
@@ -50,42 +62,60 @@ export default function RecuperarSenhaPage() {
 
   return (
     <AuthFormCard
-      tabCode="REC"
+      tabCode="ESQ"
       tabLabel="Recuperação"
       showPin={true}
       pinColor="var(--yellow)"
       className="rotate-[-0.6deg]"
     >
-      <AuthFormHeader eyebrow="Acesso restrito" title="Recuperar senha" />
+      <AuthFormHeader eyebrow="Acesso ao clube" title="Esqueci minha senha" />
 
-      <AuthFormMeta left="CLUB · RECUPERAÇÃO" right="Sessão segura" />
+      <AuthFormMeta left="CLUB · RECUPERAÇÃO" right="Link seguro" />
 
       <p className="mt-4 text-sm/6 text-(--ink-soft)">
-        Informe seu e-mail registrado para simular o envio de instruções de
-        recuperação.
+        Informe o e-mail da sua conta. Se ele estiver cadastrado, enviaremos as
+        instruções para criar uma nova senha.
       </p>
 
       {isSuccess ? (
-        <div className="animate-fade-in mt-4 rounded-lg border border-(--teal)/20 bg-(--teal)/10 p-3 [font-family:var(--design-font-body)] text-xs font-medium text-(--teal)">
-          Dossiê localizado! As instruções de recuperação foram enviadas para o
-          seu e-mail.
+        <div
+          className="mt-4 rounded-lg border border-(--teal)/20 bg-(--teal)/10 p-3 [font-family:var(--design-font-body)] text-xs font-medium text-(--teal-deep)"
+          role="status"
+          aria-live="polite"
+        >
+          {SUCCESS_MESSAGE}
         </div>
       ) : null}
 
-      <form className="mt-6 space-y-5" onSubmit={handleRecover} noValidate>
+      {generalError ? (
+        <div
+          className="mt-4 rounded-lg border border-(--red)/20 bg-(--red)/10 p-3 [font-family:var(--design-font-body)] text-xs font-medium text-(--red-deep)"
+          role="alert"
+        >
+          {generalError}
+        </div>
+      ) : null}
+
+      <form className="mt-6 space-y-5" onSubmit={handleRequestReset} noValidate>
         <AuthFormField
           id="email"
           label="E-mail"
           type="email"
+          name="email"
           value={emailValue}
-          onChange={(e) => setEmailValue(e.target.value)}
+          onChange={(event) => {
+            setEmailValue(event.target.value)
+            setEmailError('')
+            setGeneralError('')
+            setIsSuccess(false)
+          }}
           autoComplete="email"
-          error={error}
+          error={emailError}
           required
           disabled={isLoading}
         />
         <DesignFormButton disabled={isLoading}>
-          {isLoading ? 'Localizando registro...' : 'Enviar link'}
+          {isLoading ? 'Enviando instruções...' : 'Enviar link'}
           {!isLoading ? (
             <span className={arrowIconClass} aria-hidden>
               →

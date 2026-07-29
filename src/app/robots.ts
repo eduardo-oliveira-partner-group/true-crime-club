@@ -7,7 +7,13 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/cliente', '/login', '/cadastro', '/recuperar-senha'],
+      disallow: [
+        '/cliente',
+        '/login',
+        '/cadastro',
+        '/redefinir-senha',
+        '/recuperar-senha',
+      ],
     },
     sitemap: `${siteConfig.url}/sitemap.xml`,
     host: siteConfig.url,

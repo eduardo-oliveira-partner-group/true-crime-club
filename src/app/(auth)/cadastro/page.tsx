@@ -32,6 +32,7 @@ function safeNextPath(raw: string | null): string {
   if (
     pathname === '/login' ||
     pathname === '/cadastro' ||
+    pathname === '/redefinir-senha' ||
     pathname === '/recuperar-senha'
   ) {
     return '/cliente/perfil'

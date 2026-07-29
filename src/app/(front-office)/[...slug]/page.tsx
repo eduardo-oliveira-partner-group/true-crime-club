@@ -15,6 +15,10 @@ const RESERVED_ROUTES = new Set([
   'casos',
   'api',
   'api-docs',
+  'login',
+  'cadastro',
+  'redefinir-senha',
+  'recuperar-senha',
 ])
 
 interface CatchAllProps {

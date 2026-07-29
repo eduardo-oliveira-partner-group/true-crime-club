@@ -34,7 +34,8 @@ Todas `noindex` via `metadata` no layout `src/app/(auth)/layout.tsx`
 | --- | --- | --- | --- | --- |
 | `/login` | Login do cliente. | (mock futuro: `login`) | `noindex` (layout) | private |
 | `/cadastro` | Cadastro de cliente. | (mock futuro: `createAccount`) | `noindex` (layout) | private |
-| `/recuperar-senha` | Recuperação de senha. | (mock futuro: `requestPasswordReset`) | `noindex` (layout) | private |
+| `/recuperar-senha` | Solicitação do link de recuperação. | `apiClient.auth.requestPasswordReset` | `noindex` (layout) | private |
+| `/redefinir-senha` | Validação do token e definição da nova senha. | `apiClient.auth.validatePasswordResetToken`, `apiClient.auth.resetPassword` | `noindex` (layout) | private |
 
 ## Rotas da área do cliente — `(cliente)`
 
@@ -68,7 +69,7 @@ Todas `noindex` via `metadata` no layout `src/app/(cliente)/cliente/layout.tsx`.
   produto dinâmicas.
 - `src/app/robots.ts` — gera `robots.txt` permitindo rastreio das rotas
   públicas e bloqueando `/cliente`, `/login`, `/cadastro`,
-  `/recuperar-senha`.
+  `/recuperar-senha` e `/redefinir-senha`.
 - `src/lib/site.ts` — `siteConfig` (URL canônica base, OG default, locale).
 - `src/lib/seo.ts` — `buildMetadata` (canonical, OG, Twitter, robots).
 - `src/components/seo/json-ld.tsx`, `breadcrumbs.tsx`, `product-json-ld.tsx` —

@@ -26,6 +26,7 @@ function safeNextPath(raw: string | null): string {
   if (
     pathname === '/login' ||
     pathname === '/cadastro' ||
+    pathname === '/redefinir-senha' ||
     pathname === '/recuperar-senha'
   ) {
     return '/cliente/perfil'
@@ -46,6 +47,7 @@ function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const nextPath = safeNextPath(searchParams.get('next'))
+  const passwordResetSucceeded = searchParams.get('senha_redefinida') === '1'
 
   useEffect(() => {
     apiClient.auth
@@ -119,6 +121,16 @@ function LoginForm() {
       <p className="mt-4 text-sm/6 text-(--ink-soft)">
         Use seu e-mail e senha cadastrados para acessar o seu dossiê pessoal.
       </p>
+
+      {passwordResetSucceeded ? (
+        <div
+          className="mt-4 rounded-lg border border-(--teal)/20 bg-(--teal)/10 p-3 [font-family:var(--design-font-body)] text-xs font-medium text-(--teal-deep)"
+          role="status"
+          aria-live="polite"
+        >
+          Senha redefinida com sucesso. Entre com a sua nova senha.
+        </div>
+      ) : null}
 
       {errors.general ? (
         <div className="mt-4 rounded-lg border border-(--red)/20 bg-(--red)/10 p-3 [font-family:var(--design-font-body)] text-xs font-medium text-(--red)">

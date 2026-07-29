@@ -101,14 +101,15 @@ Convenções de tipo:
 | `confirmacao.nota_cobranca` | text | `order.billingCycleNote` | Operações | Nota de cobrança (vem do pedido). |
 | `confirmacao.nota_envio` | text | `order.shippingCycleNote` | Operações | Nota de envio (vem do pedido). |
 
-## Autenticação (`/login`, `/cadastro`, `/recuperar-senha`)
+## Autenticação (`/login`, `/cadastro`, `/recuperar-senha`, `/redefinir-senha`)
 
 | Chave | Tipo | Valor mockado de fallback | Owner Backoffice | Notas |
 | --- | --- | --- | --- | --- |
 | `auth.logo` | image | `assets/images/brand/logo.png` | Design | Logo nas telas de auth. |
 | `auth.login.heading` | text | (hardcoded nas páginas) | Marketing | Sugere-se extrair. |
 | `auth.cadastro.heading` | text | (hardcoded) | Marketing | Sugere-se extrair. |
-| `auth.recuperar.heading` | text | (hardcoded) | Marketing | Sugere-se extrair. |
+| `auth.esqueci_senha.heading` | text | (hardcoded) | Marketing | Sugere-se extrair. |
+| `auth.redefinir_senha.heading` | text | (hardcoded) | Marketing | Sugere-se extrair. |
 
 ## Área do cliente (`/cliente/**`)
 

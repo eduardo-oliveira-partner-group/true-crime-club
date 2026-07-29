@@ -98,18 +98,15 @@ export function AuthFormField({
   error,
   ...props
 }: AuthFormFieldProps) {
+  const errorId = `${id}-error`
+
   return (
     <div className="flex flex-col gap-1.5">
-      <div className="flex items-center justify-between">
+      <div>
         <Label className={formLabelClass} htmlFor={id}>
           {label}
           {props.required && <span className="ml-0.5 text-(--red)">*</span>}
         </Label>
-        {error ? (
-          <span className="[font-family:var(--design-font-body)] text-[11px] font-medium text-(--red)">
-            {error}
-          </span>
-        ) : null}
       </div>
       <Input
         id={id}
@@ -120,8 +117,17 @@ export function AuthFormField({
           className,
         )}
         aria-invalid={error ? true : undefined}
+        aria-describedby={error ? errorId : props['aria-describedby']}
         {...props}
       />
+      {error ? (
+        <span
+          id={errorId}
+          className="[font-family:var(--design-font-body)] text-[11px]/4 font-medium text-(--red)"
+        >
+          {error}
+        </span>
+      ) : null}
     </div>
   )
 }
