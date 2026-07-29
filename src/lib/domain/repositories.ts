@@ -19,6 +19,8 @@ export {
   getDynamicContentByRoute,
   getExclusiveContentBySlug,
   getOrderById,
+  getPaymentById,
+  getPendingPixPaymentForOrder,
   getPlanById,
   getProductBySlug,
   getSeoEntry,

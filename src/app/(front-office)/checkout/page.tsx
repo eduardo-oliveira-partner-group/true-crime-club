@@ -16,6 +16,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/src/components/ui/alert'
 import { Button } from '@/src/components/ui/button'
 import { CheckoutSkeleton } from '@/src/components/ui/page-loading-skeletons'
 import { apiClient, ApiClientError } from '@/src/lib/api-client'
+import { saveCheckoutPixPayment } from '@/src/lib/checkout-pix-storage'
 import {
   dossierCardSurface,
   fontHeading,
@@ -242,27 +243,53 @@ export default function CheckoutPage() {
             }
           : undefined,
     })
-    if (result && typeof result === 'object' && 'pagamento' in result) {
-      const pagamento = (result as { pagamento?: unknown }).pagamento
-      if (pagamento) {
-        sessionStorage.setItem(
-          'checkout:lastPayment',
-          JSON.stringify(pagamento),
-        )
-      }
+    const resultRecord =
+      result && typeof result === 'object'
+        ? (result as Record<string, unknown>)
+        : null
+
+    const pedido =
+      resultRecord?.pedido && typeof resultRecord.pedido === 'object'
+        ? (resultRecord.pedido as Record<string, unknown>)
+        : null
+
+    const orderId =
+      (pedido && typeof pedido.id === 'string' && pedido.id) ||
+      (typeof resultRecord?.id === 'string' && resultRecord.id) ||
+      undefined
+
+    const pagamento =
+      (resultRecord?.pagamento && typeof resultRecord.pagamento === 'object'
+        ? resultRecord.pagamento
+        : null) ||
+      (pedido?.pagamento && typeof pedido.pagamento === 'object'
+        ? pedido.pagamento
+        : null)
+
+    if (orderId && pagamento && typeof pagamento === 'object') {
+      const raw = pagamento as Record<string, unknown>
+      saveCheckoutPixPayment(orderId, {
+        id: typeof raw.id === 'string' ? raw.id : undefined,
+        metodo: typeof raw.metodo === 'string' ? raw.metodo : undefined,
+        pixQrCode:
+          (typeof raw.pixQrCode === 'string' && raw.pixQrCode) ||
+          (typeof raw.pixCopiaCola === 'string' && raw.pixCopiaCola) ||
+          (typeof raw.qrCode === 'string' && raw.qrCode) ||
+          undefined,
+        pixQrCodeBase64:
+          typeof raw.pixQrCodeBase64 === 'string'
+            ? raw.pixQrCodeBase64
+            : typeof raw.qrCodeBase64 === 'string'
+              ? raw.qrCodeBase64
+              : undefined,
+        pixExpiraEm:
+          (typeof raw.pixExpiraEm === 'string' && raw.pixExpiraEm) ||
+          (typeof raw.pixExpiresAt === 'string' && raw.pixExpiresAt) ||
+          undefined,
+      })
     }
-    if (
-      result &&
-      typeof result === 'object' &&
-      'pedido' in result &&
-      result.pedido &&
-      typeof result.pedido === 'object' &&
-      'id' in result.pedido &&
-      typeof result.pedido.id === 'string'
-    ) {
-      return result.pedido.id
-    }
-    return undefined
+
+    return orderId
   }
 
   return (

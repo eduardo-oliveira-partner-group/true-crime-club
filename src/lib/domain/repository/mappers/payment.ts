@@ -3,6 +3,7 @@ import type { Invoice, Payment } from '../../types'
 export type ApiPayment = {
   id: string
   idPedido?: string
+  pedidoId?: string
   idAssinatura?: string
   valor: number
   status?: string
@@ -10,7 +11,9 @@ export type ApiPayment = {
   vencimento: string
   pagoEm?: string
   pixQrCode?: string
+  pixCopiaCola?: string
   pixExpiraEm?: string
+  pixExpiresAt?: string
   motivoRecusa?: string
 }
 
@@ -44,17 +47,26 @@ export function mapApiPaymentToDomain(apiPayment: ApiPayment): Payment {
     pix: 'pix',
   }
 
+  const statusKey = (apiPayment.status ?? '').trim().toLowerCase()
+  const methodKey = (apiPayment.metodo ?? '').trim().toLowerCase()
+  const pixQrCode =
+    apiPayment.pixQrCode?.trim() || apiPayment.pixCopiaCola?.trim() || undefined
+  const hasPixCode = Boolean(pixQrCode)
+
   return {
     id: apiPayment.id,
-    orderId: apiPayment.idPedido ?? undefined,
+    orderId: apiPayment.idPedido ?? apiPayment.pedidoId ?? undefined,
     subscriptionId: apiPayment.idAssinatura ?? undefined,
     amount: apiPayment.valor,
-    status: statusMap[apiPayment.status ?? ''] ?? 'paid',
-    method: methodMap[apiPayment.metodo ?? ''] ?? 'credit_card',
+    status:
+      statusMap[statusKey] ??
+      (methodKey === 'pix' || hasPixCode ? 'pending' : 'paid'),
+    method: methodMap[methodKey] ?? (hasPixCode ? 'pix' : 'credit_card'),
     dueDate: apiPayment.vencimento,
     paidAt: apiPayment.pagoEm ?? undefined,
-    pixQrCode: apiPayment.pixQrCode ?? undefined,
-    pixExpiresAt: apiPayment.pixExpiraEm ?? undefined,
+    pixQrCode,
+    pixExpiresAt:
+      apiPayment.pixExpiraEm ?? apiPayment.pixExpiresAt ?? undefined,
     refusalReason: apiPayment.motivoRecusa ?? undefined,
   }
 }

@@ -160,13 +160,54 @@ export async function reactivateSubscription(): Promise<Subscription> {
 export async function listPayments(): Promise<Payment[]> {
   try {
     const apiPayments = await apiClient.customer.listPayments()
-    return apiPayments.map(mapApiPaymentToDomain)
+    const list = Array.isArray(apiPayments) ? apiPayments : []
+    return list.map(mapApiPaymentToDomain)
   } catch (error) {
     if (isUnauthorizedError(error)) {
       return []
     }
     throw error
   }
+}
+
+export async function getPaymentById(id: string): Promise<Payment | null> {
+  try {
+    const apiPayment = await apiClient.customer.getPayment(id)
+    return mapApiPaymentToDomain(apiPayment)
+  } catch (error) {
+    if (isNotFoundError(error) || isUnauthorizedError(error)) {
+      return null
+    }
+    throw error
+  }
+}
+
+/** Pix pendente do pedido: lista + detalhe se o QR não vier na listagem. */
+export async function getPendingPixPaymentForOrder(
+  orderId: string,
+): Promise<Payment | null> {
+  const payments = await listPayments()
+  const forOrder = payments.filter((payment) => payment.orderId === orderId)
+  const pendingPix = payments.filter(
+    (payment) =>
+      payment.method === 'pix' &&
+      (payment.status === 'pending' || Boolean(payment.pixQrCode)),
+  )
+
+  const matched =
+    forOrder.find(
+      (payment) =>
+        payment.method === 'pix' &&
+        (payment.status === 'pending' || Boolean(payment.pixQrCode)),
+    ) ??
+    forOrder.find((payment) => payment.status === 'pending') ??
+    (pendingPix.length === 1 ? pendingPix[0] : null)
+
+  if (!matched) return null
+  if (matched.pixQrCode) return matched
+
+  const detailed = await getPaymentById(matched.id)
+  return detailed?.pixQrCode ? detailed : matched
 }
 
 export async function listInvoices(): Promise<Invoice[]> {

@@ -20,13 +20,23 @@ import { Button } from '@/src/components/ui/button'
 import { ConfirmationSkeleton } from '@/src/components/ui/page-loading-skeletons'
 import { useCheckoutPaymentWs } from '@/src/hooks/use-checkout-payment-ws'
 import {
+  type CheckoutPixPaymentSnapshot,
+  clearCheckoutPixPayment,
+  readCheckoutPixPayment,
+  saveCheckoutPixPayment,
+} from '@/src/lib/checkout-pix-storage'
+import {
   dossierCardSurface,
   fontHeading,
   fontMono,
   sectionFrame,
   warmShadowClass,
 } from '@/src/lib/design/classes'
-import { getOrderById, listOrders } from '@/src/lib/domain/repositories'
+import {
+  getOrderById,
+  getPendingPixPaymentForOrder,
+  listOrders,
+} from '@/src/lib/domain/repositories'
 import type { CartItem, Order, Payment } from '@/src/lib/domain/types'
 import {
   formatCurrency,
@@ -36,6 +46,21 @@ import {
 } from '@/src/lib/formatters'
 import { getProductImage } from '@/src/lib/product-images'
 import { cn } from '@/src/lib/utils'
+
+function snapshotToPixState(payment: CheckoutPixPaymentSnapshot): {
+  pixPayment: Pick<Payment, 'pixQrCode' | 'pixExpiresAt'>
+  pixQrImage: string | null
+} {
+  return {
+    pixPayment: {
+      pixQrCode: payment.pixQrCode,
+      pixExpiresAt: payment.pixExpiraEm,
+    },
+    pixQrImage: payment.pixQrCodeBase64
+      ? `data:image/png;base64,${payment.pixQrCodeBase64}`
+      : null,
+  }
+}
 
 export default function ConfirmacaoPage() {
   const searchParams = useSearchParams()
@@ -48,62 +73,102 @@ export default function ConfirmacaoPage() {
   const [pixQrImage, setPixQrImage] = useState<string | null>(null)
   const [awaitingPixConfirmation, setAwaitingPixConfirmation] = useState(false)
 
-  const refreshOrder = useCallback(async (orderId: string) => {
-    const updated = await getOrderById(orderId)
-    if (!updated) return null
-    setOrder(updated)
-    if (updated.paymentStatus === 'paid') {
-      setPixPayment(null)
-      setPixQrImage(null)
-      setAwaitingPixConfirmation(false)
-    }
-    return updated
+  const clearPixState = useCallback((orderId?: string) => {
+    if (orderId) clearCheckoutPixPayment(orderId)
+    setPixPayment(null)
+    setPixQrImage(null)
+    setAwaitingPixConfirmation(false)
   }, [])
 
-  useEffect(() => {
-    const raw = sessionStorage.getItem('checkout:lastPayment')
-    if (!raw) return
-    try {
-      const payment = JSON.parse(raw) as {
-        metodo?: string
-        pixQrCode?: string
-        pixQrCodeBase64?: string
-        pixExpiraEm?: string
+  const showPixSnapshot = useCallback(
+    (snapshot: CheckoutPixPaymentSnapshot) => {
+      const applied = snapshotToPixState(snapshot)
+      setAwaitingPixConfirmation(true)
+      setPixPayment(applied.pixPayment)
+      setPixQrImage(applied.pixQrImage)
+    },
+    [],
+  )
+
+  const refreshOrder = useCallback(
+    async (orderId: string) => {
+      const updated = await getOrderById(orderId)
+      if (!updated) return null
+      setOrder(updated)
+      if (updated.paymentStatus === 'paid') {
+        clearPixState(orderId)
       }
-      if (payment.metodo === 'pix' && payment.pixQrCode) {
-        setAwaitingPixConfirmation(true)
-        setPixPayment({
-          pixQrCode: payment.pixQrCode,
-          pixExpiresAt: payment.pixExpiraEm,
-        })
-        if (payment.pixQrCodeBase64) {
-          setPixQrImage(`data:image/png;base64,${payment.pixQrCodeBase64}`)
-        }
-      }
-    } catch {
-      // ignora payload invalido
-    } finally {
-      sessionStorage.removeItem('checkout:lastPayment')
-    }
-  }, [])
+      return updated
+    },
+    [clearPixState],
+  )
 
   useEffect(() => {
+    let cancelled = false
     const id = searchParams.get('pedido')
-    const request = id
-      ? getOrderById(id)
-      : listOrders().then((orders) => orders[0] ?? null)
-    request
-      .then((loaded) => {
+
+    async function load() {
+      setLoading(true)
+
+      if (id) {
+        const stored = readCheckoutPixPayment(id)
+        if (stored) showPixSnapshot(stored)
+      }
+
+      try {
+        const loaded = id
+          ? await getOrderById(id)
+          : ((await listOrders())[0] ?? null)
+
+        if (cancelled) return
         setOrder(loaded)
-        if (loaded?.paymentStatus === 'paid') {
-          setAwaitingPixConfirmation(false)
-          setPixPayment(null)
-          setPixQrImage(null)
+
+        if (!loaded) return
+
+        if (loaded.paymentStatus === 'paid') {
+          clearPixState(loaded.id)
+          return
         }
-      })
-      .catch(() => setOrder(null))
-      .finally(() => setLoading(false))
-  }, [searchParams])
+
+        const stored = readCheckoutPixPayment(loaded.id)
+        if (stored) {
+          showPixSnapshot(stored)
+          return
+        }
+
+        // Pedido pendente (ou já com Pix em tela): tenta rehidratar o QR pela API.
+        if (
+          loaded.paymentStatus === 'pending' ||
+          loaded.status === 'pending_payment'
+        ) {
+          try {
+            const remote = await getPendingPixPaymentForOrder(loaded.id)
+            if (cancelled || !remote?.pixQrCode) return
+
+            const snapshot: CheckoutPixPaymentSnapshot = {
+              id: remote.id,
+              metodo: 'pix',
+              pixQrCode: remote.pixQrCode,
+              pixExpiraEm: remote.pixExpiresAt,
+            }
+            saveCheckoutPixPayment(loaded.id, snapshot)
+            showPixSnapshot(snapshot)
+          } catch {
+            // Confirmação segue mesmo se a rehidratação do Pix falhar.
+          }
+        }
+      } catch {
+        if (!cancelled) setOrder(null)
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+
+    void load()
+    return () => {
+      cancelled = true
+    }
+  }, [clearPixState, searchParams, showPixSnapshot])
 
   const orderId = order?.id
   const paymentPending =

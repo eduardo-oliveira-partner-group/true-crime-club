@@ -29,6 +29,8 @@ export {
   getCurrentCustomer,
   getCustomerProfile,
   getOrderById,
+  getPaymentById,
+  getPendingPixPaymentForOrder,
   getSubscription,
   listAddresses,
   listCards,
