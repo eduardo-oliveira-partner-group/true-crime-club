@@ -106,3 +106,9 @@ cookie cross-site (`SameSite=None; Secure`) e proteção CSRF antes do rollout.
 Páginas CMS (home, FAQ, rotas dinâmicas) usam `CMS_DELIVERY_BASE_URL` quando
 configurada; sem ela, o frontend cai no conteúdo CMS mock local
 (`src/lib/domain/cms-mock-data.ts`).
+
+Para validar os estados de erro de carregamento em desenvolvimento, acesse
+`/loja`, `/cliente/pedidos` ou `/cliente/assinatura` com o parâmetro
+`?simularErroApi=true`. A chamada HTTP continua sendo realizada pelo navegador
+e, após a resposta, a simulação devolve erro `503` apenas para a chamada de
+listagem correspondente e não é habilitada em produção.

@@ -3,12 +3,13 @@
 import { IconSparkles } from '@tabler/icons-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import { DesignPageShell } from '@/src/components/public-design/design-page-shell'
 import { DossierCard } from '@/src/components/public-design/dossier-card'
 import { SectionEyebrow } from '@/src/components/public-design/section-eyebrow'
 import { ShopCatalog } from '@/src/components/shop/shop-catalog'
+import { LoadErrorState } from '@/src/components/ui/load-error-state'
 import {
   AvailabilityBadge,
   PriceBlock,
@@ -52,29 +53,49 @@ function pickFeaturedBox(boxProducts: Product[]): Product | undefined {
 export function LojaPageClient() {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState(false)
 
-  useEffect(() => {
-    let cancelled = false
+  const loadProducts = useCallback(async (showLoading = true) => {
+    if (showLoading) {
+      setLoading(true)
+      setLoadError(false)
+    }
 
-    listProducts()
-      .then((items) => {
-        if (!cancelled) setProducts(items)
-      })
-      .catch(() => {
-        if (!cancelled) setProducts([])
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false)
-      })
-
-    return () => {
-      cancelled = true
+    try {
+      setProducts(await listProducts())
+      setLoadError(false)
+    } catch {
+      setProducts([])
+      setLoadError(true)
+    } finally {
+      if (showLoading) setLoading(false)
     }
   }, [])
+
+  useEffect(() => {
+    void loadProducts()
+  }, [loadProducts])
 
   const boxProducts = products.filter((product) => product.type === 'box')
   const extraProducts = products.filter((product) => product.type !== 'box')
   const featuredBox = pickFeaturedBox(boxProducts)
+
+  if (!loading && loadError) {
+    return (
+      <DesignPageShell showOverlays={false}>
+        <section className="bg-(--paper)">
+          <LoadErrorState
+            code="Catálogo temporariamente fechado"
+            title="Não foi possível abrir a loja"
+            description="A conexão com o catálogo foi interrompida. Tente novamente para reabrir este arquivo."
+            onRetry={() => loadProducts(false)}
+            className="min-h-[min(760px,calc(100svh-110px))]"
+            secondaryLink={{ href: '/', label: 'Voltar à home' }}
+          />
+        </section>
+      </DesignPageShell>
+    )
+  }
 
   return (
     <DesignPageShell showOverlays={false}>

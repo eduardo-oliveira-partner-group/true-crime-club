@@ -1,10 +1,8 @@
 'use client'
 
-import { IconAlertTriangle } from '@tabler/icons-react'
-import Link from 'next/link'
 import { useEffect } from 'react'
 
-import { Button } from '@/src/components/ui/button'
+import { LoadErrorState } from '@/src/components/ui/load-error-state'
 
 export default function Error({
   error,
@@ -18,28 +16,14 @@ export default function Error({
   }, [error])
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-16 text-center text-(--ink) sm:px-6">
-      <span className="mx-auto flex size-12 items-center justify-center rounded-[10px] border border-(--red)/25 bg-(--card) text-(--red)">
-        <IconAlertTriangle className="size-6" />
-      </span>
-      <h1 className="mt-5 [font-family:var(--design-font-heading),system-ui,sans-serif] text-2xl font-semibold tracking-tight text-(--ink) sm:text-3xl">
-        Falha ao carregar a área do cliente
-      </h1>
-      <p className="mt-3 text-sm/6 text-(--ink-mute)">
-        Não foi possível montar esta seção. Tente novamente em instantes.
-      </p>
-      <div className="mt-6 flex flex-wrap justify-center gap-3">
-        <Button
-          type="button"
-          onClick={() => unstable_retry()}
-          className="rounded-[9px] bg-(--red) text-[#fbf9f6] hover:bg-(--red-deep)"
-        >
-          Tentar novamente
-        </Button>
-        <Button asChild variant="outline" className="rounded-[9px]">
-          <Link href="/">Voltar à home</Link>
-        </Button>
-      </div>
-    </div>
+    <LoadErrorState
+      code="Área temporariamente fechada"
+      title="Falha ao carregar a área do cliente"
+      description="Não foi possível montar esta seção. Tente novamente em instantes."
+      onRetry={unstable_retry}
+      className="min-h-[min(640px,calc(100svh-180px))] py-8 sm:py-12"
+      details={error.digest ? <>Referência: {error.digest}</> : undefined}
+      secondaryLink={{ href: '/', label: 'Voltar à home' }}
+    />
   )
 }

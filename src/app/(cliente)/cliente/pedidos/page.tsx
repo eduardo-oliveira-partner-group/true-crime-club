@@ -2,7 +2,7 @@
 
 import { IconArrowRight, IconBoxSeam, IconCalendar } from '@tabler/icons-react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import { Button } from '@/src/components/ui/button'
 import {
@@ -13,6 +13,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from '@/src/components/ui/empty'
+import { LoadErrorState } from '@/src/components/ui/load-error-state'
 import { OrdersListSkeleton } from '@/src/components/ui/page-loading-skeletons'
 import {
   cardShadowBase,
@@ -54,12 +55,41 @@ export default function PedidosPage() {
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    listOrders()
-      .then(setOrders)
-      .catch(() => setOrders([]))
-      .finally(() => setLoading(false))
+  const [loadError, setLoadError] = useState(false)
+
+  const loadOrders = useCallback(async (showLoading = true) => {
+    if (showLoading) {
+      setLoading(true)
+      setLoadError(false)
+    }
+
+    try {
+      setOrders(await listOrders())
+      setLoadError(false)
+    } catch {
+      setOrders([])
+      setLoadError(true)
+    } finally {
+      if (showLoading) setLoading(false)
+    }
   }, [])
+
+  useEffect(() => {
+    void loadOrders()
+  }, [loadOrders])
+
+  if (!loading && loadError) {
+    return (
+      <LoadErrorState
+        code="Consulta interrompida"
+        title="Não foi possível carregar os pedidos"
+        description="Seu histórico continua preservado. Tente novamente para consultar os dossiês."
+        onRetry={() => loadOrders(false)}
+        className="min-h-[min(640px,calc(100svh-180px))] py-8 sm:py-12"
+        secondaryLink={{ href: '/loja', label: 'Explorar a loja' }}
+      />
+    )
+  }
 
   return (
     <div>

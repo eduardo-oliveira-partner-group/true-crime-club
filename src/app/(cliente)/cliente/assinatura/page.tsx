@@ -7,7 +7,7 @@ import {
   IconTicket,
 } from '@tabler/icons-react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import { Alert, AlertDescription, AlertTitle } from '@/src/components/ui/alert'
 import { Button } from '@/src/components/ui/button'
@@ -20,6 +20,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from '@/src/components/ui/empty'
+import { LoadErrorState } from '@/src/components/ui/load-error-state'
 import { Skeleton } from '@/src/components/ui/skeleton'
 import {
   cardShadowBase,
@@ -167,13 +168,28 @@ export default function AssinaturaClientePage() {
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [cancelling, setCancelling] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [loadError, setLoadError] = useState(false)
+
+  const loadSubscription = useCallback(async (showLoading = true) => {
+    if (showLoading) {
+      setLoading(true)
+      setLoadError(false)
+    }
+
+    try {
+      setSubscription(await getSubscription())
+      setLoadError(false)
+    } catch {
+      setSubscription(null)
+      setLoadError(true)
+    } finally {
+      if (showLoading) setLoading(false)
+    }
+  }, [])
 
   useEffect(() => {
-    getSubscription()
-      .then(setSubscription)
-      .catch(() => setSubscription(null))
-      .finally(() => setLoading(false))
-  }, [])
+    void loadSubscription()
+  }, [loadSubscription])
 
   const handleCancelSubscription = async () => {
     setCancelling(true)
@@ -192,6 +208,19 @@ export default function AssinaturaClientePage() {
     } finally {
       setCancelling(false)
     }
+  }
+
+  if (!loading && loadError) {
+    return (
+      <LoadErrorState
+        code="Consulta interrompida"
+        title="Não foi possível carregar a assinatura"
+        description="Os dados do seu plano não foram alterados. Tente novamente para abrir este arquivo."
+        onRetry={() => loadSubscription(false)}
+        className="min-h-[min(640px,calc(100svh-180px))] py-8 sm:py-12"
+        secondaryLink={{ href: '/assinatura', label: 'Conhecer planos' }}
+      />
+    )
   }
 
   return (

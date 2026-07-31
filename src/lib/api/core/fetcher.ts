@@ -7,6 +7,41 @@ import {
 } from './envelope'
 import { ApiClientError } from './error'
 
+const simulatedLoadErrors = [
+  {
+    matches: (endpoint: string) =>
+      endpoint === '/produtos' || endpoint.startsWith('/produtos?'),
+    message: 'Não foi possível carregar os produtos.',
+  },
+  {
+    matches: (endpoint: string) => endpoint === '/cliente/pedidos',
+    message: 'Não foi possível carregar os pedidos.',
+  },
+  {
+    matches: (endpoint: string) => endpoint === '/cliente/assinatura',
+    message: 'Não foi possível carregar a assinatura.',
+  },
+]
+
+function getSimulatedLoadError(endpoint: string, options: RequestInit) {
+  if (
+    process.env.NODE_ENV !== 'development' ||
+    typeof window === 'undefined' ||
+    (options.method ?? 'GET').toUpperCase() !== 'GET'
+  ) {
+    return null
+  }
+
+  const shouldSimulate =
+    new URLSearchParams(window.location.search).get('simularErroApi') === 'true'
+  if (!shouldSimulate) return null
+
+  const simulatedError = simulatedLoadErrors.find(({ matches }) =>
+    matches(endpoint),
+  )
+  return simulatedError ?? null
+}
+
 function readStatusCode(value: unknown, fallback: number): number {
   if (typeof value === 'number' && Number.isFinite(value)) {
     return value
@@ -62,6 +97,8 @@ function extractApiErrorMessage(errorData: unknown, status: number): string {
 }
 
 export async function fetcher(endpoint: string, options: RequestInit = {}) {
+  const simulatedError = getSimulatedLoadError(endpoint, options)
+
   const apiBaseUrl = getApiBaseUrl()
   const url = `${apiBaseUrl.replace(/\/$/, '')}${endpoint}`
   const headers = new Headers(options.headers || {})
@@ -77,6 +114,14 @@ export async function fetcher(endpoint: string, options: RequestInit = {}) {
   })
 
   const payload = await response.json().catch(() => null)
+
+  if (simulatedError) {
+    throw new ApiClientError(
+      simulatedError.message,
+      503,
+      'SIMULATED_LOAD_ERROR',
+    )
+  }
 
   if (!response.ok || isApiFailureEnvelope(payload)) {
     const code = isApiEnvelope(payload) ? payload.codigo : undefined
