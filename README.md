@@ -112,3 +112,30 @@ Para validar os estados de erro de carregamento em desenvolvimento, acesse
 `?simularErroApi=true`. A chamada HTTP continua sendo realizada pelo navegador
 e, após a resposta, a simulação devolve erro `503` apenas para a chamada de
 listagem correspondente e não é habilitada em produção.
+
+### Testes
+
+A suíte usa Vitest para regras e componentes isolados e Playwright para os
+fluxos completos de tela. Os testes E2E iniciam automaticamente o Next.js e uma
+API HTTP mockada em `127.0.0.1`, incluindo autenticação por cookie `HttpOnly`.
+Não é necessário manter o backend real em execução.
+
+Na primeira execução, instale o navegador do Playwright:
+
+```bash
+pnpm exec playwright install chromium
+```
+
+Comandos disponíveis:
+
+```bash
+pnpm test             # unitários + E2E
+pnpm test:unit        # Vitest
+pnpm test:unit:watch  # Vitest em modo watch
+pnpm test:e2e         # Playwright headless
+pnpm test:e2e:ui      # Playwright com interface
+pnpm test:e2e:update  # atualiza as referências visuais
+```
+
+Os artefatos de falha ficam em `test-results/`; o relatório navegável do
+Playwright fica em `playwright-report/`.
