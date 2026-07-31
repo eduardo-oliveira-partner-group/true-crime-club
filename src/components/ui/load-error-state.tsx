@@ -70,8 +70,8 @@ export function LoadErrorState({
       <EmptyHeader className="max-w-xl gap-3">
         <EmptyMedia className="mb-1 w-full max-w-[430px]">
           <Image
-            src="/imagens/erros/arquivo-indisponivel.png"
-            alt="Pasta de arquivo temporariamente lacrada, com lupa e selo de alerta"
+            src="/imagens/erros/arquivo-indisponivel-vivo.png"
+            alt="Dossiê temporariamente indisponível, com lupa, fio de evidência interrompido e selo de alerta"
             width={1536}
             height={1024}
             priority

@@ -1,6 +1,6 @@
 ---
 name: TrueCrime.Club
-description: Clube de assinatura investigativo premium — papel, pistas e evidências sob a luz do dia.
+description: Clube investigativo premium — papel quente, pistas e cores vivas sob a luz do dia.
 colors:
   paper: '#ede4dd'
   paper-soft: '#f5eee4'
@@ -113,20 +113,25 @@ components:
 
 O design system do TrueCrime.Club é construído em torno da metáfora do quadro de evidências: um painel de investigação onde fotos, pistas, fios coloridos e alfinetes conectam fragmentos de um caso aberto. A superfície é papel envelhecido sob luz do dia, não escuridão cinematográfica. Cada seção é uma peça de evidência pinada ao quadro — cards com alfinetes físicos, etiquetas de arquivo, selos de dossiê, fitas adesivas simuladas, linhas tracejadas conectando passos.
 
+O sistema tem três fontes canônicas e complementares. A landing (`src/app/(front-office)/landing.tsx` e sua implementação em `_landing`) define composição, ritmo, superfícies e interação. O logo (`src/assets/images/brand/logo.png`) define a atitude cromática e tipográfica da marca: letras recortadas, irregulares e alternadas sobre blocos vivos de yellow, purple, teal e red. O favicon (`src/app/favicon.ico`) condensa o mesmo universo em uma lupa sobre esse mosaico cromático, tornando a investigação o símbolo imediato do produto. Em caso de dúvida, preserve essa hierarquia: os assets definem a assinatura, a landing mostra como ela vira interface e os tokens deste documento normalizam as cores para uso consistente no produto.
+
+O papel quente é o palco, não a identidade inteira. Toda página do front office deve carregar uma presença cromática inequívoca da marca em pontos de foco — ação, status, destaque, comunidade, selo, aba ou mídia. Uma tela composta apenas de bege, marrom e cards claros está incompleta mesmo que use as superfícies corretas.
+
 O sistema visual rejeita explicitamente terror apelativo, decoração policial caricata, superfícies brancas sem tratamento, glassmorphism como default, gradient text e a estética escura saturada de plataformas de crime genéricas. A investigação aqui é sofisticada e colecionável, não mórbida ou amadora. O acabamento é editorial e premium — cada elemento deve parecer produzido com a qualidade de um material de arquivo real.
 
 **Key Characteristics:**
 
 - Modo claro com textura documental (grão fotográfico, micro-pontos, linhas de grade sutis em modo `mix-blend-multiply`)
-- Paleta quente com acentos cirúrgicos em quatro cores de função (vermelho, amarelo, teal, roxo)
+- Paleta quente com quatro acentos vivos e funcionais (vermelho, amarelo, teal, roxo), visíveis em áreas sólidas e pontos focais
 - Tipografia editorial com hierarquia forte: Archivo para títulos pesados, Hanken Grotesk para corpo limpo, Special Elite para metadados de arquivo
+- Wordmark oficial em colagem tipográfica multicolorida e favicon com lupa como assinaturas proprietárias; nunca reconstruídos com texto ou ícones genéricos
 - Alfinetes de quadro de evidências (radial-gradients simulando pins 3D) como elemento visual de assinatura
 - Micro-rotações em cards e fitas adesivas para simular materiais fixados ao quadro
 - Separadores tracejados e bordas finas com baixa opacidade para ritmo documental
 
 ## 2. Colors
 
-Paleta quente e documental: superfícies de papel envelhecido com quatro acentos cromáticos que marcam função, não decoração.
+Paleta quente, documental e deliberadamente viva. `paper`, `paper-soft` e `card` criam o cenário físico; red, yellow, teal e purple carregam o reconhecimento imediato do logo e do favicon. Os acentos marcam função, mas sua saturação e presença também são parte obrigatória da identidade.
 
 ### Primary
 
@@ -154,11 +159,15 @@ Paleta quente e documental: superfícies de papel envelhecido com quatro acentos
 
 **The Four-Wire Rule.** As quatro cores de acento (red, yellow, teal, purple) funcionam como fios coloridos do quadro de evidências. Cada uma marca uma função específica e não deve ser usada fora do seu papel. Red = ação e evidência. Yellow = alerta e destaque. Teal = catalogação e status. Purple = comunidade e exclusividade. Misturar funções dilui o sistema.
 
+**The Vivid Brand Rule.** As quatro cores do logo e do favicon são assinatura, não enfeite opcional. Use os tokens em saturação integral em CTAs, selos, abas, pins, números, faixas e estados relevantes; não os converta em pastéis lavados nem reduza a aplicação inteira a neutros quentes. Em cada composição, escolha um acento dominante e no máximo um acento de apoio. A reunião das quatro cores fica reservada a momentos de assinatura, como o logo, o agrupamento de investigadores no hero, marquees e sínteses visuais da marca.
+
+**The Raster-to-Token Rule.** O logo e o favicon são referências visuais, mas a interface deve usar os valores normalizados deste documento e de `src/lib/design/tokens.ts`, não amostras de cor extraídas dos pixels dos arquivos. Isso preserva contraste, semântica e consistência entre telas.
+
 **The Paper-First Rule.** A superfície padrão é sempre paper (#ede4dd), nunca branco puro (#fff) ou cinza frio. Cards usam card (#fbf9f6), um branco-quente que flutua sobre o paper sem criar contraste frio. Superfícies brancas sem tratamento são proibidas.
 
-**The Daylight Section Rule.** Seções públicas e comerciais usam superfícies claras (`paper`, `paper-soft`, `card`) como base. Não use fundos escuros em heroes, catálogos, product detail, quick views ou painéis de compra apenas para criar drama. `night` é reservado para footer, overlays de imagem estritamente necessários ou momentos invertidos muito pontuais, sempre com contraste testado e nunca como padrão da página.
+**The Daylight Section Rule.** Seções públicas e comerciais usam superfícies claras (`paper`, `paper-soft`, `card`) como base. A exceção canônica é o hero fotográfico da home, que usa `night`, overlays escuros e texto `cream` para preservar leitura enquanto red e yellow mantêm a energia da marca. Não generalize essa exceção para heroes de loja, catálogos, product detail, quick views ou painéis de compra apenas para criar drama. Fora do hero institucional, `night` é reservado para footer, overlays de imagem estritamente necessários ou momentos invertidos muito pontuais.
 
-**The No Section Wallpaper Rule.** Seções de página não usam imagens de fundo, wallpapers, gradientes atmosféricos, radiais decorativos ou grids como plano de fundo. Imagens pertencem a cards, galerias, produtos, fotos editoriais ou mídias reais com propósito. O fundo da seção deve continuar sendo uma superfície física clara do sistema.
+**The No Section Wallpaper Rule.** A fotografia full-bleed é exclusiva do hero institucional da landing. Nas demais seções, imagens pertencem a cards, galerias, produtos, fotos editoriais ou blocos de mídia reais com propósito; nunca funcionam como wallpaper. Gradientes atmosféricos, radiais decorativos e grids de fundo não substituem conteúdo nem a superfície física clara do sistema.
 
 ## 3. Typography
 
@@ -182,6 +191,8 @@ Paleta quente e documental: superfícies de papel envelhecido com quatro acentos
 **The Typewriter Rule.** Special Elite é reservada para metadados de arquivo: eyebrows, labels de card, badges, tags de status e códigos de referência. Nunca em títulos, nunca em body, nunca em botões. Se o texto não parecer uma etiqueta de catalogação, não usa typewriter.
 
 **The No Serif Rule.** A experiência pública do TrueCrime.Club não usa fontes serifadas em títulos, preços, CTAs, cards, quick views ou superfícies de compra. `font-heading` global pode apontar para legados fora do sistema; páginas públicas devem preferir `var(--design-font-heading)` ou o helper `fontHeading` para garantir Archivo/system-ui. Preços usam a mesma família sans de heading, nunca serif.
+
+**The Logo Integrity Rule.** A mistura de serif, sans, script e slab pertence exclusivamente ao artwork do wordmark. Ela não autoriza misturar famílias na interface nem reproduzir o nome da marca com texto estilizado. Sempre use o arquivo oficial do logo, preserve sua proporção e transparência e mantenha uma área de respiro sem sobrepor labels, badges ou controles.
 
 **The Drop-Cap Rule.** O primeiro bloco de prosa de cada seção editorial usa drop-cap: primeira letra em Archivo bold, cor red, float left. Nunca em cards, nunca em listas. Um drop-cap por seção, máximo.
 
@@ -246,13 +257,25 @@ O sistema usa elevação tonal (superfícies paper → card → card com gradien
 - **Mobile:** Hamburguer abre menu fullscreen com links empilhados, borda dashed entre itens, dois CTAs (Entrar outline + Assinar red) lado a lado no fim. Body overflow hidden enquanto aberto.
 - **Cart badge:** Pill red com borda paper, posicionada absolute top-right do ícone de carrinho.
 
+### Brand Logo / Favicon (Assinatura)
+
+- **Logo:** Usar somente `src/assets/images/brand/logo.png`, sempre com largura automática e sem distorção. A implementação canônica mede 32px de altura no header e 38px no footer. Não recortar, recolorir, aplicar filtros, sombras ou reconstruir as letras com HTML.
+- **Contraste:** Preservar a transparência do arquivo e posicioná-lo sobre superfícies simples (`paper`, `card`, `ink` ou `night`) que mantenham legíveis os blocos yellow, purple, teal e red. Evitar fundos fotográficos ou cromáticos concorrentes imediatamente atrás do wordmark.
+- **Favicon:** Usar `src/app/favicon.ico` como ícone oficial do documento, atalho e metadata. A lupa e o mosaico multicolorido são uma redução da marca, não um ícone genérico reutilizável dentro de botões, filtros ou cards.
+
+### Homepage Hero (Assinatura)
+
+- **Scene:** Fotografia investigativa full-bleed sobre `night`, com overlays direcionais escuros que protegem a leitura; é a exceção institucional ao sistema paper-first.
+- **Color:** Texto principal em cream, CTA primário red, metadado de caso yellow e um agrupamento com yellow, purple, teal e red para ecoar o logo. A fotografia nunca pode apagar essa assinatura cromática.
+- **Scope:** Reutilizar a gramática do hero — contraste, enquadramento e hierarquia — apenas em momentos de marca equivalentes. Fluxos comerciais e utilitários voltam para `paper`, `paper-soft` e `card`.
+
 ### Testimonial Card (Assinatura)
 
 Card com micro-rotação alternada (±1.8deg), fita adesiva amarela simulada no topo (pseudo-element com background yellow/55, rotate -2deg, borda dashed lateral), ícone de aspas colorido, texto em itálico, footer com dot colorido + username + likes. Tilt mantido no hover, sombra expande.
 
 ### Section Eyebrow (Assinatura)
 
-Linha horizontal de 22px em currentColor + texto Special Elite bold uppercase + tracking 0.12em. Cor padrão red, variante yellow para seções sobre fundo escuro. Precede todo título de seção.
+Linha horizontal de 22px em currentColor + texto Special Elite bold uppercase + tracking 0.12em. Cor padrão red, variante yellow para seções invertidas. Use quando o label comunica uma categoria, estado ou pista real dentro do ritmo de marketing; não é prefixo obrigatório de todo título.
 
 ### Promo Marquee (Assinatura)
 
@@ -276,11 +299,14 @@ Botão fixo bottom-right com ícone + texto + seta. Aparece após scroll do hero
 - **Do** respeitar `prefers-reduced-motion: reduce` em toda animação. Marquees param, hero-in fica visível sem animação, reveals aparecem instantaneamente.
 - **Do** usar Special Elite apenas para metadados de arquivo (eyebrows, tags, labels, códigos). Nunca para corpo ou títulos.
 - **Do** manter o Four-Wire Rule: red = ação, yellow = alerta/destaque, teal = catalogação/status, purple = comunidade/exclusividade.
+- **Do** tornar pelo menos um acento vivo protagonista em cada página do front office; a base paper-first deve amplificar as cores do logo, não neutralizá-las.
+- **Do** usar `logo.png` e `favicon.ico` como assets canônicos, preservando proporção, transparência, cores e significado investigativo.
+- **Do** tratar o hero fotográfico da landing como exceção institucional controlada: `night` e overlays servem à fotografia, enquanto red, yellow, teal e purple mantêm a marca reconhecível.
 
 ### Don't:
 
-- **Don't** usar fundo escuro como padrão. Night (#0e1014) é reservado para footer, overlays de mídia estritamente necessários e seções invertidas raras — nunca como base de hero de loja, catálogo, product detail, quick view, modal de compra ou página comercial.
-- **Don't** usar imagens de fundo em seções. Fotos e assets devem viver dentro de cards, galerias ou blocos de mídia, nunca como wallpaper de seção.
+- **Don't** usar fundo escuro como padrão. Night (#0e1014) é reservado para o hero institucional da landing, footer, overlays de mídia estritamente necessários e seções invertidas raras — nunca como base de hero de loja, catálogo, product detail, quick view, modal de compra ou página comercial.
+- **Don't** usar imagens de fundo em seções fora do hero institucional da landing. Fotos e assets devem viver dentro de cards, galerias ou blocos de mídia, nunca como wallpaper de seção.
 - **Don't** usar fontes serifadas no front office público. Evite `font-heading` quando ele puder resolver para uma serif global; use `fontHeading`/`var(--design-font-heading)` para títulos e preços.
 - **Don't** deixar elementos com borda e `border-radius: 0`, `rounded-none` ou cantos secos em interfaces públicas. O único raio zero aceitável é em linhas, divisores e elementos puramente estruturais sem borda visível.
 - **Don't** usar border-left ou border-right maiores que 1px como accent colorido em cards (side-stripe ban).
@@ -288,8 +314,10 @@ Botão fixo bottom-right com ícone + texto + seta. Aparece após scroll do hero
 - **Don't** usar glassmorphism como default. Backdrop-blur aparece apenas no header sticky e em badges de overlay sobre imagens — nunca em cards ou containers.
 - **Don't** usar border-radius maior que 16px em cards. Cards de dossiê usam 14-16px; pills são para badges e botões pequenos.
 - **Don't** usar sombras frias (rgba(0,0,0,...)) em cards ou botões. Todas as sombras usam a cor ink em transparência (rgba(33,28,24,...)).
-- **Don't** criar seções sem eyebrow. Toda seção pública tem um SectionEyebrow com código de seção e título curto.
+- **Don't** repetir eyebrows como scaffold automático. `SectionEyebrow` só entra quando seu texto comunica categoria, estado ou pista; se o label puder ser removido sem perda de significado, remova-o.
 - **Don't** usar superfícies brancas puras (#fff) ou cinzas frios. O sistema é quente do paper ao ink.
+- **Don't** desaturar red, yellow, teal e purple até a aplicação parecer monocromática, bege ou marrom. Cores vivas fazem parte da identidade tanto quanto o papel documental.
+- **Don't** redesenhar, recolorir ou remontar o wordmark com fontes da interface. A colagem tipográfica pertence ao arquivo oficial, e o favicon com lupa não substitui ícones funcionais.
 - **Don't** usar cards idênticos em grid sem variação. Feature cards têm rotações alternadas e pins coloridos. Archive cards têm abas amarelas rotacionadas e badges "arquivado".
 - **Don't** usar terror apelativo, sangue, choque visual, decoração policial caricata ou linguagem mórbida. A investigação é sofisticada e colecionável, não apelativa ou amadora.
 - **Don't** usar uppercase tracked labels acima de toda seção como scaffold AI — o eyebrow do TrueCrime.Club é um sistema deliberado com código de seção sequencial e traço de abertura, não um padrão genérico repetido sem intenção.
