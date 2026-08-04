@@ -330,6 +330,7 @@ export function CheckoutStepper({
     void refreshShipping(selectedZipCode)
     // Recalcula assim que o endereço selecionado muda; a cotação de
     // assinatura exige planoId no body.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedZipCode, planId, isSubscriptionFlow])
 
   function handleAddressSaved(nextAddresses: Address[]) {
@@ -1106,12 +1107,15 @@ export function CheckoutStepper({
         <div className="lg:sticky lg:top-24">
           <OrderSummary
             isSubscriptionFlow={isSubscriptionFlow}
+            isAnnualSubscription={Boolean(isAnnualPlan)}
             planName={planName}
             planPrice={planPrice}
             items={cartItems}
             subtotalAmount={subtotalAmount}
             discountAmount={discountAmount}
             shippingPrice={shippingPrice}
+            shippingLoading={shippingLoading}
+            shippingQuoted={hasSelectedShipping}
             totalAmount={totalAmount}
             installmentsCount={
               selectedPayment?.type === 'credit_card' ? installments : 1
@@ -1135,153 +1139,212 @@ interface OrderSummaryItem {
 
 function OrderSummary({
   isSubscriptionFlow,
+  isAnnualSubscription,
   planName,
   planPrice,
   items,
   subtotalAmount,
   discountAmount,
   shippingPrice,
+  shippingLoading,
+  shippingQuoted,
   totalAmount,
   installmentsCount,
   installmentValue,
 }: {
   isSubscriptionFlow: boolean
+  isAnnualSubscription: boolean
   planName?: string
   planPrice?: number
   items: OrderSummaryItem[]
   subtotalAmount: number
   discountAmount: number
   shippingPrice: number
+  shippingLoading: boolean
+  shippingQuoted: boolean
   totalAmount: number
   installmentsCount: number
   installmentValue: number
 }) {
   const hasItems = (isSubscriptionFlow && planName != null) || items.length > 0
+  const freteValueLabel = shippingLoading
+    ? 'Calculando…'
+    : shippingQuoted
+      ? formatCurrency(shippingPrice)
+      : 'A calcular'
 
   return (
-    <section className={cn(dossierCardSurface, warmShadowClass, 'p-5 sm:p-6')}>
-      <div className="flex items-center justify-between border-b border-[rgba(33,28,24,0.15)] pb-4">
-        <p
-          className={cn(
-            fontMono,
-            'text-xs font-semibold tracking-[0.16em] text-(--red) uppercase',
-          )}
-        >
-          Resumo do pedido
-        </p>
-        <p
-          className={cn(
-            fontMono,
-            'text-[0.6rem] tracking-[0.14em] text-(--ink-mute) uppercase',
-          )}
-        >
-          DOSS-07
-        </p>
-      </div>
-
-      {hasItems ? (
-        <ul className="mt-4 space-y-2.5 text-sm text-(--ink-soft)">
-          {isSubscriptionFlow && planName ? (
-            <li className="flex justify-between gap-4">
-              <span>{planName} (assinatura)</span>
-              <span className="font-medium text-(--ink)">
-                {formatCurrency(planPrice ?? 0)}/mês
-              </span>
-            </li>
-          ) : null}
-          {items.map((item) => (
-            <li key={item.id} className="flex justify-between gap-4">
-              <span>{item.label}</span>
-              <span className="font-medium text-(--ink)">{item.value}</span>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="mt-4 text-sm text-(--ink-soft)">
-          Nenhum item selecionado.
-        </p>
+    <section
+      className={cn(
+        dossierCardSurface,
+        warmShadowClass,
+        'overflow-hidden bg-(--card)',
       )}
-
-      <div className="mt-5 space-y-2.5 border-t border-[rgba(33,28,24,0.15)] pt-4 text-sm text-(--ink-soft)">
-        <div className="flex justify-between gap-4">
-          <span>Subtotal</span>
-          <span className="text-(--ink)">{formatCurrency(subtotalAmount)}</span>
-        </div>
-
-        {discountAmount > 0 ? (
-          <div className="flex flex-col gap-1 rounded border border-[rgba(26,165,135,0.15)] bg-[rgba(26,165,135,0.06)] p-2">
-            <div className="flex justify-between gap-4 font-semibold text-(--teal-deep)">
-              <span className="flex items-center gap-1.5">
-                <span className="size-1.5 rounded-full bg-(--teal)" />
-                Desconto
-              </span>
-              <span>− {formatCurrency(discountAmount)}</span>
-            </div>
-          </div>
-        ) : null}
-
-        <div className="flex justify-between gap-4">
-          <span>Frete</span>
-          <span className="text-(--ink)">{formatCurrency(shippingPrice)}</span>
+    >
+      <div className="border-b border-dashed border-[rgba(33,28,24,0.18)] p-5 sm:p-6">
+        <div className="flex items-center justify-between gap-3">
+          <p
+            className={cn(
+              fontMono,
+              'text-xs font-semibold tracking-[0.16em] text-(--red) uppercase',
+            )}
+          >
+            Resumo do pedido
+          </p>
+          {/* <p
+            className={cn(
+              fontMono,
+              'rounded-[2px] border border-[rgba(33,28,24,0.12)] bg-(--paper-soft) px-2 py-1 text-[0.6rem] tracking-[0.14em] text-(--ink-mute) uppercase',
+            )}
+          >
+            DOSS-07
+          </p> */}
         </div>
       </div>
 
-      <div className="mt-4 border-t border-[rgba(33,28,24,0.15)] pt-4">
-        {installmentsCount > 1 ? (
-          <div className="space-y-1.5 text-right">
-            <div className="flex items-baseline justify-between gap-4">
-              <span
-                className={cn(
-                  fontMono,
-                  'text-xs font-semibold tracking-[0.14em] text-(--red) uppercase',
-                )}
-              >
-                Parcelas
+      <div className="space-y-5 p-5 text-sm sm:p-6">
+        <div className="space-y-3">
+          {hasItems ? (
+            <ul className="space-y-2.5 text-(--ink-soft)">
+              {isSubscriptionFlow && planName ? (
+                <li className="flex flex-col gap-0.5">
+                  <div className="flex justify-between gap-4">
+                    <span className="min-w-0 truncate text-(--ink)">
+                      {planName}
+                    </span>
+                    <span className="shrink-0 font-medium text-(--ink)">
+                      {formatCurrency(planPrice ?? 0)}
+                      {isAnnualSubscription ? (
+                        <span className="text-(--ink-mute)">/mês</span>
+                      ) : null}
+                    </span>
+                  </div>
+                  <span className="text-xs text-(--ink-mute)">
+                    Assinatura
+                    {isAnnualSubscription ? ' · cobrada anualmente' : ''}
+                  </span>
+                </li>
+              ) : null}
+              {items.map((item) => (
+                <li key={item.id} className="flex justify-between gap-4">
+                  <span className="min-w-0 truncate">{item.label}</span>
+                  <span className="shrink-0 font-medium text-(--ink)">
+                    {item.value}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-(--ink-soft)">Nenhum item selecionado.</p>
+          )}
+        </div>
+
+        <div className="space-y-2.5 border-t border-dashed border-[rgba(33,28,24,0.18)] pt-4 text-(--ink-soft)">
+          <div className="flex justify-between gap-4">
+            <span>Subtotal</span>
+            <span className="text-(--ink)">
+              {formatCurrency(subtotalAmount)}
+            </span>
+          </div>
+
+          {discountAmount > 0 ? (
+            <div className="flex justify-between gap-4 rounded-[8px] border border-[rgba(26,165,135,0.18)] bg-[rgba(26,165,135,0.06)] px-2.5 py-2 font-semibold text-(--teal-deep)">
+              <span className="flex min-w-0 items-center gap-1.5">
+                <span
+                  className="size-1.5 shrink-0 rounded-full bg-(--teal)"
+                  aria-hidden
+                />
+                <span className="truncate">Desconto</span>
               </span>
-              <div className="flex flex-col items-end">
-                <span className="text-[0.7rem] font-medium tracking-wider text-(--ink-mute) uppercase">
-                  {installmentsCount}x de
-                </span>
+              <span className="shrink-0">
+                − {formatCurrency(discountAmount)}
+              </span>
+            </div>
+          ) : null}
+
+          <div className="flex justify-between gap-4">
+            <span>Frete</span>
+            <span
+              className={cn(
+                'text-(--ink)',
+                !shippingQuoted && !shippingLoading && 'text-(--ink-mute)',
+              )}
+            >
+              {freteValueLabel}
+            </span>
+          </div>
+        </div>
+
+        <div className="border-t border-[rgba(33,28,24,0.15)] pt-4">
+          {installmentsCount > 1 ? (
+            <div className="space-y-2">
+              <div className="flex items-end justify-between gap-4">
+                <div className="space-y-0.5">
+                  <span
+                    className={cn(
+                      fontMono,
+                      'text-xs font-semibold tracking-[0.14em] text-(--red) uppercase',
+                    )}
+                  >
+                    Parcelas
+                  </span>
+                  <p className="text-[0.7rem] text-(--ink-mute)">
+                    {installmentsCount}x sem juros
+                    {!shippingQuoted && !shippingLoading ? ' · sem frete' : ''}
+                  </p>
+                </div>
                 <span
                   className={cn(
                     fontHeading,
-                    'text-3xl font-bold tracking-tight text-(--red)',
+                    'text-[1.75rem] leading-none font-semibold tracking-[-0.02em] text-(--ink)',
                   )}
                 >
                   {formatCurrency(installmentValue)}
                 </span>
               </div>
+              <div className="flex justify-between border-t border-dashed border-[rgba(33,28,24,0.18)] pt-2 text-xs text-(--ink-mute)">
+                <span>Total à vista</span>
+                <span className="font-semibold text-(--ink-soft)">
+                  {formatCurrency(totalAmount)}
+                </span>
+              </div>
             </div>
-            <div className="flex justify-between border-t border-dashed border-[rgba(33,28,24,0.1)] pt-1.5 text-xs text-(--ink-mute)">
-              <span>Total à vista</span>
-              <span className="font-semibold text-(--ink-soft)">
+          ) : (
+            <div className="flex items-end justify-between gap-4">
+              <div className="space-y-0.5">
+                <span
+                  className={cn(
+                    fontMono,
+                    'text-xs font-semibold tracking-[0.14em] text-(--red) uppercase',
+                  )}
+                >
+                  Total
+                </span>
+                {!shippingQuoted && !shippingLoading ? (
+                  <p className="text-[0.7rem] text-(--ink-mute)">
+                    Sem frete ainda
+                  </p>
+                ) : null}
+              </div>
+              <span
+                className={cn(
+                  fontHeading,
+                  'text-[1.75rem] leading-none font-semibold tracking-[-0.02em] text-(--ink)',
+                )}
+              >
                 {formatCurrency(totalAmount)}
               </span>
             </div>
-          </div>
-        ) : (
-          <div className="flex items-end justify-between gap-4">
-            <span
-              className={cn(
-                fontMono,
-                'text-xs font-semibold tracking-[0.14em] text-(--red) uppercase',
-              )}
-            >
-              Total
-            </span>
-            <span
-              className={cn(fontHeading, 'text-2xl font-semibold text-(--ink)')}
-            >
-              {formatCurrency(totalAmount)}
-            </span>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
-      <p className="mt-4 text-[0.7rem]/5 text-(--ink-mute)">
-        Ao confirmar, o pedido é criado e a cobrança é processada no gateway
-        configurado (cartão ou Pix).
-      </p>
+      {/* <div className="border-t border-dashed border-[rgba(33,28,24,0.18)] p-5 sm:p-6">
+        <p className="text-[0.7rem]/5 text-(--ink-mute)">
+          Ao confirmar, o pedido é criado e a cobrança é processada no gateway
+          configurado (cartão ou Pix).
+        </p>
+      </div> */}
     </section>
   )
 }

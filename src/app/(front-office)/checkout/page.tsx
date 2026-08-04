@@ -17,13 +17,7 @@ import { Button } from '@/src/components/ui/button'
 import { CheckoutSkeleton } from '@/src/components/ui/page-loading-skeletons'
 import { apiClient, ApiClientError } from '@/src/lib/api-client'
 import { saveCheckoutPixPayment } from '@/src/lib/checkout-pix-storage'
-import {
-  dossierCardSurface,
-  fontHeading,
-  fontMono,
-  sectionFrame,
-  warmShadowClass,
-} from '@/src/lib/design/classes'
+import { fontHeading, fontMono, sectionFrame } from '@/src/lib/design/classes'
 import {
   getCart,
   getPlanById,
@@ -281,7 +275,7 @@ export default function CheckoutPage() {
     <DesignPageShell className="overflow-hidden">
       <div className={cn(sectionFrame, 'relative z-10 py-12 lg:py-16')}>
         <header className="flex flex-col gap-5 border-b border-[rgba(33,28,24,0.15)] pb-8">
-          <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex flex-wrap items-center gap-2">
             <SectionEyebrow className="mb-0">Checkout</SectionEyebrow>
             <p
               className={cn(
@@ -289,7 +283,7 @@ export default function CheckoutPage() {
                 'text-[0.65rem] tracking-[0.14em] text-(--ink-mute) uppercase',
               )}
             >
-              PROC-07 · sessão segura
+              · sessão segura
             </p>
           </div>
 
@@ -307,7 +301,7 @@ export default function CheckoutPage() {
                 Confira endereço, frete e pagamento antes de confirmar o pedido.
               </p>
             </div>
-            {plan ? (
+            {/* {plan ? (
               <div
                 className={cn(
                   dossierCardSurface,
@@ -335,7 +329,7 @@ export default function CheckoutPage() {
                   </span>
                 </p>
               </div>
-            ) : null}
+            ) : null} */}
           </div>
         </header>
 

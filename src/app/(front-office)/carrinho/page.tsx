@@ -460,7 +460,7 @@ export default function CarrinhoPage() {
 
             <aside
               aria-label="Resumo do pedido"
-              className="lg:sticky lg:top-6 lg:self-start"
+              className="pb-24 lg:sticky lg:top-6 lg:self-start lg:pb-0"
             >
               <OrderSummary
                 dossierCode={dossierCode}
@@ -955,208 +955,384 @@ function OrderSummary({
   const hasAddresses = addresses.length > 0
   const manualCepValid = isValidCep(manualCep)
   const hasItems = (isSubscriptionFlow && planName != null) || items.length > 0
+  const shippingMeta = [shippingRegion, shippingDays]
+    .filter(Boolean)
+    .join(' · ')
+  const showShippingQuote = shippingQuoted || shippingLoading
+  const freteValueLabel = shippingLoading
+    ? 'Calculando…'
+    : shippingQuoted
+      ? formatCurrency(shipping)
+      : 'A calcular'
 
-  return (
-    <div
+  const checkoutButton = (
+    <Button
+      asChild
+      size="lg"
       className={cn(
-        dossierCardSurface,
-        cardShadowBase,
-        'overflow-hidden bg-(--card)',
+        fontMono,
+        buttonLiftShadow,
+        'group h-12 w-full justify-between rounded-[9px] border border-[rgba(33,28,24,0.15)] bg-(--red) px-5 text-[13px] font-bold tracking-[0.04em] text-[#fbf9f6] uppercase hover:-translate-y-0.5 hover:bg-(--red-deep) motion-reduce:hover:translate-y-0',
       )}
     >
-      <div className="border-b border-[rgba(33,28,24,0.15)] p-5 sm:p-6">
-        <div className="flex items-center justify-between gap-3">
-          <p
-            className={cn(
-              fontMono,
-              'text-xs font-semibold tracking-[0.16em] text-(--red) uppercase',
+      <Link href={checkoutHref}>
+        Ir para checkout
+        <IconArrowRight className={cn('size-4', arrowIconClass)} />
+      </Link>
+    </Button>
+  )
+
+  return (
+    <>
+      <div
+        className={cn(
+          dossierCardSurface,
+          cardShadowBase,
+          'overflow-hidden bg-(--card)',
+        )}
+      >
+        <div className="border-b border-dashed border-[rgba(33,28,24,0.18)] p-5 sm:p-6">
+          <div className="flex items-center justify-between gap-3">
+            <p
+              className={cn(
+                fontMono,
+                'text-xs font-semibold tracking-[0.16em] text-(--red) uppercase',
+              )}
+            >
+              Resumo do pedido
+            </p>
+            <p
+              className={cn(
+                fontMono,
+                'rounded-[2px] border border-[rgba(33,28,24,0.12)] bg-(--paper-soft) px-2 py-1 text-[0.6rem] tracking-[0.14em] text-(--ink-mute) uppercase',
+              )}
+            >
+              {dossierCode}
+            </p>
+          </div>
+        </div>
+
+        <div className="space-y-5 p-5 text-sm sm:p-6">
+          {/* Itens */}
+          <div className="space-y-3">
+            {hasItems ? (
+              <ul className="space-y-2.5 text-(--ink-soft)">
+                {isSubscriptionFlow && planName ? (
+                  <li className="flex flex-col gap-0.5">
+                    <div className="flex justify-between gap-4">
+                      <span className="min-w-0 truncate text-(--ink)">
+                        {planName}
+                      </span>
+                      <span className="shrink-0 font-medium text-(--ink)">
+                        {formatCurrency(planPrice ?? 0)}
+                        {isAnnualSubscription ? (
+                          <span className="text-(--ink-mute)">/mês</span>
+                        ) : null}
+                      </span>
+                    </div>
+                    <span className="text-xs text-(--ink-mute)">
+                      Assinatura
+                      {isAnnualSubscription ? ' · cobrada anualmente' : ''}
+                    </span>
+                  </li>
+                ) : null}
+                {items.map((item) => (
+                  <li key={item.id} className="flex justify-between gap-4">
+                    <span className="min-w-0 truncate">{item.label}</span>
+                    <span className="shrink-0 font-medium text-(--ink)">
+                      {item.value}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-(--ink-soft)">Nenhum item selecionado.</p>
             )}
-          >
-            Resumo do pedido
-          </p>
-          <p
-            className={cn(
-              fontMono,
-              'text-[0.6rem] tracking-[0.14em] text-(--ink-mute) uppercase',
+          </div>
+
+          <div className="space-y-2 border-t border-dashed border-[rgba(33,28,24,0.18)] pt-4">
+            {hasAddresses ? (
+              <div className="space-y-1.5">
+                <label
+                  htmlFor="cart-shipping-address"
+                  className="text-xs font-medium text-(--ink-soft)"
+                >
+                  Endereço de entrega
+                </label>
+                <select
+                  id="cart-shipping-address"
+                  value={selectedAddressId}
+                  onChange={(event) => onSelectAddress(event.target.value)}
+                  disabled={shippingLoading}
+                  className={cn(
+                    formInputClass,
+                    'mt-0 appearance-none bg-(--card) py-2.5 pr-8 text-sm',
+                  )}
+                >
+                  {addresses.map((address) => (
+                    <option key={address.id} value={address.id}>
+                      {address.label} · CEP {formatCep(address.zipCode)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ) : (
+              <div className="space-y-1.5">
+                <label
+                  htmlFor="cart-shipping-cep"
+                  className="text-xs font-medium text-(--ink-soft)"
+                >
+                  CEP de entrega
+                </label>
+                <div className="flex gap-2">
+                  <Input
+                    id="cart-shipping-cep"
+                    value={manualCep}
+                    onChange={(event) =>
+                      onManualCepChange(formatCep(event.target.value))
+                    }
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter') {
+                        event.preventDefault()
+                        onCalculateManualCep()
+                      }
+                    }}
+                    placeholder="00000-000"
+                    inputMode="numeric"
+                    autoComplete="postal-code"
+                    maxLength={9}
+                    disabled={shippingLoading}
+                    aria-invalid={manualCep.length > 0 && !manualCepValid}
+                    aria-describedby={
+                      shippingError
+                        ? 'cart-shipping-error'
+                        : showShippingQuote && shippingMeta
+                          ? 'cart-shipping-meta'
+                          : undefined
+                    }
+                    className={cn(
+                      formInputClass,
+                      'mt-0 h-10 flex-1 bg-(--card) py-2',
+                    )}
+                  />
+                  <Button
+                    type="button"
+                    disabled={!manualCepValid || shippingLoading}
+                    onClick={onCalculateManualCep}
+                    className={cn(
+                      fontMono,
+                      'h-10 shrink-0 rounded-[9px] bg-(--red) px-3.5 text-[11px] font-bold tracking-[0.06em] text-[#fbf9f6] uppercase hover:bg-(--red-deep)',
+                    )}
+                  >
+                    {shippingLoading ? '…' : 'Calcular'}
+                  </Button>
+                </div>
+              </div>
             )}
-          >
-            {dossierCode}
-          </p>
+
+            {shippingLoading ? (
+              <p className="text-xs text-(--ink-mute)">Consultando frete…</p>
+            ) : null}
+
+            {!shippingLoading && shippingQuoted && shippingMeta ? (
+              <p
+                id="cart-shipping-meta"
+                className="flex items-start gap-1.5 text-xs font-medium text-(--teal-deep)"
+              >
+                <span
+                  className="mt-1.5 size-1.5 shrink-0 rounded-full bg-(--teal)"
+                  aria-hidden
+                />
+                {shippingMeta}
+                {shipping > 0 ? ` · ${formatCurrency(shipping)}` : null}
+              </p>
+            ) : null}
+
+            {!shippingLoading && !shippingQuoted && !shippingError ? (
+              <p className="text-xs text-(--ink-mute)">
+                {hasAddresses
+                  ? 'O frete é calculado com o endereço selecionado.'
+                  : 'Informe o CEP para incluir o frete no total.'}
+              </p>
+            ) : null}
+
+            {shippingError ? (
+              <p
+                id="cart-shipping-error"
+                className="text-xs text-(--red)"
+                role="alert"
+              >
+                {shippingError}
+              </p>
+            ) : null}
+          </div>
+
+          {/* Cupom — antes dos totais, para o desconto aparecer no fluxo */}
+          <CouponForm appliedCode={couponCode} />
+
+          {/* Conta */}
+          <div className="space-y-2.5 border-t border-dashed border-[rgba(33,28,24,0.18)] pt-4 text-(--ink-soft)">
+            <div className="flex justify-between gap-4">
+              <span>Subtotal</span>
+              <span className="text-(--ink)">{formatCurrency(subtotal)}</span>
+            </div>
+
+            {discount > 0 ? (
+              <div className="flex justify-between gap-4 rounded-[8px] border border-[rgba(26,165,135,0.18)] bg-[rgba(26,165,135,0.06)] px-2.5 py-2 font-semibold text-(--teal-deep)">
+                <span className="flex min-w-0 items-center gap-1.5">
+                  <span
+                    className="size-1.5 shrink-0 rounded-full bg-(--teal)"
+                    aria-hidden
+                  />
+                  <span className="truncate">
+                    Desconto
+                    {couponCode ? (
+                      <span className="font-medium text-(--teal-deep)/80">
+                        {' '}
+                        · {couponCode}
+                      </span>
+                    ) : null}
+                  </span>
+                </span>
+                <span className="shrink-0">− {formatCurrency(discount)}</span>
+              </div>
+            ) : null}
+
+            <div className="flex justify-between gap-4">
+              <span>Frete</span>
+              <span
+                className={cn(
+                  'text-(--ink)',
+                  !shippingQuoted && !shippingLoading && 'text-(--ink-mute)',
+                )}
+              >
+                {freteValueLabel}
+              </span>
+            </div>
+          </div>
+
+          <div className="border-t border-[rgba(33,28,24,0.15)] pt-4">
+            <div className="flex items-end justify-between gap-4">
+              <div className="space-y-0.5">
+                <span
+                  className={cn(
+                    fontMono,
+                    'text-xs font-semibold tracking-[0.14em] text-(--red) uppercase',
+                  )}
+                >
+                  Total
+                </span>
+                {!shippingQuoted && !shippingLoading ? (
+                  <p className="text-[0.7rem] text-(--ink-mute)">
+                    Sem frete ainda
+                  </p>
+                ) : null}
+              </div>
+              <span
+                className={cn(
+                  fontHeading,
+                  'text-[1.75rem] leading-none font-semibold tracking-[-0.02em] text-(--ink)',
+                )}
+              >
+                {formatCurrency(total)}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div className="border-t border-dashed border-[rgba(33,28,24,0.18)] p-5 sm:p-6">
+          <div className="hidden sm:block">{checkoutButton}</div>
+
+          <ul className="space-y-2 text-xs text-(--ink-soft) sm:mt-5">
+            <li className="inline-flex items-center gap-2">
+              <IconShieldCheck
+                className="size-4 shrink-0 text-(--teal)"
+                aria-hidden
+              />
+              Pagamento seguro e ambiente criptografado.
+            </li>
+            <li className="inline-flex items-center gap-2">
+              <IconTruck
+                className="size-4 shrink-0 text-(--teal)"
+                aria-hidden
+              />
+              Envio previsto para o ciclo seguinte à compra.
+            </li>
+          </ul>
         </div>
       </div>
 
-      <div className="space-y-4 p-5 text-sm sm:p-6">
-        {hasItems ? (
-          <ul className="space-y-2.5 text-(--ink-soft)">
-            {isSubscriptionFlow && planName ? (
-              <li className="flex justify-between gap-4">
-                <span>{planName} (assinatura)</span>
-                <span className="font-medium text-(--ink)">
-                  {formatCurrency(planPrice ?? 0)}
-                  {isAnnualSubscription ? '/mês' : ''}
-                </span>
-              </li>
-            ) : null}
-            {items.map((item) => (
-              <li key={item.id} className="flex justify-between gap-4">
-                <span>{item.label}</span>
-                <span className="font-medium text-(--ink)">{item.value}</span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-(--ink-soft)">Nenhum item selecionado.</p>
-        )}
-
-        <div className="space-y-2.5 border-t border-[rgba(33,28,24,0.15)] pt-4 text-(--ink-soft)">
-          <div className="flex justify-between gap-4">
-            <span>Subtotal</span>
-            <span className="text-(--ink)">{formatCurrency(subtotal)}</span>
-          </div>
-
-          {discount > 0 ? (
-            <div className="flex flex-col gap-1 rounded border border-[rgba(26,165,135,0.15)] bg-[rgba(26,165,135,0.06)] p-2">
-              <div className="flex justify-between gap-4 font-semibold text-(--teal-deep)">
-                <span className="flex items-center gap-1.5">
-                  <span className="size-1.5 rounded-full bg-(--teal)" />
-                  Desconto{couponCode ? ` · ${couponCode}` : ''}
-                </span>
-                <span>− {formatCurrency(discount)}</span>
-              </div>
-            </div>
-          ) : null}
-
-          {hasAddresses ? (
-            <select
-              id="cart-shipping-address"
-              aria-label="Endereço para cálculo do frete"
-              value={selectedAddressId}
-              onChange={(event) => onSelectAddress(event.target.value)}
-              disabled={shippingLoading}
-              className={cn(
-                formInputClass,
-                'mt-0 appearance-none bg-(--card) py-2.5 pr-8 text-sm',
-              )}
-            >
-              {addresses.map((address) => (
-                <option key={address.id} value={address.id}>
-                  {address.label} · CEP {formatCep(address.zipCode)}
-                </option>
-              ))}
-            </select>
-          ) : (
-            <div className="flex gap-2">
-              <Input
-                id="cart-shipping-cep"
-                value={manualCep}
-                onChange={(event) =>
-                  onManualCepChange(formatCep(event.target.value))
-                }
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter') {
-                    event.preventDefault()
-                    onCalculateManualCep()
-                  }
-                }}
-                placeholder="CEP para frete"
-                inputMode="numeric"
-                autoComplete="postal-code"
-                maxLength={9}
-                disabled={shippingLoading}
-                aria-invalid={manualCep.length > 0 && !manualCepValid}
-                className={cn(
-                  formInputClass,
-                  'mt-0 h-10 flex-1 bg-(--card) py-2',
-                )}
-              />
-              <Button
-                type="button"
-                disabled={!manualCepValid || shippingLoading}
-                onClick={onCalculateManualCep}
-                className="h-10 shrink-0 rounded-[9px] bg-(--red) px-3 text-[#fbf9f6] hover:bg-(--red-deep)"
-              >
-                {shippingLoading ? '…' : 'OK'}
-              </Button>
-            </div>
-          )}
-
-          {shippingQuoted || shippingLoading ? (
-            <>
-              <div className="flex justify-between gap-4">
-                <span>Frete</span>
-                <span className="text-(--ink)">
-                  {shippingLoading ? 'Calculando…' : formatCurrency(shipping)}
-                </span>
-              </div>
-              {!shippingLoading && (shippingRegion || shippingDays) ? (
-                <p className="text-xs text-(--ink-soft)/70">
-                  {[shippingRegion, shippingDays].filter(Boolean).join(' · ')}
-                </p>
-              ) : null}
-            </>
-          ) : null}
-          {shippingError ? (
-            <p className="text-xs text-(--red)" role="alert">
-              {shippingError}
-            </p>
-          ) : null}
-        </div>
-
-        <div className="border-t border-[rgba(33,28,24,0.15)] pt-4">
-          <div className="flex items-end justify-between gap-4">
-            <span
+      {/* Barra sticky no mobile: total + CTA sempre à mão */}
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[rgba(33,28,24,0.15)] bg-(--card) px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-12px_32px_-16px_rgba(33,28,24,0.28)] sm:hidden">
+        <div className="mx-auto flex max-w-[1180px] items-center gap-3">
+          <div className="min-w-0 flex-1">
+            <p
               className={cn(
                 fontMono,
-                'text-xs font-semibold tracking-[0.14em] text-(--red) uppercase',
+                'text-[0.62rem] font-bold tracking-[0.12em] text-(--ink-mute) uppercase',
               )}
             >
               Total
-            </span>
-            <span
-              className={cn(fontHeading, 'text-2xl font-semibold text-(--ink)')}
+              {!shippingQuoted && !shippingLoading ? ' · sem frete' : ''}
+            </p>
+            <p
+              className={cn(
+                fontHeading,
+                'truncate text-xl font-semibold tracking-[-0.02em] text-(--ink)',
+              )}
             >
               {formatCurrency(total)}
-            </span>
+            </p>
           </div>
+          <Button
+            asChild
+            className={cn(
+              fontMono,
+              buttonLiftShadow,
+              'group h-11 shrink-0 rounded-[9px] border border-[rgba(33,28,24,0.15)] bg-(--red) px-4 text-[12px] font-bold tracking-[0.04em] text-[#fbf9f6] uppercase hover:bg-(--red-deep)',
+            )}
+          >
+            <Link
+              href={checkoutHref}
+              className="inline-flex items-center gap-2"
+            >
+              Checkout
+              <IconArrowRight className={cn('size-4', arrowIconClass)} />
+            </Link>
+          </Button>
         </div>
-
-        <CouponForm />
       </div>
-
-      <div className="border-t border-dashed border-[rgba(33,28,24,0.18)] p-5 sm:p-6">
-        <Button
-          asChild
-          size="lg"
-          className={cn(
-            fontMono,
-            buttonLiftShadow,
-            'h-12 w-full justify-between rounded-[9px] border border-[rgba(33,28,24,0.15)] bg-(--red) px-5 text-[13px] font-bold tracking-[0.04em] text-[#fbf9f6] uppercase hover:-translate-y-0.5 hover:bg-(--red-deep) motion-reduce:hover:translate-y-0',
-          )}
-        >
-          <Link href={checkoutHref}>
-            Ir para checkout
-            <IconArrowRight className="size-4" />
-          </Link>
-        </Button>
-
-        <ul className="mt-5 space-y-2 text-xs text-(--ink-soft)">
-          <li className="inline-flex items-center gap-2">
-            <IconShieldCheck className="size-4 text-(--red)" />
-            Pagamento seguro e ambiente criptografado.
-          </li>
-          <li className="inline-flex items-center gap-2">
-            <IconTruck className="size-4 text-(--red)" />
-            Envio previsto para o ciclo seguinte à compra.
-          </li>
-        </ul>
-      </div>
-    </div>
+    </>
   )
 }
 
-function CouponForm() {
+function CouponForm({ appliedCode }: { appliedCode?: string }) {
   const [error, setError] = useState<string | null>(null)
   const [pending, setPending] = useState(false)
+
+  if (appliedCode) {
+    return (
+      <div
+        className="flex items-center gap-2.5 rounded-[10px] border border-[rgba(26,165,135,0.22)] bg-[rgba(26,165,135,0.08)] px-3 py-2.5"
+        role="status"
+      >
+        <IconTag className="size-4 shrink-0 text-(--teal)" aria-hidden />
+        <div className="min-w-0 flex-1">
+          <p
+            className={cn(
+              fontMono,
+              'text-[0.62rem] font-bold tracking-[0.12em] text-(--teal-deep) uppercase',
+            )}
+          >
+            Cupom aplicado
+          </p>
+          <p className="truncate text-sm font-semibold text-(--ink)">
+            {appliedCode}
+          </p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <form
@@ -1191,20 +1367,16 @@ function CouponForm() {
           setPending(false)
         }
       }}
-      className="mt-6 space-y-2"
+      className="space-y-2"
     >
-      <label
-        htmlFor="coupon"
-        className={cn(
-          fontMono,
-          'text-[0.68rem] font-bold tracking-[0.14em] text-(--red) uppercase',
-        )}
-      >
-        Cupom de desconto
-      </label>
-      <div className="flex gap-2">
-        <div className="relative flex-1">
-          <IconTag className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-(--ink-soft)/60" />
+      <div className="space-y-1.5">
+        <label
+          htmlFor="coupon"
+          className="text-xs font-medium text-(--ink-soft)"
+        >
+          Cupom de desconto
+        </label>
+        <div className="flex gap-2">
           <Input
             id="coupon"
             name="coupon"
@@ -1215,21 +1387,23 @@ function CouponForm() {
               if (error) setError(null)
             }}
             className={cn(
-              'h-10 w-full rounded-[10px] border bg-(--paper-soft) pr-3 pl-9 text-sm text-(--ink) placeholder:text-(--ink-mute) focus-visible:ring-2 focus-visible:outline-none',
-              error
-                ? 'border-(--red) focus:border-(--red) focus-visible:ring-(--red)/25'
-                : 'border-[rgba(33,28,24,0.15)] focus:border-(--red) focus-visible:ring-(--red)/20',
+              formInputClass,
+              'mt-0 h-10 flex-1 bg-(--card) py-2',
+              error &&
+                'border-(--red) focus:border-(--red) focus-visible:border-(--red)',
             )}
           />
+          <Button
+            type="submit"
+            disabled={pending}
+            className={cn(
+              fontMono,
+              'h-10 shrink-0 rounded-[9px] bg-(--red) px-3.5 text-[11px] font-bold tracking-[0.06em] text-[#fbf9f6] uppercase hover:bg-(--red-deep)',
+            )}
+          >
+            {pending ? '…' : 'Aplicar'}
+          </Button>
         </div>
-        <Button
-          type="submit"
-          variant="outline"
-          disabled={pending}
-          className="h-10 shrink-0 rounded-[9px] border-[rgba(33,28,24,0.15)] bg-(--card) px-4 text-(--ink) hover:border-(--ink) hover:bg-(--ink) hover:text-[#fbf9f6]"
-        >
-          {pending ? 'Aplicando…' : 'Aplicar'}
-        </Button>
       </div>
       {error ? (
         <p id="coupon-error" role="alert" className="text-xs text-(--red)">
