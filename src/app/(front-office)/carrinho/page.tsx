@@ -30,6 +30,14 @@ import {
 } from '@/src/components/ui/empty'
 import { Input } from '@/src/components/ui/input'
 import { CartSkeleton } from '@/src/components/ui/page-loading-skeletons'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/src/components/ui/select'
 import { PENDING_PLAN_STORAGE_KEY } from '@/src/lib/add-to-cart'
 import { apiClient, ApiClientError } from '@/src/lib/api-client'
 import { notifyCartUpdated } from '@/src/lib/cart-events'
@@ -1059,22 +1067,27 @@ function OrderSummary({
                 >
                   Endereço de entrega
                 </label>
-                <select
-                  id="cart-shipping-address"
+                <Select
                   value={selectedAddressId}
-                  onChange={(event) => onSelectAddress(event.target.value)}
+                  onValueChange={onSelectAddress}
                   disabled={shippingLoading}
-                  className={cn(
-                    formInputClass,
-                    'mt-0 appearance-none bg-(--card) py-2.5 pr-8 text-sm',
-                  )}
                 >
-                  {addresses.map((address) => (
-                    <option key={address.id} value={address.id}>
-                      {address.label} · CEP {formatCep(address.zipCode)}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger
+                    id="cart-shipping-address"
+                    className={cn(formInputClass, 'mt-0 w-full')}
+                  >
+                    <SelectValue placeholder="Selecione um endereço" />
+                  </SelectTrigger>
+                  <SelectContent position="popper">
+                    <SelectGroup>
+                      {addresses.map((address) => (
+                        <SelectItem key={address.id} value={address.id}>
+                          {address.label} · CEP {formatCep(address.zipCode)}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
               </div>
             ) : (
               <div className="space-y-1.5">
