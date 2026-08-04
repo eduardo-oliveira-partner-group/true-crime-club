@@ -1,8 +1,9 @@
-import { IconArrowRight, IconChevronDown } from '@tabler/icons-react'
+import { IconArrowRight } from '@tabler/icons-react'
 import Link from 'next/link'
 
 import { PageRenderer } from '@/src/app/(front-office)/_landing/landing'
 import { DesignPageShell } from '@/src/components/public-design/design-page-shell'
+import { FaqAccordion } from '@/src/components/public-design/faq-accordion'
 import { SectionEyebrow } from '@/src/components/public-design/section-eyebrow'
 import { JsonLd } from '@/src/components/seo/json-ld'
 import {
@@ -12,13 +13,9 @@ import {
 } from '@/src/components/ui/scroll-reveal'
 import {
   arrowIconClass,
-  cardShadowBase,
   ctaButtonBase,
-  dossierCardSurface,
   fontHeading,
-  fontType,
   sectionFrame,
-  transitionCardHover,
 } from '@/src/lib/design/classes'
 import {
   getCmsPageByRoute,
@@ -26,7 +23,6 @@ import {
   getSeoEntry,
 } from '@/src/lib/domain/repositories'
 import { buildMetadata } from '@/src/lib/seo'
-import { cn } from '@/src/lib/utils'
 
 export async function generateMetadata() {
   const page = await getCmsPageByRoute('/faq')
@@ -159,38 +155,9 @@ export default async function FaqPage() {
       <section className="relative isolate overflow-hidden border-b border-[rgba(33,28,24,0.15)] bg-(--paper-soft) py-16 lg:py-24">
         <div className={`${sectionFrame} max-w-4xl`}>
           <ScrollRevealGroup className="space-y-4" staggerChildren={0.07}>
-            {faqItems.map((item) => (
-              <ScrollRevealItem key={item.code}>
-                <details
-                  className={cn(
-                    'group relative p-5 transition-all duration-300 sm:p-6',
-                    dossierCardSurface,
-                    cardShadowBase,
-                    transitionCardHover,
-                    'hover:-translate-y-0.5 hover:border-(--red)/30 hover:shadow-[0_24px_44px_-18px_rgba(33,28,24,0.3)]',
-                  )}
-                >
-                  <summary className="flex cursor-pointer list-none items-start justify-between gap-4 outline-none [&::-webkit-details-marker]:hidden">
-                    <div className="flex items-start gap-4">
-                      <span
-                        className={`mt-1 text-[11px] font-bold tracking-[0.14em] text-(--red) uppercase ${fontType}`}
-                      >
-                        {item.code}
-                      </span>
-                      <span
-                        className={`text-base font-semibold tracking-tight text-(--ink) sm:text-lg ${fontHeading}`}
-                      >
-                        {item.question}
-                      </span>
-                    </div>
-                    <IconChevronDown className="mt-0.5 size-5 shrink-0 text-(--red) transition-transform duration-300 group-open:rotate-180" />
-                  </summary>
-                  <div className="mt-4 border-t border-dashed border-[rgba(33,28,24,0.15)] pt-4 pl-[3.8rem] text-[16px] leading-[1.6] text-(--ink-soft) sm:pl-[4.8rem]">
-                    {item.answer}
-                  </div>
-                </details>
-              </ScrollRevealItem>
-            ))}
+            <ScrollRevealItem>
+              <FaqAccordion items={faqItems} />
+            </ScrollRevealItem>
           </ScrollRevealGroup>
         </div>
       </section>

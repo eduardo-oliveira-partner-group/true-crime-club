@@ -47,11 +47,15 @@ import {
   FieldSet,
   FieldTitle,
 } from '@/src/components/ui/field'
-import {
-  NativeSelect,
-  NativeSelectOption,
-} from '@/src/components/ui/native-select'
 import { RadioGroup, RadioGroupItem } from '@/src/components/ui/radio-group'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/src/components/ui/select'
 import { Skeleton } from '@/src/components/ui/skeleton'
 import { Spinner } from '@/src/components/ui/spinner'
 import {
@@ -71,6 +75,7 @@ import {
   fontHeading,
   fontMono,
   formInputClass,
+  formSelectTriggerClass,
   transitionBgColor,
   warmShadowClass,
 } from '@/src/lib/design/classes'
@@ -493,7 +498,7 @@ export function CheckoutStepper({
               }}
               stepCircleContainerClassName="space-y-6"
               stepContainerClassName="pb-5"
-              contentClassName="pb-2"
+              contentClassName="pb-3"
               footerClassName="border-t border-[rgba(33,28,24,0.12)] pt-5"
               backButtonText={
                 <>
@@ -610,55 +615,89 @@ export function CheckoutStepper({
                       />
                     ) : null}
 
-                    {addresses.map((address) =>
-                      editingAddressId === address.id ? (
-                        <AddressForm
-                          key={address.id}
-                          formId={`checkout-address-edit-${address.id}`}
-                          idPrefix={`checkout-addr-edit-${address.id}`}
-                          address={address}
-                          onSaved={handleAddressSaved}
-                          onCancel={resetAddressForm}
-                        />
-                      ) : (
-                        <OptionCard
-                          key={address.id}
-                          selected={selectedAddressId === address.id}
-                          onSelect={() => {
-                            void handleSelectAddress(address.id)
-                          }}
-                          name="address"
-                          title={address.label}
-                          detail={`${address.street}, ${address.number}${
-                            address.complement ? ` (${address.complement})` : ''
-                          } — ${address.neighborhood} · ${address.city}/${address.state} · CEP ${formatCep(address.zipCode)}`}
-                          trailing={
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon-sm"
-                              disabled={
-                                Boolean(editingAddressId) || showAddressForm
-                              }
-                              onClick={(e) => {
-                                e.preventDefault()
-                                e.stopPropagation()
-                                setShowAddressForm(false)
-                                setEditingAddressId(address.id)
-                              }}
+                    {addresses.length > 0 ? (
+                      <RadioGroup
+                        value={selectedAddressId}
+                        onValueChange={(id) => {
+                          void handleSelectAddress(id)
+                        }}
+                        className="gap-3"
+                      >
+                        {addresses.map((address) =>
+                          editingAddressId === address.id ? (
+                            <AddressForm
+                              key={address.id}
+                              formId={`checkout-address-edit-${address.id}`}
+                              idPrefix={`checkout-addr-edit-${address.id}`}
+                              address={address}
+                              onSaved={handleAddressSaved}
+                              onCancel={resetAddressForm}
+                            />
+                          ) : (
+                            <FieldLabel
+                              key={address.id}
+                              htmlFor={`address-${address.id}`}
                               className={cn(
-                                'size-7 shrink-0 rounded-[9px] p-1 text-(--red)',
-                                transitionBgColor,
-                                'hover:bg-(--red)/10 hover:text-(--red-deep)',
+                                'w-full rounded-[10px] border transition-colors has-data-checked:bg-(--teal)/8',
+                                selectedAddressId === address.id
+                                  ? 'border-(--teal) bg-(--teal)/8'
+                                  : 'border-[rgba(33,28,24,0.15)] bg-(--paper-soft) hover:border-(--red)/35',
                               )}
-                              aria-label={`Editar endereço ${address.label}`}
                             >
-                              <IconEdit className="size-3.5" />
-                            </Button>
-                          }
-                        />
-                      ),
-                    )}
+                              <Field
+                                orientation="horizontal"
+                                className="items-start gap-3 p-4"
+                              >
+                                <RadioGroupItem
+                                  value={address.id}
+                                  id={`address-${address.id}`}
+                                  className="mt-1"
+                                />
+                                <FieldContent className="min-w-0 flex-1 gap-2">
+                                  <div className="flex items-start justify-between gap-3">
+                                    <FieldTitle className="min-w-0 font-medium text-(--ink)">
+                                      {address.label}
+                                    </FieldTitle>
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="icon-sm"
+                                      disabled={
+                                        Boolean(editingAddressId) ||
+                                        showAddressForm
+                                      }
+                                      onClick={(e) => {
+                                        e.preventDefault()
+                                        e.stopPropagation()
+                                        setShowAddressForm(false)
+                                        setEditingAddressId(address.id)
+                                      }}
+                                      className={cn(
+                                        'size-7 shrink-0 rounded-[9px] p-1 text-(--red)',
+                                        transitionBgColor,
+                                        'hover:bg-(--red)/10 hover:text-(--red-deep)',
+                                      )}
+                                      aria-label={`Editar endereço ${address.label}`}
+                                    >
+                                      <IconEdit className="size-3.5" />
+                                    </Button>
+                                  </div>
+                                  <FieldDescription className="text-pretty text-(--ink-soft)">
+                                    {address.street}, {address.number}
+                                    {address.complement
+                                      ? ` (${address.complement})`
+                                      : ''}{' '}
+                                    — {address.neighborhood} · {address.city}/
+                                    {address.state} · CEP{' '}
+                                    {formatCep(address.zipCode)}
+                                  </FieldDescription>
+                                </FieldContent>
+                              </Field>
+                            </FieldLabel>
+                          ),
+                        )}
+                      </RadioGroup>
+                    ) : null}
 
                     {!showAddressForm &&
                     !editingAddressId &&
@@ -768,48 +807,51 @@ export function CheckoutStepper({
                             >
                               <Field
                                 orientation="horizontal"
-                                className="items-start"
+                                className="items-start gap-3 p-4"
                               >
-                                <FieldContent className="gap-2">
-                                  <div className="flex flex-wrap items-center gap-2">
-                                    <FieldTitle>{option.label}</FieldTitle>
-                                    {option.carrier ? (
-                                      <Badge variant="secondary">
-                                        {option.carrier}
-                                      </Badge>
-                                    ) : null}
-                                    {isFastest ? (
-                                      <Badge className="border-transparent bg-(--teal)/15 text-(--teal-deep)">
-                                        Mais rápida
-                                      </Badge>
-                                    ) : null}
-                                    {isCheapest ? (
-                                      <Badge className="border-transparent bg-(--amber)/20 text-(--ink-soft)">
-                                        Mais econômica
-                                      </Badge>
-                                    ) : null}
+                                <RadioGroupItem
+                                  value={option.id}
+                                  id={optionId}
+                                  className="mt-1"
+                                />
+                                <FieldContent className="min-w-0 flex-1 gap-2">
+                                  <div className="flex items-start justify-between gap-4">
+                                    <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
+                                      <FieldTitle className="min-w-0 font-medium text-(--ink)">
+                                        {option.label}
+                                      </FieldTitle>
+                                      {option.carrier ? (
+                                        <Badge variant="secondary">
+                                          {option.carrier}
+                                        </Badge>
+                                      ) : null}
+                                      {isFastest ? (
+                                        <Badge className="border-transparent bg-(--teal)/15 text-(--teal-deep)">
+                                          Mais rápida
+                                        </Badge>
+                                      ) : null}
+                                      {isCheapest ? (
+                                        <Badge className="border-transparent bg-(--amber)/20 text-(--ink-soft)">
+                                          Mais econômica
+                                        </Badge>
+                                      ) : null}
+                                    </div>
+                                    <span
+                                      className={cn(
+                                        fontHeading,
+                                        'shrink-0 text-sm font-bold text-(--ink)',
+                                      )}
+                                    >
+                                      {option.price === 0
+                                        ? 'Grátis'
+                                        : formatCurrency(option.price)}
+                                    </span>
                                   </div>
-                                  <FieldDescription>
+                                  <FieldDescription className="text-pretty text-(--ink-soft)">
                                     Prazo estimado:{' '}
                                     {formatBusinessDays(option.estimatedDays)}
                                   </FieldDescription>
                                 </FieldContent>
-                                <div className="flex shrink-0 flex-col items-end gap-2">
-                                  <span
-                                    className={cn(
-                                      fontHeading,
-                                      'text-sm font-bold text-(--ink)',
-                                    )}
-                                  >
-                                    {option.price === 0
-                                      ? 'Grátis'
-                                      : formatCurrency(option.price)}
-                                  </span>
-                                  <RadioGroupItem
-                                    value={option.id}
-                                    id={optionId}
-                                  />
-                                </div>
                               </Field>
                             </FieldLabel>
                           )
@@ -849,20 +891,51 @@ export function CheckoutStepper({
                       </Empty>
                     ) : null}
 
-                    {paymentOptions.map((option) => (
-                      <OptionCard
-                        key={option.id}
-                        selected={selectedPaymentId === option.id}
-                        onSelect={() => setSelectedPaymentId(option.id)}
-                        name="payment"
-                        title={option.label}
-                        detail={
-                          option.type === 'pix'
-                            ? 'Pagamento via Pix'
-                            : 'Cartão de crédito'
-                        }
-                      />
-                    ))}
+                    {paymentOptions.length > 0 ? (
+                      <RadioGroup
+                        value={selectedPaymentId}
+                        onValueChange={setSelectedPaymentId}
+                        className="gap-3"
+                      >
+                        {paymentOptions.map((option) => {
+                          const optionId = `payment-${option.id}`
+
+                          return (
+                            <FieldLabel
+                              key={option.id}
+                              htmlFor={optionId}
+                              className={cn(
+                                'w-full rounded-[10px] border transition-colors has-data-checked:bg-(--teal)/8',
+                                selectedPaymentId === option.id
+                                  ? 'border-(--teal) bg-(--teal)/8'
+                                  : 'border-[rgba(33,28,24,0.15)] bg-(--paper-soft) hover:border-(--red)/35',
+                              )}
+                            >
+                              <Field
+                                orientation="horizontal"
+                                className="items-start gap-3 p-4"
+                              >
+                                <RadioGroupItem
+                                  value={option.id}
+                                  id={optionId}
+                                  className="mt-1"
+                                />
+                                <FieldContent className="min-w-0 flex-1 gap-2">
+                                  <FieldTitle className="font-medium text-(--ink)">
+                                    {option.label}
+                                  </FieldTitle>
+                                  <FieldDescription className="text-pretty text-(--ink-soft)">
+                                    {option.type === 'pix'
+                                      ? 'Pagamento via Pix'
+                                      : 'Cartão de crédito'}
+                                  </FieldDescription>
+                                </FieldContent>
+                              </Field>
+                            </FieldLabel>
+                          )
+                        })}
+                      </RadioGroup>
+                    ) : null}
 
                     {showCardForm ? (
                       <CardForm
@@ -898,25 +971,31 @@ export function CheckoutStepper({
                         >
                           Quantidade de parcelas
                         </FieldLabel>
-                        <NativeSelect
+                        <Select
                           value={String(installments)}
-                          onChange={(e) =>
-                            setInstallments(Number(e.target.value))
+                          onValueChange={(value) =>
+                            setInstallments(Number(value))
                           }
-                          className={cn(formInputClass, 'px-3')}
                         >
-                          {Array.from(
-                            { length: maxInstallments },
-                            (_, i) => i + 1,
-                          ).map((n) => {
-                            const val = Math.round(totalAmount / n)
-                            return (
-                              <NativeSelectOption key={n} value={String(n)}>
-                                {n}x de {formatCurrency(val)}
-                              </NativeSelectOption>
-                            )
-                          })}
-                        </NativeSelect>
+                          <SelectTrigger className={formSelectTriggerClass}>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent position="popper">
+                            <SelectGroup>
+                              {Array.from(
+                                { length: maxInstallments },
+                                (_, i) => i + 1,
+                              ).map((n) => {
+                                const val = Math.round(totalAmount / n)
+                                return (
+                                  <SelectItem key={n} value={String(n)}>
+                                    {n}x de {formatCurrency(val)}
+                                  </SelectItem>
+                                )
+                              })}
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
                       </Field>
                     )}
                   <p className="mt-4 text-[0.7rem]/5 text-(--ink-mute)">
@@ -947,25 +1026,31 @@ export function CheckoutStepper({
                       >
                         Tamanho de camiseta
                       </FieldLabel>
-                      <NativeSelect
-                        value={preferences.shirtSize ?? ''}
-                        onChange={(e) =>
+                      <Select
+                        value={preferences.shirtSize || '__none__'}
+                        onValueChange={(value) =>
                           setPreferences((prev) => ({
                             ...prev,
-                            shirtSize: e.target.value,
+                            shirtSize: value === '__none__' ? '' : value,
                           }))
                         }
-                        className={cn(formInputClass, 'px-3')}
                       >
-                        <NativeSelectOption value="">
-                          Prefiro não informar
-                        </NativeSelectOption>
-                        {SHIRT_SIZES.map((option) => (
-                          <NativeSelectOption key={option} value={option}>
-                            {option}
-                          </NativeSelectOption>
-                        ))}
-                      </NativeSelect>
+                        <SelectTrigger className={formSelectTriggerClass}>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent position="popper">
+                          <SelectGroup>
+                            <SelectItem value="__none__">
+                              Prefiro não informar
+                            </SelectItem>
+                            {SHIRT_SIZES.map((option) => (
+                              <SelectItem key={option} value={option}>
+                                {option}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
                     </Field>
                     <Field>
                       <FieldLabel
@@ -976,25 +1061,31 @@ export function CheckoutStepper({
                       >
                         Tamanho de calçado
                       </FieldLabel>
-                      <NativeSelect
-                        value={preferences.shoeSize ?? ''}
-                        onChange={(e) =>
+                      <Select
+                        value={preferences.shoeSize || '__none__'}
+                        onValueChange={(value) =>
                           setPreferences((prev) => ({
                             ...prev,
-                            shoeSize: e.target.value,
+                            shoeSize: value === '__none__' ? '' : value,
                           }))
                         }
-                        className={cn(formInputClass, 'px-3')}
                       >
-                        <NativeSelectOption value="">
-                          Prefiro não informar
-                        </NativeSelectOption>
-                        {SHOE_SIZES.map((option) => (
-                          <NativeSelectOption key={option} value={option}>
-                            {option}
-                          </NativeSelectOption>
-                        ))}
-                      </NativeSelect>
+                        <SelectTrigger className={formSelectTriggerClass}>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent position="popper">
+                          <SelectGroup>
+                            <SelectItem value="__none__">
+                              Prefiro não informar
+                            </SelectItem>
+                            {SHOE_SIZES.map((option) => (
+                              <SelectItem key={option} value={option}>
+                                {option}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
                     </Field>
                   </FieldGroup>
                   <Field className="mt-4">
@@ -1016,7 +1107,10 @@ export function CheckoutStepper({
                       }
                       rows={3}
                       placeholder="Preferências de cores, estilo, alergias, etc."
-                      className={cn(formInputClass, 'resize-none')}
+                      className={cn(
+                        formInputClass,
+                        'field-sizing-fixed min-h-24 resize-none',
+                      )}
                     />
                   </Field>
                 </Section>
@@ -1464,50 +1558,6 @@ function Section({
       </div>
       {children}
     </section>
-  )
-}
-
-function OptionCard({
-  selected,
-  onSelect,
-  name,
-  title,
-  detail,
-  trailing,
-}: {
-  selected: boolean
-  onSelect: () => void
-  name: string
-  title: string
-  detail?: string
-  trailing?: React.ReactNode
-}) {
-  return (
-    <label
-      className={cn(
-        'flex cursor-pointer items-start gap-3 rounded-[10px] border p-4 text-sm transition-colors',
-        selected
-          ? 'border-(--teal) bg-(--teal)/8'
-          : 'border-[rgba(33,28,24,0.15)] bg-(--paper-soft) hover:border-(--red)/35',
-      )}
-    >
-      <input
-        type="radio"
-        name={name}
-        checked={selected}
-        onChange={onSelect}
-        className="mt-1 accent-(--teal)"
-      />
-      <span className="min-w-0 flex-1">
-        <span className="flex items-start justify-between gap-4">
-          <span className="font-medium text-(--ink)">{title}</span>
-          {trailing}
-        </span>
-        {detail ? (
-          <span className="mt-1 block text-(--ink-soft)">{detail}</span>
-        ) : null}
-      </span>
-    </label>
   )
 }
 

@@ -49,6 +49,7 @@ import {
   fontHeading,
   fontMono,
   formInputClass,
+  formSelectTriggerClass,
   sectionFrame,
   transitionCardHover,
   transitionColors,
@@ -1074,7 +1075,7 @@ function OrderSummary({
                 >
                   <SelectTrigger
                     id="cart-shipping-address"
-                    className={cn(formInputClass, 'mt-0 w-full')}
+                    className={cn(formSelectTriggerClass, 'mt-0')}
                   >
                     <SelectValue placeholder="Selecione um endereço" />
                   </SelectTrigger>

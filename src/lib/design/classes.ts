@@ -66,5 +66,8 @@ export const formLabelClass =
  * Includes overrides so shadcn Input/Textarea defaults (h-9, ring, rounded-3xl) do not win. */
 export const formInputClass = `mt-2 h-auto min-h-0 w-full min-w-0 rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-(--card) px-4 py-3 text-sm text-(--ink) shadow-none outline-none placeholder:text-(--ink-mute) ${transitionBgColor} focus:border-(--red) focus:bg-(--card) focus:shadow-[0_0_0_2px_rgba(197,39,31,0.15)] focus-visible:border-(--red) focus-visible:bg-(--card) focus-visible:shadow-[0_0_0_2px_rgba(197,39,31,0.15)] focus-visible:ring-0`
 
+/** Select trigger aligned with formInputClass (overrides shadcn size/rounding defaults). */
+export const formSelectTriggerClass = `${formInputClass} data-[size=default]:h-auto data-[size=sm]:h-auto whitespace-normal *:data-[slot=select-value]:line-clamp-none *:data-[slot=select-value]:whitespace-normal`
+
 /** Inline action links on auth and utility forms. */
 export const formLinkClass = `font-medium text-(--red) no-underline ${transitionBgColor} hover:text-(--red-deep)`

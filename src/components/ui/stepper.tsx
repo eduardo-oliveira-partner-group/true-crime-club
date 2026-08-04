@@ -249,7 +249,21 @@ function SlideTransition({
   const containerRef = useRef<HTMLDivElement>(null)
 
   useLayoutEffect(() => {
-    if (containerRef.current) onHeightReady(containerRef.current.offsetHeight)
+    const container = containerRef.current
+    if (!container) return
+
+    const updateHeight = () => {
+      onHeightReady(container.offsetHeight)
+    }
+
+    updateHeight()
+
+    const resizeObserver = new ResizeObserver(() => {
+      updateHeight()
+    })
+    resizeObserver.observe(container)
+
+    return () => resizeObserver.disconnect()
   }, [children, onHeightReady])
 
   return (
@@ -261,6 +275,7 @@ function SlideTransition({
       animate="center"
       exit="exit"
       transition={{ duration: 0.4 }}
+      className="pb-1"
       style={{ position: 'absolute', left: 0, right: 0, top: 0 }}
     >
       {children}

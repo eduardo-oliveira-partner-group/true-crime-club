@@ -7,14 +7,19 @@ import { Button } from '@/src/components/ui/button'
 import { Field, FieldGroup, FieldLabel } from '@/src/components/ui/field'
 import { Input } from '@/src/components/ui/input'
 import {
-  NativeSelect,
-  NativeSelectOption,
-} from '@/src/components/ui/native-select'
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/src/components/ui/select'
 import {
   fontHeading,
   fontMono,
   formInputClass,
   formLabelClass,
+  formSelectTriggerClass,
 } from '@/src/lib/design/classes'
 import { addCard } from '@/src/lib/domain/repositories'
 import type { PaymentMethod } from '@/src/lib/domain/types'
@@ -181,31 +186,37 @@ export function CardForm({
         <div className="grid grid-cols-3 gap-3">
           <Field>
             <FieldLabel className={formLabelClass}>Mês</FieldLabel>
-            <NativeSelect
-              value={expiryMonth}
-              onChange={(e) => setExpiryMonth(e.target.value)}
-              className={formInputClass}
-            >
-              {EXPIRY_MONTHS.map((month) => (
-                <NativeSelectOption key={month} value={month}>
-                  {month}
-                </NativeSelectOption>
-              ))}
-            </NativeSelect>
+            <Select value={expiryMonth} onValueChange={setExpiryMonth}>
+              <SelectTrigger className={formSelectTriggerClass}>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent position="popper">
+                <SelectGroup>
+                  {EXPIRY_MONTHS.map((month) => (
+                    <SelectItem key={month} value={month}>
+                      {month}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
           </Field>
           <Field>
             <FieldLabel className={formLabelClass}>Ano</FieldLabel>
-            <NativeSelect
-              value={expiryYear}
-              onChange={(e) => setExpiryYear(e.target.value)}
-              className={formInputClass}
-            >
-              {EXPIRY_YEARS.map((year) => (
-                <NativeSelectOption key={year} value={year}>
-                  {year}
-                </NativeSelectOption>
-              ))}
-            </NativeSelect>
+            <Select value={expiryYear} onValueChange={setExpiryYear}>
+              <SelectTrigger className={formSelectTriggerClass}>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent position="popper">
+                <SelectGroup>
+                  {EXPIRY_YEARS.map((year) => (
+                    <SelectItem key={year} value={year}>
+                      {year}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
           </Field>
           <Field>
             <FieldLabel className={formLabelClass} htmlFor={`${idPrefix}-cvc`}>

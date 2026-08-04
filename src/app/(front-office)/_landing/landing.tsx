@@ -1,7 +1,5 @@
 'use client'
 
-import { IconChevronDown } from '@tabler/icons-react'
-
 import { LandingClientChrome } from '@/src/app/(front-office)/_landing/landing-client-chrome'
 import { Reveal } from '@/src/app/(front-office)/_landing/reveal'
 import { ArchiveBand } from '@/src/app/(front-office)/_landing/sections/archive-band'
@@ -16,15 +14,10 @@ import { RibbonMarquee } from '@/src/app/(front-office)/_landing/sections/ribbon
 import { StandaloneEdition } from '@/src/app/(front-office)/_landing/sections/standalone-edition'
 import { Testimonials } from '@/src/app/(front-office)/_landing/sections/testimonials'
 import { DesignPageShell } from '@/src/components/public-design/design-page-shell'
+import { FaqAccordion } from '@/src/components/public-design/faq-accordion'
 import { SectionEyebrow } from '@/src/components/public-design/section-eyebrow'
-import {
-  cardShadowBase,
-  dossierCardSurface,
-  fontHeading,
-  transitionCardHover,
-} from '@/src/lib/design/classes'
+import { fontHeading } from '@/src/lib/design/classes'
 import { PaginaCms, SecaoCms } from '@/src/lib/domain/types'
-import { cn } from '@/src/lib/utils'
 
 export function PageRenderer({ sections }: { sections: SecaoCms[] }) {
   const sortedSections = [...sections].sort((a, b) => a.ordem - b.ordem)
@@ -116,32 +109,7 @@ export function PageRenderer({ sections }: { sections: SecaoCms[] }) {
                     Perguntas Frequentes
                   </h2>
                 </div>
-                <div className="space-y-4">
-                  {(faqProps.items || []).map((item, idx: number) => (
-                    <details
-                      key={idx}
-                      className={cn(
-                        'group relative p-5 transition-all duration-300 sm:p-6',
-                        dossierCardSurface,
-                        cardShadowBase,
-                        transitionCardHover,
-                        'hover:-translate-y-0.5 hover:border-(--red)/30 hover:shadow-[0_24px_44px_-18px_rgba(33,28,24,0.3)]',
-                      )}
-                    >
-                      <summary className="flex cursor-pointer list-none items-start justify-between gap-4 outline-none [&::-webkit-details-marker]:hidden">
-                        <span
-                          className={`text-base font-semibold tracking-tight text-(--ink) sm:text-lg ${fontHeading}`}
-                        >
-                          {item.question}
-                        </span>
-                        <IconChevronDown className="mt-0.5 size-5 shrink-0 text-(--red) transition-transform duration-300 group-open:rotate-180" />
-                      </summary>
-                      <div className="mt-4 border-t border-dashed border-[rgba(33,28,24,0.15)] pt-4 text-[16px] leading-[1.6] text-(--ink-soft)">
-                        {item.answer}
-                      </div>
-                    </details>
-                  ))}
-                </div>
+                <FaqAccordion items={faqProps.items || []} />
               </section>
             )
           }

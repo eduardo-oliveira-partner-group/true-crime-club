@@ -26,6 +26,7 @@ import {
   fontMono,
   formInputClass,
   formLabelClass,
+  formSelectTriggerClass,
 } from '@/src/lib/design/classes'
 import {
   addCustomerAddress,
@@ -321,7 +322,7 @@ export function AddressForm({
               onValueChange={setState}
               disabled={lookingUpCep}
             >
-              <SelectTrigger className={cn(formInputClass, 'w-full')}>
+              <SelectTrigger className={formSelectTriggerClass}>
                 <SelectValue placeholder="Selecione" />
               </SelectTrigger>
               <SelectContent position="popper">

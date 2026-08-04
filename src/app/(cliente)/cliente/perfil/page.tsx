@@ -24,9 +24,13 @@ import {
 } from '@/src/components/ui/empty'
 import { Input } from '@/src/components/ui/input'
 import {
-  NativeSelect,
-  NativeSelectOption,
-} from '@/src/components/ui/native-select'
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/src/components/ui/select'
 import { Skeleton } from '@/src/components/ui/skeleton'
 import { Textarea } from '@/src/components/ui/textarea'
 import { apiClient } from '@/src/lib/api-client'
@@ -36,6 +40,7 @@ import {
   fontHeading,
   fontMono,
   formInputClass,
+  formSelectTriggerClass,
   transitionBgColor,
 } from '@/src/lib/design/classes'
 import { deleteCustomerAddress } from '@/src/lib/domain/repositories'
@@ -591,20 +596,23 @@ export default function PerfilPage() {
                     Tamanho de Camiseta
                   </p>
                   {editPrefs ? (
-                    <NativeSelect
-                      value={tempShirt}
-                      onChange={(e) => setTempShirt(e.target.value)}
-                      className={formInputClass}
+                    <Select
+                      value={tempShirt || undefined}
+                      onValueChange={setTempShirt}
                     >
-                      <NativeSelectOption value="">
-                        Selecione
-                      </NativeSelectOption>
-                      {SHIRT_SIZES.map((size) => (
-                        <NativeSelectOption key={size} value={size}>
-                          {size}
-                        </NativeSelectOption>
-                      ))}
-                    </NativeSelect>
+                      <SelectTrigger className={formSelectTriggerClass}>
+                        <SelectValue placeholder="Selecione" />
+                      </SelectTrigger>
+                      <SelectContent position="popper">
+                        <SelectGroup>
+                          {SHIRT_SIZES.map((size) => (
+                            <SelectItem key={size} value={size}>
+                              {size}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
                   ) : (
                     <p className="mt-1 text-sm text-(--ink-soft)">
                       {displayValue(shirtSize)}
@@ -618,20 +626,23 @@ export default function PerfilPage() {
                     Tamanho de Calçado
                   </p>
                   {editPrefs ? (
-                    <NativeSelect
-                      value={tempShoe}
-                      onChange={(e) => setTempShoe(e.target.value)}
-                      className={formInputClass}
+                    <Select
+                      value={tempShoe || undefined}
+                      onValueChange={setTempShoe}
                     >
-                      <NativeSelectOption value="">
-                        Selecione
-                      </NativeSelectOption>
-                      {SHOE_SIZES.map((size) => (
-                        <NativeSelectOption key={size} value={size}>
-                          {size}
-                        </NativeSelectOption>
-                      ))}
-                    </NativeSelect>
+                      <SelectTrigger className={formSelectTriggerClass}>
+                        <SelectValue placeholder="Selecione" />
+                      </SelectTrigger>
+                      <SelectContent position="popper">
+                        <SelectGroup>
+                          {SHOE_SIZES.map((size) => (
+                            <SelectItem key={size} value={size}>
+                              {size}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
                   ) : (
                     <p className="mt-1 text-sm text-(--ink-soft)">
                       {displayValue(shoeSize)}
