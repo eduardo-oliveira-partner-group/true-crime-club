@@ -4,6 +4,7 @@ export {
   getCart,
   getCartTotals,
   removeCartItem,
+  resolveMerchandiseTotals,
   updateCartItemQuantity,
 } from './domains/cart'
 export {

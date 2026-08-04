@@ -1217,17 +1217,6 @@ function OrderSummary({
               </span>
               <span>− {formatCurrency(discountAmount)}</span>
             </div>
-            {isSubscriptionFlow &&
-              planName?.toLowerCase().includes('anual') && (
-                <span
-                  className={cn(
-                    fontMono,
-                    'pl-3 text-[0.62rem] font-bold tracking-[0.06em] text-(--teal-deep) uppercase',
-                  )}
-                >
-                  Economia anual aplicada (2 meses grátis)
-                </span>
-              )}
           </div>
         ) : null}
 

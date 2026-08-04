@@ -40,6 +40,7 @@ import {
   dossierCardSurface,
   fontHeading,
   fontMono,
+  formInputClass,
   sectionFrame,
   transitionCardHover,
   transitionColors,
@@ -49,17 +50,28 @@ import {
   applyCoupon,
   calculateShipping,
   getCart,
-  getCartTotals,
+  getPlanById,
+  listPlans,
   removeCartItem,
+  resolveMerchandiseTotals,
   updateCartItemQuantity,
 } from '@/src/lib/domain/repositories'
 import { emptyCart } from '@/src/lib/domain/repository/core/helpers'
-import type { Cart, CartItem } from '@/src/lib/domain/types'
-import { formatCurrency } from '@/src/lib/formatters'
+import type {
+  Address,
+  Cart,
+  CartItem,
+  SubscriptionPlan,
+} from '@/src/lib/domain/types'
+import {
+  formatCep,
+  formatCurrency,
+  isValidCep,
+  normalizeDigits,
+} from '@/src/lib/formatters'
 import { getProductImage } from '@/src/lib/product-images'
 import { cn } from '@/src/lib/utils'
 
-const sampleZipCode = '05435-020'
 const emptyShipping = { price: 0, region: '', estimatedDays: '' }
 
 function isAuthError(error: unknown): boolean {
@@ -73,31 +85,122 @@ function isPlanCartItem(item: CartItem): boolean {
   return item.productType === 'subscription' || Boolean(item.planId)
 }
 
-async function fetchShippingForCart(cart: Cart) {
+async function fetchShippingForCart(cart: Cart, zipCode: string | null) {
   if (cart.items.length === 0) return emptyShipping
+  if (!zipCode || !isValidCep(zipCode)) return emptyShipping
 
   const planFromCart = cart.items.find(isPlanCartItem)
   return calculateShipping(
-    sampleZipCode,
+    normalizeDigits(zipCode),
     planFromCart?.planId ? { planoId: planFromCart.planId } : undefined,
   ).catch(() => emptyShipping)
+}
+
+function resolveZipCode(
+  addresses: Address[],
+  selectedAddressId: string,
+  manualCep: string,
+): string | null {
+  const selected = addresses.find((address) => address.id === selectedAddressId)
+  if (selected?.zipCode && isValidCep(selected.zipCode)) {
+    return normalizeDigits(selected.zipCode)
+  }
+  if (isValidCep(manualCep)) return normalizeDigits(manualCep)
+  return null
+}
+
+async function resolvePlansForCart(cart: Cart): Promise<{
+  plan: SubscriptionPlan | null
+  monthlyPlan: SubscriptionPlan | null
+}> {
+  const resolvedPlanoId = cart.items.find(isPlanCartItem)?.planId
+  if (!resolvedPlanoId) {
+    return { plan: null, monthlyPlan: null }
+  }
+
+  const plan = await getPlanById(resolvedPlanoId)
+  if (!plan) {
+    return { plan: null, monthlyPlan: null }
+  }
+
+  if (plan.billingInterval !== 'annual') {
+    return { plan, monthlyPlan: null }
+  }
+
+  const monthlyPlan =
+    (await listPlans()).find((p) => p.billingInterval === 'monthly') ?? null
+
+  return { plan, monthlyPlan }
 }
 
 export default function CarrinhoPage() {
   const router = useRouter()
   const [cart, setCart] = useState<Cart | null>(null)
+  const [plan, setPlan] = useState<SubscriptionPlan | null>(null)
+  const [monthlyPlan, setMonthlyPlan] = useState<SubscriptionPlan | null>(null)
   const [shipping, setShipping] = useState(emptyShipping)
+  const [shippingLoading, setShippingLoading] = useState(false)
+  const [shippingError, setShippingError] = useState<string | null>(null)
+  const [addresses, setAddresses] = useState<Address[]>([])
+  const [selectedAddressId, setSelectedAddressId] = useState('')
+  const [manualCep, setManualCep] = useState('')
+  const [shippingQuoted, setShippingQuoted] = useState(false)
+
+  const syncPlans = async (nextCart: Cart) => {
+    const resolved = await resolvePlansForCart(nextCart)
+    setPlan(resolved.plan)
+    setMonthlyPlan(resolved.monthlyPlan)
+  }
+
+  const applyShipping = async (nextCart: Cart, zipCode: string | null) => {
+    if (!zipCode) {
+      setShippingQuoted(false)
+      setShippingError(null)
+      setShipping(emptyShipping)
+      setCart({
+        ...nextCart,
+        shippingEstimate: 0,
+        shippingRegion: undefined,
+      })
+      notifyCartUpdated({
+        ...nextCart,
+        shippingEstimate: 0,
+        shippingRegion: undefined,
+      })
+      return
+    }
+
+    setShippingLoading(true)
+    setShippingError(null)
+    try {
+      const nextShipping = await fetchShippingForCart(nextCart, zipCode)
+      const cartWithShipping: Cart = {
+        ...nextCart,
+        shippingEstimate: nextShipping.price,
+        shippingRegion: nextShipping.region || undefined,
+      }
+      setCart(cartWithShipping)
+      notifyCartUpdated(cartWithShipping)
+      setShipping(nextShipping)
+      setShippingQuoted(true)
+      if (
+        nextShipping.price === 0 &&
+        !nextShipping.region &&
+        !nextShipping.estimatedDays
+      ) {
+        setShippingError(
+          'Não foi possível calcular o frete para este CEP. Tente outro.',
+        )
+      }
+    } finally {
+      setShippingLoading(false)
+    }
+  }
 
   const handleCartChange = async (nextCart: Cart) => {
-    const nextShipping = await fetchShippingForCart(nextCart)
-    const cartWithShipping: Cart = {
-      ...nextCart,
-      shippingEstimate: nextShipping.price,
-      shippingRegion: nextShipping.region || undefined,
-    }
-    setCart(cartWithShipping)
-    notifyCartUpdated(cartWithShipping)
-    setShipping(nextShipping)
+    await syncPlans(nextCart)
+    const zipCode = resolveZipCode(addresses, selectedAddressId, manualCep)
+    await applyShipping(nextCart, zipCode)
   }
 
   useEffect(() => {
@@ -162,22 +265,60 @@ export default function CarrinhoPage() {
           window.history.replaceState(null, '', '/carrinho')
         }
 
-        const nextCart = await getCart()
+        const [nextCart, profile] = await Promise.all([
+          getCart(),
+          apiClient.customer.getProfile().catch(() => null),
+        ])
         if (cancelled) return
 
-        const nextShipping = await fetchShippingForCart(nextCart)
-        return { nextCart, nextShipping }
+        const nextAddresses = profile?.addresses ?? []
+        const preferred =
+          nextAddresses.find((address) => address.isDefault) ??
+          nextAddresses[0] ??
+          null
+        const zipCode = preferred?.zipCode
+          ? normalizeDigits(preferred.zipCode)
+          : null
+
+        const nextShipping = await fetchShippingForCart(nextCart, zipCode)
+        const plans = await resolvePlansForCart(nextCart)
+        return {
+          nextCart,
+          nextShipping,
+          nextAddresses,
+          preferredId: preferred?.id ?? '',
+          zipCode,
+          plan: plans.plan,
+          monthlyPlan: plans.monthlyPlan,
+        }
       })
       .then((result) => {
         if (cancelled || !result) return
-        const { nextCart, nextShipping } = result
-        setCart(nextCart)
-        notifyCartUpdated(nextCart)
-        setShipping({
-          price: nextCart.shippingEstimate ?? nextShipping.price,
-          region: nextCart.shippingRegion ?? nextShipping.region,
-          estimatedDays: nextShipping.estimatedDays,
-        })
+        const {
+          nextCart,
+          nextShipping,
+          nextAddresses,
+          preferredId,
+          zipCode,
+          plan: nextPlan,
+          monthlyPlan: nextMonthlyPlan,
+        } = result
+        setAddresses(nextAddresses)
+        setSelectedAddressId(preferredId)
+        setManualCep('')
+        setPlan(nextPlan)
+        setMonthlyPlan(nextMonthlyPlan)
+        const cartWithShipping: Cart = {
+          ...nextCart,
+          shippingEstimate: zipCode ? nextShipping.price : 0,
+          shippingRegion: zipCode
+            ? nextShipping.region || undefined
+            : undefined,
+        }
+        setCart(cartWithShipping)
+        notifyCartUpdated(cartWithShipping)
+        setShipping(zipCode ? nextShipping : emptyShipping)
+        setShippingQuoted(Boolean(zipCode))
       })
       .catch((error: unknown) => {
         if (cancelled) return
@@ -186,6 +327,8 @@ export default function CarrinhoPage() {
           return
         }
         setCart(emptyCart())
+        setPlan(null)
+        setMonthlyPlan(null)
         notifyCartUpdated(emptyCart())
       })
 
@@ -194,21 +337,49 @@ export default function CarrinhoPage() {
     }
   }, [router])
 
+  async function handleSelectAddress(addressId: string) {
+    if (!cart) return
+    setSelectedAddressId(addressId)
+    setManualCep('')
+    const selected = addresses.find((address) => address.id === addressId)
+    await applyShipping(
+      cart,
+      selected?.zipCode ? normalizeDigits(selected.zipCode) : null,
+    )
+  }
+
+  async function handleManualCepSubmit() {
+    if (!cart || !isValidCep(manualCep)) return
+    setSelectedAddressId('')
+    await applyShipping(cart, normalizeDigits(manualCep))
+  }
+
   if (!cart) return <CartSkeleton />
 
-  const totals = getCartTotals(cart)
+  const merchandise = resolveMerchandiseTotals({ cart, plan, monthlyPlan })
   const planItems = cart.items.filter(isPlanCartItem)
   const productItems = cart.items.filter((item) => !isPlanCartItem(item))
-  const shippingPrice = cart.shippingEstimate ?? shipping.price
-  const shippingRegion = cart.shippingRegion || shipping.region
-  const subtotal = totals.subtotal
-  const discount = totals.discount
-  const grandTotal = Math.max(subtotal - discount + shippingPrice, 0)
+  const shippingPrice = shipping.price
+  const shippingRegion = shipping.region
+  const subtotalAmount = merchandise.subtotal
+  const discountAmount = merchandise.discount
+  const grandTotal = Math.max(merchandise.merchandiseTotal + shippingPrice, 0)
   const totalItemCount = cart.items.reduce(
     (sum, item) => sum + item.quantity,
     0,
   )
   const dossierCode = `CART-${String(totalItemCount).padStart(2, '0')}`
+  const summaryItems = cart.items
+    .filter((item) => !isPlanCartItem(item))
+    .map((item) => ({
+      id: item.id,
+      label: `${item.productName} × ${item.quantity}`,
+      value: formatCurrency(item.unitPrice * item.quantity),
+    }))
+  const planDisplayPrice =
+    merchandise.isAnnualSubscription && plan
+      ? (plan.pricePerMonth ?? monthlyPlan?.price ?? plan.price)
+      : plan?.price
 
   return (
     <DesignPageShell>
@@ -292,14 +463,34 @@ export default function CarrinhoPage() {
               className="lg:sticky lg:top-6 lg:self-start"
             >
               <OrderSummary
-                subtotal={subtotal}
-                discount={discount}
+                dossierCode={dossierCode}
+                isSubscriptionFlow={merchandise.isSubscriptionFlow}
+                isAnnualSubscription={merchandise.isAnnualSubscription}
+                planName={plan?.name}
+                planPrice={planDisplayPrice}
+                items={summaryItems}
+                subtotal={subtotalAmount}
+                discount={discountAmount}
                 shipping={shippingPrice}
                 shippingRegion={shippingRegion}
                 shippingDays={shipping.estimatedDays}
+                shippingLoading={shippingLoading}
+                shippingError={shippingError}
+                addresses={addresses}
+                selectedAddressId={selectedAddressId}
+                manualCep={manualCep}
+                onSelectAddress={handleSelectAddress}
+                onManualCepChange={(value) => {
+                  setManualCep(value)
+                  setShippingQuoted(false)
+                  setShippingError(null)
+                }}
+                onCalculateManualCep={() => {
+                  void handleManualCepSubmit()
+                }}
+                shippingQuoted={shippingQuoted}
                 total={grandTotal}
                 couponCode={cart.couponCode}
-                hasPlan={planItems.length > 0}
               />
             </aside>
           </div>
@@ -714,25 +905,56 @@ function QuantityControls({
 }
 
 function OrderSummary({
+  dossierCode,
+  isSubscriptionFlow,
+  isAnnualSubscription,
+  planName,
+  planPrice,
+  items,
   subtotal,
   discount,
   shipping,
   shippingRegion,
   shippingDays,
+  shippingLoading,
+  shippingError,
+  addresses,
+  selectedAddressId,
+  manualCep,
+  onSelectAddress,
+  onManualCepChange,
+  onCalculateManualCep,
+  shippingQuoted,
   total,
   couponCode,
-  hasPlan,
 }: {
+  dossierCode: string
+  isSubscriptionFlow: boolean
+  isAnnualSubscription: boolean
+  planName?: string
+  planPrice?: number
+  items: { id: string; label: string; value: string }[]
   subtotal: number
   discount: number
   shipping: number
   shippingRegion: string
   shippingDays: string
+  shippingLoading: boolean
+  shippingError: string | null
+  addresses: Address[]
+  selectedAddressId: string
+  manualCep: string
+  onSelectAddress: (addressId: string) => void
+  onManualCepChange: (value: string) => void
+  onCalculateManualCep: () => void
+  shippingQuoted: boolean
   total: number
   couponCode?: string
-  hasPlan: boolean
 }) {
   const checkoutHref = '/checkout'
+  const hasAddresses = addresses.length > 0
+  const manualCepValid = isValidCep(manualCep)
+  const hasItems = (isSubscriptionFlow && planName != null) || items.length > 0
 
   return (
     <div
@@ -742,68 +964,160 @@ function OrderSummary({
         'overflow-hidden bg-(--card)',
       )}
     >
-      <div className="border-b border-dashed border-[rgba(33,28,24,0.18)] p-5 sm:p-6">
-        <div className="flex items-center gap-3">
-          <IconClipboardText className="size-5 text-(--red)" />
+      <div className="border-b border-[rgba(33,28,24,0.15)] p-5 sm:p-6">
+        <div className="flex items-center justify-between gap-3">
           <p
             className={cn(
               fontMono,
-              'text-xs font-bold tracking-[0.12em] text-(--red) uppercase',
+              'text-xs font-semibold tracking-[0.16em] text-(--red) uppercase',
             )}
           >
             Resumo do pedido
+          </p>
+          <p
+            className={cn(
+              fontMono,
+              'text-[0.6rem] tracking-[0.14em] text-(--ink-mute) uppercase',
+            )}
+          >
+            {dossierCode}
           </p>
         </div>
       </div>
 
       <div className="space-y-4 p-5 text-sm sm:p-6">
-        <SummaryRow
-          label={hasPlan ? 'Subtotal (produtos + plano)' : 'Subtotal'}
-          value={formatCurrency(subtotal)}
-        />
-        {discount > 0 ? (
-          <SummaryRow
-            label={`Desconto${couponCode ? ` · ${couponCode}` : ''}`}
-            value={`− ${formatCurrency(discount)}`}
-            tone="gold"
-          />
-        ) : null}
-        <div className="space-y-1.5">
-          <div className="flex items-center justify-between gap-3">
-            <span className="inline-flex items-center gap-2 text-(--ink-soft)">
-              <IconTruck className="size-4 text-(--red)" />
-              Frete estimado
-            </span>
-            <span className="font-medium text-(--ink)">
-              {formatCurrency(shipping)}
-            </span>
+        {hasItems ? (
+          <ul className="space-y-2.5 text-(--ink-soft)">
+            {isSubscriptionFlow && planName ? (
+              <li className="flex justify-between gap-4">
+                <span>{planName} (assinatura)</span>
+                <span className="font-medium text-(--ink)">
+                  {formatCurrency(planPrice ?? 0)}
+                  {isAnnualSubscription ? '/mês' : ''}
+                </span>
+              </li>
+            ) : null}
+            {items.map((item) => (
+              <li key={item.id} className="flex justify-between gap-4">
+                <span>{item.label}</span>
+                <span className="font-medium text-(--ink)">{item.value}</span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-(--ink-soft)">Nenhum item selecionado.</p>
+        )}
+
+        <div className="space-y-2.5 border-t border-[rgba(33,28,24,0.15)] pt-4 text-(--ink-soft)">
+          <div className="flex justify-between gap-4">
+            <span>Subtotal</span>
+            <span className="text-(--ink)">{formatCurrency(subtotal)}</span>
           </div>
-          {(shippingRegion || shippingDays) && (
-            <p className="pl-6 text-xs text-(--ink-soft)/70">
-              {[shippingRegion, shippingDays].filter(Boolean).join(' · ')}
-            </p>
+
+          {discount > 0 ? (
+            <div className="flex flex-col gap-1 rounded border border-[rgba(26,165,135,0.15)] bg-[rgba(26,165,135,0.06)] p-2">
+              <div className="flex justify-between gap-4 font-semibold text-(--teal-deep)">
+                <span className="flex items-center gap-1.5">
+                  <span className="size-1.5 rounded-full bg-(--teal)" />
+                  Desconto{couponCode ? ` · ${couponCode}` : ''}
+                </span>
+                <span>− {formatCurrency(discount)}</span>
+              </div>
+            </div>
+          ) : null}
+
+          {hasAddresses ? (
+            <select
+              id="cart-shipping-address"
+              aria-label="Endereço para cálculo do frete"
+              value={selectedAddressId}
+              onChange={(event) => onSelectAddress(event.target.value)}
+              disabled={shippingLoading}
+              className={cn(
+                formInputClass,
+                'mt-0 appearance-none bg-(--card) py-2.5 pr-8 text-sm',
+              )}
+            >
+              {addresses.map((address) => (
+                <option key={address.id} value={address.id}>
+                  {address.label} · CEP {formatCep(address.zipCode)}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <div className="flex gap-2">
+              <Input
+                id="cart-shipping-cep"
+                value={manualCep}
+                onChange={(event) =>
+                  onManualCepChange(formatCep(event.target.value))
+                }
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter') {
+                    event.preventDefault()
+                    onCalculateManualCep()
+                  }
+                }}
+                placeholder="CEP para frete"
+                inputMode="numeric"
+                autoComplete="postal-code"
+                maxLength={9}
+                disabled={shippingLoading}
+                aria-invalid={manualCep.length > 0 && !manualCepValid}
+                className={cn(
+                  formInputClass,
+                  'mt-0 h-10 flex-1 bg-(--card) py-2',
+                )}
+              />
+              <Button
+                type="button"
+                disabled={!manualCepValid || shippingLoading}
+                onClick={onCalculateManualCep}
+                className="h-10 shrink-0 rounded-[9px] bg-(--red) px-3 text-[#fbf9f6] hover:bg-(--red-deep)"
+              >
+                {shippingLoading ? '…' : 'OK'}
+              </Button>
+            </div>
           )}
+
+          {shippingQuoted || shippingLoading ? (
+            <>
+              <div className="flex justify-between gap-4">
+                <span>Frete</span>
+                <span className="text-(--ink)">
+                  {shippingLoading ? 'Calculando…' : formatCurrency(shipping)}
+                </span>
+              </div>
+              {!shippingLoading && (shippingRegion || shippingDays) ? (
+                <p className="text-xs text-(--ink-soft)/70">
+                  {[shippingRegion, shippingDays].filter(Boolean).join(' · ')}
+                </p>
+              ) : null}
+            </>
+          ) : null}
+          {shippingError ? (
+            <p className="text-xs text-(--red)" role="alert">
+              {shippingError}
+            </p>
+          ) : null}
         </div>
 
-        <div className="h-px border-t border-dashed border-[rgba(33,28,24,0.18)]" />
-
-        <div className="flex items-end justify-between gap-3">
-          <span
-            className={cn(
-              fontMono,
-              'text-xs font-bold tracking-[0.12em] text-(--red) uppercase',
-            )}
-          >
-            Total
-          </span>
-          <span
-            className={cn(
-              fontHeading,
-              'text-2xl leading-none font-bold text-(--ink)',
-            )}
-          >
-            {formatCurrency(total)}
-          </span>
+        <div className="border-t border-[rgba(33,28,24,0.15)] pt-4">
+          <div className="flex items-end justify-between gap-4">
+            <span
+              className={cn(
+                fontMono,
+                'text-xs font-semibold tracking-[0.14em] text-(--red) uppercase',
+              )}
+            >
+              Total
+            </span>
+            <span
+              className={cn(fontHeading, 'text-2xl font-semibold text-(--ink)')}
+            >
+              {formatCurrency(total)}
+            </span>
+          </div>
         </div>
 
         <CouponForm />
@@ -836,30 +1150,6 @@ function OrderSummary({
           </li>
         </ul>
       </div>
-    </div>
-  )
-}
-
-function SummaryRow({
-  label,
-  value,
-  tone = 'default',
-}: {
-  label: string
-  value: string
-  tone?: 'default' | 'gold'
-}) {
-  return (
-    <div className="flex items-center justify-between gap-3">
-      <span className="text-(--ink-soft)">{label}</span>
-      <span
-        className={cn(
-          'font-medium',
-          tone === 'gold' ? 'text-(--red)' : 'text-(--ink)',
-        )}
-      >
-        {value}
-      </span>
     </div>
   )
 }

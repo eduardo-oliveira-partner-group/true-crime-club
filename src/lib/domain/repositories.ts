@@ -10,6 +10,7 @@ export {
   deleteCustomerAddress,
   getCart,
   getCartTotals,
+  resolveMerchandiseTotals,
   getCase,
   getCmsMenu,
   getCmsPageByRoute,

@@ -1,7 +1,13 @@
 import { apiClient } from '@/src/lib/api-client'
 
-import type { Cart, CouponResult } from '../../types'
+import type { Cart, CouponResult, SubscriptionPlan } from '../../types'
 import { emptyCart, isUnauthorizedError } from '../core/helpers'
+
+type CartWithTotals = Cart & {
+  subtotal?: number
+  discount?: number
+  total?: number
+}
 
 export async function getCart(): Promise<Cart> {
   try {
@@ -49,14 +55,56 @@ export async function applyCoupon(code: string): Promise<CouponResult> {
   }
 }
 
-export function getCartTotals(cart: Cart) {
-  const subtotal = cart.items.reduce(
-    (sum, item) => sum + item.unitPrice * item.quantity,
-    0,
-  )
-  const discount = cart.couponDiscount ?? 0
+export function getCartTotals(cart: CartWithTotals) {
+  const subtotal =
+    cart.subtotal ??
+    cart.items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0)
+  const discount = cart.discount ?? cart.couponDiscount ?? 0
   const shipping = cart.shippingEstimate ?? 0
-  const total = Math.max(subtotal - discount + shipping, 0)
+  const total = cart.total ?? Math.max(subtotal - discount + shipping, 0)
 
   return { subtotal, discount, shipping, total }
+}
+
+/**
+ * Totais de mercadoria alinhados ao checkout.
+ * Em fluxo de assinatura, o valor cobrado é o preço do plano (anual = compromisso),
+ * não a soma linear dos itens do carrinho.
+ * Desconto exibido/aplicado no resumo só quando a API envia `desconto`/`descontoCupom`.
+ */
+export function resolveMerchandiseTotals(input: {
+  cart: CartWithTotals
+  plan?: SubscriptionPlan | null
+  monthlyPlan?: SubscriptionPlan | null
+}): {
+  isSubscriptionFlow: boolean
+  isAnnualSubscription: boolean
+  subtotal: number
+  discount: number
+  merchandiseTotal: number
+} {
+  const totals = getCartTotals(input.cart)
+  const plan = input.plan ?? null
+  const apiDiscount = input.cart.discount ?? input.cart.couponDiscount ?? 0
+
+  if (!plan) {
+    return {
+      isSubscriptionFlow: false,
+      isAnnualSubscription: false,
+      subtotal: totals.subtotal,
+      discount: apiDiscount,
+      merchandiseTotal: Math.max(totals.subtotal - apiDiscount, 0),
+    }
+  }
+
+  const isAnnualSubscription = plan.billingInterval === 'annual'
+
+  return {
+    isSubscriptionFlow: true,
+    isAnnualSubscription,
+    // Preço do plano. Economia anual vs mensal não é campo da API.
+    subtotal: plan.price,
+    discount: apiDiscount,
+    merchandiseTotal: Math.max(plan.price - apiDiscount, 0),
+  }
 }

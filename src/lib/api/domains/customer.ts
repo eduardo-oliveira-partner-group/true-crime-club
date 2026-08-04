@@ -44,10 +44,17 @@ export const customerApi = {
   }> => {
     try {
       const data = await fetcher('/cliente/perfil')
+      const customer = toCustomer(asObject(data.cliente))
+      const profileAddresses = asArray(data.enderecos).map(toAddress)
+
+      // /cliente/perfil pode atrasar após DELETE; a lista CRUD é a fonte de verdade.
+      const addresses = customer.id
+        ? await listCustomerAddresses(customer.id).catch(() => profileAddresses)
+        : profileAddresses
 
       return {
-        customer: toCustomer(asObject(data.cliente)),
-        addresses: asArray(data.enderecos).map(toAddress),
+        customer,
+        addresses,
         paymentMethods: asArray(data.metodosPagamento).map(toPaymentMethod),
       }
     } catch (error) {

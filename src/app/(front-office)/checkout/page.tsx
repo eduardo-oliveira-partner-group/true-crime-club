@@ -26,9 +26,9 @@ import {
 } from '@/src/lib/design/classes'
 import {
   getCart,
-  getCartTotals,
   getPlanById,
   listPlans,
+  resolveMerchandiseTotals,
   updateCustomerProfile,
 } from '@/src/lib/domain/repositories'
 import type { CartItem, PaymentMethod } from '@/src/lib/domain/types'
@@ -183,7 +183,6 @@ export default function CheckoutPage() {
 
   const { cart, profile, paymentMethods, plan, monthlyPlan, shipping } = state
   const isSubscriptionFlow = Boolean(plan)
-  const totals = { ...cart, ...getCartTotals(cart) }
 
   const customer = profile.customer
 
@@ -197,30 +196,16 @@ export default function CheckoutPage() {
     type: method.type,
   }))
 
-  let discountAmount = 0
-  let subtotalAmount = totals.subtotal
+  const merchandise = resolveMerchandiseTotals({
+    cart,
+    plan,
+    monthlyPlan,
+  })
+  const subtotalAmount = merchandise.subtotal
+  const discountAmount = merchandise.discount
 
-  if (isSubscriptionFlow && plan) {
-    if (plan.billingInterval === 'annual') {
-      const monthlyPrice = monthlyPlan ? monthlyPlan.price : 14990
-      const commitment = plan.commitmentMonths || 12
-      subtotalAmount = monthlyPrice * commitment
-      discountAmount = subtotalAmount - plan.price
-    } else {
-      subtotalAmount = plan.price
-      discountAmount = 0
-    }
-  } else {
-    discountAmount = totals.discount
-  }
-
-  // Nao usar totals.total: ele ja inclui freteEstimado do carrinho.
-  // O stepper soma shipping.price a parte — senao o frete dobra.
-  const merchandiseAmount =
-    isSubscriptionFlow && plan
-      ? plan.price
-      : Math.max(totals.subtotal - discountAmount, 0)
-  const total = merchandiseAmount + shipping.price
+  // Frete é somado à parte — não usar total do carrinho (já pode incluir freteEstimado).
+  const total = merchandise.merchandiseTotal + shipping.price
 
   async function submitOrder(input: {
     enderecoId: string
@@ -395,11 +380,16 @@ export default function CheckoutPage() {
                   ? plan.pricePerMonth
                   : plan?.price
               }
-              cartItems={cart.items.map((item: CartItem) => ({
-                id: item.id,
-                label: `${item.productName} × ${item.quantity}`,
-                value: formatCurrency(item.unitPrice * item.quantity),
-              }))}
+              cartItems={cart.items
+                .filter(
+                  (item: CartItem) =>
+                    item.productType !== 'subscription' && !item.planId,
+                )
+                .map((item: CartItem) => ({
+                  id: item.id,
+                  label: `${item.productName} × ${item.quantity}`,
+                  value: formatCurrency(item.unitPrice * item.quantity),
+                }))}
               subtotalAmount={subtotalAmount}
               discountAmount={discountAmount}
               shippingPrice={shipping.price}
