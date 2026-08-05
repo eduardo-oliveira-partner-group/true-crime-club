@@ -29,8 +29,8 @@ export type ApiOrder = {
   urlRastreio?: string
   notaFiscalPlaceholder?: string
   statusNotaFiscal?: string
-  s3ChaveDanfe?: string
-  s3ChaveXml?: string
+  s3UrlDanfe?: string
+  s3UrlXml?: string
   numeroNotaFiscal?: string
 }
 
@@ -86,13 +86,13 @@ export function mapApiOrderToDomain(apiOrder: ApiOrder): Order {
     trackingCode: apiOrder.codigoRastreio,
     trackingUrl: apiOrder.urlRastreio,
     invoicePlaceholder:
-      apiOrder.statusNotaFiscal === 'EMITIDA'
+      apiOrder.statusNotaFiscal === 'EMITIDA' || apiOrder.s3UrlDanfe
         ? undefined
         : apiOrder.notaFiscalPlaceholder ??
           'Nota fiscal disponível após confirmação do pagamento.',
     statusNotaFiscal: apiOrder.statusNotaFiscal,
-    s3ChaveDanfe: apiOrder.s3ChaveDanfe,
-    s3ChaveXml: apiOrder.s3ChaveXml,
+    s3UrlDanfe: apiOrder.s3UrlDanfe,
+    s3UrlXml: apiOrder.s3UrlXml,
     numeroNotaFiscal: apiOrder.numeroNotaFiscal,
   }
 }

@@ -146,8 +146,8 @@ export interface Order {
   trackingUrl?: string
   invoicePlaceholder?: string
   statusNotaFiscal?: string
-  s3ChaveDanfe?: string
-  s3ChaveXml?: string
+  s3UrlDanfe?: string
+  s3UrlXml?: string
   numeroNotaFiscal?: string
 }
 
