@@ -426,6 +426,11 @@ export default function PedidoDetailPage() {
                         <span>Baixar XML da NF-e</span>
                       </a>
                     ) : null}
+                    {!order.s3UrlDanfe && !order.s3UrlXml ? (
+                      <p className="text-xs text-(--ink-mute)">
+                        Nota fiscal emitida (Nº {order.numeroNotaFiscal ?? '—'}). Os arquivos estarão disponíveis para download em instantes.
+                      </p>
+                    ) : null}
                   </div>
                 ) : order.invoicePlaceholder ? (
                   <div className="flex gap-2 border-t border-dashed border-(--ink)/12 pt-4 text-(--ink-mute)">
