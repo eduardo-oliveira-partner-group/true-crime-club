@@ -161,6 +161,7 @@ export function CheckoutStepper({
                   selectedAddressId={flow.selectedAddressId}
                   showAddressForm={flow.showAddressForm}
                   editingAddressId={flow.editingAddressId}
+                  prefillZipCode={flow.prefillZipCode}
                   onAddressSaved={flow.handleAddressSaved}
                   onCancelAddressForm={flow.resetAddressForm}
                   onOpenAddressForm={flow.openNewAddressForm}

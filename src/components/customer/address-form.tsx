@@ -48,6 +48,8 @@ import { cn } from '@/src/lib/utils'
 export type AddressFormProps = {
   /** Quando informado, o formulário entra em modo de edição. */
   address?: Address
+  /** CEP inicial para novo endereço (ex.: vindo do carrinho). */
+  initialZipCode?: string
   onCancel?: () => void
   onSaved: (addresses: Address[]) => void
   className?: string
@@ -57,6 +59,7 @@ export type AddressFormProps = {
 
 export function AddressForm({
   address,
+  initialZipCode,
   onCancel,
   onSaved,
   className,
@@ -65,7 +68,13 @@ export function AddressForm({
 }: AddressFormProps) {
   const isEditing = Boolean(address)
   const [label, setLabel] = useState(address?.label ?? '')
-  const [zip, setZip] = useState(address ? formatCep(address.zipCode) : '')
+  const [zip, setZip] = useState(() => {
+    if (address) return formatCep(address.zipCode)
+    if (initialZipCode && isValidCep(initialZipCode)) {
+      return formatCep(initialZipCode)
+    }
+    return ''
+  })
   const [street, setStreet] = useState(address?.street ?? '')
   const [number, setNumber] = useState(address?.number ?? '')
   const [complement, setComplement] = useState(address?.complement ?? '')
@@ -141,6 +150,12 @@ export function AddressForm({
 
     void fillAddressFromCep(digits)
   }
+
+  useEffect(() => {
+    if (address || !initialZipCode || !isValidCep(initialZipCode)) return
+    void fillAddressFromCep(normalizeDigits(initialZipCode))
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- preenche o endereço uma vez ao abrir o formulário.
+  }, [address, initialZipCode])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

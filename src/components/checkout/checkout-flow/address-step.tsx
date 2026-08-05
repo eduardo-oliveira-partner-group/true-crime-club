@@ -29,6 +29,7 @@ interface AddressStepProps {
   selectedAddressId: string
   showAddressForm: boolean
   editingAddressId: string | null
+  prefillZipCode?: string | null
   onAddressSaved: (addresses: Address[]) => void
   onCancelAddressForm: () => void
   onOpenAddressForm: () => void
@@ -41,6 +42,7 @@ export function AddressStep({
   selectedAddressId,
   showAddressForm,
   editingAddressId,
+  prefillZipCode,
   onAddressSaved,
   onCancelAddressForm,
   onOpenAddressForm,
@@ -81,6 +83,7 @@ export function AddressStep({
         {showAddressForm && !editingAddressId ? (
           <AddressForm
             idPrefix="checkout-addr-new"
+            initialZipCode={prefillZipCode ?? undefined}
             onSaved={onAddressSaved}
             onCancel={addresses.length > 0 ? onCancelAddressForm : undefined}
           />

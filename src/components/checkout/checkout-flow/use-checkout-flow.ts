@@ -13,6 +13,7 @@ import type {
   CheckoutStepperProps,
   SubscriberPreferencesValue,
 } from '@/src/components/checkout/checkout-flow/types'
+import { consumeCheckoutAddressPrefillCep } from '@/src/lib/checkout-address-prefill'
 import { calculateShipping } from '@/src/lib/domain/repositories'
 import type {
   Address,
@@ -98,6 +99,9 @@ export function useCheckoutFlow({
   )
   const [showAddressForm, setShowAddressForm] = useState(
     initialAddresses.length === 0,
+  )
+  const [prefillZipCode] = useState(() =>
+    initialAddresses.length === 0 ? consumeCheckoutAddressPrefillCep() : null,
   )
   const [editingAddressId, setEditingAddressId] = useState<string | null>(null)
   const [showCardForm, setShowCardForm] = useState(
@@ -336,6 +340,7 @@ export function useCheckoutFlow({
     openNewAddressForm,
     paymentOptions,
     preferences,
+    prefillZipCode,
     processingMessage,
     refreshShipping,
     resetAddressForm,

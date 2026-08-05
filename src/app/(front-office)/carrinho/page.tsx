@@ -41,6 +41,7 @@ import {
 import { PENDING_PLAN_STORAGE_KEY } from '@/src/lib/add-to-cart'
 import { apiClient, ApiClientError } from '@/src/lib/api-client'
 import { notifyCartUpdated } from '@/src/lib/cart-events'
+import { saveCheckoutAddressPrefillCep } from '@/src/lib/checkout-address-prefill'
 import {
   arrowIconClass,
   buttonLiftShadow,
@@ -363,6 +364,12 @@ export default function CarrinhoPage() {
     await applyShipping(cart, normalizeDigits(manualCep))
   }
 
+  function handleGoToCheckout() {
+    if (addresses.length === 0 && isValidCep(manualCep)) {
+      saveCheckoutAddressPrefillCep(manualCep)
+    }
+  }
+
   if (!cart) return <CartSkeleton />
 
   const merchandise = resolveMerchandiseTotals({ cart, plan, monthlyPlan })
@@ -497,6 +504,7 @@ export default function CarrinhoPage() {
                 onCalculateManualCep={() => {
                   void handleManualCepSubmit()
                 }}
+                onGoToCheckout={handleGoToCheckout}
                 shippingQuoted={shippingQuoted}
                 total={grandTotal}
                 couponCode={cart.couponCode}
@@ -933,6 +941,7 @@ function OrderSummary({
   onSelectAddress,
   onManualCepChange,
   onCalculateManualCep,
+  onGoToCheckout,
   shippingQuoted,
   total,
   couponCode,
@@ -956,6 +965,7 @@ function OrderSummary({
   onSelectAddress: (addressId: string) => void
   onManualCepChange: (value: string) => void
   onCalculateManualCep: () => void
+  onGoToCheckout: () => void
   shippingQuoted: boolean
   total: number
   couponCode?: string
@@ -984,7 +994,7 @@ function OrderSummary({
         'group h-12 w-full justify-between rounded-[9px] border border-[rgba(33,28,24,0.15)] bg-(--red) px-5 text-[13px] font-bold tracking-[0.04em] text-[#fbf9f6] uppercase hover:-translate-y-0.5 hover:bg-(--red-deep) motion-reduce:hover:translate-y-0',
       )}
     >
-      <Link href={checkoutHref}>
+      <Link href={checkoutHref} onClick={onGoToCheckout}>
         Ir para checkout
         <IconArrowRight className={cn('size-4', arrowIconClass)} />
       </Link>
@@ -1308,6 +1318,7 @@ function OrderSummary({
           >
             <Link
               href={checkoutHref}
+              onClick={onGoToCheckout}
               className="inline-flex items-center gap-2"
             >
               Checkout
