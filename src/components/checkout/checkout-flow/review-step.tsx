@@ -30,14 +30,17 @@ export function ReviewStep({
   totalAmount,
   error,
 }: ReviewStepProps) {
+  const sizeSummary = [
+    preferences.shirtSize ? `Camiseta ${preferences.shirtSize}` : null,
+    preferences.shoeSize ? `Calçado ${preferences.shoeSize}` : null,
+  ]
+    .filter(Boolean)
+    .join(' · ')
+  const preferenceNotes = preferences.notes?.trim() || undefined
   const preferenceSummary =
-    [
-      preferences.shirtSize ? `Camiseta ${preferences.shirtSize}` : null,
-      preferences.shoeSize ? `Calçado ${preferences.shoeSize}` : null,
-      preferences.notes ? 'Notas informadas' : null,
-    ]
-      .filter(Boolean)
-      .join(' · ') || 'Sem preferências informadas'
+    sizeSummary || preferenceNotes || 'Sem preferências informadas'
+  const preferenceDetail =
+    sizeSummary && preferenceNotes ? preferenceNotes : undefined
   const paymentSummary = payment
     ? `${payment.label}${
         payment.type === 'credit_card' && installments > 1
@@ -73,7 +76,11 @@ export function ReviewStep({
         }
       />
       <ReviewItem label="Pagamento" value={paymentSummary} />
-      <ReviewItem label="Preferências" value={preferenceSummary} />
+      <ReviewItem
+        label="Preferências"
+        value={preferenceSummary}
+        detail={preferenceDetail}
+      />
       {error ? (
         <p className="mt-4 rounded-[10px] border border-(--red)/45 bg-(--red)/10 px-3 py-2 text-sm text-(--ink)">
           {error}
@@ -94,7 +101,7 @@ function ReviewItem({
 }) {
   return (
     <div className="flex items-start justify-between gap-4 border-b border-dashed border-[rgba(33,28,24,0.12)] py-3 last:border-0">
-      <div>
+      <div className="min-w-0 flex-1">
         <p
           className={cn(
             fontMono,
@@ -103,10 +110,12 @@ function ReviewItem({
         >
           {label}
         </p>
-        <p className="mt-1 font-medium text-(--ink)">{value}</p>
-        {detail ? <p className="text-(--ink-soft)">{detail}</p> : null}
+        <p className="mt-1 font-medium wrap-break-word text-(--ink)">{value}</p>
+        {detail ? (
+          <p className="wrap-break-word text-(--ink-soft)">{detail}</p>
+        ) : null}
       </div>
-      <IconCircleCheck className="size-5 text-(--teal)" />
+      <IconCircleCheck className="size-5 shrink-0 text-(--teal)" />
     </div>
   )
 }
