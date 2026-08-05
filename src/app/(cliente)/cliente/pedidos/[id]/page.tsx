@@ -399,7 +399,22 @@ export default function PedidoDetailPage() {
                     )}
                   </div>
                 ) : null}
-                {order.invoicePlaceholder ? (
+                {order.statusNotaFiscal === 'EMITIDA' || order.s3ChaveDanfe ? (
+                  <div className="flex flex-col gap-2 border-t border-dashed border-(--ink)/12 pt-4">
+                    <p className={`text-[10px] font-bold tracking-[0.14em] text-(--ink-mute) uppercase ${fontMono}`}>
+                      Nota Fiscal (DANFE)
+                    </p>
+                    <a
+                      href={`/api/pedidos/${order.id}/danfe`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-xs font-semibold text-(--teal-deep) hover:underline"
+                    >
+                      <IconReceipt className="size-4 shrink-0 text-(--teal)" />
+                      <span>Baixar Nota Fiscal PDF</span>
+                    </a>
+                  </div>
+                ) : order.invoicePlaceholder ? (
                   <div className="flex gap-2 border-t border-dashed border-(--ink)/12 pt-4 text-(--ink-mute)">
                     <IconReceipt className="mt-1 size-4 shrink-0 text-(--amber)" />
                     <p>{order.invoicePlaceholder}</p>
