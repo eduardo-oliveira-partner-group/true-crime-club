@@ -588,66 +588,68 @@ export default function PerfilPage() {
                 )}
               </div>
 
-              <div className="mt-4 grid gap-6 md:grid-cols-3">
-                <div>
-                  <p
-                    className={`text-[10px] tracking-wide text-(--ink-mute) uppercase ${fontMono}`}
-                  >
-                    Tamanho de Camiseta
-                  </p>
-                  {editPrefs ? (
-                    <Select
-                      value={tempShirt || undefined}
-                      onValueChange={setTempShirt}
+              <div className="mt-4 space-y-6">
+                <div className="grid gap-6 sm:grid-cols-2">
+                  <div>
+                    <p
+                      className={`text-[10px] tracking-wide text-(--ink-mute) uppercase ${fontMono}`}
                     >
-                      <SelectTrigger className={formSelectTriggerClass}>
-                        <SelectValue placeholder="Selecione" />
-                      </SelectTrigger>
-                      <SelectContent position="popper">
-                        <SelectGroup>
-                          {SHIRT_SIZES.map((size) => (
-                            <SelectItem key={size} value={size}>
-                              {size}
-                            </SelectItem>
-                          ))}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  ) : (
-                    <p className="mt-1 text-sm text-(--ink-soft)">
-                      {displayValue(shirtSize)}
+                      Tamanho de Camiseta
                     </p>
-                  )}
-                </div>
-                <div>
-                  <p
-                    className={`text-[10px] tracking-wide text-(--ink-mute) uppercase ${fontMono}`}
-                  >
-                    Tamanho de Calçado
-                  </p>
-                  {editPrefs ? (
-                    <Select
-                      value={tempShoe || undefined}
-                      onValueChange={setTempShoe}
+                    {editPrefs ? (
+                      <Select
+                        value={tempShirt || undefined}
+                        onValueChange={setTempShirt}
+                      >
+                        <SelectTrigger className={formSelectTriggerClass}>
+                          <SelectValue placeholder="Selecione" />
+                        </SelectTrigger>
+                        <SelectContent position="popper">
+                          <SelectGroup>
+                            {SHIRT_SIZES.map((size) => (
+                              <SelectItem key={size} value={size}>
+                                {size}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <p className="mt-1 text-sm text-(--ink-soft)">
+                        {displayValue(shirtSize)}
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <p
+                      className={`text-[10px] tracking-wide text-(--ink-mute) uppercase ${fontMono}`}
                     >
-                      <SelectTrigger className={formSelectTriggerClass}>
-                        <SelectValue placeholder="Selecione" />
-                      </SelectTrigger>
-                      <SelectContent position="popper">
-                        <SelectGroup>
-                          {SHOE_SIZES.map((size) => (
-                            <SelectItem key={size} value={size}>
-                              {size}
-                            </SelectItem>
-                          ))}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  ) : (
-                    <p className="mt-1 text-sm text-(--ink-soft)">
-                      {displayValue(shoeSize)}
+                      Tamanho de Calçado
                     </p>
-                  )}
+                    {editPrefs ? (
+                      <Select
+                        value={tempShoe || undefined}
+                        onValueChange={setTempShoe}
+                      >
+                        <SelectTrigger className={formSelectTriggerClass}>
+                          <SelectValue placeholder="Selecione" />
+                        </SelectTrigger>
+                        <SelectContent position="popper">
+                          <SelectGroup>
+                            {SHOE_SIZES.map((size) => (
+                              <SelectItem key={size} value={size}>
+                                {size}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <p className="mt-1 text-sm text-(--ink-soft)">
+                        {displayValue(shoeSize)}
+                      </p>
+                    )}
+                  </div>
                 </div>
                 <div>
                   <p
@@ -659,10 +661,12 @@ export default function PerfilPage() {
                     <Textarea
                       value={tempNotes}
                       onChange={(e) => setTempNotes(e.target.value)}
-                      className={`${formInputClass} h-12 resize-none`}
+                      rows={4}
+                      placeholder="Preferências de cores, estilo, alergias, etc."
+                      className={`${formInputClass} mt-1 field-sizing-fixed min-h-24 resize-none`}
                     />
                   ) : (
-                    <p className="mt-1 text-sm text-(--ink-soft)">
+                    <p className="mt-1 text-sm whitespace-pre-wrap text-(--ink-soft)">
                       {displayValue(notes)}
                     </p>
                   )}
