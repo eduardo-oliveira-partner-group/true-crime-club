@@ -64,7 +64,9 @@ interface PreviousBoxCardProps {
 }
 
 function PreviousBoxCard({ product, onOpen }: PreviousBoxCardProps) {
-  const productImage = resolveProductImageSrc(getPrimaryProductImageUrl(product))
+  const productImage = resolveProductImageSrc(
+    getPrimaryProductImageUrl(product),
+  )
   const displayPrice = product.subscriberPrice ?? product.price
   const evidenceNumber = String(product.cycleNumber ?? 0).padStart(2, '0')
 

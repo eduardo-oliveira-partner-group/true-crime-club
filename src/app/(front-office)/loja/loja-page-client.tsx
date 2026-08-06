@@ -213,7 +213,9 @@ function CatalogSkeleton() {
 }
 
 function FeaturedProductCase({ product }: { product: Product }) {
-  const productImage = resolveProductImageSrc(getPrimaryProductImageUrl(product))
+  const productImage = resolveProductImageSrc(
+    getPrimaryProductImageUrl(product),
+  )
 
   return (
     <Link

@@ -17,7 +17,10 @@ import {
 } from '@/src/lib/design/classes'
 import { getPrimaryProductImageUrl, type Product } from '@/src/lib/domain/types'
 import { formatCurrency } from '@/src/lib/formatters'
-import { isStaticProductImage, resolveProductImageSrc } from '@/src/lib/product-images'
+import {
+  isStaticProductImage,
+  resolveProductImageSrc,
+} from '@/src/lib/product-images'
 
 export function StandaloneEdition() {
   const [product, setProduct] = useState<Product | null>(null)
@@ -65,7 +68,9 @@ export function StandaloneEdition() {
 
   if (!product) return null
 
-  const productImage = resolveProductImageSrc(getPrimaryProductImageUrl(product))
+  const productImage = resolveProductImageSrc(
+    getPrimaryProductImageUrl(product),
+  )
   const fileLabel = product.editionMonth ?? product.slug
 
   return (

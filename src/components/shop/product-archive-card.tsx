@@ -30,7 +30,9 @@ export function ProductArchiveCard({
   variant,
   onOpen,
 }: ProductArchiveCardProps) {
-  const productImage = resolveProductImageSrc(getPrimaryProductImageUrl(product))
+  const productImage = resolveProductImageSrc(
+    getPrimaryProductImageUrl(product),
+  )
   const evidenceNumber = String(product.cycleNumber ?? 0).padStart(2, '0')
   const tabCode = variant === 'box' ? `BOX ${evidenceNumber}` : 'ITEM'
   const tabLabel = variant === 'box' ? 'Arquivo avulso' : 'Peça extra'
