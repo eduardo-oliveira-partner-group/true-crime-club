@@ -9,7 +9,7 @@ const clubLinks = [
   { href: '/#funciona', label: 'Como funciona' },
   { href: '/#planos', label: 'Planos' },
   { href: '/#arquivos', label: 'Arquivos' },
-  { href: '/api-docs', label: 'Dossiê de API' },
+  // { href: '/api-docs', label: 'Dossiê de API' },
 ]
 
 const helpLinks = [
