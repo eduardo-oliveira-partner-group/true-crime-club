@@ -88,8 +88,8 @@ export function mapApiOrderToDomain(apiOrder: ApiOrder): Order {
     invoicePlaceholder:
       apiOrder.statusNotaFiscal === 'EMITIDA' || apiOrder.s3UrlDanfe
         ? undefined
-        : apiOrder.notaFiscalPlaceholder ??
-          'Nota fiscal disponível após confirmação do pagamento.',
+        : (apiOrder.notaFiscalPlaceholder ??
+          'Nota fiscal disponível após confirmação do pagamento.'),
     statusNotaFiscal: apiOrder.statusNotaFiscal,
     s3UrlDanfe: apiOrder.s3UrlDanfe,
     s3UrlXml: apiOrder.s3UrlXml,

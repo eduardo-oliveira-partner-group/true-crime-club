@@ -154,7 +154,6 @@ export function AddressForm({
   useEffect(() => {
     if (address || !initialZipCode || !isValidCep(initialZipCode)) return
     void fillAddressFromCep(normalizeDigits(initialZipCode))
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- preenche o endereço uma vez ao abrir o formulário.
   }, [address, initialZipCode])
 
   const handleSubmit = async (e: React.FormEvent) => {

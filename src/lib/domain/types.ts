@@ -6,6 +6,11 @@ export type AvailabilityStatus =
   | 'out_of_stock'
   | 'coming_soon'
 
+export interface ProductImage {
+  url: string
+  isPrimary: boolean
+}
+
 export interface Product {
   id: string
   slug: string
@@ -15,7 +20,7 @@ export interface Product {
   type: ProductType
   price: number
   subscriberPrice?: number
-  images: string[]
+  images: ProductImage[]
   categories: string[]
   inStock: boolean
   availability: AvailabilityStatus
@@ -24,6 +29,16 @@ export interface Product {
   relatedProductIds?: string[]
   editionMonth?: string
   cycleNumber?: number
+}
+
+export function getPrimaryProductImageUrl(
+  product: Pick<Product, 'images'>,
+): string {
+  return (
+    product.images.find((image) => image.isPrimary)?.url ??
+    product.images[0]?.url ??
+    ''
+  )
 }
 
 export interface Box extends Product {

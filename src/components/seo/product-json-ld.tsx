@@ -20,7 +20,9 @@ export function ProductJsonLd({ product, path }: ProductJsonLdProps) {
       name: siteConfig.name,
     },
     image: product.images.map((image) =>
-      image.startsWith('http') ? image : `${siteConfig.url}${image}`,
+      image.url.startsWith('http')
+        ? image.url
+        : `${siteConfig.url}${image.url}`,
     ),
     offers: {
       '@type': 'Offer',

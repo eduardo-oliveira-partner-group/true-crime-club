@@ -15,7 +15,7 @@ import {
   ScrollRevealGroup,
   ScrollRevealItem,
 } from '@/src/components/ui/scroll-reveal'
-import type { Product } from '@/src/lib/domain/types'
+import { getPrimaryProductImageUrl, type Product } from '@/src/lib/domain/types'
 import { formatCurrency } from '@/src/lib/formatters'
 import { getProductImage } from '@/src/lib/product-images'
 
@@ -61,7 +61,7 @@ interface PreviousBoxCardProps {
 }
 
 function PreviousBoxCard({ product, onOpen }: PreviousBoxCardProps) {
-  const productImage = getProductImage(product.images[0] ?? '')
+  const productImage = getProductImage(getPrimaryProductImageUrl(product))
   const displayPrice = product.subscriberPrice ?? product.price
   const evidenceNumber = String(product.cycleNumber ?? 0).padStart(2, '0')
 

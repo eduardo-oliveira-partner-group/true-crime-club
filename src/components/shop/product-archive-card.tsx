@@ -11,7 +11,7 @@ import {
   fontType,
   transitionCardHover,
 } from '@/src/lib/design/classes'
-import type { Product } from '@/src/lib/domain/types'
+import { getPrimaryProductImageUrl, type Product } from '@/src/lib/domain/types'
 import { formatAvailability, formatEditionMonth } from '@/src/lib/formatters'
 import { getProductImage } from '@/src/lib/product-images'
 import { cn } from '@/src/lib/utils'
@@ -27,7 +27,7 @@ export function ProductArchiveCard({
   variant,
   onOpen,
 }: ProductArchiveCardProps) {
-  const productImage = getProductImage(product.images[0] ?? '')
+  const productImage = getProductImage(getPrimaryProductImageUrl(product))
   const evidenceNumber = String(product.cycleNumber ?? 0).padStart(2, '0')
   const tabCode = variant === 'box' ? `BOX ${evidenceNumber}` : 'ITEM'
   const tabLabel = variant === 'box' ? 'Arquivo avulso' : 'Peça extra'

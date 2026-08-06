@@ -1,4 +1,14 @@
-import type { AvailabilityStatus, Product, ProductType } from '../../types'
+import type {
+  AvailabilityStatus,
+  Product,
+  ProductImage,
+  ProductType,
+} from '../../types'
+
+export type ApiProductImage = {
+  url: string
+  principal?: boolean
+}
 
 export type ApiProduct = {
   id: string
@@ -9,7 +19,7 @@ export type ApiProduct = {
   tipo?: string
   preco: number
   precoAssinante?: number
-  imagens?: string[]
+  imagens?: ApiProductImage[]
   categorias?: string[]
   emEstoque?: boolean
   disponibilidade?: string
@@ -18,6 +28,19 @@ export type ApiProduct = {
   relacionados?: string[]
   mesEdicao?: string
   ciclo?: number
+}
+
+function mapApiProductImages(
+  imagens: ApiProductImage[] | undefined,
+): ProductImage[] {
+  if (!imagens?.length) return []
+
+  const hasPrimary = imagens.some((image) => image.principal)
+
+  return imagens.map((image, index) => ({
+    url: image.url,
+    isPrimary: image.principal ?? (!hasPrimary && index === 0),
+  }))
 }
 
 export function mapApiProductToDomain(apiProduct: ApiProduct): Product {
@@ -46,7 +69,7 @@ export function mapApiProductToDomain(apiProduct: ApiProduct): Product {
     type: typeMap[apiProduct.tipo ?? ''] ?? 'product',
     price: apiProduct.preco,
     subscriberPrice: apiProduct.precoAssinante,
-    images: apiProduct.imagens ?? [],
+    images: mapApiProductImages(apiProduct.imagens),
     categories: apiProduct.categorias ?? [],
     inStock: apiProduct.emEstoque ?? false,
     availability: availabilityMap[disponibilidade] ?? 'available',

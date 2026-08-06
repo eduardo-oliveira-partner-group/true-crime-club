@@ -36,7 +36,7 @@ import {
   fontType,
 } from '@/src/lib/design/classes'
 import { designTokens } from '@/src/lib/design/tokens'
-import type { Product } from '@/src/lib/domain/types'
+import { getPrimaryProductImageUrl, type Product } from '@/src/lib/domain/types'
 import {
   formatAvailability,
   formatCurrency,
@@ -216,7 +216,7 @@ export function ProductQuickView({
     return null
   }
 
-  const productImage = getProductImage(activeProduct.images[0] ?? '')
+  const productImage = getProductImage(getPrimaryProductImageUrl(activeProduct))
   const evidenceNumber = String(activeProduct.cycleNumber ?? 0).padStart(2, '0')
 
   return (

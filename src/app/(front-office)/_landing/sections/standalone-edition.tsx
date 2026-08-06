@@ -15,7 +15,7 @@ import {
   sectionFrame,
   transitionLift,
 } from '@/src/lib/design/classes'
-import type { Product } from '@/src/lib/domain/types'
+import { getPrimaryProductImageUrl, type Product } from '@/src/lib/domain/types'
 import { formatCurrency } from '@/src/lib/formatters'
 
 export function StandaloneEdition() {
@@ -64,7 +64,7 @@ export function StandaloneEdition() {
 
   if (!product) return null
 
-  const productImage = product.images[0]
+  const productImage = getPrimaryProductImageUrl(product)
   const fileLabel = product.editionMonth ?? product.slug
 
   return (

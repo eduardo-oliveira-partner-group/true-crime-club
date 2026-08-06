@@ -26,7 +26,7 @@ import {
   transitionCardHover,
 } from '@/src/lib/design/classes'
 import { listProducts } from '@/src/lib/domain/repositories'
-import type { Product } from '@/src/lib/domain/types'
+import { getPrimaryProductImageUrl, type Product } from '@/src/lib/domain/types'
 import { getProductImage } from '@/src/lib/product-images'
 import { cn } from '@/src/lib/utils'
 
@@ -210,7 +210,7 @@ function CatalogSkeleton() {
 }
 
 function FeaturedProductCase({ product }: { product: Product }) {
-  const productImage = getProductImage(product.images[0] ?? '')
+  const productImage = getProductImage(getPrimaryProductImageUrl(product))
 
   return (
     <Link

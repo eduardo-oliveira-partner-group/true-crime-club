@@ -1,5 +1,5 @@
 import { listProducts } from '@/src/lib/domain/repositories'
-import type { Product } from '@/src/lib/domain/types'
+import { getPrimaryProductImageUrl, type Product } from '@/src/lib/domain/types'
 import { formatCurrency } from '@/src/lib/formatters'
 
 /** Categorias legadas/opcionais — a API atual usa `box` + `destaque`. */
@@ -62,7 +62,7 @@ export function toLandingArchiveItem(product: Product): LandingArchiveItem {
     title,
     price: formatCurrency(product.price),
     href: `/loja/${product.slug}`,
-    imageUrl: product.images[0] ?? '',
+    imageUrl: getPrimaryProductImageUrl(product),
     alt: product.name,
   }
 }

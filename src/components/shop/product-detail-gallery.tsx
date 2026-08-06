@@ -2,7 +2,7 @@ import { IconSparkles } from '@tabler/icons-react'
 import Image from 'next/image'
 
 import { fontHeading, fontType } from '@/src/lib/design/classes'
-import type { Product } from '@/src/lib/domain/types'
+import { getPrimaryProductImageUrl, type Product } from '@/src/lib/domain/types'
 import { getProductImage } from '@/src/lib/product-images'
 
 interface ProductDetailGalleryProps {
@@ -10,7 +10,7 @@ interface ProductDetailGalleryProps {
 }
 
 export function ProductDetailGallery({ product }: ProductDetailGalleryProps) {
-  const primaryImage = getProductImage(product.images[0] ?? '')
+  const primaryImage = getProductImage(getPrimaryProductImageUrl(product))
   const evidenceNumber = String(product.cycleNumber ?? 0).padStart(2, '0')
 
   return (
@@ -50,13 +50,13 @@ export function ProductDetailGallery({ product }: ProductDetailGalleryProps) {
 
       {product.images.length > 1 ? (
         <div className="grid grid-cols-4 gap-3">
-          {product.images.slice(0, 4).map((imagePath, index) => {
-            const image = getProductImage(imagePath)
+          {product.images.slice(0, 4).map((productImage, index) => {
+            const image = getProductImage(productImage.url)
             if (!image) return null
 
             return (
               <div
-                key={imagePath}
+                key={productImage.url}
                 className="relative aspect-square overflow-hidden rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-(--card)"
               >
                 <Image

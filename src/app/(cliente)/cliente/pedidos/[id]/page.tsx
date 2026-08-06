@@ -401,7 +401,9 @@ export default function PedidoDetailPage() {
                 ) : null}
                 {order.statusNotaFiscal === 'EMITIDA' || order.s3UrlDanfe ? (
                   <div className="flex flex-col gap-2 border-t border-dashed border-(--ink)/12 pt-4">
-                    <p className={`text-[10px] font-bold tracking-[0.14em] text-(--ink-mute) uppercase ${fontMono}`}>
+                    <p
+                      className={`text-[10px] font-bold tracking-[0.14em] text-(--ink-mute) uppercase ${fontMono}`}
+                    >
                       Nota Fiscal
                     </p>
                     {order.s3UrlDanfe ? (
@@ -428,7 +430,9 @@ export default function PedidoDetailPage() {
                     ) : null}
                     {!order.s3UrlDanfe && !order.s3UrlXml ? (
                       <p className="text-xs text-(--ink-mute)">
-                        Nota fiscal emitida (Nº {order.numeroNotaFiscal ?? '—'}). Os arquivos estarão disponíveis para download em instantes.
+                        Nota fiscal emitida (Nº {order.numeroNotaFiscal ?? '—'}
+                        ). Os arquivos estarão disponíveis para download em
+                        instantes.
                       </p>
                     ) : null}
                   </div>
