@@ -7,7 +7,8 @@ import {
   IconQrcode,
 } from '@tabler/icons-react'
 import Image from 'next/image'
-import { useState } from 'react'
+import * as QRCode from 'qrcode'
+import { useEffect, useState } from 'react'
 
 import { Button } from '@/src/components/ui/button'
 import {
@@ -73,7 +74,34 @@ export function PixAwaitingPanel({
   const [copyFeedback, setCopyFeedback] = useState<
     'idle' | 'success' | 'error'
   >('idle')
+  const [generatedQrImage, setGeneratedQrImage] = useState<string | null>(null)
   const pixCode = payment.pixQrCode ?? ''
+  const qrImageSource = qrImage ?? generatedQrImage
+
+  useEffect(() => {
+    let cancelled = false
+
+    if (qrImage || !pixCode) {
+      setGeneratedQrImage(null)
+      return
+    }
+
+    void QRCode.toDataURL(pixCode, {
+      errorCorrectionLevel: 'M',
+      margin: 2,
+      width: 176,
+    })
+      .then((dataUrl) => {
+        if (!cancelled) setGeneratedQrImage(dataUrl)
+      })
+      .catch(() => {
+        if (!cancelled) setGeneratedQrImage(null)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [pixCode, qrImage])
 
   const statuses = [
     ['Pedido', orderNumber],
@@ -152,12 +180,12 @@ export function PixAwaitingPanel({
 
       <div className="mt-5 grid gap-5 border-t border-[rgba(33,28,24,0.12)] pt-5 lg:grid-cols-[minmax(0,11rem)_1fr] lg:items-center">
         <div className="flex justify-center lg:justify-start">
-          {qrImage ? (
+          {qrImageSource ? (
             <div className="rounded-[12px] border border-[rgba(33,28,24,0.15)] bg-[#fbf9f6] p-3">
               <Image
                 alt="QR Code para pagamento Pix"
                 height={176}
-                src={qrImage}
+                src={qrImageSource}
                 unoptimized
                 width={176}
                 className="size-[160px] sm:size-[176px]"

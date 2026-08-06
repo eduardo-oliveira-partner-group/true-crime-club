@@ -12,18 +12,34 @@ import {
 import Image from 'next/image'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
+import { PixAwaitingPanel } from '@/src/components/checkout/pix-awaiting-panel'
 import { Button } from '@/src/components/ui/button'
 import { OrderDetailSkeleton } from '@/src/components/ui/page-loading-skeletons'
+import { useCheckoutPaymentWs } from '@/src/hooks/use-checkout-payment-ws'
+import {
+  type CheckoutPixPaymentSnapshot,
+  clearCheckoutPixPayment,
+  readCheckoutPixPayment,
+  saveCheckoutPixPayment,
+} from '@/src/lib/checkout-pix-storage'
 import {
   cardShadowBase,
   dossierCardSurface,
   fontHeading,
   fontMono,
 } from '@/src/lib/design/classes'
-import { getOrderById } from '@/src/lib/domain/repositories'
-import type { CartItem, Order, OrderStatus } from '@/src/lib/domain/types'
+import {
+  getOrderById,
+  getPendingPixPaymentForOrder,
+} from '@/src/lib/domain/repositories'
+import type {
+  CartItem,
+  Order,
+  OrderStatus,
+  Payment,
+} from '@/src/lib/domain/types'
 import {
   formatCurrency,
   formatDate,
@@ -58,6 +74,23 @@ function currentJourneyStep(status: OrderStatus) {
   return 0
 }
 
+type PixPayment = Pick<Payment, 'pixQrCode' | 'pixExpiresAt'>
+
+function snapshotToPixState(snapshot: CheckoutPixPaymentSnapshot): {
+  payment: PixPayment
+  qrImage: string | null
+} {
+  return {
+    payment: {
+      pixQrCode: snapshot.pixQrCode,
+      pixExpiresAt: snapshot.pixExpiraEm,
+    },
+    qrImage: snapshot.pixQrCodeBase64
+      ? `data:image/png;base64,${snapshot.pixQrCodeBase64}`
+      : null,
+  }
+}
+
 function ValueRow({
   label,
   value,
@@ -86,14 +119,123 @@ export default function PedidoDetailPage() {
   const params = useParams<{ id: string }>()
   const [order, setOrder] = useState<Order | null>(null)
   const [loading, setLoading] = useState(true)
+  const [pixPayment, setPixPayment] = useState<PixPayment | null>(null)
+  const [pixQrImage, setPixQrImage] = useState<string | null>(null)
+  const [pixLookupComplete, setPixLookupComplete] = useState(false)
+  const [pixLookupError, setPixLookupError] = useState(false)
 
   useEffect(() => {
     if (!params.id) return
-    getOrderById(params.id)
-      .then(setOrder)
-      .catch(() => setOrder(null))
-      .finally(() => setLoading(false))
+
+    let cancelled = false
+
+    async function load() {
+      setLoading(true)
+      setPixPayment(null)
+      setPixQrImage(null)
+      setPixLookupComplete(false)
+      setPixLookupError(false)
+
+      try {
+        const loaded = await getOrderById(params.id)
+        if (cancelled) return
+
+        setOrder(loaded)
+
+        const paymentPending = Boolean(
+          loaded &&
+          (loaded.paymentStatus === 'pending' ||
+            loaded.status === 'pending_payment'),
+        )
+
+        if (!loaded || loaded.paymentStatus === 'paid' || !paymentPending) {
+          return
+        }
+
+        const stored = readCheckoutPixPayment(loaded.id)
+        if (stored) {
+          const state = snapshotToPixState(stored)
+          setPixPayment(state.payment)
+          setPixQrImage(state.qrImage)
+          return
+        }
+
+        try {
+          const remote = await getPendingPixPaymentForOrder(loaded.id)
+          if (
+            cancelled ||
+            !remote ||
+            (remote.method !== 'pix' && !remote.pixQrCode)
+          ) {
+            return
+          }
+
+          setPixPayment({
+            pixQrCode: remote.pixQrCode,
+            pixExpiresAt: remote.pixExpiresAt,
+          })
+
+          if (remote.pixQrCode) {
+            saveCheckoutPixPayment(loaded.id, {
+              id: remote.id,
+              metodo: 'pix',
+              pixQrCode: remote.pixQrCode,
+              pixExpiraEm: remote.pixExpiresAt,
+            })
+          }
+        } catch {
+          if (!cancelled) setPixLookupError(true)
+        }
+      } catch {
+        if (!cancelled) setOrder(null)
+      } finally {
+        if (!cancelled) {
+          setPixLookupComplete(true)
+          setLoading(false)
+        }
+      }
+    }
+
+    void load()
+    return () => {
+      cancelled = true
+    }
   }, [params.id])
+
+  const refreshOrder = useCallback(async (orderId: string) => {
+    try {
+      const updated = await getOrderById(orderId)
+      if (!updated) return
+
+      setOrder(updated)
+      if (
+        updated.paymentStatus === 'paid' ||
+        (updated.paymentStatus !== 'pending' &&
+          updated.status !== 'pending_payment')
+      ) {
+        clearCheckoutPixPayment(orderId)
+        setPixPayment(null)
+        setPixQrImage(null)
+      }
+    } catch {
+      // O polling é apenas uma confirmação auxiliar; mantém o pedido na tela.
+    }
+  }, [])
+
+  const paymentPending = Boolean(
+    order &&
+    (order.paymentStatus === 'pending' || order.status === 'pending_payment'),
+  )
+
+  useCheckoutPaymentWs(order?.id, {
+    enabled: paymentPending,
+    onPaymentConfirmed: () => {
+      if (order?.id) void refreshOrder(order.id)
+    },
+    onPoll: () => {
+      if (order?.id) return refreshOrder(order.id)
+    },
+  })
 
   if (loading) return <OrderDetailSkeleton />
 
@@ -247,6 +389,24 @@ export default function PedidoDetailPage() {
           )}
         </div>
       </section>
+
+      {paymentPending ? (
+        pixPayment ? (
+          <div className="mt-8">
+            <PixAwaitingPanel
+              payment={pixPayment}
+              qrImage={pixQrImage}
+              orderNumber={order.orderNumber}
+              createdAt={order.createdAt}
+            />
+          </div>
+        ) : pixLookupComplete ? (
+          <PendingPaymentNotice
+            orderId={order.id}
+            lookupError={pixLookupError}
+          />
+        ) : null
+      ) : null}
 
       <section
         aria-label="Detalhes do pedido"
@@ -448,5 +608,51 @@ export default function PedidoDetailPage() {
         </div>
       </section>
     </div>
+  )
+}
+
+function PendingPaymentNotice({
+  orderId,
+  lookupError,
+}: {
+  orderId: string
+  lookupError: boolean
+}) {
+  return (
+    <section
+      className={`mt-8 ${dossierCardSurface} ${cardShadowBase} p-5 sm:p-7`}
+      aria-live="polite"
+    >
+      <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p
+            className={`text-[10px] font-bold tracking-[0.14em] text-(--amber) uppercase ${fontMono}`}
+          >
+            Pagamento pendente
+          </p>
+          <h2
+            className={`mt-2 text-2xl font-semibold text-(--ink) ${fontHeading}`}
+          >
+            Instruções de pagamento indisponíveis
+          </h2>
+          <p className="mt-2 max-w-2xl text-sm/6 text-(--ink-soft)">
+            {lookupError
+              ? 'Não foi possível consultar a cobrança agora. Tente abrir a confirmação novamente em alguns instantes.'
+              : 'A cobrança ainda está sendo preparada. Abra a confirmação para consultar o Pix assim que os dados forem liberados.'}
+          </p>
+        </div>
+        <Button
+          asChild
+          variant="outline"
+          className="shrink-0 rounded-[9px] border-(--ink)/15 text-(--ink) hover:bg-(--ink) hover:text-[#fbf9f6]"
+        >
+          <Link
+            href={`/checkout/confirmacao?pedido=${encodeURIComponent(orderId)}`}
+          >
+            Abrir confirmação
+          </Link>
+        </Button>
+      </div>
+    </section>
   )
 }
