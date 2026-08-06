@@ -195,13 +195,6 @@ function AnnualPlanCard({
           >
             {plan.name}
           </span>
-          {plan.isRecommended ? (
-            <span
-              className={`inline-flex items-center rounded-full bg-[#10b981] px-[14px] py-2 text-[12.5px] leading-none font-bold tracking-[0.04em] text-white uppercase ${fontType}`}
-            >
-              20% OFF
-            </span>
-          ) : null}
         </div>
         <div className="mb-1.5 flex items-end gap-1.5">
           <strong
