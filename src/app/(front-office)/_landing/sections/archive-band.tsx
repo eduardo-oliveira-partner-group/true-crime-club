@@ -157,8 +157,8 @@ function ArchiveCard({
       <div
         className={`absolute top-[-25px] right-4 z-0 inline-flex origin-bottom-right rotate-[2.5deg] items-center gap-2 rounded-t-[8px] bg-(--yellow) px-[15px] pt-1.5 pb-6 text-[9.5px] tracking-wider text-(--ink) uppercase shadow-[0_6px_14px_-8px_rgba(33,28,24,0.4)] ${fontType}`}
       >
-        <span className="font-bold text-(--red)">{box.box}</span>Caso Victória
-        Monteiro
+        <span className="font-bold text-(--red)">{box.box}</span>
+        Arquivo avulso
       </div>
       <div
         className={`relative z-1 flex flex-col overflow-hidden rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-(--card) text-(--ink) shadow-[0_9px_22px_-8px_rgba(33,28,24,0.35),inset_0_0_0_1px_rgba(255,255,255,0.5)] ${transitionCardHover} group-hover:translate-y-[-5px] group-hover:shadow-[0_20px_36px_-14px_rgba(33,28,24,0.45),inset_0_0_0_1px_rgba(255,255,255,0.6)]`}

@@ -19,20 +19,12 @@ export type LandingArchiveItem = {
   alt: string
 }
 
-function parseBoxProductName(name: string): { box: string; title: string } {
+function parseBoxLabel(name: string): string {
   const boxMatch = name.match(/^(?:Box|TCC\s*-\s*CAIXA)\s*(\d+)/i)
   if (boxMatch) {
-    const number = boxMatch[1].padStart(2, '0')
-    const rest = name
-      .slice(boxMatch[0].length)
-      .replace(/^\s*[—–-]\s*/, '')
-      .trim()
-    return {
-      box: `BOX ${number}`,
-      title: rest || name,
-    }
+    return `BOX ${boxMatch[1].padStart(2, '0')}`
   }
-  return { box: 'BOX', title: name }
+  return 'BOX'
 }
 
 function hasCategory(product: Product, categories: Set<string>): boolean {
@@ -55,11 +47,9 @@ function isArchivedBox(product: Product): boolean {
 }
 
 export function toLandingArchiveItem(product: Product): LandingArchiveItem {
-  const { box, title } = parseBoxProductName(product.name)
-
   return {
-    box,
-    title,
+    box: parseBoxLabel(product.name),
+    title: product.name,
     price: formatCurrency(product.price),
     href: `/loja/${product.slug}`,
     imageUrl: getPrimaryProductImageUrl(product),
