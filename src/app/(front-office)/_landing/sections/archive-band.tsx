@@ -11,6 +11,7 @@ import {
 } from '@/src/app/(front-office)/_landing/landing-products'
 import { useReveal } from '@/src/app/(front-office)/_landing/reveal'
 import { SectionEyebrow } from '@/src/components/public-design/section-eyebrow'
+import { Skeleton } from '@/src/components/ui/skeleton'
 import {
   fontHeading,
   fontMono,
@@ -42,16 +43,25 @@ export function ArchiveBand() {
       <section
         id="arquivos"
         className="relative mt-[88px] border-y border-[rgba(33,28,24,0.15)] text-(--paper) [background:var(--purple)]"
+        aria-busy="true"
+        aria-label="Carregando arquivos do clube"
       >
-        <div className="relative mx-auto max-w-[1180px] px-8 py-[68px] text-center">
-          <SectionEyebrow variant="yellow">
-            06 — Arquivos do clube
-          </SectionEyebrow>
-          <h2
-            className={`m-0 mt-4 animate-pulse text-[clamp(28px,3.4vw,44px)] font-semibold text-(--paper) ${fontHeading}`}
-          >
-            Carregando arquivos do clube...
-          </h2>
+        <span className="sr-only">Carregando arquivos do clube...</span>
+        <div className="relative mx-auto max-w-[1180px] px-8 py-[68px] max-[860px]:px-[22px]">
+          <div className="mb-11">
+            <SectionEyebrow variant="yellow">
+              06 — Arquivos do clube
+            </SectionEyebrow>
+            <Skeleton className="mt-4 h-[clamp(28px,3.4vw,44px)] w-[min(100%,520px)] rounded-lg bg-white/15" />
+          </div>
+          <div className="mt-3 grid grid-cols-4 gap-[30px] max-[860px]:grid-cols-2 max-[540px]:grid-cols-1">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <ArchiveCardSkeleton key={index} />
+            ))}
+          </div>
+          <div className="mt-[46px] flex justify-center">
+            <Skeleton className="h-11 w-56 rounded-[9px] bg-white/15" />
+          </div>
         </div>
       </section>
     )
@@ -134,6 +144,25 @@ export function ArchiveBand() {
         </div>
       </div>
     </section>
+  )
+}
+
+function ArchiveCardSkeleton() {
+  return (
+    <div className="relative pt-6">
+      <div className="absolute inset-x-0 top-6 bottom-0 z-0 translate-y-[-3px] rotate-[2.5deg] rounded-[10px] bg-(--yellow)/40" />
+      <div className="relative z-1 flex flex-col overflow-hidden rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-(--card)">
+        <Skeleton className="aspect-square w-full rounded-none rounded-t-[10px] bg-(--ink)/10" />
+        <div className="flex flex-1 flex-col gap-2 px-4 pt-4 pb-[18px]">
+          <Skeleton className="h-3 w-16 bg-(--ink)/10" />
+          <Skeleton className="h-5 w-3/4 bg-(--ink)/10" />
+          <div className="mt-2 flex items-center justify-between gap-[10px]">
+            <Skeleton className="h-5 w-16 bg-(--ink)/10" />
+            <Skeleton className="h-8 w-20 rounded-lg bg-(--ink)/10" />
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }
 
