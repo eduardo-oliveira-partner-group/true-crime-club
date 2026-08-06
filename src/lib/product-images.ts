@@ -23,5 +23,35 @@ const productImages: Record<string, StaticImageData> = {
 }
 
 export function getProductImage(path: string): StaticImageData | undefined {
-  return productImages[path]
+  if (!path) return undefined
+
+  return (
+    productImages[path] ?? productImages[path.replace(/^\//, '')] ?? undefined
+  )
+}
+
+/** Resolve asset local mapeado ou URL/caminho vindo da API. */
+export function resolveProductImageSrc(
+  path: string,
+): StaticImageData | string | undefined {
+  if (!path.trim()) return undefined
+
+  const local = getProductImage(path)
+  if (local) return local
+
+  if (
+    path.startsWith('http://') ||
+    path.startsWith('https://') ||
+    path.startsWith('/')
+  ) {
+    return path
+  }
+
+  return undefined
+}
+
+export function isStaticProductImage(
+  src: StaticImageData | string,
+): src is StaticImageData {
+  return typeof src !== 'string'
 }

@@ -9,7 +9,7 @@ const resolvedPort = Number.isFinite(port) && port > 0 ? port : 4100
 const products = [
   {
     id: 'prod-copa',
-    identificador: 'edicao-copa-do-mundo',
+    identificador: 'edicao-copa-do-mundo-avulsa',
     nome: 'Box 10 — Arquivo Copa do Mundo',
     descricao:
       'Uma investigação especial sobre os bastidores de uma final histórica.',
@@ -17,7 +17,11 @@ const products = [
     tipo: 'caixa',
     preco: 18990,
     precoAssinante: 16990,
-    imagens: [{ url: '/imagens/pendrive/IMG_PD_04.jpg', principal: true }],
+    imagens: [
+      { url: 'design-sugerido/edicao-copa.png', principal: true },
+      { url: 'design-sugerido/box-01.png', principal: false },
+      { url: 'design-sugerido/box-02.png', principal: false },
+    ],
     categorias: ['box', 'destaque', 'edicao-especial'],
     emEstoque: true,
     disponibilidade: 'limitado',
@@ -39,7 +43,11 @@ const products = [
     descricaoCurta: 'Documentos e novas pistas do arquivo Victória.',
     tipo: 'caixa',
     preco: 15990,
-    imagens: [{ url: '/imagens/pendrive/IMG_PD_05.jpg', principal: true }],
+    imagens: [
+      { url: 'design-sugerido/box-03.png', principal: true },
+      { url: 'design-sugerido/box-04.png', principal: false },
+      { url: 'products/box-01.jpg', principal: false },
+    ],
     categorias: ['box', 'arquivos'],
     emEstoque: true,
     disponibilidade: 'disponivel',
@@ -57,7 +65,10 @@ const products = [
     descricaoCurta: 'Uma nova cena e um conjunto de evidências conflitantes.',
     tipo: 'caixa',
     preco: 14990,
-    imagens: [{ url: '/imagens/pendrive/IMG_PD_06.jpg', principal: true }],
+    imagens: [
+      { url: 'design-sugerido/box-02.png', principal: true },
+      { url: 'products/box-02.jpg', principal: false },
+    ],
     categorias: ['box', 'arquivos'],
     emEstoque: true,
     disponibilidade: 'disponivel',

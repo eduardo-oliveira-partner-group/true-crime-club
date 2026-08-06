@@ -39,7 +39,7 @@ const caseNotes = [
   },
 ]
 
-const highlightedEditionSlug = 'edicao-copa-do-mundo'
+const highlightedEditionSlug = 'edicao-copa-do-mundo-avulsa'
 
 function pickFeaturedBox(boxProducts: Product[]): Product | undefined {
   return (

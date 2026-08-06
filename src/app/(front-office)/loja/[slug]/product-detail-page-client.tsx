@@ -25,18 +25,10 @@ import {
   ProductKicker,
 } from '@/src/components/ui/product-quick-view'
 import { ScrollReveal } from '@/src/components/ui/scroll-reveal'
-import { fontHeading, fontType, sectionFrame } from '@/src/lib/design/classes'
+import { fontHeading, sectionFrame } from '@/src/lib/design/classes'
 import { getProductBySlug, listProducts } from '@/src/lib/domain/repositories'
 import type { Product } from '@/src/lib/domain/types'
 import { formatEditionMonth } from '@/src/lib/formatters'
-
-function getReferenceCode(product: Product) {
-  if (product.type === 'box' && product.cycleNumber) {
-    return `EVID-${String(product.cycleNumber).padStart(2, '0')}`
-  }
-
-  return product.id.replace('prod-', 'ITEM-').toUpperCase()
-}
 
 interface ProductDetailPageClientProps {
   slug: string
@@ -153,24 +145,6 @@ export function ProductDetailPageClient({
               </div>
 
               <div className="relative z-10 flex flex-col">
-                <header className="flex flex-wrap items-start justify-between gap-4 border-b border-[rgba(33,28,24,0.15)] p-5 sm:px-7">
-                  <div className="flex items-center gap-3">
-                    <div className="flex size-10 items-center justify-center rounded-[2px] border border-[rgba(33,28,24,0.15)] bg-(--paper-soft) text-(--red)">
-                      <IconPackage className="size-5" />
-                    </div>
-                    <div>
-                      <p
-                        className={`text-[0.65rem] tracking-[0.16em] text-(--red) uppercase ${fontType}`}
-                      >
-                        Ficha do arquivo
-                      </p>
-                      <p className="font-mono text-xs text-(--ink)/45">
-                        {getReferenceCode(product)}
-                      </p>
-                    </div>
-                  </div>
-                </header>
-
                 <div className="flex flex-1 flex-col px-5 py-6 sm:px-7 sm:py-8">
                   <div className="space-y-6">
                     <ProductKicker product={product} />

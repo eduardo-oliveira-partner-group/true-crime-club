@@ -6,13 +6,12 @@ import {
   IconExternalLink,
   IconPackage,
   IconShoppingBag,
-  IconSparkles,
   IconX,
 } from '@tabler/icons-react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { type ReactNode, useEffect, useState } from 'react'
 
+import { ProductDetailGallery } from '@/src/components/shop/product-detail-gallery'
 import { Button } from '@/src/components/ui/button'
 import {
   Dialog,
@@ -36,13 +35,12 @@ import {
   fontType,
 } from '@/src/lib/design/classes'
 import { designTokens } from '@/src/lib/design/tokens'
-import { getPrimaryProductImageUrl, type Product } from '@/src/lib/domain/types'
+import type { Product } from '@/src/lib/domain/types'
 import {
   formatAvailability,
   formatCurrency,
   formatEditionMonth,
 } from '@/src/lib/formatters'
-import { getProductImage } from '@/src/lib/product-images'
 import { cn } from '@/src/lib/utils'
 
 export function getAvailabilityTone(availability: Product['availability']) {
@@ -216,7 +214,6 @@ export function ProductQuickView({
     return null
   }
 
-  const productImage = getProductImage(getPrimaryProductImageUrl(activeProduct))
   const evidenceNumber = String(activeProduct.cycleNumber ?? 0).padStart(2, '0')
 
   return (
@@ -238,7 +235,7 @@ export function ProductQuickView({
           'max-h-[calc(100vh-1.5rem)] w-[calc(100%-1.5rem)] max-w-6xl gap-0 overflow-y-auto rounded-[14px_14px_16px_16px] border border-[rgba(33,28,24,0.16)] bg-(--card) p-0 text-(--ink) ring-0 sm:max-w-6xl lg:max-h-[calc(100vh-3rem)] lg:overflow-hidden',
           cardShadowBase,
           'duration-200 data-open:zoom-in-[1] data-closed:zoom-out-[1]',
-          'grid grid-rows-[240px_minmax(0,1fr)] sm:grid-rows-[360px_minmax(0,1fr)] lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:grid-rows-none',
+          'grid grid-rows-[320px_minmax(0,1fr)] sm:grid-rows-[400px_minmax(0,1fr)] lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:grid-rows-none',
         )}
       >
         <div
@@ -263,34 +260,7 @@ export function ProductQuickView({
           </button>
         </DialogClose>
 
-        <div className="relative min-h-[240px] min-w-0 overflow-hidden bg-(--paper-soft) sm:min-h-[360px] lg:min-h-[620px]">
-          {productImage ? (
-            <Image
-              src={productImage}
-              alt={activeProduct.name}
-              fill
-              placeholder="blur"
-              sizes="(max-width: 1024px) 100vw, 520px"
-              className="object-cover object-center"
-              priority
-            />
-          ) : (
-            <ProductImagePlaceholder product={activeProduct} />
-          )}
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(244,241,236,0.02)_0%,rgba(33,28,24,0.22)_100%)]" />
-          <div className="absolute bottom-5 left-5 z-20 hidden rounded-[10px] border border-[rgba(33,28,24,0.2)] bg-(--paper-soft)/90 px-4 py-3 backdrop-blur-[2px] lg:block">
-            <p
-              className={`text-[0.68rem] tracking-[0.18em] text-(--amber) uppercase ${fontType}`}
-            >
-              {activeProduct.type === 'box' ? 'Arquivo' : 'Item'}
-            </p>
-            <p
-              className={`text-4xl leading-none font-semibold text-(--ink) ${fontHeading}`}
-            >
-              {evidenceNumber}
-            </p>
-          </div>
-        </div>
+        <ProductDetailGallery product={activeProduct} variant="quick-view" />
 
         <div className="relative z-20 flex min-h-0 min-w-0 flex-col bg-(--card) p-5 sm:p-7 lg:h-full lg:overflow-hidden lg:p-0">
           <div className="min-h-0 flex-1 lg:overflow-y-auto lg:p-9 lg:pb-6">
@@ -445,22 +415,5 @@ export function ProductQuickView({
         </div>
       </DialogContent>
     </Dialog>
-  )
-}
-
-function ProductImagePlaceholder({ product }: { product: Product }) {
-  return (
-    <div className="absolute inset-0 flex items-center justify-center bg-(--card)">
-      <div className="absolute inset-6 border border-[rgba(33,28,24,0.15)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_38%,rgba(197,39,31,0.1),transparent_28%),radial-gradient(circle_at_48%_58%,rgba(26,165,135,0.08),transparent_32%)]" />
-      <div className="relative z-10 flex flex-col items-center text-center">
-        <IconSparkles className="size-9 text-(--red)" />
-        <p
-          className={`mt-3 max-w-44 text-xs tracking-[0.14em] text-(--ink) uppercase ${fontType}`}
-        >
-          {product.categories[0] ?? 'item'} do arquivo
-        </p>
-      </div>
-    </div>
   )
 }

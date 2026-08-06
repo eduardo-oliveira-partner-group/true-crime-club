@@ -29,9 +29,12 @@ test.describe('jornada pública', () => {
         .first(),
     ).toBeVisible()
 
-    await page.locator('a[href="/loja/edicao-copa-do-mundo"]').first().click()
+    await page
+      .locator('a[href="/loja/edicao-copa-do-mundo-avulsa"]')
+      .first()
+      .click()
 
-    await expect(page).toHaveURL(/\/loja\/edicao-copa-do-mundo$/)
+    await expect(page).toHaveURL(/\/loja\/edicao-copa-do-mundo-avulsa$/)
     await expect(
       page.getByRole('heading', {
         level: 1,

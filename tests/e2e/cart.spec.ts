@@ -6,7 +6,7 @@ test.describe('carrinho autenticado', () => {
   })
 
   test('adiciona um produto pelo detalhe', async ({ page, request }) => {
-    await page.goto('/loja/edicao-copa-do-mundo')
+    await page.goto('/loja/edicao-copa-do-mundo-avulsa')
 
     await page
       .getByRole('button', { name: 'Adicionar ao carrinho' })
