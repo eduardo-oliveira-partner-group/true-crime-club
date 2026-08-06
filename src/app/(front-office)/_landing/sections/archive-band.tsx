@@ -163,12 +163,12 @@ function ArchiveCard({
       <div
         className={`relative z-1 flex flex-col overflow-hidden rounded-[10px] border border-[rgba(33,28,24,0.15)] bg-(--card) text-(--ink) shadow-[0_9px_22px_-8px_rgba(33,28,24,0.35),inset_0_0_0_1px_rgba(255,255,255,0.5)] ${transitionCardHover} group-hover:translate-y-[-5px] group-hover:shadow-[0_20px_36px_-14px_rgba(33,28,24,0.45),inset_0_0_0_1px_rgba(255,255,255,0.6)]`}
       >
-        <div
+        {/* <div
           aria-hidden="true"
           className={`absolute top-[10px] right-[10px] z-2 rotate-[-9deg] border-2 border-[rgba(94,94,162,0.85)] bg-[rgba(251,249,246,0.65)] px-[9px] py-[5px] pb-1.5 text-[9.5px] font-bold tracking-[0.14em] text-[rgba(94,94,162,0.95)] uppercase shadow-[inset_0_0_0_1px_rgba(94,94,162,0.4)] backdrop-blur-[2px] ${fontType}`}
         >
           ARQUIVADO
-        </div>
+        </div> */}
         <div className="relative aspect-square overflow-hidden border-b border-[rgba(33,28,24,0.15)]">
           {image ? (
             <Image
