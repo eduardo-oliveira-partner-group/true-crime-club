@@ -104,7 +104,7 @@ export function PublicFooter() {
             © {new Date().getFullYear()} TRUECRIME.CLUB · TODOS OS CASOS
             RESERVADOS
           </span>
-          <span>CNPJ 00.000.000/0001-00 · FEITO NO BRASIL</span>
+          <span>CNPJ 27.235.091/0001-09 · FEITO NO BRASIL</span>
         </div>
       </div>
     </footer>
