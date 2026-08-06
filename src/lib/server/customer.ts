@@ -15,6 +15,7 @@ import type {
   SubscriberPreferences,
   Subscription,
 } from '@/src/lib/domain/types'
+import { normalizeDigits } from '@/src/lib/formatters'
 
 export { addCustomerAddress, deleteCustomerAddress }
 
@@ -428,8 +429,8 @@ export async function updateCustomerProfile(input: {
     body: JSON.stringify({
       nome: input.name,
       email: input.email,
-      telefone: input.phone,
-      documento: input.document,
+      telefone: input.phone ? normalizeDigits(input.phone) : undefined,
+      documento: input.document ? normalizeDigits(input.document) : undefined,
       preferencias: input.preferences
         ? {
             tamanhoCamiseta: input.preferences.shirtSize,

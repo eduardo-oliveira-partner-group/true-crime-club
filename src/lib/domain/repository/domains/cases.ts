@@ -10,12 +10,12 @@ export async function listCases(): Promise<CaseSummary[]> {
   return await apiClient.cases.list()
 }
 
-export async function getCase(identificador: string): Promise<CaseDetail> {
-  return await apiClient.cases.get(identificador)
+export async function getCase(idCaso: string): Promise<CaseDetail> {
+  return await apiClient.cases.get(idCaso)
 }
 
 export async function listInvestigationFilesByBox(
-  identificador: string,
+  idCaso: string,
 ): Promise<InvestigationFilesByBox[]> {
-  return await apiClient.cases.listFiles(identificador)
+  return await apiClient.cases.listFiles(idCaso)
 }

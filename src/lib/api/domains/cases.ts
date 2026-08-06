@@ -18,11 +18,11 @@ import { toInvestigationFilesByBox } from '../mappers/investigation'
 export const casesApi = {
   list: (): Promise<CaseSummary[]> =>
     fetcher('/casos').then((res) => asArray(res).map(toCaseSummary)),
-  get: (identificador: string): Promise<CaseDetail> =>
-    fetcher(`/casos/${encodeURIComponent(identificador)}`).then(toCaseDetail),
-  listFiles: (identificador: string): Promise<InvestigationFilesByBox[]> =>
-    fetcher(`/casos/${encodeURIComponent(identificador)}/arquivos`).then(
-      (res) => asArray(res.boxes).map(toInvestigationFilesByBox),
+  get: (idCaso: string): Promise<CaseDetail> =>
+    fetcher(`/casos/${encodeURIComponent(idCaso)}`).then(toCaseDetail),
+  listFiles: (idCaso: string): Promise<InvestigationFilesByBox[]> =>
+    fetcher(`/casos/${encodeURIComponent(idCaso)}/arquivos`).then((res) =>
+      asArray(res.boxes).map(toInvestigationFilesByBox),
     ),
 }
 

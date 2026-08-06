@@ -383,7 +383,7 @@ export interface CaseDetail extends CaseSummary {
   boxes: CaseBox[]
 }
 
-export type InvestigationFileType = 'audio' | 'image' | 'text' | 'sheet'
+export type InvestigationFileType = 'audio' | 'image' | 'pdf' | 'text' | 'sheet'
 
 export interface InvestigationFile {
   id: string

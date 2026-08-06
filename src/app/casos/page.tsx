@@ -155,8 +155,8 @@ export default function CasosPage() {
     setLoadingFiles(true)
     setSelectedFile(null)
     try {
-      const detail = await apiClient.cases.get(caseSummary.identifier)
-      const files = await apiClient.cases.listFiles(caseSummary.identifier)
+      const detail = await apiClient.cases.get(caseSummary.id)
+      const files = await apiClient.cases.listFiles(caseSummary.id)
       const mapped: Record<
         string,
         Record<'arquivos' | 'documentos', InvestigationFile[]>
@@ -839,6 +839,9 @@ export default function CasosPage() {
                                     {file.type === 'image' && (
                                       <IconPhoto className="size-5 text-[#33ff33] md:size-6" />
                                     )}
+                                    {file.type === 'pdf' && (
+                                      <IconFileText className="size-5 text-[#33ff33] md:size-6" />
+                                    )}
                                     {file.type === 'text' && (
                                       <IconFileText className="size-5 text-[#33ff33] md:size-6" />
                                     )}
@@ -1085,6 +1088,24 @@ export default function CasosPage() {
                               <p className="px-1 text-[11px] text-[#33ff33]/60 italic">
                                 {selectedFile.content}
                               </p>
+                            )}
+                          </div>
+                        )}
+
+                        {/* PDF VIEW */}
+                        {selectedFile.type === 'pdf' && (
+                          <div className="flex min-h-[45vh] flex-col gap-3">
+                            {selectedFile.downloadUrl ? (
+                              <iframe
+                                src={selectedFile.downloadUrl}
+                                title={selectedFile.name}
+                                className="min-h-[45vh] w-full flex-1 rounded border border-[#33ff33]/30 bg-white"
+                              />
+                            ) : (
+                              <div className="flex flex-1 items-center justify-center rounded border border-dashed border-[#33ff33]/30 p-8 text-center text-xs text-[#33ff33]/70">
+                                URL de download indisponível para este
+                                documento.
+                              </div>
                             )}
                           </div>
                         )}

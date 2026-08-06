@@ -10,12 +10,18 @@ import { asArray, asNumber, asOptionalString, asString } from '../core/json'
 function toInvestigationFileType(
   value: JsonValue | undefined,
 ): InvestigationFileType {
-  return value === 'audio' ||
-    value === 'image' ||
-    value === 'text' ||
-    value === 'sheet'
-    ? value
-    : 'text'
+  if (typeof value !== 'string') return 'text'
+  if (value === 'audio' || value.startsWith('audio/')) return 'audio'
+  if (value === 'image' || value.startsWith('image/')) return 'image'
+  if (value === 'pdf' || value === 'application/pdf') return 'pdf'
+  if (
+    value === 'sheet' ||
+    value.includes('spreadsheet') ||
+    value.includes('excel')
+  ) {
+    return 'sheet'
+  }
+  return 'text'
 }
 
 export function toInvestigationFile(data: JsonObject): InvestigationFile {
@@ -26,6 +32,7 @@ export function toInvestigationFile(data: JsonObject): InvestigationFile {
     modified: asString(data.modificadoEm),
     size: String(data.tamanhoBytes ?? ''),
     storageKey: asOptionalString(data.storageKey),
+    downloadUrl: asOptionalString(data.downloadUrl),
     content: asOptionalString(data.conteudo),
     corrupted: data.corrompido === true,
     columns: Array.isArray(data.colunas) ? data.colunas.map(String) : undefined,

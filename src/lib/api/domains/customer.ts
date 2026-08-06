@@ -16,6 +16,19 @@ import { toPaymentMethod } from '../mappers/payment'
 async function getCustomerId(): Promise<string> {
   const customer = toCustomer(await fetcher('/autenticacao/cliente-atual'))
   if (!customer.id) {
+    try {
+      const profile = asObject(await fetcher('/cliente/perfil'))
+      const profileCustomer = profile.cliente
+        ? toCustomer(asObject(profile.cliente))
+        : null
+
+      if (profileCustomer?.id) {
+        return profileCustomer.id
+      }
+    } catch {
+      // Mantém a falha original abaixo quando nenhum endpoint expõe o ID.
+    }
+
     throw new Error('Sessão inválida: não foi possível identificar o cliente')
   }
   return customer.id

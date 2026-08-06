@@ -195,8 +195,14 @@ Request:
 
 ```json
 {
+  "nome": "Mariana Silva",
+  "documento": "529.982.247-25",
   "telefone": "(11) 98765-4321",
-  "preferencias": { "tamanhoCamiseta": "M", "tamanhoCalcado": "38", "notas": "Prefere tons escuros." }
+  "preferencias": {
+    "tamanhoCamiseta": "M",
+    "tamanhoCalcado": "38",
+    "observacoes": "Prefere tons escuros."
+  }
 }
 ```
 
@@ -207,8 +213,13 @@ Response `200`:
   "id": "cust-001",
   "nome": "Mariana Silva",
   "email": "mariana.silva@email.com",
+  "documento": "529.982.247-25",
   "telefone": "(11) 98765-4321",
-  "preferencias": { "tamanhoCamiseta": "M", "tamanhoCalcado": "38", "notas": "Prefere tons escuros." }
+  "preferencias": {
+    "tamanhoCamiseta": "M",
+    "tamanhoCalcado": "38",
+    "observacoes": "Prefere tons escuros."
+  }
 }
 ```
 
