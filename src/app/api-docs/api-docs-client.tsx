@@ -428,7 +428,7 @@ export default function ApiDocsClient({
               {spec.info.version}
             </span>
           </div>
-          <a
+          {/* <a
             href="/docs/openapi.yaml"
             download
             className="flex items-center gap-2 rounded-md border border-[#fffaf0]/10 bg-[#171211] px-3 py-1.5 font-mono text-xs text-[#d7c9b5] transition-colors hover:bg-[#fffaf0]/10"
@@ -442,7 +442,7 @@ export default function ApiDocsClient({
             </svg>
             <span className="text-[#fffaf0]/60">Baixar:</span>
             <span className="font-semibold text-[#fffaf0]">openapi.yaml</span>
-          </a>
+          </a> */}
 
           {/* {spec.servers && spec.servers.length > 0 && (
             <div className="flex items-center gap-2 rounded-md border border-[#fffaf0]/10 bg-[#171211] px-3 py-1.5 font-mono text-xs text-[#d7c9b5]">
