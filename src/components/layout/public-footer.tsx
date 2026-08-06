@@ -24,9 +24,9 @@ const socialLinks = [
     href: 'https://instagram.com/oficialtruecrime.club',
     label: 'Instagram',
   },
-  { href: '#', label: 'TikTok' },
-  { href: '#', label: 'YouTube' },
-  { href: '#', label: 'Newsletter' },
+  // { href: '#', label: 'TikTok' },
+  // { href: '#', label: 'YouTube' },
+  // { href: '#', label: 'Newsletter' },
 ]
 
 function FooterColumn({
