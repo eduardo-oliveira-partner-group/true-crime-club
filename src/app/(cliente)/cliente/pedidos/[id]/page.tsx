@@ -45,7 +45,10 @@ import {
   formatDate,
   formatOrderStatus,
 } from '@/src/lib/formatters'
-import { getProductImage } from '@/src/lib/product-images'
+import {
+  isStaticProductImage,
+  resolveProductImageSrc,
+} from '@/src/lib/product-images'
 import { cn } from '@/src/lib/utils'
 
 const statusTone: Record<OrderStatus, string> = {
@@ -436,7 +439,7 @@ export default function PedidoDetailPage() {
 
             <div className="space-y-4">
               {order.items.map((item: CartItem) => {
-                const productImage = getProductImage(item.image ?? '')
+                const productImage = resolveProductImageSrc(item.image ?? '')
                 return (
                   <article
                     key={item.id}
@@ -448,6 +451,12 @@ export default function PedidoDetailPage() {
                           src={productImage}
                           alt={item.productName}
                           fill
+                          unoptimized={!isStaticProductImage(productImage)}
+                          placeholder={
+                            isStaticProductImage(productImage)
+                              ? 'blur'
+                              : undefined
+                          }
                           sizes="96px"
                           className="object-cover"
                         />

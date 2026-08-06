@@ -383,6 +383,7 @@ export default function CheckoutPage() {
                   id: item.id,
                   label: `${item.productName} × ${item.quantity}`,
                   value: formatCurrency(item.unitPrice * item.quantity),
+                  image: item.image,
                 }))}
               subtotalAmount={subtotalAmount}
               discountAmount={discountAmount}

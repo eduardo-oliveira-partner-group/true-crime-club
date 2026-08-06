@@ -28,6 +28,7 @@ export interface CheckoutOrderSummaryItem {
   id: string
   label: string
   value: string
+  image?: string
 }
 
 export interface CheckoutStepperProps {

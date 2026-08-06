@@ -46,7 +46,10 @@ import {
   formatOrderStatus,
   formatPaymentStatus,
 } from '@/src/lib/formatters'
-import { getProductImage } from '@/src/lib/product-images'
+import {
+  isStaticProductImage,
+  resolveProductImageSrc,
+} from '@/src/lib/product-images'
 import { cn } from '@/src/lib/utils'
 
 function snapshotToPixState(payment: CheckoutPixPaymentSnapshot): {
@@ -618,7 +621,7 @@ function StatusPanel({
 }
 
 function OrderItemCard({ item }: { item: CartItem }) {
-  const productImage = getProductImage(item.image ?? '')
+  const productImage = resolveProductImageSrc(item.image ?? '')
   const lineTotal = item.unitPrice * item.quantity
 
   return (
@@ -632,6 +635,10 @@ function OrderItemCard({ item }: { item: CartItem }) {
             src={productImage}
             alt={item.productName}
             fill
+            unoptimized={!isStaticProductImage(productImage)}
+            placeholder={
+              isStaticProductImage(productImage) ? 'blur' : undefined
+            }
             sizes="(max-width: 640px) 100vw, 96px"
             className="object-cover object-center"
           />

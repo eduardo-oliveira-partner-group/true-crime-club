@@ -79,7 +79,10 @@ import {
   isValidCep,
   normalizeDigits,
 } from '@/src/lib/formatters'
-import { getProductImage } from '@/src/lib/product-images'
+import {
+  isStaticProductImage,
+  resolveProductImageSrc,
+} from '@/src/lib/product-images'
 import { cn } from '@/src/lib/utils'
 
 const emptyShipping = { price: 0, region: '', estimatedDays: '' }
@@ -661,7 +664,7 @@ function CartLineItem({
   }
   onCartChange: (cart: Cart) => Promise<void>
 }) {
-  const productImage = getProductImage(item.image ?? '')
+  const productImage = resolveProductImageSrc(item.image ?? '')
   const lineTotal = item.unitPrice * item.quantity
   const itemCode = `EVID-${String(item.quantity).padStart(2, '0')}`
   const [confirmOpen, setConfirmOpen] = useState(false)
@@ -734,6 +737,10 @@ function CartLineItem({
               src={productImage}
               alt={item.productName}
               fill
+              unoptimized={!isStaticProductImage(productImage)}
+              placeholder={
+                isStaticProductImage(productImage) ? 'blur' : undefined
+              }
               sizes="(max-width: 640px) 96px, 180px"
               className="object-cover object-center transition duration-500 group-hover:scale-[1.04]"
             />

@@ -1,3 +1,6 @@
+import { IconPackage } from '@tabler/icons-react'
+import Image from 'next/image'
+
 import type { CheckoutOrderSummaryItem } from '@/src/components/checkout/checkout-flow/types'
 import {
   dossierCardSurface,
@@ -6,6 +9,10 @@ import {
   warmShadowClass,
 } from '@/src/lib/design/classes'
 import { formatCurrency } from '@/src/lib/formatters'
+import {
+  isStaticProductImage,
+  resolveProductImageSrc,
+} from '@/src/lib/product-images'
 import { cn } from '@/src/lib/utils'
 
 interface OrderSummaryProps {
@@ -88,14 +95,42 @@ export function CheckoutOrderSummary({
                   </span>
                 </li>
               ) : null}
-              {items.map((item) => (
-                <li key={item.id} className="flex justify-between gap-4">
-                  <span className="min-w-0 truncate">{item.label}</span>
-                  <span className="shrink-0 font-medium text-(--ink)">
-                    {item.value}
-                  </span>
-                </li>
-              ))}
+              {items.map((item) => {
+                const productImage = resolveProductImageSrc(item.image ?? '')
+
+                return (
+                  <li key={item.id} className="flex items-center gap-3">
+                    <div className="relative size-12 shrink-0 overflow-hidden rounded-[8px] border border-[rgba(33,28,24,0.15)] bg-(--paper-soft)">
+                      {productImage ? (
+                        <Image
+                          src={productImage}
+                          alt=""
+                          fill
+                          unoptimized={!isStaticProductImage(productImage)}
+                          placeholder={
+                            isStaticProductImage(productImage)
+                              ? 'blur'
+                              : undefined
+                          }
+                          sizes="48px"
+                          className="object-cover object-center"
+                        />
+                      ) : (
+                        <IconPackage
+                          className="absolute inset-0 m-auto size-5 text-(--red)/50"
+                          aria-hidden="true"
+                        />
+                      )}
+                    </div>
+                    <span className="min-w-0 flex-1 truncate text-(--ink)">
+                      {item.label}
+                    </span>
+                    <span className="shrink-0 font-medium text-(--ink)">
+                      {item.value}
+                    </span>
+                  </li>
+                )
+              })}
             </ul>
           ) : (
             <p className="text-(--ink-soft)">Nenhum item selecionado.</p>

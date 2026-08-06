@@ -34,20 +34,21 @@ export function getProductImage(path: string): StaticImageData | undefined {
 export function resolveProductImageSrc(
   path: string,
 ): StaticImageData | string | undefined {
-  if (!path.trim()) return undefined
+  const normalizedPath = path.trim()
+  if (!normalizedPath) return undefined
 
-  const local = getProductImage(path)
+  const local = getProductImage(normalizedPath)
   if (local) return local
 
   if (
-    path.startsWith('http://') ||
-    path.startsWith('https://') ||
-    path.startsWith('/')
+    normalizedPath.startsWith('http://') ||
+    normalizedPath.startsWith('https://') ||
+    normalizedPath.startsWith('/')
   ) {
-    return path
+    return normalizedPath
   }
 
-  return undefined
+  return `/${normalizedPath}`
 }
 
 export function isStaticProductImage(
