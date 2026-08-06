@@ -27,7 +27,10 @@ import {
 } from '@/src/lib/design/classes'
 import { listProducts } from '@/src/lib/domain/repositories'
 import { getPrimaryProductImageUrl, type Product } from '@/src/lib/domain/types'
-import { getProductImage } from '@/src/lib/product-images'
+import {
+  isStaticProductImage,
+  resolveProductImageSrc,
+} from '@/src/lib/product-images'
 import { cn } from '@/src/lib/utils'
 
 const caseNotes = [
@@ -210,7 +213,7 @@ function CatalogSkeleton() {
 }
 
 function FeaturedProductCase({ product }: { product: Product }) {
-  const productImage = getProductImage(getPrimaryProductImageUrl(product))
+  const productImage = resolveProductImageSrc(getPrimaryProductImageUrl(product))
 
   return (
     <Link
@@ -234,7 +237,10 @@ function FeaturedProductCase({ product }: { product: Product }) {
               src={productImage}
               alt={product.name}
               fill
-              placeholder="blur"
+              unoptimized={!isStaticProductImage(productImage)}
+              placeholder={
+                isStaticProductImage(productImage) ? 'blur' : undefined
+              }
               sizes="(max-width: 1024px) 100vw, 560px"
               className="object-cover object-center transition duration-500 group-hover:scale-[1.03] motion-reduce:transition-none"
             />

@@ -13,7 +13,10 @@ import {
 } from '@/src/lib/design/classes'
 import { getPrimaryProductImageUrl, type Product } from '@/src/lib/domain/types'
 import { formatAvailability, formatEditionMonth } from '@/src/lib/formatters'
-import { getProductImage } from '@/src/lib/product-images'
+import {
+  isStaticProductImage,
+  resolveProductImageSrc,
+} from '@/src/lib/product-images'
 import { cn } from '@/src/lib/utils'
 
 export interface ProductArchiveCardProps {
@@ -27,7 +30,7 @@ export function ProductArchiveCard({
   variant,
   onOpen,
 }: ProductArchiveCardProps) {
-  const productImage = getProductImage(getPrimaryProductImageUrl(product))
+  const productImage = resolveProductImageSrc(getPrimaryProductImageUrl(product))
   const evidenceNumber = String(product.cycleNumber ?? 0).padStart(2, '0')
   const tabCode = variant === 'box' ? `BOX ${evidenceNumber}` : 'ITEM'
   const tabLabel = variant === 'box' ? 'Arquivo avulso' : 'Peça extra'
@@ -99,7 +102,10 @@ export function ProductArchiveCard({
               src={productImage}
               alt={product.name}
               fill
-              placeholder="blur"
+              unoptimized={!isStaticProductImage(productImage)}
+              placeholder={
+                isStaticProductImage(productImage) ? 'blur' : undefined
+              }
               sizes="(max-width: 1024px) 50vw, 25vw"
               className="size-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-[1.03] motion-reduce:transition-none"
             />

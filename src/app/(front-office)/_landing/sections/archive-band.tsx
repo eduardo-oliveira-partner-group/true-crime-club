@@ -175,6 +175,7 @@ function ArchiveCard({
               src={image}
               alt={box.alt}
               fill
+              unoptimized
               sizes="(max-width: 540px) 100vw, (max-width: 860px) 50vw, 25vw"
               className="block object-cover"
             />

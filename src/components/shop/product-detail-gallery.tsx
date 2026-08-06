@@ -128,6 +128,7 @@ export function ProductDetailGallery({
                         alt={`${product.name} — imagem ${index + 1}`}
                         fill
                         priority={index === 0}
+                        unoptimized={!isStaticProductImage(src)}
                         placeholder={
                           isStaticProductImage(src) ? 'blur' : undefined
                         }
@@ -236,6 +237,7 @@ function ProductImageThumbnails({
                   src={image}
                   alt={`${product.name} — imagem ${index + 1}`}
                   fill
+                  unoptimized={!isStaticProductImage(image)}
                   placeholder={isStaticProductImage(image) ? 'blur' : undefined}
                   sizes="56px"
                   className="object-cover object-center"

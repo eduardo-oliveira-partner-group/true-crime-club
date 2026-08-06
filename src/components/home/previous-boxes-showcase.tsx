@@ -17,7 +17,10 @@ import {
 } from '@/src/components/ui/scroll-reveal'
 import { getPrimaryProductImageUrl, type Product } from '@/src/lib/domain/types'
 import { formatCurrency } from '@/src/lib/formatters'
-import { getProductImage } from '@/src/lib/product-images'
+import {
+  isStaticProductImage,
+  resolveProductImageSrc,
+} from '@/src/lib/product-images'
 
 interface PreviousBoxesShowcaseProps {
   products: Product[]
@@ -61,7 +64,7 @@ interface PreviousBoxCardProps {
 }
 
 function PreviousBoxCard({ product, onOpen }: PreviousBoxCardProps) {
-  const productImage = getProductImage(getPrimaryProductImageUrl(product))
+  const productImage = resolveProductImageSrc(getPrimaryProductImageUrl(product))
   const displayPrice = product.subscriberPrice ?? product.price
   const evidenceNumber = String(product.cycleNumber ?? 0).padStart(2, '0')
 
@@ -86,7 +89,10 @@ function PreviousBoxCard({ product, onOpen }: PreviousBoxCardProps) {
               src={productImage}
               alt={product.name}
               fill
-              placeholder="blur"
+              unoptimized={!isStaticProductImage(productImage)}
+              placeholder={
+                isStaticProductImage(productImage) ? 'blur' : undefined
+              }
               sizes="(max-width: 768px) 100vw, 480px"
               className="size-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-[1.03]"
             />

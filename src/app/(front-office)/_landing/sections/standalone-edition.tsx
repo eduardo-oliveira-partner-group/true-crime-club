@@ -17,6 +17,7 @@ import {
 } from '@/src/lib/design/classes'
 import { getPrimaryProductImageUrl, type Product } from '@/src/lib/domain/types'
 import { formatCurrency } from '@/src/lib/formatters'
+import { isStaticProductImage, resolveProductImageSrc } from '@/src/lib/product-images'
 
 export function StandaloneEdition() {
   const [product, setProduct] = useState<Product | null>(null)
@@ -64,7 +65,7 @@ export function StandaloneEdition() {
 
   if (!product) return null
 
-  const productImage = getPrimaryProductImageUrl(product)
+  const productImage = resolveProductImageSrc(getPrimaryProductImageUrl(product))
   const fileLabel = product.editionMonth ?? product.slug
 
   return (
@@ -91,6 +92,7 @@ export function StandaloneEdition() {
               src={productImage}
               alt={product.name}
               fill
+              unoptimized={!isStaticProductImage(productImage)}
               sizes="(max-width: 860px) 100vw, 620px"
               className="block object-cover object-center"
             />
