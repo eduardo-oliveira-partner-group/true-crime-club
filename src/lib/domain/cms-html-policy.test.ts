@@ -121,4 +121,13 @@ describe('cms-html-policy', () => {
     expect(sanitized.toLowerCase()).not.toContain('<script')
     expect(sanitized).not.toContain('pwned')
   })
+
+  it('conta só elementos HTML proibidos, sem body/#text', () => {
+    const source =
+      '<h1>Nossa História</h1><p>O <strong>True Crime Club</strong> nasceu.</p><p>Cada caso.</p>'
+    const inspection = inspectCmsHtml(source)
+    expect(inspection.changed).toBe(true)
+    expect(inspection.riskCategories).toContain('forbidden-element')
+    expect(inspection.removedElementCount).toBe(1)
+  })
 })

@@ -75,6 +75,17 @@ const ALLOWED_ATTR = ['href', 'target', 'rel'] as const
 
 const ALLOWED_TAG_SET = new Set<string>(ALLOWED_TAGS)
 
+/** Nós internos do DOMPurify/DOM — não são conteúdo editorial removido. */
+const IGNORED_SANITIZE_TAGS = new Set([
+  '#text',
+  '#comment',
+  '#document',
+  '#document-fragment',
+  'html',
+  'head',
+  'body',
+])
+
 const SANITIZE_CONFIG: Config = {
   ALLOWED_TAGS: [...ALLOWED_TAGS],
   ALLOWED_ATTR: [...ALLOWED_ATTR],
@@ -200,11 +211,12 @@ function sanitizeWithStats(source: string): {
 
   const onSanitizeElement = (node: Element, data: SanitizeElementHookEvent) => {
     const tag = data.tagName?.toLowerCase()
-    if (!tag || ALLOWED_TAG_SET.has(tag)) {
+    if (!tag || ALLOWED_TAG_SET.has(tag) || IGNORED_SANITIZE_TAGS.has(tag)) {
       return
     }
 
-    if (node.parentNode) {
+    // Conta apenas elementos HTML reais removidos da marcação editorial.
+    if (node.nodeType === 1 && node.parentNode) {
       stats.removedElementCount += 1
       stats.riskCategories.add('forbidden-element')
     }
