@@ -40,6 +40,12 @@ export type CmsHtmlRiskCategory =
   | 'forbidden-attribute'
   | 'unsafe-url'
   | 'link-normalization'
+  | 'element-remap'
+
+export type CmsHtmlTagRemap = {
+  from: string
+  to: string
+}
 
 export type CmsHtmlInspection = {
   policyVersion: typeof CMS_HTML_POLICY_VERSION
@@ -48,10 +54,12 @@ export type CmsHtmlInspection = {
   riskCategories: CmsHtmlRiskCategory[]
   removedElementCount: number
   removedAttributeCount: number
-  /** Tags HTML proibidas que seriam removidas (ex.: ["h1", "script"]). */
+  /** Tags HTML proibidas que seriam removidas (ex.: ["script"]). */
   removedElementTags: string[]
   /** Atributos proibidos/inseguros que seriam removidos (ex.: ["onclick", "style"]). */
   removedAttributeNames: string[]
+  /** Tags convertidas para equivalentes permitidos (ex.: h1 → h2). */
+  remappedElementTags: CmsHtmlTagRemap[]
 }
 
 const ALLOWED_TAGS = [
@@ -76,6 +84,11 @@ const ALLOWED_ATTR = ['href', 'target', 'rel'] as const
 
 const ALLOWED_TAG_SET = new Set<string>(ALLOWED_TAGS)
 
+/** Conversões editoriais seguras antes da remoção (título máximo permitido é h2). */
+const TAG_REMAP: Record<string, string> = {
+  h1: 'h2',
+}
+
 /** Nós internos do DOMPurify/DOM — não são conteúdo editorial removido. */
 const IGNORED_SANITIZE_TAGS = new Set([
   '#text',
@@ -99,6 +112,7 @@ type SanitizeStats = {
   removedAttributeCount: number
   removedElementTags: Set<string>
   removedAttributeNames: Set<string>
+  remappedElementTags: Map<string, string>
   riskCategories: Set<CmsHtmlRiskCategory>
 }
 
@@ -204,12 +218,30 @@ function sanitizeWithStats(source: string): {
     removedAttributeCount: 0,
     removedElementTags: new Set(),
     removedAttributeNames: new Set(),
+    remappedElementTags: new Map(),
     riskCategories: new Set(),
   }
 
   const onSanitizeElement = (node: Element, data: SanitizeElementHookEvent) => {
     const tag = data.tagName?.toLowerCase()
     if (!tag || IGNORED_SANITIZE_TAGS.has(tag)) {
+      return
+    }
+
+    const remappedTo = TAG_REMAP[tag]
+    if (
+      remappedTo &&
+      node.nodeType === 1 &&
+      node.parentNode &&
+      node.ownerDocument
+    ) {
+      const replacement = node.ownerDocument.createElement(remappedTo)
+      while (node.firstChild) {
+        replacement.appendChild(node.firstChild)
+      }
+      node.parentNode.replaceChild(replacement, node)
+      stats.remappedElementTags.set(tag, remappedTo)
+      stats.riskCategories.add('element-remap')
       return
     }
 
@@ -290,6 +322,9 @@ export function inspectCmsHtml(source: string): CmsHtmlInspection {
     removedAttributeCount: stats.removedAttributeCount,
     removedElementTags: Array.from(stats.removedElementTags).sort(),
     removedAttributeNames: Array.from(stats.removedAttributeNames).sort(),
+    remappedElementTags: Array.from(stats.remappedElementTags.entries())
+      .map(([from, to]) => ({ from, to }))
+      .sort((a, b) => a.from.localeCompare(b.from)),
   }
 }
 

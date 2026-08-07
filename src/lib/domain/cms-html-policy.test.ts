@@ -124,19 +124,32 @@ describe('cms-html-policy', () => {
 
   it('conta só elementos HTML proibidos, sem body/#text', () => {
     const source =
-      '<h1>Nossa História</h1><p>O <strong>True Crime Club</strong> nasceu.</p><p>Cada caso.</p>'
+      '<div>Nossa História</div><p>O <strong>True Crime Club</strong> nasceu.</p><p>Cada caso.</p>'
     const inspection = inspectCmsHtml(source)
     expect(inspection.changed).toBe(true)
     expect(inspection.riskCategories).toContain('forbidden-element')
     expect(inspection.removedElementCount).toBe(1)
-    expect(inspection.removedElementTags).toEqual(['h1'])
+    expect(inspection.removedElementTags).toEqual(['div'])
+  })
+
+  it('converte h1 em h2 em vez de remover o título', () => {
+    const source =
+      '<h1>Nossa História</h1><p>O <strong>True Crime Club</strong> nasceu.</p>'
+    const sanitized = sanitizeCmsHtml(source)
+    expect(sanitized).toContain('<h2>Nossa História</h2>')
+    expect(sanitized).not.toContain('<h1')
+
+    const inspection = inspectCmsHtml(source)
+    expect(inspection.remappedElementTags).toEqual([{ from: 'h1', to: 'h2' }])
+    expect(inspection.removedElementTags).not.toContain('h1')
   })
 
   it('lista as tags e atributos problemáticos na inspeção', () => {
     const source =
       '<h1>Título</h1><p onclick="alert(1)" style="color:red">Texto</p><script>x()</script>'
     const inspection = inspectCmsHtml(source)
-    expect(inspection.removedElementTags).toEqual(['h1', 'script'])
+    expect(inspection.remappedElementTags).toEqual([{ from: 'h1', to: 'h2' }])
+    expect(inspection.removedElementTags).toEqual(['script'])
     expect(inspection.removedAttributeNames).toEqual(['onclick', 'style'])
   })
 })
