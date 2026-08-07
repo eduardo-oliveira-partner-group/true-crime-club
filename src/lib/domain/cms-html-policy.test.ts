@@ -129,5 +129,14 @@ describe('cms-html-policy', () => {
     expect(inspection.changed).toBe(true)
     expect(inspection.riskCategories).toContain('forbidden-element')
     expect(inspection.removedElementCount).toBe(1)
+    expect(inspection.removedElementTags).toEqual(['h1'])
+  })
+
+  it('lista as tags e atributos problemáticos na inspeção', () => {
+    const source =
+      '<h1>Título</h1><p onclick="alert(1)" style="color:red">Texto</p><script>x()</script>'
+    const inspection = inspectCmsHtml(source)
+    expect(inspection.removedElementTags).toEqual(['h1', 'script'])
+    expect(inspection.removedAttributeNames).toEqual(['onclick', 'style'])
   })
 })

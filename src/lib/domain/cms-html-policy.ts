@@ -1,6 +1,9 @@
 /**
  * Política de HTML do CMS — manter em paridade com
  * mvp-betalabs-frontend/src/lib/cms/html-policy.ts até existir pacote compartilhado.
+ *
+ * isomorphic-dompurify + jsdom@25 (override) para compatibilidade com Node 20:
+ * jsdom@30+ / undici@8 exigem Node 22+ (markAsUncloneable).
  */
 import DOMPurify, { type Config } from 'isomorphic-dompurify'
 
@@ -23,14 +26,8 @@ type DOMPurifyHookable = {
     entryPoint: 'uponSanitizeAttribute',
     hook: (node: Element, data: SanitizeAttributeHookEvent) => void,
   ): void
-  removeHook(
-    entryPoint: 'uponSanitizeElement',
-    hook: (node: Element, data: SanitizeElementHookEvent) => void,
-  ): void
-  removeHook(
-    entryPoint: 'uponSanitizeAttribute',
-    hook: (node: Element, data: SanitizeAttributeHookEvent) => void,
-  ): void
+  removeHook(entryPoint: 'uponSanitizeElement'): void
+  removeHook(entryPoint: 'uponSanitizeAttribute'): void
   sanitize(source: string, config?: Config): string
 }
 
@@ -51,6 +48,10 @@ export type CmsHtmlInspection = {
   riskCategories: CmsHtmlRiskCategory[]
   removedElementCount: number
   removedAttributeCount: number
+  /** Tags HTML proibidas que seriam removidas (ex.: ["h1", "script"]). */
+  removedElementTags: string[]
+  /** Atributos proibidos/inseguros que seriam removidos (ex.: ["onclick", "style"]). */
+  removedAttributeNames: string[]
 }
 
 const ALLOWED_TAGS = [
@@ -96,6 +97,8 @@ const SANITIZE_CONFIG: Config = {
 type SanitizeStats = {
   removedElementCount: number
   removedAttributeCount: number
+  removedElementTags: Set<string>
+  removedAttributeNames: Set<string>
   riskCategories: Set<CmsHtmlRiskCategory>
 }
 
@@ -168,35 +171,28 @@ function isAllowedHref(href: string): boolean {
   return false
 }
 
-function normalizeExternalLinks(html: string, stats: SanitizeStats): string {
-  if (typeof DOMParser === 'undefined') {
-    return html
+function normalizeBlankTargetRel(node: Element, stats: SanitizeStats): void {
+  const target = node.getAttribute('target')?.toLowerCase()
+  if (target !== '_blank') {
+    return
   }
 
-  const doc = new DOMParser().parseFromString(html, 'text/html')
+  const rel = node.getAttribute('rel') ?? ''
+  const parts = new Set(rel.split(/\s+/).filter(Boolean))
+  const required = ['noopener', 'noreferrer']
+  let changed = false
 
-  for (const anchor of doc.body.querySelectorAll(
-    "a[target='_blank'], a[target='_BLANK']",
-  )) {
-    const rel = anchor.getAttribute('rel') ?? ''
-    const parts = new Set(rel.split(/\s+/).filter(Boolean))
-    const required = ['noopener', 'noreferrer']
-    let changed = false
-
-    for (const token of required) {
-      if (!parts.has(token)) {
-        parts.add(token)
-        changed = true
-      }
-    }
-
-    if (changed) {
-      anchor.setAttribute('rel', Array.from(parts).join(' '))
-      stats.riskCategories.add('link-normalization')
+  for (const token of required) {
+    if (!parts.has(token)) {
+      parts.add(token)
+      changed = true
     }
   }
 
-  return doc.body.innerHTML
+  if (changed) {
+    node.setAttribute('rel', Array.from(parts).join(' '))
+    stats.riskCategories.add('link-normalization')
+  }
 }
 
 function sanitizeWithStats(source: string): {
@@ -206,19 +202,29 @@ function sanitizeWithStats(source: string): {
   const stats: SanitizeStats = {
     removedElementCount: 0,
     removedAttributeCount: 0,
+    removedElementTags: new Set(),
+    removedAttributeNames: new Set(),
     riskCategories: new Set(),
   }
 
   const onSanitizeElement = (node: Element, data: SanitizeElementHookEvent) => {
     const tag = data.tagName?.toLowerCase()
-    if (!tag || ALLOWED_TAG_SET.has(tag) || IGNORED_SANITIZE_TAGS.has(tag)) {
+    if (!tag || IGNORED_SANITIZE_TAGS.has(tag)) {
       return
     }
 
-    // Conta apenas elementos HTML reais removidos da marcação editorial.
-    if (node.nodeType === 1 && node.parentNode) {
-      stats.removedElementCount += 1
-      stats.riskCategories.add('forbidden-element')
+    if (!ALLOWED_TAG_SET.has(tag)) {
+      // Conta apenas elementos HTML reais removidos da marcação editorial.
+      if (node.nodeType === 1 && node.parentNode) {
+        stats.removedElementCount += 1
+        stats.removedElementTags.add(tag)
+        stats.riskCategories.add('forbidden-element')
+      }
+      return
+    }
+
+    if (tag === 'a' && node.nodeType === 1) {
+      normalizeBlankTargetRel(node, stats)
     }
   }
 
@@ -233,6 +239,7 @@ function sanitizeWithStats(source: string): {
 
     if (attr.startsWith('on')) {
       stats.removedAttributeCount += 1
+      stats.removedAttributeNames.add(attr)
       stats.riskCategories.add('forbidden-attribute')
       data.keepAttr = false
       return
@@ -240,6 +247,7 @@ function sanitizeWithStats(source: string): {
 
     if (attr === 'style') {
       stats.removedAttributeCount += 1
+      stats.removedAttributeNames.add(attr)
       stats.riskCategories.add('forbidden-attribute')
       data.keepAttr = false
       return
@@ -248,6 +256,7 @@ function sanitizeWithStats(source: string): {
     if (attr === 'href' && typeof data.attrValue === 'string') {
       if (isUnsafeUrl(data.attrValue) || !isAllowedHref(data.attrValue)) {
         stats.removedAttributeCount += 1
+        stats.removedAttributeNames.add(attr)
         stats.riskCategories.add('unsafe-url')
         data.keepAttr = false
       }
@@ -257,12 +266,10 @@ function sanitizeWithStats(source: string): {
   purify.addHook('uponSanitizeElement', onSanitizeElement)
   purify.addHook('uponSanitizeAttribute', onSanitizeAttribute)
 
-  let html = purify.sanitize(source, SANITIZE_CONFIG)
+  const html = purify.sanitize(source, SANITIZE_CONFIG)
 
-  purify.removeHook('uponSanitizeElement', onSanitizeElement)
-  purify.removeHook('uponSanitizeAttribute', onSanitizeAttribute)
-
-  html = normalizeExternalLinks(html, stats)
+  purify.removeHook('uponSanitizeElement')
+  purify.removeHook('uponSanitizeAttribute')
 
   return { html, stats }
 }
@@ -281,6 +288,8 @@ export function inspectCmsHtml(source: string): CmsHtmlInspection {
     riskCategories: Array.from(stats.riskCategories),
     removedElementCount: stats.removedElementCount,
     removedAttributeCount: stats.removedAttributeCount,
+    removedElementTags: Array.from(stats.removedElementTags).sort(),
+    removedAttributeNames: Array.from(stats.removedAttributeNames).sort(),
   }
 }
 
