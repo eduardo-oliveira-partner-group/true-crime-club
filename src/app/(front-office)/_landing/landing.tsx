@@ -17,6 +17,7 @@ import { DesignPageShell } from '@/src/components/public-design/design-page-shel
 import { FaqAccordion } from '@/src/components/public-design/faq-accordion'
 import { SectionEyebrow } from '@/src/components/public-design/section-eyebrow'
 import { fontHeading } from '@/src/lib/design/classes'
+import { sanitizeCmsHtml } from '@/src/lib/domain/cms-html-policy'
 import { PaginaCms, SecaoCms } from '@/src/lib/domain/types'
 
 export function PageRenderer({ sections }: { sections: SecaoCms[] }) {
@@ -89,7 +90,7 @@ export function PageRenderer({ sections }: { sections: SecaoCms[] }) {
               <section key={key} className="mx-auto max-w-[800px] px-8 py-16">
                 <div
                   dangerouslySetInnerHTML={{
-                    __html: richTextProps.content || '',
+                    __html: sanitizeCmsHtml(richTextProps.content || ''),
                   }}
                 />
               </section>

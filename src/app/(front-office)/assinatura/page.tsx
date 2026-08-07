@@ -3,6 +3,7 @@ import { DesignPageShell } from '@/src/components/public-design/design-page-shel
 import { DossierCard } from '@/src/components/public-design/dossier-card'
 import { SectionEyebrow } from '@/src/components/public-design/section-eyebrow'
 import { fontHeading, sectionFrame } from '@/src/lib/design/classes'
+import { sanitizeCmsHtml } from '@/src/lib/domain/cms-html-policy'
 import { getDynamicContent, getSeoEntry } from '@/src/lib/domain/repositories'
 import { buildMetadata } from '@/src/lib/seo'
 
@@ -50,7 +51,9 @@ export default function AssinaturaPage() {
           {howItWorks?.type === 'html' ? (
             <div
               className="prose prose-sm prose-headings:text-(--ink) prose-strong:text-(--ink) prose-a:text-(--red) mt-4 max-w-none text-(--ink-soft)"
-              dangerouslySetInnerHTML={{ __html: howItWorks.value }}
+              dangerouslySetInnerHTML={{
+                __html: sanitizeCmsHtml(howItWorks.value),
+              }}
             />
           ) : (
             <p className="mt-4 text-sm/6 text-(--ink-soft)">
