@@ -7,7 +7,10 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     setupFiles: ['./tests/setup.ts'],
-    include: ['tests/unit/**/*.test.{ts,tsx}'],
+    include: [
+      'tests/unit/**/*.test.{ts,tsx}',
+      'src/lib/domain/cms-html-policy.test.ts',
+    ],
     coverage: {
       reporter: ['text', 'html'],
     },
